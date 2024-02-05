@@ -63,7 +63,10 @@ body {
     background-color: #e8eaf1 !important;
     text-align: start;
 }
-
+.custom-btn-submit {
+    
+    text-align: center;
+}
 .custom-btn4 {
     width: 100%;
     color: #d90f81 !important;
