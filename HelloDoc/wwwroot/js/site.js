@@ -9,6 +9,11 @@ var iti = window.intlTelInput(input, {
     utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@16.0.3/build/js/utils.js",
 });
 
+var input1 = document.querySelector("#phone1");
+var iti1 = window.intlTelInput(input1, {
+    separateDialCode: true,
+    utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@16.0.3/build/js/utils.js",
+});
 // store the instance variable so we can access it in the console e.g. window.iti.getNumber()
 window.iti = iti;
 window.onload = () => {

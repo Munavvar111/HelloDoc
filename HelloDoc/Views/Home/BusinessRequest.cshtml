@@ -3,8 +3,8 @@
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/intl-tel-input@16.0.3/build/css/intlTelInput.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js"></script>
     }
-<partial name="navbar"></partial>
-<div class="container-fluid">
+    <partial name="AlertModel"></partial>
+<div class="container-fluid bg-light">
     <div class="row d-flex justify-content-center">
         <div class="row justify-content-center ">
             <div class="col-md-6 d-flex justify-content-end mb-4 mt-3">
@@ -157,7 +157,18 @@
                 <div class="row">
                     <h4>(Optional) Upload Photo or Document</h4>
                 </div>
+                <div class="row">
+                    <div class="col-md-12 mb-3">
+                        <div class="input-group custom-file-button">
 
+                            <input type="file" title="please select a file" class="form-control" id="inputGroupFile">
+                            <label class="input-group-text bg-info" for="inputGroupFile">
+                                <i class="fa fa-cloud-upload" aria-hidden="true" style="margin-right:5px ;"></i>Upload
+                                <!-- </button> -->
+                            </label>
+                        </div>
+                    </div>
+                </div>
                 <div class="row justify-content-end">
                     <div class="col-md-6 mb-3 d-flex justify-content-end ">
                         <button class="btn btn-info " style="margin-right: 17px;">Submit</button>
