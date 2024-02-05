@@ -93,5 +93,46 @@ body {
 
 
 
+}
+:root {
+    --bs-dark: linear-gradient(318.32deg, #c3d1e4 0%, #dde7f3 55%, #d4e0ed 100%);
+}
 
-  
+.theme-container {
+    padding: 2px;
+    border-radius: 8px;
+    transition: 0.2s;
+    cursor: pointer;
+}
+
+    .theme-container:hover {
+        opacity: 0.7;
+    }
+
+.border-dark {
+    border: 1px solid #37b5cc !important;
+}
+
+.text-change {
+    color: #fff !important;
+}
+
+.text-change-dark {
+    color: #212529 !important;
+}
+
+@keyframes change {
+    0% {
+        transform: scale(1);
+    }
+
+    100% {
+        transform: scale(1.1);
+    }
+}
+
+.change {
+    animation-name: change;
+    animation-duration: 0.5s;
+    animation-direction: alternate;
+}
