@@ -1,0 +1,94 @@
+html {
+  font-size: 14px;
+}
+.login-right form {
+    max-width: 500px;
+}
+
+@media screen and (max-width: 992px) {
+    .login-container {
+        position: relative;
+        display: block;
+        padding: 0 !important;
+    }
+
+    .login-left {
+        height: 100vh;
+        width: 100vw !important;
+    }
+
+        .login-left img {
+            height: 100%;
+            width: 100%;
+            object-fit: cover;
+            opacity: 0.1;
+        }
+
+    .login-right {
+        position: absolute !important;
+        top: 0;
+        left: 0;
+        width: 100% !important;
+    }
+
+        .login-right form {
+            width: 90% !important;
+        }
+
+    .dark-mode-btn {
+        margin: 2rem !important;
+    }
+}
+  
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  margin-bottom: 60px;
+}
+.custom-color {
+    background-color: rgb(16, 23, 126) !important;
+    color: white;
+    font-weight: 500;
+}
+.custom-btn {
+    color: #4367d3 !important;
+    background-color: #e8eaf1 !important;
+    text-align: start;
+}
+
+.custom-btn4 {
+    width: 100%;
+    color: #d90f81 !important;
+    background-color: #f7e6ee !important;
+    text-align: start;
+    height: 70px;
+    display: flex;
+}
+@media only screen and (max-width: 767px) {
+
+
+    .right {
+        height: 100vh;
+        background-image: url('../content/hellodoc.jpg');
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center center;
+    }
+
+    /* .hellodocimg{
+        display: none !important;
+    } */
+
+
+
+
+
+  

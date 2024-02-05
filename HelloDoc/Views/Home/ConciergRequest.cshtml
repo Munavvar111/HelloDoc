@@ -1,0 +1,168 @@
+﻿@section Styles {
+        <link rel="stylesheet" type="text/css" href='~/css/p.css' />
+        <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/intl-tel-input@16.0.3/build/css/intlTelInput.css">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js"></script>
+    }
+<partial name="navbar"></partial>
+
+<div class="container-fluid">
+    <div class="row d-flex justify-content-center">
+        <div class="row justify-content-center ">
+            <div class="col-md-6 d-flex justify-content-end mb-4 mt-3">
+                <button class="p-2 btn border border-info">
+
+                    <a class=" text-info text-decoration-none" asp-action="PatientSubmit">
+                        <i class="fa fa-chevron-left" aria-hidden="true" style="margin-right: 5px;"></i>Back
+                    </a>
+                </button>
+            </div>
+
+        </div>
+        <div class="row  justify-content-center">
+            <div class="col-md-6 bg-white">
+                <div class="row ">
+                    <h4 class="mb-3">
+                        Concierge Information
+                    </h4>
+                    <div class="row mb-3">
+                        <div class="col-md-12 col-lg-6">
+                            <div class="form-floating mb-3">
+                                <input class="form-control" placeholder="Leave a comment here" id="floatingTextarea2"></input>
+                                <label for="floatingTextarea2" class="floating-label">Your First Name</label>
+                            </div>
+                        </div>
+                        <div class="col-md-12 col-lg-6 mb-3">
+                            <div class="form-floating">
+                                <input class="form-control" placeholder="Leave a comment here" id="floatingTextarea2"></input>
+                                <label for="floatingTextarea2" class="floating-label">Your Last Name</label>
+                            </div>
+                        </div>
+                        <div class="col-md-12 col-lg-6 mb-3">
+                            <div class="input-group">
+                                <input type="tel" id="phone" class="input">                            <!--     <span class="input-group-addon">Tel</span> -->
+                            </div>
+                        </div>
+                        <div class="col-md-12 col-lg-6 mb-3">
+                            <div class="form-floating">
+                                <input class="form-control" placeholder="Leave a comment here" id="floatingTextarea2" type="email"></input>
+                                <label for="floatingTextarea2" class="floating-label">Your Email</label>
+                            </div>
+                        </div>
+                        <div class="col-md-12 col-lg-6 mb-3">
+                            <div class="form-floating">
+                                <input class="form-control" placeholder="Leave a comment here" id="floatingTextarea2" type="email"></input>
+                                <label for="floatingTextarea2" class="floating-label">Hotel/Property Name</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <h4>Concierge Location</h4>
+                </div>
+                <div class="row">
+                    <div class="col-md-12 col-lg-6 mb-3">
+                        <div class="form-floating">
+                            <input class="form-control" placeholder="Leave a comment here" id="floatingTextarea2" type="text"></input>
+                            <label for="floatingTextarea2" class="floating-label">Street</label>
+                        </div>
+                    </div>
+                    <div class="col-md-12 col-lg-6 mb-3">
+                        <div class="form-floating">
+                            <input class="form-control" placeholder="Leave a comment here" id="floatingTextarea2" type="text"></input>
+                            <label for="floatingTextarea2" class="floating-label">City</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12 col-lg-6 mb-3">
+                        <div class="form-floating">
+                            <input class="form-control" placeholder="Leave a comment here" id="floatingTextarea2" type="text"></input>
+                            <label for="floatingTextarea2" class="floating-label">State</label>
+                        </div>
+                    </div>
+                    <div class="col-md-12 col-lg-6 mb-3">
+                        <div class="form-floating">
+                            <input class="form-control" placeholder="Leave a comment here" id="floatingTextarea2" type="text"></input>
+                            <label for="floatingTextarea2" class="floating-label">Zip Code</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-12 col-lg-6 mb-3">
+                    <h4>
+                        Patient Information
+                    </h4>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-floating mb-3">
+                            <textarea class="form-control" placeholder="Leave a comment here" id="floatingTextarea2" style="height: 100px"></textarea>
+                            <label for="floatingTextarea2" class="floating-label">Enter A Brief Details Of Symptoms(Optional)</label>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12 col-lg-6 mb-3">
+                        <div class="form-floating">
+                            <input class="form-control" placeholder="Leave a comment here" id="floatingTextarea2"></input>
+                            <label for="floatingTextarea2" class="floating-label">First Name</label>
+                        </div>
+
+                    </div>
+                    <div class="col-md-12 col-lg-6 mb-3">
+                        <div class="form-floating">
+                            <input class="form-control" placeholder="Leave a comment here" id="floatingTextarea2"></input>
+                            <label for="floatingTextarea2" class="floating-label">Last Name</label>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12 col-lg-6 mb-4">
+                        <div class="form-floating">
+                            <input id="startDate" class="form-control" type="date" placeholder="" />
+                            <label for="floatingTextarea2" class="floating-label">Date Of Birth</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <h4>Patient Contact Information</h4>
+                </div>
+                <div class="row">
+                    <div class="col-md-12 col-lg-6 mb-3">
+                        <div class="form-floating">
+                            <input class="form-control" placeholder="Leave a comment here" id="floatingTextarea2" type="email"></input>
+                            <label for="floatingTextarea2" class="floating-label">Email</label>
+                        </div>
+                    </div>
+                    <div class="col-md-12 col-lg-6 mb-3">
+                        <div class="input-group">
+                            <input type="tel" id="phone1" class="col-md-12 input">                            <!--     <span class="input-group-addon">Tel</span> -->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <h4>Patient Location</h4>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <div class="form-floating">
+                            <input class="form-control" placeholder="Leave a comment here" id="floatingTextarea2" type="text"></input>
+                            <label for="floatingTextarea2" class="floating-label">Room #/ Suite(Optional)</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row justify-content-end">
+                    <div class="col-md-6 mb-3 d-flex justify-content-end ">
+                        <button class="btn btn-info " style="margin-right: 17px;">Submit</button>
+                        <button class="btn border-info">Cancel</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+ </div>
