@@ -1,23 +1,26 @@
-﻿
+﻿@model HelloDoc.DataModels.AspnetUser
 @{
     Layout = "~/Views/Shared/_Layout2.cshtml";
     ViewData["Title"] = "Login";
 }
+
+
 <a asp-controller="Home" asp-action="Index" asp-area="" class="link-info d-flex w-100 justify-content-end">
     <span class="material-symbols-outlined"> chevron_left </span>
     Back
 </a>
 <h3 class="fw-semibold">Login To Your Account</h3>
 
-<form class="w-100" method="post" action="Login/SubmitFORM">
+<form class="w-100" method="post" action="">
     <div class="input-group mb-3">
         <div class="form-floating flex-grow-1">
-            <input type="email"
+            <input asp-for="Username" type="text"
                    class="form-control"
                    id="floatingInputGroup1"
-                   name="uname"
-                   placeholder="Username" />
-            <label for="floatingInputGroup1">Email</label>
+                   />
+            <label for="floatingInputGroup1 " asp-for="Username">UserName</label>
+            <span asp-validation-for="Username" class="text-danger"></span>
+
         </div>
         <span class="input-group-text ">
             <span class="material-symbols-outlined text-secondary">
@@ -27,12 +30,13 @@
     </div>
     <div class="input-group mb-3">
         <div class="form-floating flex-grow-1 ">
-            <input type="password"
+            <input asp-for="Passwordhash" type="password"
                    class="form-control"
                    id="password"
-                   name="password"
-                   placeholder="*****" />
-            <label for="password">Password</label>
+                    />
+            <label for="password" asp-for="Passwordhash">Password</label>
+            <span asp-validation-for="Passwordhash" class="text-danger"></span>
+
         </div>
         <span class="input-group-text" id="passwordBtn">
             <span class="material-symbols-outlined text-secondary">
@@ -46,4 +50,5 @@
     </button>
 </form>
 <a asp-controller="Login" asp-action="ForgotPassword" asp-area="" class="link-info">Forgot Password ?</a>
+<div asp-validation-summary="All" class="text-danger"></div>
 <script src="~/js/passwordInput.js" asp-append-version="true"></script> 

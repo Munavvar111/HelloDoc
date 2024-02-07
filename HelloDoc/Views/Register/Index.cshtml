@@ -1,4 +1,5 @@
-﻿@{
+﻿@model HelloDoc.DataModels.AspnetUser
+@{
     Layout = "~/Views/Shared/_Layout2.cshtml";
     ViewData["Title"] = "Register";
 }
@@ -8,16 +9,17 @@
 </a>
 <h3 class="fw-semibold">Create Account</h3>
 
-<form class="w-100 needs-validation" method="post" action="Register">
+<form class="w-100 needs-validation" method="post" action="">
     <div class="input-group mb-3 has-validation">
         
         <div class="form-floating flex-grow-1">
-            <input type="email"
+            <input type="text"
                    class="form-control"
                    id="floatingInputGroup1"
-                   name="uname"
-                   placeholder="Username" />
-            <label for="floatingInputGroup1">Email</label>
+                   asp-for="Username"
+                    />
+            <label for="floatingInputGroup1" asp-for="Username">UserName</label>
+
         </div>
         <span class="input-group-text ">
             <span class="material-symbols-outlined text-secondary">
@@ -33,9 +35,9 @@
             <input type="password"
                    class="form-control"
                    id="password"
-                   name="password"
-                   placeholder="*****" />
-            <label for="password">Password</label>
+                   asp-for="Passwordhash"
+                    />
+            <label for="password" asp-for="Passwordhash">Password</label>
         </div>
         <span class="input-group-text" id="passwordBtn">
             <span class="material-symbols-outlined text-secondary">
