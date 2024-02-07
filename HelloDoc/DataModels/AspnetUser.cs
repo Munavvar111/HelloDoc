@@ -15,12 +15,10 @@ public partial class AspnetUser
     public string Aspnetuserid { get; set; } = null!;
 
     [Column("username")]
-    [Required(ErrorMessage = "Please Enter the UserName")]
     [StringLength(256)]
     public string Username { get; set; } = null!;
 
     [Column("passwordhash", TypeName = "character varying")]
-    [Required(ErrorMessage = "Please Enter the Password")]
     public string? Passwordhash { get; set; }
 
     [Column("email")]

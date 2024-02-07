@@ -40,6 +40,8 @@ public partial class ApplicationDbContext : DbContext
 
     public virtual DbSet<Healthprofessionaltype> Healthprofessionaltypes { get; set; }
 
+    public virtual DbSet<LoginModel> LoginModels { get; set; }
+
     public virtual DbSet<Menu> Menus { get; set; }
 
     public virtual DbSet<Orderdetail> Orderdetails { get; set; }
@@ -124,8 +126,6 @@ public partial class ApplicationDbContext : DbContext
         modelBuilder.Entity<AspnetUser>(entity =>
         {
             entity.HasKey(e => e.Aspnetuserid).HasName("aspnet_users_pkey");
-
-            entity.Property(e => e.Aspnetuserid).HasDefaultValueSql("1");
         });
 
         modelBuilder.Entity<AspnetUserrole>(entity =>
@@ -182,6 +182,11 @@ public partial class ApplicationDbContext : DbContext
         modelBuilder.Entity<Healthprofessionaltype>(entity =>
         {
             entity.HasKey(e => e.Healthprofessionalid).HasName("healthprofessionaltype_pkey");
+        });
+
+        modelBuilder.Entity<LoginModel>(entity =>
+        {
+            entity.HasKey(e => new { e.Username, e.Passwordhash }).HasName("LoginModel_pkey");
         });
 
         modelBuilder.Entity<Menu>(entity =>
