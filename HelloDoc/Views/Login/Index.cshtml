@@ -1,0 +1,49 @@
+﻿
+@{
+    Layout = "~/Views/Shared/_Layout2.cshtml";
+    ViewData["Title"] = "Login";
+}
+<a asp-controller="Home" asp-action="Index" asp-area="" class="link-info d-flex w-100 justify-content-end">
+    <span class="material-symbols-outlined"> chevron_left </span>
+    Back
+</a>
+<h3 class="fw-semibold">Login To Your Account</h3>
+
+<form class="w-100" method="post" action="Login/SubmitFORM">
+    <div class="input-group mb-3">
+        <div class="form-floating flex-grow-1">
+            <input type="email"
+                   class="form-control"
+                   id="floatingInputGroup1"
+                   name="uname"
+                   placeholder="Username" />
+            <label for="floatingInputGroup1">Email</label>
+        </div>
+        <span class="input-group-text ">
+            <span class="material-symbols-outlined text-secondary">
+                account_circle
+            </span>
+        </span>
+    </div>
+    <div class="input-group mb-3">
+        <div class="form-floating flex-grow-1 ">
+            <input type="password"
+                   class="form-control"
+                   id="password"
+                   name="password"
+                   placeholder="*****" />
+            <label for="password">Password</label>
+        </div>
+        <span class="input-group-text" id="passwordBtn">
+            <span class="material-symbols-outlined text-secondary">
+                visibility
+            </span>
+        </span>
+    </div>
+
+    <button type="submit" class="btn btn-info w-100 text-white">
+        Log In
+    </button>
+</form>
+<a asp-controller="Login" asp-action="ForgotPassword" asp-area="" class="link-info">Forgot Password ?</a>
+<script src="~/js/passwordInput.js" asp-append-version="true"></script> 

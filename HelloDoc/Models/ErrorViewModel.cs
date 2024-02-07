@@ -1,4 +1,4 @@
-namespace HelloDoc.Models
+namespace HalloDocPatient.Models
 {
     public class ErrorViewModel
     {

@@ -1,36 +1,46 @@
 ﻿<!DOCTYPE html>
-<html lang="en" > 
+<html lang="en" data-bs-theme="light">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - HelloDoc</title>
+    <title>@ViewData["Title"] - HalloDocPatient</title>
+    <link rel="shortcut icon" href="~/images/favicon.png" type="image/x-icon" />
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"/>
-
-    <link rel="stylesheet" href="~/HelloDoc.styles.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-
-    @RenderSection("Header",required:false)
-    @RenderSection("Styles",required: false)
+    <link rel="stylesheet" href="~/HalloDocPatient.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/style.css" asp-append-version="true" />
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.css" asp-append-version="true" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js" asp-append-version="true"></script>
 
 </head>
 <body>
-    <header>
-       
-            
-    </header>
-    <div class="container-fluid p-0">
-        <main role="main" class="">
-            @RenderBody()
+    <div class="container-fluid d-flex flex-column max-vw-100 vh-100 p-0 bg-light">
+        <partial name="~/Views/Shared/_Header.cshtml" />
+        <main class="container-fluid d-flex flex-column  p-0 bg-light flex-grow-1 align-items-center">
+               
+                <div class="d-flex justify-content-end m-auto  p-0 container my-4">
+                        <a asp-controller="Request" asp-action="Index" asp-area=""
+                           class="btn btn-outline-info d-flex align-items-center">
+                            <span class="material-symbols-outlined"> chevron_left </span> Back
+                        </a>
+                    </div>
+                    @RenderBody()
+               
         </main>
+        <partial name="~/Views/Shared/_Footer.cshtml" />
     </div>
 
-    
-    
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+
+
+
+
+
+
+
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
-    @await RenderSectionAsync("Scripts", required: false)
+    <script src="~/js/custom.js" asp-append-version="true"></script>
 </body>
 </html>

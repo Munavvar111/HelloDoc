@@ -1,0 +1,228 @@
+﻿@{
+    ViewData["Title"] = "Family/Friend Request";
+}
+
+<form class="container border rounded-3 p-3 p-md-5 mb-3  d-flex flex-column gap-4 bg-white">
+    <div class="row row-cols-1 row-cols-md-2 g-3">
+        <div class="col-12 col-md-12">
+            <h5 class="fw-semibold">Family/Friend Information</h5>
+        </div>
+
+        <div class="col">
+            <div class="form-floating">
+                <input type="text"
+                       class="form-control"
+                       id="floatingInput"
+                       placeholder="name@example.com" />
+                <label for="floatingInput focus-ring">Your First Name</label>
+            </div>
+        </div>
+        <div class="col">
+            <div class="form-floating">
+                <input type="text"
+                       class="form-control"
+                       id="floatingInput"
+                       placeholder="name@example.com" />
+                <label for="floatingInput">Your Last Name</label>
+            </div>
+        </div>
+        <div class="col">
+            <div class="border rounded-2 tel-container">
+                <input id="phone1"
+                       type="tel"
+                       class="form-control border-0 tel-input"
+                       name="phone" />
+            </div>
+        </div>
+
+        <div class="col">
+            <div class="form-floating">
+                <input type="email"
+                       class="form-control"
+                       id="phone"
+                       placeholder="+91 9876543210" />
+                <label for="floatingInput">Your Email</label>
+            </div>
+        </div>
+        <div class="col">
+            <div class="form-floating">
+                <input type="text"
+                       class="form-control"
+                       id="floatingInput"
+                       placeholder="name@example.com" />
+                <label for="floatingInput">Relation with Patient</label>
+            </div>
+        </div>
+    </div>
+
+    <div class="row row-cols-1 row-cols-md-2 g-3">
+        <div class="col-12 col-md-12">
+            <h5 class="fw-semibold">Patient Information</h5>
+        </div>
+        <div class="col-12 col-md-12">
+            <div class="form-floating">
+                <textarea class="form-control"
+                          placeholder="Leave a comment here"
+                          id="floatingTextarea2"
+                          style="height: 100px"></textarea>
+                <label for="floatingTextarea2">
+                    Enter Brief detail of Symptoms
+                    <span class="d-none d-sm-inline">(Optional)</span>
+                </label>
+            </div>
+        </div>
+        <div class="col">
+            <div class="form-floating">
+                <input type="text"
+                       class="form-control"
+                       id="floatingInput"
+                       placeholder="name@example.com" />
+                <label for="floatingInput">First Name</label>
+            </div>
+        </div>
+        <div class="col">
+            <div class="form-floating">
+                <input type="text"
+                       class="form-control"
+                       id="floatingInput"
+                       placeholder="name@example.com" />
+                <label for="floatingInput">Last Name</label>
+            </div>
+        </div>
+        <div class="col">
+            <div class="form-floating">
+                <input type="date"
+                       class="form-control"
+                       id="floatingInput"
+                       placeholder="name@example.com" />
+                <label for="floatingInput">Date of Birth</label>
+            </div>
+        </div>
+    </div>
+    <div class="row row-cols-1 row-cols-md-2 g-3">
+        <div class="col-12 col-md-12">
+            <h5 class="fw-semibold">Patient Contact Information</h5>
+        </div>
+
+        <div class="col">
+            <div class="form-floating">
+                <input type="email"
+                       class="form-control"
+                       id="floatingInput"
+                       placeholder="name@example.com" />
+                <label for="floatingInput">Email</label>
+            </div>
+        </div>
+        <div class="col">
+            <div class="border rounded-2 tel-container">
+                <input id="phone2"
+                       type="tel"
+                       class="form-control border-0 tel-input"
+                       name="phone" />
+            </div>
+        </div>
+    </div>
+    <div class="row row-cols-1 row-cols-md-2 g-3">
+        <div class="col-12 col-md-12">
+            <h5 class="fw-semibold">Patient Location</h5>
+        </div>
+        <div class="col">
+            <div class="form-floating">
+                <input type="text"
+                       class="form-control"
+                       id="floatingInput"
+                       placeholder="Rajpath Road" />
+                <label for="floatingInput">Street</label>
+            </div>
+        </div>
+        <div class="col">
+            <div class="form-floating">
+                <input type="text"
+                       class="form-control"
+                       id="floatingInput"
+                       placeholder="Rajpath Road" />
+                <label for="floatingInput">City</label>
+            </div>
+        </div>
+        <div class="col">
+            <div class="form-floating">
+                <input type="text"
+                       class="form-control"
+                       id="floatingInput"
+                       placeholder="Rajpath Road" />
+                <label for="floatingInput">State</label>
+            </div>
+        </div>
+        <div class="col">
+            <div class="form-floating">
+                <input type="text"
+                       class="form-control"
+                       id="floatingInput"
+                       placeholder="Rajpath Road" />
+                <label for="floatingInput">Zip Code</label>
+            </div>
+        </div>
+        <div class="col">
+            <div class="form-floating">
+                <input type="text"
+                       class="form-control"
+                       id="floatingInput"
+                       placeholder="Rajpath Road" />
+                <label for="floatingInput">Room #/ Suite (Optional)</label>
+            </div>
+        </div>
+    </div>
+    <div class="row row-cols-1 g-3">
+        <div class="col-12 col-md-12">
+            <h5 class="fw-semibold">(Optional) Upload Photo or Document</h5>
+        </div>
+        <div class="col">
+            <div class="input-group input-group-lg">
+                <div id="fileName" class="form-control fs-6 align-middle">
+                    Select File
+                </div>
+                <input type="file" class="form-control" id="fileInput" hidden />
+                <label class="input-group-text btn btn-info text-light"
+                       for="fileInput">
+                    <span class="material-symbols-outlined me-2">
+                        cloud_upload
+                    </span>
+                    <span class="d-none d-md-inline">Upload</span>
+                </label>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="d-flex gap-3 align-items-center justify-content-end">
+            <button class="btn btn-info text-light" type="submit">
+                Submit
+            </button>
+            <a href="submitrequest.html" class="btn btn-outline-info d-flex align-items-center h-100">
+                Cancel
+            </a>
+        </div>
+    </div>
+</form>
+
+
+
+
+    <partial name="_InfoModal.cshtml" />
+   
+
+
+
+<script src="~/js/fileInput.js"></script>
+
+<script>
+    const phone1 = document.querySelector("#phone1");
+    const phoneInput1 = window.intlTelInput(phone1, {
+        utilsScript:
+            "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",
+    });
+    const phone2 = document.querySelector("#phone2");
+    const phoneInput2 = window.intlTelInput(phone2, {
+        utilsScript:
+            "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",
+    });
+</script>

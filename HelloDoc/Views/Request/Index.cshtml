@@ -1,0 +1,15 @@
+﻿@{
+    ViewData["Title"] = "Request";
+}
+<div class="w-100  d-flex flex-column request-container gap-4 m-auto pb-5">
+    <h3 class="fw-bolder">I am a...</h3>
+
+    <a asp-controller="Request" asp-action="PatientRequest" asp-area=""
+       class="btn btn-outline-primary bg-primary bg-opacity-25 link-primary fw-bolder text-start py-3">PATIENT</a>
+    <a asp-controller="Request" asp-action="FriendRequest" asp-area=""
+       class="btn btn-outline-info bg-info bg-opacity-25 link-info fw-bolder text-start py-3">FAMILY/FRIEND</a>
+    <a asp-controller="Request" asp-action="ConceirgeRequest" asp-area=""
+       class="btn btn-outline-success bg-success bg-opacity-25 link-success fw-bolder text-start py-3">CONCIERGE</a>
+    <a asp-controller="Request" asp-action="BusinessRequest" asp-area=""
+       class="btn btn-outline-danger bg-danger bg-opacity-25 link-danger fw-bolder text-start py-3">BUSINESS PARTNERS</a>
+</div>

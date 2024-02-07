@@ -1,0 +1,92 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout2.cshtml";
+    ViewData["Title"] = "Register";
+}
+<a asp-controller="Home" asp-action="Index" asp-area="" class="link-info d-flex w-100 justify-content-end">
+    <span class="material-symbols-outlined"> chevron_left </span>
+    Back
+</a>
+<h3 class="fw-semibold">Create Account</h3>
+
+<form class="w-100 needs-validation" method="post" action="Register">
+    <div class="input-group mb-3 has-validation">
+        
+        <div class="form-floating flex-grow-1">
+            <input type="email"
+                   class="form-control"
+                   id="floatingInputGroup1"
+                   name="uname"
+                   placeholder="Username" />
+            <label for="floatingInputGroup1">Email</label>
+        </div>
+        <span class="input-group-text ">
+            <span class="material-symbols-outlined text-secondary">
+                account_circle
+            </span>
+        </span>
+        <div class="invalid-feedback">
+            Please choose a username.
+        </div>
+    </div>
+    <div class="input-group mb-3 has-validation">
+        <div class="form-floating flex-grow-1 ">
+            <input type="password"
+                   class="form-control"
+                   id="password"
+                   name="password"
+                   placeholder="*****" />
+            <label for="password">Password</label>
+        </div>
+        <span class="input-group-text" id="passwordBtn">
+            <span class="material-symbols-outlined text-secondary">
+                visibility
+            </span>
+        </span>
+        <div  class="invalid-feedback">
+            Please choose a username.
+        </div>
+    </div>
+    <div class="input-group mb-3">
+        <div class="form-floating flex-grow-1 ">
+            <input type="password"
+                   class="form-control"
+                   id="cpassword"
+                   name="cpassword"
+                   placeholder="*****" />
+            <label for="cpassword">Confirm Password</label>
+        </div>
+        <span class="input-group-text" id="cpasswordBtn">
+            <span class="material-symbols-outlined text-secondary">
+                visibility
+            </span>
+        </span>
+    </div>
+
+    <button type="submit" class="btn btn-info w-100 text-white">
+        Create
+    </button>
+</form>
+
+<script>
+    let passwordInput = document.getElementById("password");
+    let passwordBtn = document.getElementById("passwordBtn")
+    function togglePasswordVisibility() {
+        if (passwordInput.type === "password") {
+            passwordInput.type = "text";
+        } else {
+            passwordInput.type = "password";
+        }
+    }
+    passwordBtn.addEventListener("click", () => togglePasswordVisibility())
+    let cpasswordInput = document.getElementById("cpassword");
+    let cpasswordBtn = document.getElementById("cpasswordBtn")
+    function togglecPasswordVisibility() {
+        if (cpasswordInput.type === "password") {
+            cpasswordInput.type = "text";
+        } else {
+            cpasswordInput.type = "password";
+        }
+    }
+    cpasswordBtn.addEventListener("click", () => togglecPasswordVisibility())
+
+</script>

@@ -1,71 +1,38 @@
-document.body.style = "background-color: var(--bs-dark);transition: 0.5s;"
+// Light Dark Mode Switching js
+document.getElementById("modeSwitch").addEventListener("click", () => {
+    const theme = localStorage.getItem("theme") || "light";
+    if (theme === "light") {
+        applyDarkTheme();
+        localStorage.setItem("theme", "dark");
+    } else if (theme === "dark") {
+        applyLightTheme();
+        localStorage.setItem("theme", "light");
+    }
+});
 
-var theme = "light";
-const root = document.querySelector(":root");
-const textColor = document.querySelectorAll(".text-change-dark");
-var container = document.getElementsByClassName("theme-container")[0];
-
-const themeIcon = document.getElementById("theme-icon");
-const themeIcon2 = document.getElementById("theme-icon2");
-const navbar = document.querySelector("nav");
-
-console.log(document.getElementsByClassName("theme-container")[0])
-if (container) {
-
-    container.addEventListener("click", setTheme);
-    console.log("ndf")
-    function setTheme() {
-        switch (theme) {
-            case "light":
-                setDark();
-                theme = "dark";
-                break;
-            case "dark":
-                setLight();
-                theme = "light";
-                break;
-        }
+const applyDarkTheme = () => {
+    let list = document.querySelectorAll(".bg-light, .bg-white");
+    document.documentElement.setAttribute("data-bs-theme", "dark");
+    document.getElementById("modeSwitch").innerHTML = '<span class="material-symbols-outlined"> light_mode </span>'
+    for (let i = 0; i < list.length; i++) {
+        list[i].classList.add("bg-light-invert");
     }
 }
 
-function setDark() {
-    root.style.setProperty("--bs-dark", "#212529");
-    container.style.backgroundColor = "#37b5cc";
-    themeIcon.classList.add("d-none");
-    themeIcon2.classList.remove("d-none");
-    setTimeout(() => {
-
-        themeIcon2.classList.remove("change");
-    }, 300);
-
-    for (let i = 0; i < textColor.length; i++) {
-        textColor[i].classList.remove("text-change-dark");
-        textColor[i].classList.add("text-change");
+const applyLightTheme = () => {
+    let list = document.querySelectorAll(".bg-light, .bg-white");
+    document.documentElement.setAttribute("data-bs-theme", "light");
+    document.getElementById("modeSwitch").innerHTML = '<span class="material-symbols-outlined"> dark_mode </span>'
+    for (let i = 0; i < list.length; i++) {
+        list[i].classList.remove("bg-light-invert");
     }
-    themeIcon2.classList.add("change");
-    // themeIcon.src = moon2;
-
 }
 
-function setLight() {
-    root.style.setProperty(
-        "--bs-dark",
-        "linear-gradient(318.32deg, #c3d1e4 0%, #dde7f3 55%, #d4e0ed 100%)"
-    );
-
-    container.style.backgroundColor = "#fff";
-    themeIcon.classList.remove("d-none");
-    themeIcon2.classList.add("d-none");
-
-    setTimeout(() => {
-        themeIcon.classList.remove("change");
-    }, 300);
-
-    for (let i = 0; i < textColor.length; i++) {
-        textColor[i].classList.remove("text-change");
-        textColor[i].classList.add("text-change-dark");
+window.addEventListener("DOMContentLoaded", () => {
+    const theme = localStorage.getItem("theme") || "light";
+    if (theme === "light") {
+        applyLightTheme();
+    } else if (theme === "dark") {
+        applyDarkTheme();
     }
-    themeIcon.classList.add("change");
-    // themeIcon.src = sun;
-
-}
+})

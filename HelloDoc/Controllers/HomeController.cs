@@ -1,8 +1,8 @@
-﻿using HelloDoc.Models;
+﻿using HalloDocPatient.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 
-namespace HelloDoc.Controllers
+namespace HalloDocPatient.Controllers
 {
     public class HomeController : Controller
     {
@@ -14,39 +14,6 @@ namespace HelloDoc.Controllers
         }
 
         public IActionResult Index()
-        {
-            return View();
-        }
-
-        public IActionResult Privacy()
-        {
-            return View();
-        }
-        public IActionResult PatientSubmit()
-        {
-            return View();
-        }
-        public IActionResult PatientRegister()
-        {
-            return View();
-        }
-        public IActionResult ForgotPassword()
-        {
-            return View();
-        }
-        public IActionResult PatientRequest()
-        {
-            return View();
-        }
-        public IActionResult FamilyRequest()
-        {
-            return View();
-        }
-        public IActionResult ConciergRequest()
-        {
-            return View();
-        }
-        public IActionResult BusinessRequest()
         {
             return View();
         }

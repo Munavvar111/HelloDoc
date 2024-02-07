@@ -1,0 +1,35 @@
+﻿<div class="modal fade"
+     id="infoModal"
+     data-bs-backdrop="static"
+     data-bs-keyboard="false"
+     tabindex="-1"
+     aria-labelledby="staticBackdropLabel"
+     aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content py-5">
+            <div class="modal-body d-flex flex-column align-items-center justify-content-center gap-3">
+                <img src="~/images/warning-ico.png" alt="" />
+                <h2>Information</h2>
+                <p class="text-center">
+                    When submitting a request, you must provide the correct contact
+                    information for the patient or the responsibly party. Failure to
+                    provide the correct email and phone number will delay service or
+                    be declined.
+                </p>
+                <button type="button"
+                        class="btn btn-info m-auto text-light"
+                        data-bs-dismiss="modal">
+                    Ok
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    const myModal = new bootstrap.Modal('#infoModal', {
+        keyboard: false
+    })
+    myModal.show();
+</script>

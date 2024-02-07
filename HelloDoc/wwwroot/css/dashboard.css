@@ -1,0 +1,45 @@
+.logo-container {
+  width: 150px;
+}
+
+nav ul li a {
+  color: #6c757d;
+}
+.nav-link.active {
+  border-bottom: 3px solid #17a2b8 !important;
+}
+.active a {
+  color: #17a2b8;
+}
+
+#Sidebar {
+  width: 300px;
+  transform: translateX(-100%);
+  transition: all 0.2s ease-in;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: start;
+  padding-top: 200px;
+}
+
+#menuBtn {
+  display: none;
+}
+
+@media screen and (max-width: 992px) {
+  #menuBtn {
+    display: block;
+  }
+  .desktop-nav {
+    display: none !important;
+  }
+  ul li a {
+    color: black !important;
+  }
+  .active{
+    background-color: #b1e7f0;
+    color:black ;
+    border: none;
+  }
+}

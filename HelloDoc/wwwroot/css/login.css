@@ -1,0 +1,40 @@
+
+.login-right form {
+    max-width: 500px;
+}
+
+
+@media screen and (max-width: 992px) {
+    .login-container {
+        position: relative;
+        display: block;
+        padding: 0 !important;
+    }
+
+    .login-left {
+        height: 100vh;
+        width: 100vw !important;
+    }
+
+        .login-left img {
+            height: 100%;
+            width: 100%;
+            object-fit: cover;
+            opacity: 0.1;
+        }
+
+    .login-right {
+        position: absolute !important;
+        top: 0;
+        left: 0;
+        width: 100% !important;
+    }
+
+        .login-right form {
+            width: 90% !important;
+        }
+
+    .dark-mode-btn {
+        margin: 2rem !important;
+    }
+}
