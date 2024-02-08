@@ -30,4 +30,9 @@
     <EditorConfigFiles Remove="C:\Users\pca45\source\repos\HelloDoc\HelloDoc\.editorconfig" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\BusinessLayer\BusinessLayer.csproj" />
+    <ProjectReference Include="..\DataAccessLayer\DataAccessLayer.csproj" />
+  </ItemGroup>
+
 </Project>

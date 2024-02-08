@@ -1,4 +1,4 @@
-using HelloDoc.DataContext;
+using DataAccessLayer.DataContext;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);

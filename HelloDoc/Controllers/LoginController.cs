@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using HelloDoc.DataContext;
-using HelloDoc.DataModels;
+using DataAccessLayer.CustomModel;
+using DataAccessLayer.DataContext;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -15,6 +15,7 @@ namespace HalloDocPatient.Controllers
         public LoginController(ApplicationDbContext context)
         {
             _context = context;
+           
 
         }
         public IActionResult Index()
@@ -28,17 +29,17 @@ namespace HalloDocPatient.Controllers
         {
             if(ModelState.IsValid)
             {
-                var user = await _context.AspnetUsers.FirstOrDefaultAsync(a.Username);
+                var user = await _context.AspnetUsers.FindAsync(a.Username);
                 if(user != null) {
                     var LoginDto = new LoginModel
                     {
                         Username = user.Username,
-                        Passwordhash = user.PasswordHash,
+                        Passwordhash = user.Passwordhash,
 
                     };
                     if(LoginDto.Passwordhash==a.Passwordhash)
                     {
-                        return RedirectToAction("Index","Home");
+                        return RedirectToAction("Index","Dashboard");
                     }
                     else
                     {
@@ -56,12 +57,7 @@ namespace HalloDocPatient.Controllers
             return View(a);
 
         }
-        private async Task<AspnetUser> GetUserByUsernameAsync(string userName)
-        {
-            // Implement your own logic to retrieve a user by username
-            // Example: querying from a repository, calling an API, etc.
-            return await _context.AspnetUsers.FindByNameAsync(User);
-        }
+        
 
         public IActionResult ForgotPassword()
         {

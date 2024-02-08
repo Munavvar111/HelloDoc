@@ -1,5 +1,5 @@
-﻿using HelloDoc.DataContext;
-using HelloDoc.DataModels;
+﻿using DataAccessLayer.DataContext;
+using DataAccessLayer.DataModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
