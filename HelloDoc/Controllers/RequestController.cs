@@ -93,8 +93,13 @@ namespace HalloDocPatient.Controllers
             }
     
         }
-
-
+        [HttpPost]
+        public JsonResult CheckEmail(string email)
+        {
+            AspnetUser entities = new AspnetUser();
+            bool isValid = !entities.Users.ToList().Exists(p => p.Email.Equals(email, StringComparison.CurrentCultureIgnoreCase));
+            return Json(isValid);
+        }
         public IActionResult FriendRequest()
         {
             return View();

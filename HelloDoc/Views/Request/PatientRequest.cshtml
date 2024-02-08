@@ -65,9 +65,10 @@
             <div class="form-floating">
                 <input type="email"
                        class="form-control"
-                       id="floatingInput"
+                       id="Email"
                        placeholder="name@example.com"
-                       asp-for="Email"/>
+                       asp-for="Email"
+                      onchange="checkUserEmail(this)"/>
                 <label for="floatingInput" asp-for="Email">Email</label>
                 <span asp-validation-for="Email" class="text-danger"></span>
 
@@ -84,7 +85,7 @@
         </div>
 
 
-        <div class="col">
+        <div class="col d-none" id="pwdcol">
             <div class="form-floating">
                 <input type="password"
                        class="form-control"
@@ -93,7 +94,7 @@
                 <label for="floatingInput">Password</label>
             </div>
         </div>
-        <div class="col">
+        <div class="col d-none" id="pwdrow">
             <div class="form-floating">
                 <input type="password"
                        class="form-control"
@@ -197,6 +198,7 @@
     </div>
 </form>
 
+
 <script src="~/js/fileInput.js"></script>
 
 <script>
@@ -205,4 +207,33 @@
         utilsScript:
             "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",
     });
+</script>
+
+<script src="http://code.jquery.com/jquery-1.11.3.js" type="text/javascript"></script>
+<script type="text/javascript">
+    function CheckAvailability() {
+        var email = $("#Email").val();
+        $.ajax({
+            type: "POST",
+            url: "CheckEmail",
+            data: '{email: "' + email + '" }',
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (response) {
+                var message = $("#message");
+                if (response) {
+                    //Email available.
+                    #pwdrow.show()
+                    #pwdcol.show()
+                }
+                else {
+                    //Email not available.
+                    message.css("color", "red");
+                    message.html("Email is NOT available");
+                }
+            }
+        });
+    };
+
+    
 </script>
