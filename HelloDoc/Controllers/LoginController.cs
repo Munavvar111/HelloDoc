@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using BusinessLayer.InterFace;
+using BusinessLayer.Repository;
 using DataAccessLayer.CustomModel;
 using DataAccessLayer.DataContext;
 using Microsoft.AspNetCore.Identity;
@@ -9,14 +11,13 @@ namespace HalloDocPatient.Controllers
 {
     public class LoginController : Controller
     {
-
+        private readonly ILogin _login;
         private readonly ApplicationDbContext _context;
 
-        public LoginController(ApplicationDbContext context)
+        public LoginController(ApplicationDbContext context, ILogin login)
         {
+            _login = login;        
             _context = context;
-           
-
         }
         public IActionResult Index()
         {
@@ -31,21 +32,15 @@ namespace HalloDocPatient.Controllers
             {
                 var user = await _context.AspnetUsers.FindAsync(a.Username);
                 if(user != null) {
-                    var LoginDto = new LoginModel
+                    if (_login.isLoginValid(a))
                     {
-                        Username = user.Username,
-                        Passwordhash = user.Passwordhash,
-
-                    };
-                    if(LoginDto.Passwordhash==a.Passwordhash)
-                    {
-                        return RedirectToAction("Index","Dashboard");
+                        return RedirectToAction("Index", "Dashboard");
                     }
                     else
                     {
                         ModelState.AddModelError(string.Empty, "Invalid login attempt");
-                    }
 
+                    }
                 }
                 else
                 {
