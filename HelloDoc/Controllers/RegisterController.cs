@@ -28,17 +28,17 @@ namespace HalloDocPatient.Controllers
 
         [HttpPost]
         public async Task<IActionResult> Index(AspnetUser ac)
-        {     
-            
-                AspnetUser user = new AspnetUser();
-                user.Aspnetuserid = ac.Username;
-               user.Username = ac.Username;
-                user.Passwordhash = ac.Passwordhash;
-                _context.AspnetUsers.Add(user);
-                 _context.SaveChanges();
-                return RedirectToAction(nameof(View1));
-            
-            
+        {
+
+            AspnetUser user = new AspnetUser();
+            user.Aspnetuserid = ac.Username;
+            user.Username = ac.Username;
+            user.Passwordhash = ac.Passwordhash;
+            _context.AspnetUsers.Add(user);
+            _context.SaveChanges();
+            return RedirectToAction(nameof(View1));
+
+
         }
 
     }

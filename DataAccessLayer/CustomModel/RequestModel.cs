@@ -18,7 +18,7 @@ namespace DataAccessLayer.CustomModel
         public string Email { get; set; } = null!;
 
         [Column("username")]
-        public string Username { get; set; } = "mimna";
+        public string? Username { get; set; }
 
         [Column("firstname")]
         [Required(ErrorMessage = "Please Enter FirstName")]
