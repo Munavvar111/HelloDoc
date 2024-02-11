@@ -39,7 +39,6 @@ namespace HalloDocPatient.Controllers
                     else
                     {
                         ModelState.AddModelError(string.Empty, "Invalid login attempt");
-
                     }
                 }
                 else

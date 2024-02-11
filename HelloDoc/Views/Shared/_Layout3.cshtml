@@ -1,0 +1,56 @@
+﻿<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - HalloDocPatient</title>
+    <link rel="shortcut icon" href="~/images/favicon.png" type="image/x-icon" />
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/HalloDocPatient.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/style.css" asp-append-version="true" />
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.css" asp-append-version="true" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js" asp-append-version="true"></script>
+
+</head>
+<body>
+    <div class="container-fluid d-flex flex-column max-vw-100 vh-100 p-0 bg-light">
+        <header class="w-100 shadow px-2 px-md-5 position-relative z-2 ">
+            <section class="d-flex justify-content-between border-bottom pb-1">
+                <div class="logo-container d-flex gap-3 align-items-center bg-logo bg-opacity-50 pb-2 rounded-3">
+                    <img src="~/images/logo.png" alt="logo" class="w-100 h-100" />
+                </div>
+
+                <div class="fw-bolder d-flex align-items-center gap-3">
+                    <span class="text-muted">Welcome, munavvar!</span>
+                    <button class="btn btn-outline-info text-center align-middle" id="modeSwitch">
+                        <span class="material-symbols-outlined"> dark_mode </span>
+                    </button>
+                    <a href="/Logout" class="btn btn-outline-danger">Logout</a>
+                </div>
+            </section>
+        </header>
+
+        <main class="container-fluid d-flex flex-column  p-0 bg-light flex-grow-1 align-items-center">
+
+            
+            @RenderBody()
+
+        </main>
+        <partial name="~/Views/Shared/_Footer.cshtml" />
+    </div>
+
+
+
+
+
+
+
+
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/custom.js" asp-append-version="true"></script>
+</body>
+</html>
