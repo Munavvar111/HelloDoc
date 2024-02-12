@@ -16,6 +16,8 @@ namespace HalloDocPatient.Controllers
 
         public async Task<IActionResult> Index()
         {
+            var username = HttpContext.Session.GetString("Username");
+
             var PatientDetails = (from req in _context.Requests
                                   join refi in _context.Requestwisefiles on req.Requestid equals refi.Requestid into requestFiles
                                   from file in requestFiles.DefaultIfEmpty()
@@ -25,6 +27,8 @@ namespace HalloDocPatient.Controllers
                                       Status = req.Status,
                                       Filename = file != null ? file.Filename : null
                                   }).ToList();
+
+            ViewBag.Username = username;
 
             return View(PatientDetails);
         }

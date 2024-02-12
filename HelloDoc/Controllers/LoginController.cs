@@ -30,27 +30,25 @@ namespace HalloDocPatient.Controllers
         {
             if(ModelState.IsValid)
             {
+                
                 var user = await _context.AspnetUsers.FindAsync(a.Username);
-                if(user != null) {
                     if (_login.isLoginValid(a))
                     {
-                        return RedirectToAction("Index", "Dashboard");
+                    HttpContext.Session.SetString("Username", a.Username);
+
+                    return RedirectToAction("Index", "Dashboard");
                     }
                     else
                     {
                         ModelState.AddModelError(string.Empty, "Invalid login attempt");
                     }
                 }
-                else
-                {
-                    // User not found
-                    ModelState.AddModelError(string.Empty, "User not found");
-                }
 
-            }
             return View(a);
-
         }
+            
+
+        
         
 
         public IActionResult ForgotPassword()

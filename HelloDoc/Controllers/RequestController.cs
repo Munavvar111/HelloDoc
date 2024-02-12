@@ -93,12 +93,16 @@ namespace HalloDocPatient.Controllers
         //PaatientRequest
 
         [HttpPost]
-        public  async Task<IActionResult> PatientRequest([FromForm] RequestModel requestModel)
+        public  async Task<IActionResult> PatientRequest( RequestModel requestModel)
         {
             var requestform = requestModel.File.FileName;
             requestModel.Username = requestModel.Firstname+requestModel.Lastname;
             var modelStateErrors = this.ModelState.Values.SelectMany(m => m.Errors);
-            if (ModelState.IsValid)
+            if(!ModelState.IsValid)
+            {
+                return View(requestModel);
+            }
+            else 
             {
                 if(requestModel.File!=null && requestModel.File.Length > 0)
                 {
@@ -113,23 +117,22 @@ namespace HalloDocPatient.Controllers
                     _patientRequest.AddPatientRequest(requestModel, ReqTypeId: 1);
                     var request = _patientRequest.GetRequestByEmail(requestModel.Email);
                     _patientRequest.AddRequestWiseFile(uniqueFileName, request.Requestid);
+                    return RedirectToAction("Index", "Dashboard");
                 }
                 //_patientRequest is a interface addpatientrequest is method;
                 else {
                     _patientRequest.AddPatientRequest(requestModel, ReqTypeId: 1);
+                    return RedirectToAction("Index", "Dashboard");
 
                 }
 
-                return RedirectToAction("Index", "Dashboard");  
+                  
                 
                 
 
 
             }
-            else
-            {
-                return View(requestModel);
-            }
+            
     
         }
         public IActionResult Error()
