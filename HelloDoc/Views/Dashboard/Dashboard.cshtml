@@ -28,7 +28,7 @@
             <tbody>
                 @foreach (var item in Model)
                 {
-                    <tr data-toggle="collapse" data-target="#details@(item.Filename)" class="accordion-toggle">
+                    <tr data-toggle="collapse" data-target="#details@(item.CreatedDate)" class="accordion-toggle">
                         <td>
                             @Html.DisplayFor(modelItem => item.CreatedDate)
                         </td>
@@ -36,15 +36,18 @@
                             @Html.DisplayFor(modelItem => item.Status)
                         </td>
                         <td class="d-none d-md-table-cell">
-                            @Html.DisplayFor(model=>item.Filename)
+                            @if (!string.IsNullOrEmpty(item.Filename))
+                            {
+                                <partial name="DocumentModel"></partial>
+                            }
                         </td>
                     </tr>
                     <tr>
                         <td colspan="3" class="hiddenRow">
-                            <div id="details@(item.Status)" class="accordian-body collapse">
+                            <div id="details@(item.CreatedDate)" class="accordian-body collapse">
                                 <!-- Additional details here -->
                                 Status: @Html.DisplayFor(modelItem => item.Status) <br />
-                                Request ID: @Html.DisplayFor(modelItem => item.Status) <br />
+                                Request ID: @Html.DisplayFor(modelItem => item.Filename) <br />
                                 <!-- Add other fields as needed -->
                             </div>
                         </td>

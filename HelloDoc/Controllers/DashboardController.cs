@@ -16,7 +16,7 @@ namespace HalloDocPatient.Controllers
 
         public async Task<IActionResult> Index()
         {
-            avar PatientDetails = (from req in _context.Requests
+            var PatientDetails = (from req in _context.Requests
                                   join refi in _context.Requestwisefiles on req.Requestid equals refi.Requestid into requestFiles
                                   from file in requestFiles.DefaultIfEmpty()
                                   select new PatientDashboard
