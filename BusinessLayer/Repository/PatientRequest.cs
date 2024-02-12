@@ -125,7 +125,7 @@ namespace BusinessLayer.Repository
             {
 
             request.Userid = UserId;
-                request.Requesttypeid=reqTypeId;
+            request.Requesttypeid=reqTypeId;
             request.Firstname = requestModel.Firstname;
             request.Lastname = requestModel.Lastname;
             request.Email = requestModel.Email;
@@ -154,9 +154,22 @@ namespace BusinessLayer.Repository
             _context.Requestclients.Add(requestClient);
             _context.SaveChanges();
         }
+        public void AddRequestWiseFile(string Filename,int RequestID)
+        {
+            var requestWiseFile=new Requestwisefile();
+            {
+                requestWiseFile.Filename = Filename;
+                requestWiseFile.Createddate = DateTime.Now;
+                requestWiseFile.Requestid= RequestID;
+            }
+            _context.Requestwisefiles.Add(requestWiseFile);
 
-        
+            _context.SaveChanges();
 
-        
+        }
+
+
+
+
     }
 }

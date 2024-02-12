@@ -1,6 +1,7 @@
 using BusinessLayer.InterFace;
 using BusinessLayer.Repository;
 using DataAccessLayer.DataContext;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -9,11 +10,16 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<ILogin, Login>();    
 builder.Services.AddScoped<IPatientRequest,PatientRequest>();    
+builder.Services.AddScoped<IOtherRequest,OtherRequest>();    
 
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
+});
+builder.Services.Configure<FormOptions>(options =>
+{
+    options.MultipartBodyLengthLimit = long.MaxValue;
 });
 var app = builder.Build();
 

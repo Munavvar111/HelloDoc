@@ -13,15 +13,17 @@ namespace HalloDocPatient.Controllers
     public class RequestController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly IOtherRequest _otherrequest;
 
         private readonly IPatientRequest _patientRequest;
         private readonly ILogger<RequestController> _logger;
 
-        public RequestController(ApplicationDbContext context, IPatientRequest patientRequest, ILogger<RequestController> logger)
+        public RequestController(ApplicationDbContext context, IPatientRequest patientRequest, ILogger<RequestController> logger, IOtherRequest otherrequest)
         {
             _context = context;
             _patientRequest = patientRequest;
             _logger = logger;
+            _otherrequest = otherrequest;
         }
         public IActionResult PatientRequest()
         {
@@ -88,17 +90,37 @@ namespace HalloDocPatient.Controllers
             return View(requestOther);
         }
 
+        //PaatientRequest
 
         [HttpPost]
-        public  async Task<IActionResult> PatientRequest(RequestModel requestModel)
+        public  async Task<IActionResult> PatientRequest([FromForm] RequestModel requestModel)
         {
+            var requestform = requestModel.File.FileName;
             requestModel.Username = requestModel.Firstname+requestModel.Lastname;
             var modelStateErrors = this.ModelState.Values.SelectMany(m => m.Errors);
             if (ModelState.IsValid)
             {
-                
+                if(requestModel.File!=null && requestModel.File.Length > 0)
+                {
+                    var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
+                    var uniqueFileName = Guid.NewGuid().ToString() + "_" + requestModel.File.FileName;
+                    var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await requestModel.File.CopyToAsync(stream);
+                    }
                     _patientRequest.AddPatientRequest(requestModel, ReqTypeId: 1);
-                    return RedirectToAction("Index", "Dashboard");
+                    var request = _patientRequest.GetRequestByEmail(requestModel.Email);
+                    _patientRequest.AddRequestWiseFile(uniqueFileName, request.Requestid);
+                }
+                //_patientRequest is a interface addpatientrequest is method;
+                else {
+                    _patientRequest.AddPatientRequest(requestModel, ReqTypeId: 1);
+
+                }
+
+                return RedirectToAction("Index", "Dashboard");  
                 
                 
 
@@ -138,31 +160,10 @@ namespace HalloDocPatient.Controllers
         {
             if(ModelState.IsValid)
             {
-                Request friend=new Request();
-                friend.Requesttypeid = 2;//Friend 
-                friend.Firstname = request.FirstNameOther;
-                friend.Lastname = request.LastNameOther;
-                friend.Email = request.EmailOther;
-                friend.Status = 1;//Unsigned
-                friend.Relationname = request.Relation;
-                friend.Createddate = DateTime.Now;
-                _context.Requests.Add(friend);  
-                _context.SaveChanges();
+                _otherrequest.AddFriendRequest(request, ReqTypeId: 2);
+                 return RedirectToAction("Index", "Dashboard");
 
-                Requestclient requestclient = new Requestclient();
-                requestclient.Requestid=friend.Requestid;
-                requestclient.Firstname=request.FirstName;
-                requestclient.Lastname= request.LastName;  
-                requestclient.Email= request.Email;
-                requestclient.Intdate = request.BirthDate.Day;
-                requestclient.Intyear=request.BirthDate.Year;
-                requestclient.Strmonth = request.BirthDate.Month.ToString();
-                requestclient.Street = request.Street;
-                requestclient.City = request.City;  
-                requestclient.State = request.State;    
-                requestclient.Zipcode = request.Zipcode;
-                _context.Requestclients.Add(requestclient);
-                _context.SaveChanges();
+
 
 
             }

@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
@@ -47,6 +49,11 @@ namespace DataAccessLayer.CustomModel
         [Column("zipcode")]
         [Required(ErrorMessage = "Please Enter Mobile")]
         public string Zipcode { get; set; } = null!;
+
+        public string? FileName { get; set; }
+
+        [FromForm]
+        public IFormFile File { get; set; }
 
     }
 }

@@ -1,0 +1,65 @@
+﻿@model List<DataAccessLayer.CustomModel.PatientDashboard>
+
+<div class="tab-pane fade bg-light show active" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab">
+    <div class="mt-5 bg-light m-2">
+        <span class="text-muted fs-1">Medical History</span>
+    </div>
+    <div class="d-flex justify-content-end bg-white p-4 m-2">
+        <button href="/Logout" class="btn btn-outline-info">
+            <span class="d-none d-md-inline">Create New Request</span>
+            <span class="d-md-none">+</span>
+        </button>
+    </div>
+    <div class="m-2">
+        <table class="table" id="sortTable">
+            <thead class="thead-Secondary">
+                <tr class="table-secondary">
+                    <th>
+                        Crreateddate
+                    </th>
+                    <th class="d-none d-md-table-cell">
+                        status
+                    </th>
+                    <th class="d-none d-md-table-cell">
+                        document
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr data-toggle="collapse" data-target="#details@(item.Filename)" class="accordion-toggle">
+                        <td>
+                            @Html.DisplayFor(modelItem => item.CreatedDate)
+                        </td>
+                        <td class="d-none d-md-table-cell">
+                            @Html.DisplayFor(modelItem => item.Status)
+                        </td>
+                        <td class="d-none d-md-table-cell">
+                            @Html.DisplayFor(model=>item.Filename)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="3" class="hiddenRow">
+                            <div id="details@(item.Status)" class="accordian-body collapse">
+                                <!-- Additional details here -->
+                                Status: @Html.DisplayFor(modelItem => item.Status) <br />
+                                Request ID: @Html.DisplayFor(modelItem => item.Status) <br />
+                                <!-- Add other fields as needed -->
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<style>
+    .hiddenRow {
+        padding: 0 !important;
+    }
+</style>
+<script>
+    $('#sortTable').DataTable();
+</script>

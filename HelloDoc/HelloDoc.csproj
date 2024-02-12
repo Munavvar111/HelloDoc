@@ -24,6 +24,7 @@
 
   <ItemGroup>
     <Folder Include="wwwroot\content\NewFolder\" />
+    <Folder Include="wwwroot\uploads\" />
   </ItemGroup>
 
   <ItemGroup>
