@@ -16,8 +16,13 @@ namespace BusinessLayer.InterFace
 
         Request GetRequestByEmail(string email);
 
+
         void AddFriendRequest(RequestOthers friendRequest,int ReqTypeId);
 
+        void AddConceirgeRequest(RequestOthers addconciegeRequest,int ReqTypeId);
 
+        void Conceirge(RequestOthers conceirge);
+
+        void ConceirgeRequest(int RequestID,int ConceirgeID);
     }
 }

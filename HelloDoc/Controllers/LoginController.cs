@@ -31,12 +31,12 @@ namespace HalloDocPatient.Controllers
             if(ModelState.IsValid)
             {
                 
-                var user = await _context.AspnetUsers.FindAsync(a.Username);
+                var user = await _context.AspnetUsers.FindAsync(a.Email);
                     if (_login.isLoginValid(a))
                     {
-                    HttpContext.Session.SetString("Username", a.Username);
+                    HttpContext.Session.SetString("Email", a.Email);
 
-                    return RedirectToAction("Index", "Dashboard");
+                        return RedirectToAction("Index", "Dashboard");
                     }
                     else
                     {

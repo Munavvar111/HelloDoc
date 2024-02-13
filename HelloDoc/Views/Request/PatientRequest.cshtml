@@ -88,19 +88,21 @@
         <div class="col"  id="pwdcol" style="display:none">
             <div class="form-floating">
                 <input type="password"
+                       asp-for="Passwordhash"
                        class="form-control"
                        id="floatingInput"
                        placeholder="*****" />
-                <label for="floatingInput">Password</label>
+                <label for="floatingInput" asp-for="Passwordhash">Password</label>
             </div>
         </div>
         <div class="col" id="pwdrow" style="display:none">
             <div class="form-floating">
                 <input type="password"
                        class="form-control"
+                       asp-for="ConfirmPasswordhash"
                        id="floatingInput"
                        placeholder="*****" />
-                <label for="floatingInput">Confirm Password</label>
+                <label for="floatingInput" asp-for="ConfirmPasswordhash">Confirm Password</label>
             </div>
         </div>
 

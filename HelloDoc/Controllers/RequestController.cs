@@ -95,7 +95,6 @@ namespace HalloDocPatient.Controllers
         [HttpPost]
         public  async Task<IActionResult> PatientRequest( RequestModel requestModel)
         {
-            var requestform = requestModel.File.FileName;
             requestModel.Username = requestModel.Firstname+requestModel.Lastname;
             var modelStateErrors = this.ModelState.Values.SelectMany(m => m.Errors);
             if(!ModelState.IsValid)
@@ -117,20 +116,14 @@ namespace HalloDocPatient.Controllers
                     _patientRequest.AddPatientRequest(requestModel, ReqTypeId: 1);
                     var request = _patientRequest.GetRequestByEmail(requestModel.Email);
                     _patientRequest.AddRequestWiseFile(uniqueFileName, request.Requestid);
-                    return RedirectToAction("Index", "Dashboard");
+                    return RedirectToAction("Index", "Login");
                 }
                 //_patientRequest is a interface addpatientrequest is method;
                 else {
                     _patientRequest.AddPatientRequest(requestModel, ReqTypeId: 1);
-                    return RedirectToAction("Index", "Dashboard");
+                    return RedirectToAction("Index", "Login");
 
                 }
-
-                  
-                
-                
-
-
             }
             
     
@@ -181,49 +174,7 @@ namespace HalloDocPatient.Controllers
         {
             if (ModelState.IsValid)
             {
-                Concierge concierge = new Concierge();
-                concierge.Conciergename = requestOther.FirstNameOther;
-                concierge.City = requestOther.City;
-                concierge.State = requestOther.State;    
-                concierge.Street=requestOther.Street;
-                concierge.Zipcode=requestOther.Zipcode;
-                concierge.Createddate=DateTime.Now;
-                concierge.Regionid = 1;
-
-                _context.Concierges.Add(concierge);
-                _context.SaveChanges();
-
-                Request request = new Request();
-                request.Firstname = requestOther.FirstNameOther;
-                request.Requesttypeid = 2;//Friend 
-                request.Lastname = requestOther.LastNameOther;
-                request.Email = requestOther.EmailOther;
-                request.Status = 1;//Unsigned
-                request.Createddate = DateTime.Now;
-                
-                _context.Requests.Add(request);
-                _context.SaveChanges();
-
-                Requestconcierge requestconcierge= new Requestconcierge();
-                requestconcierge.Conciergeid = concierge.Conciergeid;
-                requestconcierge.Requestid=request.Requestid;
-
-                _context.Requestconcierges.Add(requestconcierge);
-                _context.SaveChanges();
-
-
-                Requestclient requestclient = new Requestclient();
-                requestclient.Requestid = request.Requestid;
-                requestclient.Firstname = requestOther.FirstName;
-                requestclient.Lastname = requestOther.LastName;
-                requestclient.Email = requestOther.Email;
-                requestclient.Intdate = requestOther.BirthDate.Day;
-                requestclient.Intyear = requestOther.BirthDate.Year;
-                requestclient.Strmonth = requestOther.BirthDate.Month.ToString();
-
-
-                _context.Requestclients.Add(requestclient);
-                _context.SaveChanges();
+                _otherrequest.AddConceirgeRequest(requestOther, ReqTypeId: 3);
 
                 return RedirectToAction("Index", "dashboard");
             }

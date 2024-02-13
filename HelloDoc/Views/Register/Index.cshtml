@@ -1,4 +1,4 @@
-﻿@model DataAccessLayer.DataModels.AspnetUser
+﻿@model DataAccessLayer.CustomModel.LoginModel
 @{
     Layout = "~/Views/Shared/_Layout2.cshtml";
     ViewData["Title"] = "Register";
@@ -13,12 +13,11 @@
     <div class="input-group mb-3 has-validation">
         
         <div class="form-floating flex-grow-1">
-            <input type="text"
+            <input type="email"
                    class="form-control"
                    id="floatingInputGroup1"
-                   asp-for="Username"
-                    />
-            <label for="floatingInputGroup1" asp-for="Username">UserName</label>
+                   asp-for="Email" />
+            <label for="floatingInputGroup1" asp-for="Email">Email</label>
 
         </div>
         <span class="input-group-text ">
@@ -35,8 +34,7 @@
             <input type="password"
                    class="form-control"
                    id="password"
-                   asp-for="Passwordhash"
-                    />
+                   asp-for="Passwordhash" />
             <label for="password" asp-for="Passwordhash">Password</label>
         </div>
         <span class="input-group-text" id="passwordBtn">
@@ -53,9 +51,9 @@
             <input type="password"
                    class="form-control"
                    id="cpassword"
-                   name="cpassword"
-                   placeholder="*****" />
-            <label for="cpassword">Confirm Password</label>
+                   placeholder="*****"
+                   asp-for="ConfirmPasswordhash" />
+            <label for="cpassword" asp-for="ConfirmPasswordhash">Confirm Password</label>
         </div>
         <span class="input-group-text" id="cpasswordBtn">
             <span class="material-symbols-outlined text-secondary">

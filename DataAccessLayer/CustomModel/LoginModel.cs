@@ -6,15 +6,17 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DataAccessLayer.CustomModel;
 
-[PrimaryKey("Username", "Passwordhash")]
 [Table("LoginModel")]
 public partial class LoginModel
 {
-    [Key]
+    
     [StringLength(256)]
-    public string Username { get; set; } = null!;
+    public string? Username { get; set; }
+    public string Email { get; set; } = null!;   
 
     [Key]
     [StringLength(256)]
     public string Passwordhash { get; set; } = null!;
+
+    public string? ConfirmPasswordhash { get; set; }
 }

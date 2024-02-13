@@ -61,6 +61,42 @@ namespace BusinessLayer.Repository
             AddRequestClient(requestOthers, request1.Requestid);
         }
 
-        
+        public void AddConceirgeRequest(RequestOthers addconciegeRequest, int RequestID)
+        {
+            AddRequest(addconciegeRequest, RequestID);
+            Conceirge(addconciegeRequest);
+            var request1 = GetRequestByEmail(addconciegeRequest.EmailOther);
+            AddRequestClient(addconciegeRequest, request1.Requestid);
+
+        }
+
+        public void Conceirge(RequestOthers conceirge)
+        {
+            Concierge concierge = new Concierge();
+            concierge.Conciergename = conceirge.FirstNameOther;
+            concierge.City = conceirge.City;
+            concierge.State = conceirge.State;
+            concierge.Street = conceirge.Street;
+            concierge.Zipcode = conceirge.Zipcode;
+            concierge.Createddate = DateTime.Now;
+            concierge.Regionid = 1;
+
+            _context.Concierges.Add(concierge);
+            _context.SaveChanges();
+            var request1 = GetRequestByEmail(conceirge.EmailOther);
+            ConceirgeRequest(request1.Requestid, concierge.Conciergeid);
+
+        }
+
+        public void ConceirgeRequest(int RequestID,int ConceirgeID)
+        {
+            Requestconcierge requestconcierge = new Requestconcierge();
+            requestconcierge.Conciergeid = ConceirgeID;
+            requestconcierge.Requestid = RequestID;
+
+            _context.Requestconcierges.Add(requestconcierge);
+            _context.SaveChanges();
+
+        }
     }
 }

@@ -50,10 +50,12 @@ namespace DataAccessLayer.CustomModel
         [Required(ErrorMessage = "Please Enter Mobile")]
         public string Zipcode { get; set; } = null!;
 
+        public string? Passwordhash { get; set; }
+        public string? ConfirmPasswordhash { get; set; }
         public string? FileName { get; set; }
 
         [FromForm]
-        public IFormFile File { get; set; }
+        public IFormFile? File { get; set; }
 
     }
 }

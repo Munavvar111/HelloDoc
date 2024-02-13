@@ -4,11 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Transactions;
+using BC = BCrypt.Net.BCrypt;
+
 using BusinessLayer.InterFace;
 using DataAccessLayer.CustomModel;
 using DataAccessLayer.DataContext;
 using DataAccessLayer.DataModels;
 using Microsoft.Extensions.Logging;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace BusinessLayer.Repository
 {
@@ -22,7 +25,10 @@ namespace BusinessLayer.Repository
             _logger = logger;
         }
        
-
+        public AspnetUser GetUserByUserName(string userName)
+        {
+            return _context.AspnetUsers.FirstOrDefault(x => x.Username == userName);
+        }
         public User GetUserByEmail(string email)
         {
             return _context.Users.FirstOrDefault(x=>x.Email==email);
@@ -30,7 +36,7 @@ namespace BusinessLayer.Repository
         }
         public Request GetRequestByEmail(string email)
         {
-            return _context.Requests.FirstOrDefault(r => r.Email == email);
+            return _context.Requests.OrderBy(e=>e.Requestid).LastOrDefault(r => r.Email == email);
         }
 
         public AspnetUser GetAspnetUserBYEmail(string email)
@@ -41,14 +47,22 @@ namespace BusinessLayer.Repository
         {
             var aspnetUser = new AspnetUser();
             {
+                
+
+                aspnetUser.Passwordhash = BC.HashPassword(requestModel.Passwordhash);
+
                 // populate aspnetUser properties from requestModel
                 aspnetUser.Aspnetuserid = Guid.NewGuid().ToString();
                 aspnetUser.Email = requestModel.Email;
                 aspnetUser.Username = requestModel.Firstname+requestModel.Lastname;
-            };
+                    _context.AspnetUsers.Add(aspnetUser);
+                    _context.SaveChanges();
+                }
+               
+            
+            
+                
 
-            _context.AspnetUsers.Add(aspnetUser);
-            _context.SaveChanges();
         }
 
         public void AddUser(RequestModel requestModel, String AspnetUserID)

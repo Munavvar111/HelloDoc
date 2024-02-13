@@ -1,37 +1,48 @@
-﻿using DataAccessLayer.CustomModel;
+﻿using BusinessLayer.InterFace;
+using BusinessLayer.Repository;
+using DataAccessLayer.CustomModel;
 using DataAccessLayer.DataContext;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace HalloDocPatient.Controllers
 {
     public class DashboardController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly IPatientRequest _patientRequest;
 
-        public DashboardController(ApplicationDbContext context)
+        public DashboardController(ApplicationDbContext context, IPatientRequest patientRequest)
         {
             _context = context;
+            _patientRequest = patientRequest;
         }
-
+        public IActionResult ViewDocument()
+        {
+            return View();
+        }
         public async Task<IActionResult> Index()
         {
-            var username = HttpContext.Session.GetString("Username");
+            var email = HttpContext.Session.GetString("Email");
 
-            var PatientDetails = (from req in _context.Requests
-                                  join refi in _context.Requestwisefiles on req.Requestid equals refi.Requestid into requestFiles
-                                  from file in requestFiles.DefaultIfEmpty()
-                                  select new PatientDashboard
-                                  {
-                                      CreatedDate = req.Createddate,
-                                      Status = req.Status,
-                                      Filename = file != null ? file.Filename : null
-                                  }).ToList();
+            var result = from req in _context.Requests
+                         join reqFile in _context.Requestwisefiles
+                         on req.Requestid equals reqFile.Requestid into reqFilesGroup
+                         where req.Email == email
+                         from reqFile in reqFilesGroup.DefaultIfEmpty()
+                         select new PatientDashboard
+                         {
+                             CreatedDate = reqFile != null ? reqFile.Createddate : req.Createddate,
+                             Status = req.Status,
+                             Filename = reqFile != null ? reqFile.Filename : null
+                         };
 
-            ViewBag.Username = username;
+            ViewBag.Email = email;
 
-            return View(PatientDetails);
+            return View(result.ToList());
         }
+
 
     }
 

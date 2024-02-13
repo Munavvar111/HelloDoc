@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
+using BC = BCrypt.Net.BCrypt;
 using BusinessLayer.InterFace;
 using DataAccessLayer.CustomModel;
 using DataAccessLayer.DataContext;
@@ -18,7 +20,19 @@ namespace BusinessLayer.Repository
         }
         public bool isLoginValid(LoginModel a)
         {
-            return _context.AspnetUsers.Any(i => i.Username == a.Username && i.Passwordhash == a.Passwordhash);
+            var account = _context.AspnetUsers.SingleOrDefault(x => x.Email == a.Email);
+
+            // check account found and verify password
+            if (account == null || !BC.Verify(a.Passwordhash, account.Passwordhash))
+            {
+                // authentication failed
+                return false;
+            }
+            else
+            {
+                // authentication successful
+                return true;
+            }
         }
     }
 }

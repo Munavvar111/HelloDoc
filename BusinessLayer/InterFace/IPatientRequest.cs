@@ -12,7 +12,7 @@ namespace BusinessLayer.InterFace
     {
 
         User GetUserByEmail(string Email);
-
+        AspnetUser GetUserByUserName(string UserName);  
         Request GetRequestByEmail(string email);
 
         AspnetUser GetAspnetUserBYEmail(string Email);
