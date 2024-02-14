@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <link href="./css/bootstrap.min.css" rel="stylesheet">
+  <link href="./css/style.css" rel="stylesheet">
+  <style>
+    @media only screen and (max-width: 880px) {
+        .sale-image {
+            width: 40%;
+        }
+    }
+
+    @media only screen and (max-width: 768px) {
+        .container-fluid {
+            width: 100%;
+            padding: 0 10px;
+        }
+
+        .d-flex {
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .w-25 {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        .ml-3,
+        .mr-5,
+        .mr-2 {
+            margin: 0;
+        }
+
+        .custom-btn {
+            width: 100%;
+            text-align: left;
+        }
+
+        .bg-white {
+            width: 100%;
+            margin: 10px 0;
+        }
+
+        .mb-5,
+        .mt-5,
+        .ml-5,
+        .mr-5 {
+            margin: 0 0 10px;
+        }
+
+        .d-flex {
+            flex-direction: column;
+        }
+
+        .table {
+            overflow-x: auto;
+            display: block;
+            white-space: nowrap;
+        }
+
+        th,
+        td {
+            text-align: center;
+        }
+    }
+
+    @media only screen and (max-width: 1020px) {
+        .dashbord-div {
+            display: none;
+        }
+
+        body {
+            overflow-x: hidden;
+        }
+
+        .container-fluid {
+            width: 100%;
+            padding: 0 10px;
+        }
+
+        .d-flex {
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .w-25 {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        .ml-3,
+        .mr-5,
+        .mr-2 {
+            margin: 0;
+        }
+
+        .custom-btn {
+            width: 100%;
+            text-align: left;
+        }
+
+        .bg-white {
+            width: 100%;
+            margin: 10px 0;
+        }
+
+        .mb-5,
+        .mt-5,
+        .ml-5,
+        .mr-5 {
+            margin: 0 0 10px;
+        }
+
+        .d-flex {
+            flex-direction: column;
+        }
+
+        .table {
+            overflow-x: auto;
+            display: block;
+            white-space: nowrap;
+        }
+
+        th,
+        td {
+            text-align: center;
+        }
+    }
+</style>
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg navbar-light bg-white">
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button> 
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav">
+        <li>
+
+          <a class="navbar-brand" href="#"><img src="./images/menu-bar.svg"></a>
+        </li>
+        <li class="nav-item active">
+          <a class="nav-link" href="#"><img src="./images/header-logo.svg"></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#"><img src="./images/search-icon.svg" height="15px"><input type="text" class="border border-white"></a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+  <div class="second-div">
+    <div class="sidebar-div">
+      <button type="button" class="d-flex flex-row align-items-center btn btn-white custom-btn mb-3">
+        <img src="./images/dashboard-active.svg" class="dashbordimage"><span class="ml-1  "
+            style="font-size: 16px;">Dashbord</span>
+    </button>
+
+
+
+    <button type="button" class="d-flex flex-row align-items-center btn btn-white custom-btn mb-3">
+        <img src="./images/graph-default.svg" class="dashbordimage"><span class="ml-1  "
+            style="font-size: 16px;">analysis</span>
+    </button>
+
+
+
+    <button type="button" class="d-flex flex-row align-items-center btn btn-white custom-btn mb-3">
+        <img src="./images/inbox-default.svg" class="dashbordimage"><span class="ml-1  "
+            style="font-size: 16px;">Inbox</span>
+    </button>
+
+
+
+    <button type="button" class="d-flex flex-row align-items-center btn btn-white custom-btn mb-3">
+        <img src="./images/clock-default.svg" class="dashbordimage"><span class="ml-1  "
+            style="font-size: 16px;">History</span>
+    </button>
+
+
+
+    <button type="button" class="d-flex flex-row align-items-center btn btn-white custom-btn mb-3">
+        <img src="./images/user-default.svg" class="dashbordimage"><span class="ml-1  "
+            style="font-size: 16px;">User</span>
+    </button>
+
+
+
+    <button type="button" class="d-flex flex-row align-items-center btn btn-white custom-btn mb-3">
+        <img src="./images/maintenance-default.svg" class="dashbordimage"><span class="ml-1  "
+            style="font-size: 16px;">Maintenance</span>
+    </button>
+
+
+
+    <button type="button" class="d-flex flex-row align-items-center btn btn-white custom-btn mb-3">
+        <img src="./images/setting-default.svg" class="dashbordimage"><span class="ml-1  "
+            style="font-size: 16px;">Setting</span>
+    </button>
+    </div>
+    <div class="leftsidebar  bg-light">
+      <div>
+        <h3 class="mt-4 ml-4 mb-4">Dashbord</h3>
+    </div>
+    <div class="d-flex flex-row justify-content-around flex-wrap">
+        <div class="d-flex flex-row bg-white p-4">
+            <div>
+                <img src="./images/star.svg">
+            </div>
+            <div class="d-flex flex-column ml-2">
+                <div>
+                    <span>23,456</span>
+                </div>
+                <div>
+                    New Product
+                </div>
+            </div>
+        </div>
+        <div class="d-flex flex-row bg-white p-4">
+            <div>
+                <img src="./images/new-product.svg">
+            </div>
+            <div class="d-flex flex-column ml-2">
+                <div>
+                    <span>2345</span>
+                </div>
+                <div>
+                    Add Product
+                </div>
+            </div>
+        </div>
+        <div class="d-flex flex-row bg-white p-4">
+            <div>
+                <img src="./images/total-product.svg" style="width: 40px;">
+            </div>
+            <div class="d-flex flex-column ml-2">
+                <div>
+                    <span>32456</span>
+                </div>
+                <div>
+                    Total Product
+                </div>
+            </div>
+        </div>
+        <div class="d-flex flex-row bg-white p-4">
+            <div>
+                <img src="./images/dollar-filled.svg">
+            </div>
+            <div class="d-flex flex-column ml-2">
+                <div>
+                    <span>5678</span>
+                </div>
+                <div>
+                    Today's Sale
+                </div>
+            </div>
+        </div>
+        <div class="d-flex flex-row bg-white p-4">
+            <div>
+                <img src="./images/money-bag.svg">
+            </div>
+            <div class="d-flex flex-column ml-2">
+                <div>
+                    <span>335342</span>
+                </div>
+                <div>
+                    Total Sales
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="d-flex flex-row justify-content-around flex-wrap">
+        <div class="bg-white mt-5 ml-5 mr-5" style="flex-grow: 0.1;">
+            <div class="mb-5 ml-4 mt-4 d-flex flex-row sale-image">
+                <div class="d-flex flex-grow-1">
+                    <h3>Sale</h3>
+                </div>
+                <div>
+                    <ul class="d-flex flex-row mr-3 " style="list-style: none;">
+                        <li class="mr-3 text-gray">Weakly</li>
+                        <li class="mr-3 text-gray">Monthly</li>
+                        <li class="text-gray">Yearly</li>
+                    </ul>
+                </div>
+            </div>
+            <img src="./images/data-graph.png" class="ml-5">
+        </div>
+        <div class="d-flex bg-white flex-column mt-5 ml-5 mr-5" style="flex-grow: 1;">
+            <div class=" mt-5  ">
+                <div>
+                    <h3>Sales By Country</h3>
+                </div>
+                <div class="d-flex justify-content-center">
+
+                    <img src="./images/pie-chart.svg" class="d-flex justify-content-center">
+                </div>
+            </div>
+            <div class="d-flex flex-column">
+
+                <div class="d-flex justify-content-around flex-wrap">
+                    <div>
+
+                        <svg height="50" width="50">
+                            <circle cx="30" cy="30" r="5" stroke="red" stroke-width="0" fill="red" />
+                        </svg><span>United State</span>
+                    </div>
+                    <div>
+
+                        <svg height="50" width="50">
+                            <circle cx="30" cy="30" r="5" stroke="red" stroke-width="0" fill="orange" />
+                        </svg><span>Canada</span>
+                    </div>
+
+                </div>
+                <div class="d-flex justify-content-around">
+                    <div>
+
+                        <svg height="50" width="50">
+                            <circle cx="30" cy="30" r="5" stroke="red" stroke-width="0" fill="green" />
+                        </svg><span>Russia</span>
+                    </div>
+                    <div>
+
+                        <svg height="50" width="50">
+                            <circle cx="30" cy="30" r="5" stroke="red" stroke-width="0" fill="yellow" />
+                        </svg><span>India</span>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="mt-5 bg-white ml-5 mr-5 ">
+        <div class="mb-4">
+            <h3>
+                Invoice
+            </h3>
+        </div>
+        <table class="table">
+            <thead>
+                <tr style="color: #ADADAD;">
+                    <th scope="col">Invoice</th>
+                    <th scope="col">Company Name</th>
+                    <th scope="col">Email</th>
+                    <th scope="col">Due Date</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td scope="row">653515</th>
+                    <td>Public Adjusting Firm</td>
+                    <td>georgia.young@example.com</td>
+                    <td>24 may,2020</td>
+                    <td class="text-success">paid</td>
+                    <td>$47800</td>
+                </tr>
+                    <tr>
+                        <td scope="row">558612</td>
+                        <td>Other</td>
+                        <td>jessica.hanson@example.com</td>
+                        <td>24 may,2020</td>
+                        <td class="text-success">paid</td>
+                        <td>$98,000</td>
+                    </tr>
+                    <tr>
+                        <td scope="row">558612</td>
+                        <td>Vendir</td>
+                        <td>kenzi.lawson@example.com</td>
+                        <td>22 oct,2020</td>
+                        <td class="text-success">paid</td>
+                        <td>$10,000</td>
+                    </tr>
+                    <tr>
+                        <td scope="row">651535</td>
+                        <td>Subcontractor Company</td>
+                        <td>jsckson.lawson@example.com</td>
+                        <td>1 fed,2020</td>
+                        <td class="text-danger">paid</td>
+                        <td>$10,200</td>
+                    </tr>
+                    <tr>
+                        <td scope="row">653518</td>
+                        <td>Mortgage Company</td>
+                        <td>fecila.reid@example.com</td>
+                        <td>22 oct,2020</td>
+                        <td class="text-grey">pendiing</td>
+                        <td>$12,000</td>
+                    </tr>
+                    <tr>
+                        <td scope="row">558612</td>
+                        <td>Vendir</td>
+                        <td>alma.lawson@example.com</td>
+                        <td>24 may,2020</td>
+                        <td class="text-success">paid</td>
+                        <td>$20,000</td>
+                    </tr>
+
+
+            </tbody>
+        </table>
+
+    </div>
+
+    </div>
+  </div>
+</body>
+</html>

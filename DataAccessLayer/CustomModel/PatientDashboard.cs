@@ -3,16 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using DataAccessLayer.DataModels;
 
 namespace DataAccessLayer.CustomModel
 {
     public class PatientDashboard
     {
-        public DateTime CreatedDate {  get; set; }
+        public Request Request { get; set; }
 
-        public int Status { get; set; } 
-
-        public string Filename { get; set; }
+        public Requestwisefile Requestwisefile { get; set; }    
 
     }
 }

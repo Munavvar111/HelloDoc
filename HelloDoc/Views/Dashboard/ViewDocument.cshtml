@@ -1,4 +1,4 @@
-﻿
+﻿@model string;
 @{
     Layout = "~/Views/Shared/_Layout3.cshtml";
 }
@@ -21,7 +21,7 @@
 
     <div><span>Patient Name</span></div>
     <div class="mb-3"><span class="text-info">Patient Name</span></div>
-    <div><p>Check here for any file that you or doctore of Youe subsequents have attached for you to review</p></div
+    <div><p>Check here for any file that you or doctore of Youe subsequents have attached for you to review @Model</p></div
         <div>
             <div class="input-group input-group-lg ">
                 <div id="fileName" asp-for="FileName" class="form-control fs-6 align-middle">
@@ -37,14 +37,33 @@
                 </label>
             </div>
         </div>
-        <div class="d-flex justify-content-between">
-            <div>
-                Documetn
+        <div class="d-flex justify-content-between mt-5">
+            <div class="fs-3 mt-2 mx-4"> 
+               <span>Documents</span>
             </div>
-            <div>
-                Downloads
+            <div class="mt-2 mx-4 fs-3">
+                <a class="btn btn-outline-info">Download All</a>
             </div>
         </div>
+                <table class="table">
+  <thead class="thead-secondry">
+    <tr>
+      <td scope="col"></td>
+      <th scope="col">Uploader</th>
+      <th scope="col">Updated Date </th>
+      <th scope="col">Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td scope="row"></td>
+      <td>Mark</td>
+      <td>Otto</td>
+    </tr>
+    
+  </tbody>
+</table>
+
     </div>
 </div>
 

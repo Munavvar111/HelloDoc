@@ -18,9 +18,9 @@ namespace HalloDocPatient.Controllers
             _context = context;
             _patientRequest = patientRequest;
         }
-        public IActionResult ViewDocument()
+        public IActionResult ViewDocument(string filename)
         {
-            return View();
+            return View((object)filename);
         }
         public async Task<IActionResult> Index()
         {
@@ -33,9 +33,8 @@ namespace HalloDocPatient.Controllers
                          from reqFile in reqFilesGroup.DefaultIfEmpty()
                          select new PatientDashboard
                          {
-                             CreatedDate = reqFile != null ? reqFile.Createddate : req.Createddate,
-                             Status = req.Status,
-                             Filename = reqFile != null ? reqFile.Filename : null
+                             Request = req,
+                             Requestwisefile = reqFile
                          };
 
             ViewBag.Email = email;

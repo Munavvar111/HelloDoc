@@ -16,39 +16,39 @@
             <thead class="thead-Secondary">
                 <tr class="table-secondary">
                     <th>
-                        Crreateddate
+                        CreatedDate
                     </th>
                     <th class="d-none d-md-table-cell">
-                        status
+                        Status
                     </th>
                     <th class="d-none d-md-table-cell">
-                        document
+                        Document
                     </th>
                 </tr>
             </thead>
             <tbody>
                 @foreach (var item in Model)
                 {
-                    <tr data-toggle="collapse" data-target="#details@(item.CreatedDate)" class="accordion-toggle">
+                    <tr data-toggle="collapse" data-target="#details@(item.Request.Createddate)" class="accordion-toggle">
                         <td>
-                            @Html.DisplayFor(modelItem => item.CreatedDate)
+                            @Html.DisplayFor(modelItem => item.Request.Createddate)
                         </td>
                         <td class="d-none d-md-table-cell">
-                            @Html.DisplayFor(modelItem => item.Status)
+                            @Html.DisplayFor(modelItem => item.Request.Status)
                         </td>
                         <td class="d-none d-md-table-cell">
-                            @if (!string.IsNullOrEmpty(item.Filename))
+                            @if (!string.IsNullOrEmpty(item.Requestwisefile.Filename))
                             {
-                                <a class="btn btn-outline-info d-none d-md-inline" asp-action="ViewDocument">Document</a>
+                                <a class="btn btn-outline-info d-none d-md-inline" asp-action="ViewDocument" asp-route-filename="@item.Requestwisefile.Filename">Document</a>
                             }
                         </td>
                     </tr>
                     <tr>
                         <td colspan="3" class="hiddenRow">
-                            <div id="details@(item.CreatedDate)" class="accordian-body collapse">
+                            <div id="details@(item.Request.Createddate)" class="accordian-body collapse">
                                 <!-- Additional details here -->
-                                Status: @Html.DisplayFor(modelItem => item.Status) <br />
-                                Request ID: @Html.DisplayFor(modelItem => item.Filename) <br />
+                                Status: @Html.DisplayFor(modelItem => item.Request.Status) <br />
+                                Request ID: @Html.DisplayFor(modelItem => item.Requestwisefile.Filename) <br />
                                 <!-- Add other fields as needed -->
                             </div>
                         </td>
@@ -58,4 +58,3 @@
         </table>
     </div>
 </div>
-
