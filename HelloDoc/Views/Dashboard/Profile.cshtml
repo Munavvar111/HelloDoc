@@ -2,4 +2,146 @@
 @*
     For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 *@
-<div class="tab-pane fade" id="pills-profile" role="tabpanel" aria-labelledby="pills-profile-tab">dsfss</div>
+<div class="tab-pane fade" id="pills-profile" role="tabpanel" aria-labelledby="pills-profile-tab">
+
+        <div class="container d-flex justify-content-between my-3">
+        <div class="d-flex">
+            <span class="fs-2 text-muted fw-bold">Documents</span>
+        </div>
+        <div class="d-flex justify-content-end">
+            <a asp-controller="Dashboard" asp-action="Index" asp-area=""
+               class="btn btn-outline-info d-flex align-items-center">
+                <span class="material-symbols-outlined"> chevron_left </span> Back
+            </a>
+        </div>
+    </div>
+    <form class="container border rounded-3 p-3 p-md-5 mb-3  d-flex flex-column gap-4 bg-white" method="post">
+        
+
+            
+        <div class="row row-cols-1 row-cols-md-2 g-3">
+            <div class="col-12 col-md-12">
+                <h5 class="fw-semibold">General Information</h5>
+            </div>
+           
+            <div class="col">
+                <div class="form-floating">
+                    <input type="text"
+                           class="form-control"
+                           id="floatingInput"
+                           placeholder="name@example.com"
+                           />
+                    <label for="floatingInput">First Name</label>
+                    <span class="text-danger"></span>
+                </div>
+            </div>
+            <div class="col">
+                <div class="form-floating">
+                    <input type="text"
+                           class="form-control"
+                           id="floatingInput"
+                           placeholder="name@example.com"
+                            />
+                    <label for="floatingInput">Last Name</label>
+                    <span  class="text-danger"></span>
+                </div>
+            </div>
+            <div class="col">
+                <div class="form-floating">
+                    <input type="date"
+                           class="form-control"
+                           id="floatingInput"
+                           placeholder="name@example.com"
+                           />
+                    <label for="floatingInput">Date of Birth</label>
+                    <span  class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+        <div class="row row-cols-1 row-cols-md-2 g-3">
+            <div class="col-12 col-md-12">
+                <h5 class="fw-semibold">Contact Information</h5>
+            </div>
+
+            <div class="col">
+                <div class="form-floating">
+                    <input type="email"
+                           class="form-control"
+                           id="floatingInput"
+                           placeholder="name@example.com"
+                            />
+                    <label for="floatingInput">Email</label>
+                    <span class="text-danger" ></span>
+                </div>
+            </div>
+            <div class="col">
+                <div class="border rounded-2 tel-container">
+                    <input id="phone2"
+                           type="tel"
+                           class="form-control border-0 tel-input"
+                           name="phone" />
+                </div>
+            </div>
+        </div>
+        <div class="row row-cols-1 row-cols-md-2 g-3">
+            <div class="col-12 col-md-12">
+                <h5 class="fw-semibold"> Location Information</h5>
+            </div>
+            <div class="col">
+                <div class="form-floating">
+                    <input type="text"
+                           class="form-control"
+                           id="floatingInput"
+                           placeholder="Rajpath Road"
+                           />
+                    <label for="floatingInput">Street</label>
+                    <span  class="text-danger"></span>
+                </div>
+            </div>
+            <div class="col">
+                <div class="form-floating">
+                    <input type="text"
+                           class="form-control"
+                           id="floatingInput"
+                           placeholder="Rajpath Road"
+                           />
+                    <label for="floatingInput">City</label>
+                    <span class="text-danger"></span>
+                </div>
+            </div>
+            <div class="col">
+                <div class="form-floating">
+                    <input type="text"
+                           class="form-control"
+                           id="floatingInput"
+                           placeholder="Rajpath Road"
+                           />
+                    <label for="floatingInput">State</label>
+                    <span class="text-danger"></span>
+                </div>
+            </div>
+            <div class="col">
+                <div class="form-floating">
+                    <input type="text"
+                           class="form-control"
+                           id="floatingInput"
+                           placeholder="Rajpath Road"
+                           />
+                    <label for="floatingInput">Zip Code</label>
+                    <span  class="text-danger"></span>
+                </div>
+            </div>
+            
+        </div>
+        
+        <div class="row">
+            <div class="d-flex gap-3 align-items-center justify-content-end">
+                <button class="btn btn-info text-light" type="submit">
+                    Edit
+                </button>
+                
+            </div>
+        </div>
+    </form>
+
+</div>

@@ -109,7 +109,7 @@ namespace HalloDocPatient.Controllers
             var result = from req in _context.Requests
                          join reqFile in _context.Requestwisefiles
                          on req.Requestid equals reqFile.Requestid into reqFilesGroup
-                         where req.Email == email
+                         where req.Userid == id
                          from reqFile in reqFilesGroup.DefaultIfEmpty()
                          select new PatientDashboard
                          {
