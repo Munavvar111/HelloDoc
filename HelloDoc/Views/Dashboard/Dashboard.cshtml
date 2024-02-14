@@ -1,4 +1,7 @@
 ﻿@model List<DataAccessLayer.CustomModel.PatientDashboard>
+@{
+    var uniqueRequestIds = new HashSet<int>();
+}
 
 <div class="tab-pane fade bg-light show active" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab">
     <div class="mt-5 bg-light m-2">
@@ -22,37 +25,69 @@
                         Status
                     </th>
                     <th class="d-none d-md-table-cell">
+                        Action
+                    </th> 
+                    <th class="d-none d-md-table-cell">
                         Document
                     </th>
                 </tr>
             </thead>
             <tbody>
+
                 @foreach (var item in Model)
                 {
-                    <tr data-toggle="collapse" data-target="#details@(item.Request.Createddate)" class="accordion-toggle">
-                        <td>
-                            @Html.DisplayFor(modelItem => item.Request.Createddate)
-                        </td>
-                        <td class="d-none d-md-table-cell">
-                            @Html.DisplayFor(modelItem => item.Request.Status)
-                        </td>
-                        <td class="d-none d-md-table-cell">
-                            @if (!string.IsNullOrEmpty(item.Requestwisefile.Filename))
-                            {
-                                <a class="btn btn-outline-info d-none d-md-inline" asp-action="ViewDocument" asp-route-filename="@item.Requestwisefile.Filename">Document</a>
-                            }
-                        </td>
-                    </tr>
-                    <tr>
-                        <td colspan="3" class="hiddenRow">
-                            <div id="details@(item.Request.Createddate)" class="accordian-body collapse">
-                                <!-- Additional details here -->
-                                Status: @Html.DisplayFor(modelItem => item.Request.Status) <br />
-                                Request ID: @Html.DisplayFor(modelItem => item.Requestwisefile.Filename) <br />
-                                <!-- Add other fields as needed -->
-                            </div>
-                        </td>
-                    </tr>
+                    if (uniqueRequestIds.Add(item.Request.Requestid))
+                    {
+
+
+                        <tr data-toggle="collapse" data-target="#details@(item.Request.Createddate)" class="accordion-toggle">
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Request.Createddate)
+                            </td>
+                            <td class="d-none d-md-table-cell">
+                                @Html.DisplayFor(modelItem => item.Request.Status)
+                            </td>
+                            <td class="d-none d-md-table-cell ">
+
+                                <a class="btn btn-outline-info align-items-center">
+                                    <span class="material-symbols-outlined">
+                                        person
+                                    </span>Admin
+                                </a>
+
+                                <a class="btn btn-outline-info">
+                                    <span class="material-symbols-outlined pr">
+                                        person
+                                    </span>Provider
+                                </a>
+                            </td>
+                            <td class="d-none d-md-table-cell">
+                                @if (item.Requestwisefile != null && item.Requestwisefile.Filename != null)
+                                {
+                                    <a 
+                                    class="btn btn-outline-info"
+                                    asp-action="ViewDocument"
+                                    asp-route-requestid="@item.Request.Requestid"
+                                    >Document</a>
+                                }
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="4" class="hiddenRow">
+                                <div id="details@(item.Request.Createddate)" class="accordian-body collapse">
+                                    <!-- Additional details here -->
+                                    Status: @Html.DisplayFor(modelItem => item.Request.Status) <br />
+                                    @if (item.Requestwisefile != null && item.Requestwisefile.Filename != null)
+                                    {
+                                        <a class="btn btn-outline-info"
+                                           asp-action="ViewDocument"
+                                           asp-route-requestid="@item.Request.Requestid">Document</a>
+                                    }
+                                    <!-- Add other fields as needed -->
+                                </div>
+                            </td>
+                        </tr>
+                    }
                 }
             </tbody>
         </table>

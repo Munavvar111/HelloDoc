@@ -10,7 +10,9 @@ namespace BusinessLayer.InterFace
 {
     public interface IPatientRequest
     {
+         Task<List<Requestwisefile>> GetRequestwisefileByIdAsync(int RequestID);
 
+        User GetUserById(int id);   
         User GetUserByEmail(string Email);
         AspnetUser GetUserByUserName(string UserName);  
         Request GetRequestByEmail(string email);

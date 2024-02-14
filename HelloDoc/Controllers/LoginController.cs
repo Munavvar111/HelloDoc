@@ -31,10 +31,11 @@ namespace HalloDocPatient.Controllers
             if(ModelState.IsValid)
             {
                 
-                var user = await _context.AspnetUsers.FindAsync(a.Email);
                     if (_login.isLoginValid(a))
                     {
-                    HttpContext.Session.SetString("Email", a.Email);
+                var user = await _context.Users.FirstOrDefaultAsync(x=>x.Email==a.Email);
+                    HttpContext.Session.SetString("Email", user.Email);
+                    HttpContext.Session.SetInt32("id", user.Userid);
 
                         return RedirectToAction("Index", "Dashboard");
                     }
@@ -48,8 +49,13 @@ namespace HalloDocPatient.Controllers
         }
             
 
-        
-        
+        public IActionResult LogoutController()
+        {
+            HttpContext.Session.Clear();
+            return RedirectToAction("Index","Login");
+        }
+
+
 
         public IActionResult ForgotPassword()
         {

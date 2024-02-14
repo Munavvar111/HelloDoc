@@ -96,7 +96,6 @@ namespace HalloDocPatient.Controllers
         public  async Task<IActionResult> PatientRequest( RequestModel requestModel)
         {
             requestModel.Username = requestModel.Firstname+requestModel.Lastname;
-            var modelStateErrors = this.ModelState.Values.SelectMany(m => m.Errors);
             if(!ModelState.IsValid)
             {
                 return View(requestModel);

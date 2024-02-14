@@ -12,6 +12,7 @@ using DataAccessLayer.DataContext;
 using DataAccessLayer.DataModels;
 using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore;
 
 namespace BusinessLayer.Repository
 {
@@ -25,6 +26,10 @@ namespace BusinessLayer.Repository
             _logger = logger;
         }
        
+        public User GetUserById(int id)
+        {
+            return _context.Users.FirstOrDefault(x => x.Userid == id);    
+        }
         public AspnetUser GetUserByUserName(string userName)
         {
             return _context.AspnetUsers.FirstOrDefault(x => x.Username == userName);
@@ -182,7 +187,10 @@ namespace BusinessLayer.Repository
 
         }
 
-
+        public async Task<List<Requestwisefile>> GetRequestwisefileByIdAsync(int RequestID)
+        {
+            return await _context.Requestwisefiles.Where(r=>r.Requestid==RequestID).ToListAsync();
+        }
 
 
     }
