@@ -71,7 +71,8 @@
                            class="form-control"
                            id="floatingInput"
                            placeholder="name@example.com"
-                       asp-for="Email" disabled />
+                       asp-for="Email" disabled="disabled" 
+                       id="Email" readonly />
                     <label for="floatingInput">Email</label>
                 <span asp-validation-for="Email" class="text-danger"></span>
                 </div>
@@ -95,7 +96,7 @@
                            class="form-control"
                            id="floatingInput"
                            placeholder="Rajpath Road"
-                       asp-for="Street" disabled />
+                       asp-for="Street" disabled  />
                     <label for="floatingInput">Street</label>
                     <span asp-validation-for="Street" class="text-danger"></span>
                 </div>
@@ -150,33 +151,36 @@
     </form>
 
     <script>
-    $("#SubBtn").hide()
-    $("#CanBtn").hide()
-        // Function to toggle the disabled attribute of input fields
-        function toggleEdit() {
-        
-            // Get all input fields within the form
-            var inputFields = document.querySelectorAll('form input');
+    $("#SubBtn").hide();
+    $("#CanBtn").hide();
 
-            // Toggle the disabled attribute for each input field
-            inputFields.forEach(function (input) {
-                input.disabled = !input.disabled;
-            });
-        $("#EditBtn").hide()
-        $("#SubBtn").show()
-        $("#CanBtn").show()
-        }
-
-        function toggleCancel() {
-        var inputFields = document.querySelectorAll('form input');
+    // Function to toggle the disabled attribute of input fields
+    function toggleEdit() {
+        // Get all input fields within the form excluding the input with id "Email"
+        var inputFields = document.querySelectorAll('form input:not(#Email)');
 
         // Toggle the disabled attribute for each input field
         inputFields.forEach(function (input) {
             input.disabled = !input.disabled;
         });
-            $("#EditBtn").show()
-        $("#SubBtn").hide()
-        $("#CanBtn").hide()
-        }
+
+        $("#EditBtn").hide();
+        $("#SubBtn").show();
+        $("#CanBtn").show();
+    }
+
+    function toggleCancel() {
+        var inputFields = document.querySelectorAll('form input:not(#Email)');
+
+        // Toggle the disabled attribute for each input field
+        inputFields.forEach(function (input) {
+            input.disabled = !input.disabled;
+        });
+
+        $("#EditBtn").show();
+        $("#SubBtn").hide();
+        $("#CanBtn").hide();
+    }
+
     </script>
 

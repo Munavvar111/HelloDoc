@@ -54,6 +54,8 @@ namespace DataAccessLayer.CustomModel
         public string? ConfirmPasswordhash { get; set; }
         public string? FileName { get; set; }
 
+        public string? PhoneNo { get; set; }
+
         [FromForm]
         public IFormFile? File { get; set; }
 

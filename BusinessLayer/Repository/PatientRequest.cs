@@ -167,7 +167,9 @@ namespace BusinessLayer.Repository
                 requestClient.Street = requestModel.Street;
                 requestClient.City = requestModel.City;
                 requestClient.Zipcode = requestModel.Zipcode;
-                // populate requestClient properties from requestModel
+                requestClient.Intdate = requestModel.BirthDate.Day;
+                requestClient.Intyear = requestModel.BirthDate.Year;
+                requestClient.Strmonth = requestModel.BirthDate.Month.ToString();
             };
 
             _context.Requestclients.Add(requestClient);

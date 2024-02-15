@@ -41,6 +41,7 @@
                 {
                     if (uniqueRequestIds.Add(item.Request.Requestid))
                     {
+                        var fileCount = Model.Count(m => m.Request.Requestid == item.Request.Requestid && m.Requestwisefile != null);
 
 
                         <tr data-toggle="collapse" data-target="#details@(item.Request.Createddate)" class="accordion-toggle">
@@ -48,7 +49,18 @@
                                 @Html.DisplayFor(modelItem => item.Request.Createddate)
                             </td>
                             <td class="d-none d-md-table-cell">
-                                @Html.DisplayFor(modelItem => item.Request.Status)
+                                @if (item.Request.Status == 1)
+                                {
+                                    <span>New</span>
+                                }
+                                else if (item.Request.Status == 2)
+                                {
+                                    <span>Assign</span>
+                                }
+                                else if (item.Request.Status == 3)
+                                {
+                                    <span>Cancelled</span>
+                                }
                             </td>
                             <td class="d-none d-md-table-cell ">
 
@@ -65,11 +77,11 @@
                                 </a>
                             </td>
                             <td class="d-none d-md-table-cell">
-                                @if (item.Requestwisefile != null && item.Requestwisefile.Filename != null)
+                                @if (fileCount > 0)
                                 {
                                     <a class="btn btn-outline-info"
                                        asp-action="ViewDocument"
-                                       asp-route-requestid="@item.Request.Requestid">Document</a>
+                                       asp-route-requestid="@item.Request.Requestid">Documents (@fileCount)</a>
                                 }
                             </td>
                         </tr>
@@ -78,11 +90,11 @@
                                 <div id="details@(item.Request.Createddate)" class="accordian-body collapse">
                                     <!-- Additional details here -->
                                     Status: @Html.DisplayFor(modelItem => item.Request.Status) <br />
-                                    @if (item.Requestwisefile != null && item.Requestwisefile.Filename != null)
+                                    @if (fileCount > 0)
                                     {
                                         <a class="btn btn-outline-info"
                                            asp-action="ViewDocument"
-                                           asp-route-requestid="@item.Request.Requestid">Document</a>
+                                           asp-route-requestid="@item.Request.Requestid">Documents (@fileCount)</a>
                                     }
                                     <!-- Add other fields as needed -->
                                 </div>

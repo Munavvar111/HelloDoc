@@ -171,7 +171,7 @@ namespace HalloDocPatient.Controllers
             ViewBag.Email = email;
             ViewBag.name = user.Lastname;
 
-            return View(result.Distinct().ToList());
+            return View(result.ToList());
         }
 
         public async Task<IActionResult> AddRequestByme()
@@ -191,29 +191,87 @@ namespace HalloDocPatient.Controllers
         [HttpPost]
         public async Task<IActionResult> AddRequestByme(RequestModel rm)
         {
-            var id = HttpContext.Session.GetInt32("id");
-
-            if (rm.File != null)
+            if (ModelState.IsValid)
             {
-                var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
-                var uniqueFileName = Guid.NewGuid().ToString() + "_" + rm.File.FileName;
-                var filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
-                using (var stream = new FileStream(filePath, FileMode.Create))
+
+                var id = HttpContext.Session.GetInt32("id");
+
+                if (rm.File != null)
                 {
-                    await rm.File.CopyToAsync(stream);
-                }
-                _patientRequest.AddPatientRequest(rm, ReqTypeId:1);
-                var request = _patientRequest.GetRequestByEmail(rm.Email);
-                _patientRequest.AddRequestWiseFile(uniqueFileName, request.Requestid);
-                return RedirectToAction("Index","Dashboard");
-            }
-            return View();
-        }
+                    var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
+                    var uniqueFileName = Guid.NewGuid().ToString() + "_" + rm.File.FileName;
+                    var filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await rm.File.CopyToAsync(stream);
+                    }
+                    _patientRequest.AddPatientRequest(rm, ReqTypeId: 1);
+                    var request = _patientRequest.GetRequestByEmail(rm.Email);
+                    _patientRequest.AddRequestWiseFile(uniqueFileName, request.Requestid);
+                    return RedirectToAction("Index", "Dashboard");
+                }
+            }
+           
+            return View(rm);
+        }
         public IActionResult AddRequestByElse()
         {
             return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AddRequestByElse(RequestModel requestModel)
+        {
+            if (ModelState.IsValid)
+            {
+
+                var id = HttpContext.Session.GetInt32("id");
+                var user = await _context.Users.FindAsync(id);
+                if (requestModel.File != null)
+                {
+                    var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
+                    var uniqueFileName = Guid.NewGuid().ToString() + "_" + requestModel.File.FileName;
+                    var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await requestModel.File.CopyToAsync(stream);
+                    }
+                    var request = new Request();
+                    {
+                        request.Userid = user.Userid;
+                        request.Firstname = user.Firstname;
+                        request.Lastname = user.Lastname;
+                        request.Email = user.Email;
+                        request.Requesttypeid = 2;
+                        request.Createddate = DateTime.Now;
+                        request.Status = 1;
+                        _context.Requests.Add(request);
+                        _context.SaveChanges();
+
+                    }
+                    var requestclient = new Requestclient();
+                    {
+                        requestclient.Firstname = requestModel.Firstname;
+                        requestclient.Requestid = request.Requestid;
+                        requestclient.Lastname=request.Lastname;
+                        requestclient.Email = requestModel.Email;
+                        requestclient.State = requestModel.State;
+                        requestclient.Street = requestModel.Street;
+                        requestclient.Zipcode = requestModel.Zipcode;
+                        requestclient.Intdate = requestModel.BirthDate.Day;
+                        requestclient.Intyear = requestModel.BirthDate.Year;
+                        requestclient.Strmonth = requestModel.BirthDate.Month.ToString();
+                        _context.Requestclients.Add(requestclient);
+                        _context.SaveChanges();
+                    }
+                    _patientRequest.AddRequestWiseFile(uniqueFileName, request.Requestid);
+                    return RedirectToAction("Index","Dashboard");
+                }
+                }
+            return View(requestModel);
         }
     }
 

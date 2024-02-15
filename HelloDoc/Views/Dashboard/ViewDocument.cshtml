@@ -44,7 +44,7 @@
                 <span>Documents</span>
             </div>
             <div class="mt-2 mx-4 fs-3">
-                <a class="btn btn-outline-info">Download All</a>
+                <a id="downloadAllBtn" class="btn btn-outline-info">Download All</a>
             </div>
         </div>
 
@@ -91,4 +91,20 @@
         let path = this.value.substr(this.value.lastIndexOf('\\') + 1);
         document.getElementById("fileName").innerText = path;
     };
+
+    document.getElementById("downloadAllBtn").addEventListener("click", function () {
+        // Iterate through each file and create a dynamic link
+    @foreach (var item in Model.Requestwisefileview)
+    {
+        <text>
+            var link = document.createElement("a");
+            link.href = "/uploads/@item.Filename"; // Add a slash at the beginning and adjust the path accordingly
+            link.download = "@item.Filename";
+            link.style.display = "none";
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        </text>
+    }
+        });
 </script>
