@@ -151,12 +151,35 @@ namespace HalloDocPatient.Controllers
         }
 
         [HttpPost]
-        public IActionResult FriendRequest(RequestOthers request)
+        public async Task<IActionResult> FriendRequest(RequestOthers request)
         {
             if(ModelState.IsValid)
             {
-                _otherrequest.AddFriendRequest(request, ReqTypeId: 2);
-                 return RedirectToAction("Index", "Dashboard");
+                if (request.File != null && request.File.Length > 0)
+                {
+                    var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
+                    var uniqueFileName = Guid.NewGuid().ToString() + "_" + request.File.FileName;
+                    var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await request.File.CopyToAsync(stream);
+                    }
+
+                    _otherrequest.AddFriendRequest(request, ReqTypeId: 2);
+                    var request1 = _patientRequest.GetRequestByEmail(request.EmailOther);
+                    _patientRequest.AddRequestWiseFile(uniqueFileName, request1.Requestid);
+
+                return RedirectToAction("Index", "Login");
+
+                }
+                else
+                {
+                    _otherrequest.AddFriendRequest(request, ReqTypeId: 2);
+                    return RedirectToAction("Index", "Login");
+
+
+                }
 
 
 
@@ -173,6 +196,8 @@ namespace HalloDocPatient.Controllers
         {
             if (ModelState.IsValid)
             {
+
+
                 _otherrequest.AddConceirgeRequest(requestOther, ReqTypeId: 3);
 
                 return RedirectToAction("Index", "dashboard");

@@ -1,4 +1,6 @@
-﻿<!DOCTYPE html>
+﻿
+
+<!DOCTYPE html>
 <html lang="en" data-bs-theme="light">
 <head>
     <meta charset="utf-8" />
@@ -48,7 +50,7 @@
                 </div>
 
                 <div class="fw-bolder d-flex align-items-center gap-3">
-                    <span class="text-muted d-none d-md-inline">Welcome, @ViewBag.name</span>
+                    <span class="text-muted d-none d-md-inline">Welcome,@ViewBag.name </span>
                     <a asp-controller="Login" asp-action="LogoutController"  class="btn btn-outline-info d-none d-md-inline">Logout</a>
 
                     <!-- Responsive Logout Icon for Small Screens -->
@@ -62,21 +64,38 @@
                 <!-- Responsive Navigation Toggle -->
                 
             </section>
-
+            
             <!-- Responsive Navigation -->
             <div class="collapse d-sm-none" id="responsiveNav">
                 <ul class="nav nav-tabs">
                     <li class="nav-item">
-                        <a class="nav-link active" id="pills-home-tab" data-toggle="pill" href="#pills-home" role="tab" aria-controls="pills-home" aria-selected="true">Home</a>
+                        <a class="nav-link @(ViewContext.ActionDescriptor.RouteValues["action"] == "Index" ? "active" : "")"
+                           asp-action="Index" asp-controller="Dashboard">Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" id="pills-profile-tab" data-toggle="pill" href="#pills-profile" role="tab" aria-controls="pills-profile" aria-selected="false">Profile</a>
+                        <a class="nav-link @(ViewContext.ActionDescriptor.RouteValues["action"] == "Profile" ? "active" : "")"
+                           asp-action="Profile" asp-controller="Dashboard">Profile</a>
                     </li>
+
                 </ul>
             </div>
+
         </header>
         
-        
+        <div class="w-100 shadow  px-2 px-md-5 position-relative z-2 pt-2 border-bottom d-none d-sm-block">
+            <ul class="nav nav-pills-info mb-3" id="pills-tab" role="tablist">
+                <li class="nav-item text-info">
+                    <a class="nav-link @(ViewContext.ActionDescriptor.RouteValues["action"] == "Index" ? "active" : "")"
+                       asp-action="Index" asp-controller="Dashboard">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link @(ViewContext.ActionDescriptor.RouteValues["action"] == "Profile" ? "active" : "")"
+                       asp-action="Profile" asp-controller="Dashboard">Profile</a>
+                </li>
+
+            </ul>
+
+        </div>
 
         <main class="container-fluid d-flex flex-column  p-0 bg-light flex-grow-1  ">
 

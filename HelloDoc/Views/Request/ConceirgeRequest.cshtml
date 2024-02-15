@@ -4,7 +4,7 @@
 }
 <partial name="_InfoModal.cshtml" />
 
-<form class="container border rounded-3 p-3 p-md-5 mb-3 d-flex flex-column gap-4 bg-white" method="post" asp-action="ConceirgeRequest">
+<form class="container border rounded-3 p-3 p-md-5 mb-3 d-flex flex-column gap-4 bg-white" method="post" asp-action="ConceirgeRequest" enctype="multipart/form-data">
     <div class="row row-cols-1 row-cols-md-2 g-3">
         <div class="col-12 col-md-12">
             <h5 class="fw-semibold">Concierge Information</h5>
@@ -163,7 +163,7 @@
                        id="floatingInput"
                        placeholder="name@example.com"
                        asp-for="BirthDate"/>
-                <label for="floatingInput">Date of Birth</label
+                <label for="floatingInput">Date of Birth</label>
                     <span class="text-danger" asp-validation-for="BirthDate">
 
                     </span>

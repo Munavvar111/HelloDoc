@@ -30,7 +30,6 @@ namespace BusinessLayer.InterFace
         void AddPatientRequest(RequestModel requestModel,int ReqTypeId);
 
     
-
         void AddRequestWiseFile(string Filename,int RequestId);
 
 

@@ -13,5 +13,6 @@ namespace DataAccessLayer.CustomModel
 
         public Requestwisefile Requestwisefile { get; set; }    
 
+        public User? User { get; set; }
     }
 }

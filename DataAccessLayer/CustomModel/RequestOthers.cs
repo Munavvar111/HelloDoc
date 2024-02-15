@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace DataAccessLayer.CustomModel;
@@ -58,5 +60,7 @@ public partial class RequestOthers
     [Required(ErrorMessage = "Please Enter Zipcode")]
     public string Zipcode { get; set; } = null!;
 
+    [FromForm]
+    public IFormFile? File { get; set; }
 
 }

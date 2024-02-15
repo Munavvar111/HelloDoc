@@ -1,68 +1,23 @@
-﻿@model DataAccessLayer.CustomModel.RequestOthers;
+﻿@model DataAccessLayer.CustomModel.RequestModel;
+
 @{
-    ViewData["Title"] = "Family/Friend Request";
+    Layout = "~/Views/Shared/_Layout3.cshtml";
 }
-
-<form class="container border rounded-3 p-3 p-md-5 mb-3  d-flex flex-column gap-4 bg-white" method="post" enctype="multipart/form-data">
-    <div class="row row-cols-1 row-cols-md-2 g-3">
-        <div class="col-12 col-md-12">
-            <h5 class="fw-semibold">Family/Friend Information</h5>
-        </div>
-
-        <div class="col">
-            <div class="form-floating">
-                <input type="text"
-                       class="form-control"
-                       id="floatingInput"
-                       placeholder="name@example.com" 
-                       asp-for="FirstNameOther"/>
-                <label for="floatingInput focus-ring">Your First Name</label>
-                <span asp-validation-for="FirstNameOther" class="text-danger"></span>
-            </div>
-        </div>
-        <div class="col">
-            <div class="form-floating">
-                <input type="text"
-                       class="form-control"
-                       id="floatingInput"
-                       placeholder="name@example.com"
-                       asp-for="LastNameOther"/>
-                <label for="floatingInput">Your Last Name</label>
-                <span asp-validation-for="LastNameOther" class="text-danger"></span>
-            </div>
-        </div>
-        <div class="col">
-            <div class="border rounded-2 tel-container">
-                <input id="phone1"
-                       type="tel"
-                       class="form-control border-0 tel-input"
-                       name="phone" />
-            </div>
-        </div>
-
-        <div class="col">
-            <div class="form-floating">
-                <input type="email"
-                       class="form-control"
-                       id="phone"
-                       placeholder="+91 9876543210" 
-                       asp-for="EmailOther"/>
-                <label for="floatingInput">Your Email</label>
-                <span asp-validation-for="EmailOther"></span>
-            </div>
-        </div>
-        <div class="col">
-            <div class="form-floating">
-                <input type="text"
-                       class="form-control"
-                       id="floatingInput"
-                       placeholder="name@example.com"
-                       asp-for="Relation"/>
-                <label for="floatingInput">Relation with Patient</label>
-            </div>
-        </div>
+@{
+    ViewData["Title"] = "AddRequestByMe";
+}
+<div class="d-flex justify-content-between my-3 container">
+    <div class="d-flex">
+        <span class="fs-3 text-muted fw-bold">Submit Information</span>
     </div>
-
+    <div class="d-flex justify-content-end">
+        <a asp-controller="Dashboard" asp-action="Index" asp-area=""
+           class="btn btn-outline-info d-flex align-items-center">
+            <span class="material-symbols-outlined"> chevron_left </span> Back
+        </a>
+    </div>
+</div>
+<form id="patientRequestForm" class="container border rounded-3 p-3 p-md-5 mb-3 d-flex flex-column gap-4 bg-white" method="post" enctype="multipart/form-data">
     <div class="row row-cols-1 row-cols-md-2 g-3">
         <div class="col-12 col-md-12">
             <h5 class="fw-semibold">Patient Information</h5>
@@ -84,10 +39,10 @@
                 <input type="text"
                        class="form-control"
                        id="floatingInput"
-                       placeholder="name@example.com" 
-                       asp-for="FirstName"/>
-                <label for="floatingInput">First Name</label>
-                <span class="text-danger" asp-validation-for="FirstName"></span>
+                       placeholder="name@example.com"
+                       asp-for="@Model.Firstname" />
+                <label for="floatingInput" asp-for="Firstname">First Name</label>
+                <span asp-validation-for="Firstname" class="text-danger"></span>
             </div>
         </div>
         <div class="col">
@@ -95,10 +50,11 @@
                 <input type="text"
                        class="form-control"
                        id="floatingInput"
-                       placeholder="name@example.com" 
-                       asp-for="LastName"/>
-                <label for="floatingInput">Last Name</label>
-                <span asp-validation-for="LastName" class="text-danger"></span>
+                       placeholder="name@example.com"
+                       asp-for="@Model.Lastname" />
+                <label for="floatingInput" asp-for="Lastname">Last Name</label>
+                <span asp-validation-for="Lastname" class="text-danger"></span>
+
             </div>
         </div>
         <div class="col">
@@ -106,10 +62,11 @@
                 <input type="date"
                        class="form-control"
                        id="floatingInput"
-                       placeholder="name@example.com" 
-                       asp-for="BirthDate"/>
-                <label for="floatingInput">Date of Birth</label>
+                       placeholder="name@example.com"
+                       asp-for="@Model.BirthDate" />
+                <label for="floatingInput" asp-for="BirthDate">Date of Birth</label>
                 <span asp-validation-for="BirthDate" class="text-danger"></span>
+
             </div>
         </div>
     </div>
@@ -117,26 +74,51 @@
         <div class="col-12 col-md-12">
             <h5 class="fw-semibold">Patient Contact Information</h5>
         </div>
-
         <div class="col">
             <div class="form-floating">
                 <input type="email"
                        class="form-control"
-                       id="floatingInput"
+                       id="Email"
                        placeholder="name@example.com"
-                       asp-for="Email"/>
-                <label for="floatingInput">Email</label>
-                <span class="text-danger" asp-validation-for="Email"></span>
+                       asp-for="@Model.Email"
+                       onchange="CheckAvailability()" />
+                <label for="floatingInput" asp-for="Email">Email</label>
+                <span asp-validation-for="Email" class="text-danger"></span>
+
             </div>
         </div>
         <div class="col">
             <div class="border rounded-2 tel-container">
-                <input id="phone2"
+                <input id="phone1"
                        type="tel"
                        class="form-control border-0 tel-input"
                        name="phone" />
             </div>
         </div>
+
+
+        <div class="col" id="pwdcol" style="display:none">
+            <div class="form-floating">
+                <input type="password"
+                       asp-for="Passwordhash"
+                       class="form-control"
+                       id="floatingInput"
+                       placeholder="*****" />
+                <label for="floatingInput" asp-for="Passwordhash">Password</label>
+            </div>
+        </div>
+        <div class="col" id="pwdrow" style="display:none">
+            <div class="form-floating">
+                <input type="password"
+                       class="form-control"
+                       asp-for="ConfirmPasswordhash"
+                       id="floatingInput"
+                       placeholder="*****" />
+                <label for="floatingInput" asp-for="ConfirmPasswordhash">Confirm Password</label>
+            </div>
+        </div>
+
+
     </div>
     <div class="row row-cols-1 row-cols-md-2 g-3">
         <div class="col-12 col-md-12">
@@ -147,10 +129,11 @@
                 <input type="text"
                        class="form-control"
                        id="floatingInput"
-                       placeholder="Rajpath Road" 
+                       placeholder="Rajpath Road"
                        asp-for="Street"/>
-                <label for="floatingInput">Street</label>
+                <label for="floatingInput" asp-for="Street">Street</label>
                 <span asp-validation-for="Street" class="text-danger"></span>
+
             </div>
         </div>
         <div class="col">
@@ -158,10 +141,11 @@
                 <input type="text"
                        class="form-control"
                        id="floatingInput"
-                       placeholder="Rajpath Road" 
-                       asp-for="City"/>
-                <label for="floatingInput">City</label>
+                       placeholder="Rajpath Road"
+                       asp-for="City" />
+                <label for="floatingInput" asp-for="City">City</label>
                 <span asp-validation-for="City" class="text-danger"></span>
+
             </div>
         </div>
         <div class="col">
@@ -169,10 +153,10 @@
                 <input type="text"
                        class="form-control"
                        id="floatingInput"
-                       placeholder="Rajpath Road" 
-                       asp-for="State"/>
-                <label for="floatingInput">State</label>
-                <span class="text-danger" asp-validation-for="State"></span>
+                       placeholder="Rajpath Road" asp-for="State"/>
+                <label for="floatingInput" asp-for="State">State</label>
+                <span asp-validation-for="State" class="text-danger"></span>
+
             </div>
         </div>
         <div class="col">
@@ -180,10 +164,10 @@
                 <input type="text"
                        class="form-control"
                        id="floatingInput"
-                       placeholder="Rajpath Road" 
-                       asp-for="Zipcode"/>
-                <label for="floatingInput">Zip Code</label>
+                       placeholder="Rajpath Road" asp-for="Zipcode"/>
+                <label for="floatingInput" asp-for="Zipcode"> Zip Code</label>
                 <span asp-validation-for="Zipcode" class="text-danger"></span>
+
             </div>
         </div>
         <div class="col">
@@ -201,12 +185,12 @@
             <h5 class="fw-semibold">(Optional) Upload Photo or Document</h5>
         </div>
         <div class="col">
-            <div class="input-group input-group-lg">
-                <div id="fileName" class="form-control fs-6 align-middle">
+            <div class="input-group input-group-lg ">
+                <div id="fileName" asp-for="FileName" class="form-control fs-6 align-middle">
                     Select File
                 </div>
                 <input type="file" asp-for="File" class="form-control" id="fileInput" hidden />
-                <label class="input-group-text btn btn-info text-light"
+                <label asp-for="File" class="input-group-text btn btn-info text-light"
                        for="fileInput">
                     <span class="material-symbols-outlined me-2">
                         cloud_upload
@@ -229,13 +213,6 @@
 </form>
 
 
-
-
-    <partial name="_InfoModal.cshtml" />
-   
-
-
-
 <script src="~/js/fileInput.js"></script>
 
 <script>
@@ -244,9 +221,37 @@
         utilsScript:
             "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",
     });
-    const phone2 = document.querySelector("#phone2");
-    const phoneInput2 = window.intlTelInput(phone2, {
-        utilsScript:
-            "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",
-    });
 </script>
+
+<script src="https://code.jquery.com/jquery-1.11.3.js" type="text/javascript"></script>
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+<script type="text/javascript">
+    var pwdrow = $("#pwdrow");
+    var pwdcol = $("#pwdcol");
+
+    function CheckAvailability() {
+        var email = $("#Email").val();
+        $.ajax({
+            type: "POST",
+            url: "@Url.Action("CheckEmail", "Request")",
+            data: JSON.stringify(email),
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (response) {
+                if (response) {
+                    // Email not available.
+                    pwdrow.show();
+                    pwdcol.show();
+                } else {
+                    // Email  available.
+                    pwdrow.hide();
+                    pwdcol.hide();
+                }
+            },
+            error: function (error) {
+                console.log(error);
+            }
+        });
+    };
+</script>
+

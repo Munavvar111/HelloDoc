@@ -2,8 +2,10 @@
 using BusinessLayer.Repository;
 using DataAccessLayer.CustomModel;
 using DataAccessLayer.DataContext;
+using DataAccessLayer.DataModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Globalization;
 using System.Linq;
 
 namespace HalloDocPatient.Controllers
@@ -30,6 +32,54 @@ namespace HalloDocPatient.Controllers
             };
             return View(viewmodel);
         }
+        public async Task<IActionResult> Profile()
+        {
+            var id = HttpContext.Session.GetInt32("id");
+            var User = await _context.Users.FindAsync(id);
+            DateTime BirthDate = new DateTime((int)User.Intyear, int.Parse(User.Strmonth), (int)User.Intdate);
+            ViewBag.BirthDate = BirthDate.ToString("yyyy-MM-dd");
+            var profildata = new ProfileVM();
+            profildata.Email = User.Email;
+            profildata.BirthDate = BirthDate;
+            profildata.FirstName = User.Firstname;
+            profildata.State = User.Lastname;
+            profildata.City = User.City;
+            profildata.Street = User.Street;
+            profildata.ZipCode = User.Zipcode;
+            profildata.LastName = User.Lastname;
+            return View(profildata);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Profile(ProfileVM profileVM)
+        {
+            var id = HttpContext.Session.GetInt32("id");
+            var User = await _context.Users.FindAsync(id);
+
+
+            if (ModelState.IsValid)
+            {
+                User.Firstname = profileVM.FirstName;
+                User.Lastname = profileVM.LastName;
+                User.Street = profileVM.Street; 
+                User.City=profileVM.City;
+                User.State= profileVM.State;
+                User.Zipcode = profileVM.ZipCode;
+                User.Intdate =  profileVM.BirthDate.Day;
+                User.Intyear = profileVM.BirthDate.Year;
+                User.Strmonth = profileVM.BirthDate.Month.ToString();
+
+                _context.Update(User);
+                await _context.SaveChangesAsync();  
+                return RedirectToAction("Profile");
+            }
+            else
+            {
+                return View(profileVM);  
+            }
+        }
+
+
         [HttpPost]
         public async Task<IActionResult> UploadFile(RequestFileViewModel rm,int requestid) {
             var id = requestid;
@@ -113,6 +163,7 @@ namespace HalloDocPatient.Controllers
                          from reqFile in reqFilesGroup.DefaultIfEmpty()
                          select new PatientDashboard
                          {
+                             User = user,
                              Request = req,
                              Requestwisefile = reqFile
                          };
@@ -123,7 +174,47 @@ namespace HalloDocPatient.Controllers
             return View(result.Distinct().ToList());
         }
 
+        public async Task<IActionResult> AddRequestByme()
+        {
+            var id = HttpContext.Session.GetInt32("id");
+            var request = await _context.Users.FindAsync(id);
+            var patientrequest =new RequestModel();
+            patientrequest.Firstname = request.Firstname;
+            patientrequest.Lastname = request.Lastname;
+            patientrequest.Email = request.Email;
+            patientrequest.Street = request.Street;
+            patientrequest.City = request.City;
+            patientrequest.BirthDate = new DateTime((int)request.Intyear, int.Parse(request.Strmonth), (int)request.Intdate);
+            
+            return View(patientrequest);
+        }
+        [HttpPost]
+        public async Task<IActionResult> AddRequestByme(RequestModel rm)
+        {
+            var id = HttpContext.Session.GetInt32("id");
 
+            if (rm.File != null)
+            {
+                var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
+                var uniqueFileName = Guid.NewGuid().ToString() + "_" + rm.File.FileName;
+                var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await rm.File.CopyToAsync(stream);
+                }
+                _patientRequest.AddPatientRequest(rm, ReqTypeId:1);
+                var request = _patientRequest.GetRequestByEmail(rm.Email);
+                _patientRequest.AddRequestWiseFile(uniqueFileName, request.Requestid);
+                return RedirectToAction("Index","Dashboard");
+            }
+            return View();
+        }
+
+        public IActionResult AddRequestByElse()
+        {
+            return View();
+        }
     }
 
 }
