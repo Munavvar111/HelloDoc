@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using DataAccessLayer.CustomModel;
 using DataAccessLayer.DataModels;
+using Microsoft.AspNetCore.Http;
 
 namespace BusinessLayer.InterFace
 {
@@ -32,6 +33,6 @@ namespace BusinessLayer.InterFace
     
         void AddRequestWiseFile(string Filename,int RequestId);
 
-
+        Task<string> AddFileInUploader(IFormFile file);
     }
 }

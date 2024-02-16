@@ -32,6 +32,8 @@ public partial class RequestOthers
     [StringLength(256)]
     public string? HotelName { get; set; } 
 
+    public string? PhoneNumber { get; set; }
+    public string? PhoneNumberOther { get; set; }
 
     [StringLength(256)]
     [Required(ErrorMessage ="Please Enter FirstName Of Patient")]
@@ -63,4 +65,5 @@ public partial class RequestOthers
     [FromForm]
     public IFormFile? File { get; set; }
 
+    public string? Notes { get; set; }  
 }

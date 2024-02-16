@@ -2,6 +2,7 @@
 using DataAccessLayer.CustomModel;
 using DataAccessLayer.DataContext;
 using DataAccessLayer.DataModels;
+using Org.BouncyCastle.Asn1.Ocsp;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,32 +18,35 @@ namespace BusinessLayer.Repository
         public OtherRequest(ApplicationDbContext context) {
         _context  = context;
         }
-        public Request GetRequestByEmail(string email)
-        {
-            return _context.Requests.FirstOrDefault(r => r.Email == email);
-        }
+        
         
 
         public void AddRequest(RequestOthers requestOthers, int ReqTypeId)
         {
-            Request friend = new Request();
-            friend.Requesttypeid = 2;//Friend 
+            var friend = new DataAccessLayer.DataModels.Request();
+            friend.Requesttypeid = ReqTypeId;//Friend 
             friend.Firstname = requestOthers.FirstNameOther;
             friend.Lastname = requestOthers.LastNameOther;
             friend.Email = requestOthers.EmailOther;
             friend.Status = 1;//Unsigned
             friend.Relationname = requestOthers.Relation;
+            friend.Phonenumber = requestOthers.PhoneNumberOther;
             friend.Createddate = DateTime.Now;
             _context.Requests.Add(friend);
             _context.SaveChanges();
         }
-
+        public DataAccessLayer.DataModels.Request GetRequestByEmail(string email)
+        {
+            return _context.Requests.FirstOrDefault(r => r.Email == email);
+        }
         public void AddRequestClient(RequestOthers requestOthers, int RequestID)
         {
             Requestclient requestclient = new Requestclient();
             requestclient.Requestid = RequestID;
+            requestclient.Notes=requestOthers.Notes;
             requestclient.Firstname = requestOthers.FirstName;
             requestclient.Lastname = requestOthers.LastName;
+            requestclient.Phonenumber = requestOthers.PhoneNumber;
             requestclient.Email = requestOthers.Email;
             requestclient.Intdate = requestOthers.BirthDate.Day;
             requestclient.Intyear = requestOthers.BirthDate.Year;
@@ -54,16 +58,16 @@ namespace BusinessLayer.Repository
             _context.Requestclients.Add(requestclient);
             _context.SaveChanges();
         }
-       public void AddFriendRequest(RequestOthers requestOthers, int RequestID)
+       public void AddFriendRequest(RequestOthers requestOthers, int RequestTypeID)
         {
-            AddRequest(requestOthers, RequestID);
+            AddRequest(requestOthers, RequestTypeID);
             var request1=GetRequestByEmail(requestOthers.EmailOther); 
             AddRequestClient(requestOthers, request1.Requestid);
         }
 
-        public void AddConceirgeRequest(RequestOthers addconciegeRequest, int RequestID)
+        public void AddConceirgeRequest(RequestOthers addconciegeRequest, int RequestTypeID)
         {
-            AddRequest(addconciegeRequest, RequestID);
+            AddRequest(addconciegeRequest, RequestTypeID);
             Conceirge(addconciegeRequest);
             var request1 = GetRequestByEmail(addconciegeRequest.EmailOther);
             AddRequestClient(addconciegeRequest, request1.Requestid);
@@ -98,5 +102,7 @@ namespace BusinessLayer.Repository
             _context.SaveChanges();
 
         }
+       
+        
     }
 }

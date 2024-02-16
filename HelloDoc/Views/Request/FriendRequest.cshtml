@@ -36,7 +36,8 @@
                 <input id="phone1"
                        type="tel"
                        class="form-control border-0 tel-input"
-                       name="phone" />
+                       asp-for="PhoneNumberOther"
+                       />
             </div>
         </div>
 
@@ -72,6 +73,7 @@
                 <textarea class="form-control"
                           placeholder="Leave a comment here"
                           id="floatingTextarea2"
+                          asp-for="Notes"
                           style="height: 100px"></textarea>
                 <label for="floatingTextarea2">
                     Enter Brief detail of Symptoms
@@ -134,7 +136,8 @@
                 <input id="phone2"
                        type="tel"
                        class="form-control border-0 tel-input"
-                       name="phone" />
+                       asp-for="PhoneNumber"
+                       />
             </div>
         </div>
     </div>

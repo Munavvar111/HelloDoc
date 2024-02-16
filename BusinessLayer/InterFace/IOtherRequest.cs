@@ -24,5 +24,6 @@ namespace BusinessLayer.InterFace
         void Conceirge(RequestOthers conceirge);
 
         void ConceirgeRequest(int RequestID,int ConceirgeID);
+
     }
 }

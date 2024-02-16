@@ -52,7 +52,7 @@
             <table class="table">
                 <thead class="thead-secondry">
                     <tr>
-                        <td scope="col"></td>
+                        <th scope="col"><input type="checkbox" id="selectAllCheckbox" /></th>
                         <th scope="col">Uploader</th>
                         <th scope="col">Updated Date </th>
                         <th scope="col">Actions</th>
@@ -62,6 +62,10 @@
                     @foreach (var item in Model.Requestwisefileview)
                     {
                         <tr>
+                            <td>
+                                <input type="checkbox" class="fileCheckbox" data-filename="@item.Filename" />
+
+                            </td>
                             <td>
                                 @Html.DisplayFor(modelitem => item.Filename)
                             </td>
@@ -73,8 +77,7 @@
                             </td>
                             <td>
                                 <a class="btn btn-outline-info"
-                                   asp-action="ViewFile"
-                                   asp-route-filename="@item.Filename">
+                                   href="~/uploads/@item.Filename" target="_blank">
                                     <span class="material-symbols-outlined">cloud_download</span>
                                 </a>
                             </td>
@@ -85,26 +88,37 @@
         </div>
     </div>
 </div>
-
 <script>
     document.getElementById("fileInput").onchange = function () {
         let path = this.value.substr(this.value.lastIndexOf('\\') + 1);
         document.getElementById("fileName").innerText = path;
     };
 
+    document.getElementById("selectAllCheckbox").addEventListener("change", function () {
+        // Toggle all checkboxes based on the state of the "Select All" checkbox
+        let checkboxes = document.querySelectorAll(".fileCheckbox");
+        checkboxes.forEach(function (checkbox) {
+            checkbox.checked = document.getElementById("selectAllCheckbox").checked;
+        });
+    });
+
     document.getElementById("downloadAllBtn").addEventListener("click", function () {
-        // Iterate through each file and create a dynamic link
-    @foreach (var item in Model.Requestwisefileview)
-    {
-        <text>
+        // Get selected filenames
+        let selectedFiles = [];
+        let checkboxes = document.querySelectorAll(".fileCheckbox:checked");
+        checkboxes.forEach(function (checkbox) {
+            selectedFiles.push(checkbox.dataset.filename);
+        });
+
+        // Download selected files
+        selectedFiles.forEach(function (filename) {
             var link = document.createElement("a");
-            link.href = "/uploads/@item.Filename"; // Add a slash at the beginning and adjust the path accordingly
-            link.download = "@item.Filename";
+            link.href = "/uploads/" + filename; // Adjust the path accordingly
+            link.download = filename;
             link.style.display = "none";
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
-        </text>
-    }
         });
+    });
 </script>

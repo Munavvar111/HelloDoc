@@ -13,6 +13,7 @@ using DataAccessLayer.DataModels;
 using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Http;
 
 namespace BusinessLayer.Repository
 {
@@ -36,7 +37,8 @@ namespace BusinessLayer.Repository
         }
         public User GetUserByEmail(string email)
         {
-            return _context.Users.FirstOrDefault(x=>x.Email==email);
+            return _context.Users.FirstOrDefault(x => x.Email == email);
+            
          
         }
         public Request GetRequestByEmail(string email)
@@ -75,6 +77,7 @@ namespace BusinessLayer.Repository
             var aspnetuser=GetAspnetUserBYEmail(requestModel.Email);
             var user = new User();
             {
+                user.Mobile = requestModel.PhoneNo;
                 user.Email = requestModel.Email;
                 user.Aspnetuserid = aspnetuser.Aspnetuserid;
                 user.Firstname = requestModel.Firstname;
@@ -149,6 +152,7 @@ namespace BusinessLayer.Repository
             request.Lastname = requestModel.Lastname;
             request.Email = requestModel.Email;
             request.Createddate = DateTime.Now;
+                request.Phonenumber = requestModel.PhoneNo;
             request.Status = 1;
             }
         _context.Requests.Add(request);
@@ -160,11 +164,13 @@ namespace BusinessLayer.Repository
         {
             var requestClient = new Requestclient();
             {
+                requestClient.Notes= requestModel.Notes;
                 requestClient.Requestid = RequestID;
                 requestClient.Firstname = requestModel.Firstname;
                 requestClient.Lastname = requestModel.Lastname;
                 requestClient.State = requestModel.State;
                 requestClient.Street = requestModel.Street;
+                requestClient.Phonenumber = requestModel.PhoneNo;
                 requestClient.City = requestModel.City;
                 requestClient.Zipcode = requestModel.Zipcode;
                 requestClient.Intdate = requestModel.BirthDate.Day;
@@ -193,9 +199,23 @@ namespace BusinessLayer.Repository
         {
             return await _context.Requestwisefiles.Where(r=>r.Requestid==RequestID).ToListAsync();
         }
+        public async Task<string> AddFileInUploader(IFormFile file)
+        {
+            if (file == null)
+            {
+                return null;
+            }
+            var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
+            var uniqueFileName = Guid.NewGuid().ToString() + "_" + file.FileName;
+            var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await file.CopyToAsync(stream);
+            }
+            return uniqueFileName;
+        }
 
         
-
-
     }
 }

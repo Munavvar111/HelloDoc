@@ -43,19 +43,19 @@ namespace HalloDocPatient.Controllers
         {
             if (ModelState.IsValid)
             {
-                Business business = new Business();
-                business.Name = requestOther.FirstNameOther;
-                business.City = requestOther.City;
-                business.Zipcode = requestOther.Zipcode;
-                business.Createddate = DateTime.Now;
-                business.Regionid = 1;
+                    Business business = new Business();
+                    business.Name = requestOther.FirstNameOther;
+                    business.City = requestOther.City;
+                    business.Zipcode = requestOther.Zipcode;
+                    business.Createddate = DateTime.Now;
+                    business.Regionid = 1;
 
                 _context.Businesses.Add(business);
                 _context.SaveChanges();
 
                 Request request = new Request();
                 request.Firstname = requestOther.FirstNameOther;
-                request.Requesttypeid = 2;//Friend 
+                request.Requesttypeid = 4;//Business 
                 request.Lastname = requestOther.LastNameOther;
                 request.Email = requestOther.EmailOther;
                 request.Status = 1;//Unsigned
@@ -85,7 +85,7 @@ namespace HalloDocPatient.Controllers
                 _context.Requestclients.Add(requestclient);
                 _context.SaveChanges();
 
-                return RedirectToAction("Index", "dashboard");
+                return RedirectToAction("Index", "Login");
             }
             return View(requestOther);
         }
@@ -104,14 +104,7 @@ namespace HalloDocPatient.Controllers
             {
                 if(requestModel.File!=null && requestModel.File.Length > 0)
                 {
-                    var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
-                    var uniqueFileName = Guid.NewGuid().ToString() + "_" + requestModel.File.FileName;
-                    var filePath = Path.Combine(uploadsFolder, uniqueFileName);
-
-                    using (var stream = new FileStream(filePath, FileMode.Create))
-                    {
-                        await requestModel.File.CopyToAsync(stream);
-                    }
+                    var uniqueFileName=await _patientRequest.AddFileInUploader(requestModel.File);
                     _patientRequest.AddPatientRequest(requestModel, ReqTypeId: 1);
                     var request = _patientRequest.GetRequestByEmail(requestModel.Email);
                     _patientRequest.AddRequestWiseFile(uniqueFileName, request.Requestid);
@@ -157,14 +150,7 @@ namespace HalloDocPatient.Controllers
             {
                 if (request.File != null && request.File.Length > 0)
                 {
-                    var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
-                    var uniqueFileName = Guid.NewGuid().ToString() + "_" + request.File.FileName;
-                    var filePath = Path.Combine(uploadsFolder, uniqueFileName);
-
-                    using (var stream = new FileStream(filePath, FileMode.Create))
-                    {
-                        await request.File.CopyToAsync(stream);
-                    }
+                    var uniqueFileName=await _patientRequest.AddFileInUploader(request.File);
 
                     _otherrequest.AddFriendRequest(request, ReqTypeId: 2);
                     var request1 = _patientRequest.GetRequestByEmail(request.EmailOther);
@@ -200,7 +186,7 @@ namespace HalloDocPatient.Controllers
 
                 _otherrequest.AddConceirgeRequest(requestOther, ReqTypeId: 3);
 
-                return RedirectToAction("Index", "dashboard");
+                return RedirectToAction("Index", "Login");
             }
             return View(requestOther);
         }

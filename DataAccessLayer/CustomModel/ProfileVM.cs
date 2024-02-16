@@ -31,5 +31,7 @@ namespace DataAccessLayer.CustomModel
 
         [Required(ErrorMessage = "Plese Enter The Zipcode")]
         public string ZipCode { get; set; } = null!;
+
+        public string? PhoneNO { get; set; }    
     }
 }

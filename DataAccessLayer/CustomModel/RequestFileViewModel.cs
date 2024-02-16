@@ -11,6 +11,8 @@ namespace DataAccessLayer.CustomModel
 {
     public class RequestFileViewModel
     {
+        public User? User { get; set; } 
+
         public int? Requestid {  get; set; }
         public List<Requestwisefile>? Requestwisefileview { get; set; }
         [FromForm]

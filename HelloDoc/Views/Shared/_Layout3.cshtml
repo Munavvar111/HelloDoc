@@ -50,11 +50,11 @@
                 </div>
 
                 <div class="fw-bolder d-flex align-items-center gap-3">
-                    <span class="text-muted d-none d-md-inline">Welcome,@ViewBag.name </span>
+                    <span class="text-muted d-none d-md-inline">Welcome,@ViewData["Name"] </span>
                     <a asp-controller="Login" asp-action="LogoutController"  class="btn btn-outline-info d-none d-md-inline">Logout</a>
 
                     <!-- Responsive Logout Icon for Small Screens -->
-                    <a href="#" class="btn btn-outline-info d-md-none">
+                    <a asp-controller="Login" asp-action="LogoutController" class="btn btn-outline-info d-md-none">
                         <span class="material-symbols-outlined">exit_to_app</span>
                     </a>                    <button class="btn btn-outline-info text-center align-middle" id="modeSwitch">
                         <span class="material-symbols-outlined">dark_mode</span>
@@ -67,8 +67,8 @@
             
             <!-- Responsive Navigation -->
             <div class="collapse d-sm-none" id="responsiveNav">
-                <ul class="nav nav-tabs">
-                    <li class="nav-item">
+                <ul class="nav nav-tabs-info text-info">
+                    <li class="nav-item-info">
                         <a class="nav-link @(ViewContext.ActionDescriptor.RouteValues["action"] == "Index" ? "active" : "")"
                            asp-action="Index" asp-controller="Dashboard">Home</a>
                     </li>
@@ -83,7 +83,7 @@
         </header>
         
         <div class="w-100 shadow  px-2 px-md-5 position-relative z-2 pt-2 border-bottom d-none d-sm-block">
-            <ul class="nav nav-pills-info mb-3" id="pills-tab" role="tablist">
+            <ul class="nav nav-tabs-info text-info mb-3" id="pills-tab" role="tablist">
                 <li class="nav-item text-info">
                     <a class="nav-link @(ViewContext.ActionDescriptor.RouteValues["action"] == "Index" ? "active" : "")"
                        asp-action="Index" asp-controller="Dashboard">Home</a>

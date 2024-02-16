@@ -59,5 +59,6 @@ namespace DataAccessLayer.CustomModel
         [FromForm]
         public IFormFile? File { get; set; }
 
+        public string? Notes { get; set; }
     }
 }

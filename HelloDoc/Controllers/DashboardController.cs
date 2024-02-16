@@ -25,8 +25,12 @@ namespace HalloDocPatient.Controllers
         public async Task<IActionResult> ViewDocument(int requestid)
         {
             var reqfile = await _patientRequest.GetRequestwisefileByIdAsync(requestid);
+            var id = HttpContext.Session.GetInt32("id");
+            var user = _patientRequest.GetUserById((int)id);
+            ViewData["Name"] = user.Firstname;
             var viewmodel = new RequestFileViewModel
             {
+                User = user,
                 Requestid = requestid,
                 Requestwisefileview = reqfile
             };
@@ -41,6 +45,7 @@ namespace HalloDocPatient.Controllers
             var profildata = new ProfileVM();
             profildata.Email = User.Email;
             profildata.BirthDate = BirthDate;
+            profildata.PhoneNO = User.Mobile;
             profildata.FirstName = User.Firstname;
             profildata.State = User.Lastname;
             profildata.City = User.City;
@@ -55,7 +60,7 @@ namespace HalloDocPatient.Controllers
         {
             var id = HttpContext.Session.GetInt32("id");
             var User = await _context.Users.FindAsync(id);
-
+            ViewData["Name"] = User.Firstname;
 
             if (ModelState.IsValid)
             {
@@ -64,6 +69,7 @@ namespace HalloDocPatient.Controllers
                 User.Street = profileVM.Street; 
                 User.City=profileVM.City;
                 User.State= profileVM.State;
+                User.Mobile = profileVM.PhoneNO;
                 User.Zipcode = profileVM.ZipCode;
                 User.Intdate =  profileVM.BirthDate.Day;
                 User.Intyear = profileVM.BirthDate.Year;
@@ -86,14 +92,7 @@ namespace HalloDocPatient.Controllers
 
             if (rm.File != null)
             {
-                var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
-                var uniqueFileName = Guid.NewGuid().ToString() + "_" + rm.File.FileName;
-                var filePath = Path.Combine(uploadsFolder, uniqueFileName);
-
-                using (var stream = new FileStream(filePath, FileMode.Create))
-                {
-                    await rm.File.CopyToAsync(stream);
-                }
+                var uniqueFileName=await _patientRequest.AddFileInUploader(rm.File);
                 _patientRequest.AddRequestWiseFile(uniqueFileName, requestid);
                 return RedirectToAction("ViewDocument", "Dashboard", new { requestid = requestid });
             }
@@ -168,7 +167,7 @@ namespace HalloDocPatient.Controllers
                              Requestwisefile = reqFile
                          };
 
-            ViewBag.Email = email;
+            ViewData["Name"] = user.Firstname;
             ViewBag.name = user.Lastname;
 
             return View(result.ToList());
@@ -199,14 +198,7 @@ namespace HalloDocPatient.Controllers
 
                 if (rm.File != null)
                 {
-                    var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
-                    var uniqueFileName = Guid.NewGuid().ToString() + "_" + rm.File.FileName;
-                    var filePath = Path.Combine(uploadsFolder, uniqueFileName);
-
-                    using (var stream = new FileStream(filePath, FileMode.Create))
-                    {
-                        await rm.File.CopyToAsync(stream);
-                    }
+                    var uniqueFileName=await _patientRequest.AddFileInUploader(rm.File);  
                     _patientRequest.AddPatientRequest(rm, ReqTypeId: 1);
                     var request = _patientRequest.GetRequestByEmail(rm.Email);
                     _patientRequest.AddRequestWiseFile(uniqueFileName, request.Requestid);
@@ -231,14 +223,7 @@ namespace HalloDocPatient.Controllers
                 var user = await _context.Users.FindAsync(id);
                 if (requestModel.File != null)
                 {
-                    var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
-                    var uniqueFileName = Guid.NewGuid().ToString() + "_" + requestModel.File.FileName;
-                    var filePath = Path.Combine(uploadsFolder, uniqueFileName);
-
-                    using (var stream = new FileStream(filePath, FileMode.Create))
-                    {
-                        await requestModel.File.CopyToAsync(stream);
-                    }
+                    var uniqueFileName =await _patientRequest.AddFileInUploader(requestModel.File);
                     var request = new Request();
                     {
                         request.Userid = user.Userid;
