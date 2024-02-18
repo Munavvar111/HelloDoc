@@ -10,5 +10,7 @@ namespace BusinessLayer.InterFace
     public interface ILogin
     {
        public bool isLoginValid(LoginModel a);
+
+        public bool IsSendEmail(string toEmail, string subject, string body);
     }
 }

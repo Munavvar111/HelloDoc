@@ -5,6 +5,8 @@ using BC = BCrypt.Net.BCrypt;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Principal;
+using NuGet.Common;
+using System;
 
 namespace HalloDocPatient.Controllers
 {
@@ -24,7 +26,7 @@ namespace HalloDocPatient.Controllers
         {
             return View();
         }
-        public IActionResult Register()
+        public IActionResult Register(int RequestId,string token)
         {
             return View();
         }
@@ -47,7 +49,14 @@ namespace HalloDocPatient.Controllers
                     _context.AspnetUsers.Add(aspnetUser);
                     _context.SaveChanges();
 
-                    
+                    User uc = new User();
+                    uc.Email = lc.Email;
+                    uc.Aspnetuserid = aspnetUser.Aspnetuserid;
+                    uc.Firstname = lc.Email;
+                    uc.Createddate=DateTime.Now;
+                    uc.Createdby = lc.Email;
+                    _context.Users.Add(uc);
+                    _context.SaveChanges();
 
                     return RedirectToAction(nameof(View1));
                 }

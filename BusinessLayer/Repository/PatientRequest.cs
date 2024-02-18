@@ -54,7 +54,9 @@ namespace BusinessLayer.Repository
         {
             var aspnetUser = new AspnetUser();
             {
-                
+                if(requestModel.Passwordhash==requestModel.ConfirmPasswordhash)
+                {
+
 
                 aspnetUser.Passwordhash = BC.HashPassword(requestModel.Passwordhash);
 
@@ -64,6 +66,7 @@ namespace BusinessLayer.Repository
                 aspnetUser.Username = requestModel.Firstname+requestModel.Lastname;
                     _context.AspnetUsers.Add(aspnetUser);
                     _context.SaveChanges();
+                }
                 }
                
             

@@ -105,4 +105,39 @@
             </tbody>
         </table>
     </div>
+
+    <div class="modal fade" id="loginSuccessModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <div class="modal-body">
+                    Login Succefull
+                </div>
+                
+            </div>
+        </div>
+    </div>
+
+    <!-- Add this code inside your view, at the end before the closing body tag -->
+    
+
+
 </div>
+@section scripts {
+    <script>
+        $(document).ready(function () {
+            // Convert TempData boolean value to JavaScript boolean
+            var showToaster = @(Convert.ToBoolean(TempData["ShowToaster"]).ToString().ToLower());
+
+            console.log('showToaster:', showToaster);
+
+            // Check if TempData flag is set for successful login
+            if (showToaster) {
+                $('#loginSuccessModal').modal('show')
+            }
+            setTimeout(function () {
+                $('#loginSuccessModal').modal('hide');
+            }, 1000);
+        });
+    </script>
+}

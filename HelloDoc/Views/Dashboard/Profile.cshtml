@@ -3,187 +3,179 @@
 }
 @model DataAccessLayer.CustomModel.ProfileVM;
 
-    <div class="container d-flex justify-content-between my-3">
-        <div class="d-flex">
-            <span class="fs-2 text-muted fw-bold">User Profile</span>
-        </div>
-        <div class="d-flex justify-content-end">
-            <a asp-controller="Dashboard" asp-action="Index" asp-area=""
-               class="btn btn-outline-info d-flex align-items-center">
-                <span class="material-symbols-outlined"> chevron_left </span> Back
-            </a>
-        </div>
+<div class="container d-flex justify-content-between my-3">
+    <div class="d-flex">
+        <span class="fs-2 text-muted fw-bold">User Profile</span>
     </div>
-    <form class="container border rounded-3 p-3 p-md-5 mb-3  d-flex flex-column gap-4 bg-white" method="post">
+    <div class="d-flex justify-content-end">
+        <a asp-controller="Dashboard" asp-action="Index" asp-area=""
+           class="btn btn-outline-info d-flex align-items-center">
+            <span class="material-symbols-outlined"> chevron_left </span> Back
+        </a>
+    </div>
+</div>
+<form class="container border rounded-3 p-3 p-md-5 mb-3  d-flex flex-column gap-4 bg-white" method="post">
 
 
-        <div class="row row-cols-1 row-cols-md-2 g-3">
-            <div class="col-12 col-md-12">
-                <h5 class="fw-semibold">General Information</h5>
+    <div class="row row-cols-1 row-cols-md-2 g-3">
+        <div class="col-12 col-md-12">
+            <h5 class="fw-semibold">General Information</h5>
+        </div>
+
+        <div class="col">
+            <div class="form-floating">
+                <input type="text"
+                       class="form-control"
+                       id="floatingInput"
+                       placeholder="name@example.com"
+                       asp-for="@Model.FirstName" disabled />
+                <label for="floatingInput">First Name</label>
+                <span asp-validation-for="FirstName" class="text-danger"></span>
             </div>
-
-            <div class="col">
-                <div class="form-floating">
-                    <input type="text"
-                           class="form-control"
-                           id="floatingInput"
-                           placeholder="name@example.com" 
-                           asp-for="@Model.FirstName" disabled/>
-                    <label for="floatingInput">First Name</label>
-                    <span asp-validation-for="FirstName" class="text-danger"></span>
-                </div>
-            </div>
-            <div class="col">
-                <div class="form-floating">
-                    <input type="text"
-                           class="form-control"
-                           id="floatingInput"
-                           placeholder="name@example.com"
+        </div>
+        <div class="col">
+            <div class="form-floating">
+                <input type="text"
+                       class="form-control"
+                       id="floatingInput"
+                       placeholder="name@example.com"
                        asp-for="@Model.LastName" disabled />
-                    <label for="floatingInput">Last Name</label>
-                    <span asp-validation-for="LastName" class="text-danger"></span>
-                </div>
-            </div>
-            <div class="col">
-                <div class="form-floating">
-                    <input type="date"
-                           class="form-control"
-                       id="birthdateInput"
-                           asp-for="BirthDate"
-                           placeholder="name@example.com"
-                       disabled />
-                    <label for="floatingInput">Date of Birth</label>
-                    <span asp-validation-for="BirthDate" class="text-danger"></span>
-                </div>
-            </div>
-        
-       
-    </div>
-        <div class="row row-cols-1 row-cols-md-2 g-3">
-            <div class="col-12 col-md-12">
-                <h5 class="fw-semibold">Contact Information</h5>
-            </div>
-
-            <div class="col">
-                <div class="form-floating">
-                    <input type="email"
-                           class="form-control"
-                           id="floatingInput"
-                           placeholder="name@example.com"
-                       asp-for="Email" disabled="disabled" 
-                       id="Email" readonly />
-                    <label for="floatingInput">Email</label>
-                <span asp-validation-for="Email" class="text-danger"></span>
-                </div>
-            </div>
-            <div class="col">
-                <div class="border rounded-2 tel-container">
-                    <input id="phone2"
-                           type="tel"
-                           class="form-control border-0 tel-input"
-                           asp-for="PhoneNO"
-                            disabled/>
-                </div>
+                <label for="floatingInput">Last Name</label>
+                <span asp-validation-for="LastName" class="text-danger"></span>
             </div>
         </div>
-        <div class="row row-cols-1 row-cols-md-2 g-3">
-            <div class="col-12 col-md-12">
-                <h5 class="fw-semibold"> Location Information</h5>
-            </div>
-            <div class="col">
-                <div class="form-floating">
-                    <input type="text"
-                           class="form-control"
-                           id="floatingInput"
-                           placeholder="Rajpath Road"
-                       asp-for="Street" disabled  />
-                    <label for="floatingInput">Street</label>
-                    <span asp-validation-for="Street" class="text-danger"></span>
-                </div>
-            </div>
-            <div class="col">
-                <div class="form-floating">
-                    <input type="text"
-                           class="form-control"
-                           id="floatingInput"
-                           placeholder="Rajpath Road" asp-for="City"
+        <div class="col">
+            <div class="form-floating">
+                <input type="date"
+                       class="form-control"
+                       id="birthdateInput"
+                       asp-for="BirthDate"
+                       placeholder="name@example.com"
                        disabled />
-                    <label for="floatingInput">City</label>
-                    <span asp-validation-for="City" class="text-danger"></span>
-                </div>
+                <label for="floatingInput">Date of Birth</label>
+                <span asp-validation-for="BirthDate" class="text-danger"></span>
             </div>
-            <div class="col">
-                <div class="form-floating">
-                    <input type="text"
-                           class="form-control"
-                           id="floatingInput"
+        </div>
+
+
+    </div>
+    <div class="row row-cols-1 row-cols-md-2 g-3">
+        <div class="col-12 col-md-12">
+            <h5 class="fw-semibold">Contact Information</h5>
+        </div>
+
+        <div class="col">
+            <div class="form-floating">
+                <input type="email"
+                       class="form-control"
+                       id="floatingInput"
+                       placeholder="name@example.com"
+                       asp-for="Email" disabled="disabled"
+                       id="Email" readonly />
+                <label for="floatingInput">Email</label>
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col">
+            <div class="border rounded-2 tel-container">
+                <input id="phone2"
+                       type="tel"
+                       class="form-control border-0 tel-input"
+                       asp-for="PhoneNO"
+                       disabled />
+            </div>
+        </div>
+    </div>
+    <div class="row row-cols-1 row-cols-md-2 g-3">
+        <div class="col-12 col-md-12">
+            <h5 class="fw-semibold"> Location Information</h5>
+        </div>
+        <div class="col">
+            <div class="form-floating">
+                <input type="text"
+                       class="form-control"
+                       id="floatingInput"
+                       placeholder="Rajpath Road"
+                       asp-for="Street" disabled />
+                <label for="floatingInput">Street</label>
+                <span asp-validation-for="Street" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col">
+            <div class="form-floating">
+                <input type="text"
+                       class="form-control"
+                       id="floatingInput"
+                       placeholder="Rajpath Road" asp-for="City"
+                       disabled />
+                <label for="floatingInput">City</label>
+                <span asp-validation-for="City" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col">
+            <div class="form-floating">
+                <input type="text"
+                       class="form-control"
+                       id="floatingInput"
                        placeholder="Rajpath Road" asp-for="State" disabled />
-                    <label for="floatingInput">State</label>
+                <label for="floatingInput">State</label>
                 <span asp-validation-for="State" class="text-danger"></span>
-                </div>
             </div>
-            <div class="d-flex">
+        </div>
+        <div class="d-flex">
 
             <div class="col">
                 <div class="form-floating">
                     <input type="text"
                            class="form-control"
                            id="floatingInput"
-                       placeholder="Rajpath Road" asp-for="ZipCode" disabled />
+                           placeholder="Rajpath Road" asp-for="ZipCode" disabled />
                     <label for="floatingInput">Zip Code</label>
-                <span asp-validation-for="ZipCode" class="text-danger"></span>
+                    <span asp-validation-for="ZipCode" class="text-danger"></span>
                 </div>
             </div>
             <div class="mx-3">
 
                 <button class="btn btn-outline-info" id="openMapButton" type="button">
-                    <span class="material-symbols-outlined">
-                        location_on
-                    </span>Map
+                    <span class="material-symbols-outlined">location_on</span>Map
                 </button>
-            </div>
-            </div>
 
+            </div>
         </div>
 
-        <div class="row">
-            <div class="d-flex gap-3 align-items-center justify-content-end">
-                <button class="btn btn-info text-light" id="EditBtn" type="button" onclick="toggleEdit()">
-                    Edit
-                </button> 
-                <button class="btn btn-info text-light" type="Submit" id="SubBtn">
-                    Submit
+    </div>
+
+    <div class="row">
+        <div class="d-flex gap-3 align-items-center justify-content-end">
+            <button class="btn btn-info text-light" id="EditBtn" type="button" onclick="toggleEdit()">
+                Edit
+            </button>
+            <button class="btn btn-info text-light" type="Submit" id="SubBtn">
+                Submit
             </button><button class="btn btn-info text-light" type="button" id="CanBtn" onclick="toggleCancel()">
-                    Cancel
-                </button>
+                Cancel
+            </button>
 
-            </div>
-        </div>
-    </form>
-
-<div class="modal fade" id="googleMapModal" tabindex="-1" role="dialog" aria-labelledby="googleMapModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="googleMapModalLabel">Google Maps</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-
-            </div>
-            <div class="modal-body">
-                <!-- Embed the Google Maps link here -->
-                <iframe src="https://www.google.com/maps?q=37.7749,-122.4194&output=embed" width="100%" height="450" frameborder="0" style="border:0" allowfullscreen></iframe>
-            </div>
         </div>
     </div>
-</div>
+</form>
+
 <script>
-    document.getElementById("openMapButton").addEventListener("click", function () {
-        $('#googleMapModal').modal('show');
-    });
-    </script>
-    <script>
+    function updateGoogleMap() {
+        var state = '@Html.Raw(ViewBag.State)';
+        var city = '@Html.Raw(ViewBag.City)';
+        var street = '@Html.Raw(ViewBag.Street)';
+
+        console.log(state)
+        var mapsUrl = "https://www.google.com/maps?q=" + encodeURIComponent(street + ", " + city + ", " + state + " ,");
+        console.log(mapsUrl)
+        // Open the dynamic map in a new tab
+        window.open(mapsUrl, '_blank');
+    }
+
+    document.getElementById("openMapButton").addEventListener("click", updateGoogleMap);
+
+
     $("#SubBtn").hide();
     $("#CanBtn").hide();
 
@@ -214,7 +206,8 @@
         $("#SubBtn").hide();
         $("#CanBtn").hide();
     }
-        
 
-    </script>
 
+
+
+</script>

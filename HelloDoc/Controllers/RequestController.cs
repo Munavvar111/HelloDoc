@@ -14,15 +14,17 @@ namespace HalloDocPatient.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly IOtherRequest _otherrequest;
+        private readonly ILogin _login;
 
         private readonly IPatientRequest _patientRequest;
         private readonly ILogger<RequestController> _logger;
 
-        public RequestController(ApplicationDbContext context, IPatientRequest patientRequest, ILogger<RequestController> logger, IOtherRequest otherrequest)
+        public RequestController(ApplicationDbContext context, IPatientRequest patientRequest, ILogger<RequestController> logger, IOtherRequest otherrequest,ILogin login)
         {
             _context = context;
             _patientRequest = patientRequest;
             _logger = logger;
+            _login=login;
             _otherrequest = otherrequest;
         }
         public IActionResult PatientRequest()
@@ -155,8 +157,20 @@ namespace HalloDocPatient.Controllers
                     _otherrequest.AddFriendRequest(request, ReqTypeId: 2);
                     var request1 = _patientRequest.GetRequestByEmail(request.EmailOther);
                     _patientRequest.AddRequestWiseFile(uniqueFileName, request1.Requestid);
+                    var token = Guid.NewGuid().ToString();
+                    var resetLink = Url.Action("Index", "Register", new { RequestId = request1.Requestid, token }, protocol: HttpContext.Request.Scheme);
 
-                return RedirectToAction("Index", "Login");
+                    if (_login.IsSendEmail("munavvarpopatiya999@gmail.com", "Munavvar", $"Click <a href='{resetLink}'>here</a> to reset your password."))
+                    {
+
+                        return RedirectToAction("Index", "Login");
+                    }
+                    else
+                    {
+                        ModelState.AddModelError(string.Empty, "Email Is Not Send");
+
+                    }
+                    return RedirectToAction("Index", "Login");
 
                 }
                 else

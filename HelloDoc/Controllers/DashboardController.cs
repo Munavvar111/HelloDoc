@@ -39,7 +39,7 @@ namespace HalloDocPatient.Controllers
         public async Task<IActionResult> Profile()
         {
             var id = HttpContext.Session.GetInt32("id");
-            var User = await _context.Users.FindAsync(id);
+            var User = await _context.Users.FindAsync(id);  
             DateTime BirthDate = new DateTime((int)User.Intyear, int.Parse(User.Strmonth), (int)User.Intdate);
             ViewBag.BirthDate = BirthDate.ToString("yyyy-MM-dd");
             var profildata = new ProfileVM();
@@ -47,11 +47,16 @@ namespace HalloDocPatient.Controllers
             profildata.BirthDate = BirthDate;
             profildata.PhoneNO = User.Mobile;
             profildata.FirstName = User.Firstname;
-            profildata.State = User.Lastname;
+            profildata.State = User.State;
             profildata.City = User.City;
             profildata.Street = User.Street;
             profildata.ZipCode = User.Zipcode;
             profildata.LastName = User.Lastname;
+
+            ViewBag.State = User.State;
+            ViewBag.City = User.City;
+            ViewBag.Street = User.Street;
+
             return View(profildata);
         }
 
@@ -152,6 +157,10 @@ namespace HalloDocPatient.Controllers
         }
         public async Task<IActionResult> Index()
         {
+            if (TempData["ShowToaster"] != null && (bool)TempData["ShowToaster"])
+            {
+                ViewBag.ShowToaster = true;
+            }
             var email = HttpContext.Session.GetString("Email");
             var id =HttpContext.Session.GetInt32("id");
             var user = _patientRequest.GetUserById((int)id);
