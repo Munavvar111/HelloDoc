@@ -1,4 +1,4 @@
-﻿@using Microsoft.AspNetCore.Http
+﻿
 
 <!DOCTYPE html>
 <html lang="en" data-bs-theme="light">
@@ -18,6 +18,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js" asp-append-version="true"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
 
+
     <!-- Bootstrap JS and Popper.js CDN (for collapsible functionality) -->
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
             integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
@@ -29,7 +30,9 @@
             integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
             crossorigin="anonymous"></script>
 
+
     @RenderSection("scripts", required: false)
+
 
 </head>
 <body>
@@ -37,9 +40,7 @@
     <div class="container-fluid d-flex flex-column max-vw-100 vh-100 p-0 bg-light">
         <header class="w-100 shadow px-2 px-md-5 position-relative z-2">
             <section class="d-flex justify-content-between border-bottom pb-1">
-                <button class="btn btn-outline-info text-center align-middle mt-3 d-md-none" data-bs-toggle="offcanvas" data-bs-target="#responsiveNav">
-                    <span class="material-symbols-outlined">menu</span>
-                </button>
+
                 <div class="d-sm-none">
                     <button class="btn btn-outline-info text-center align-middle mt-3" data-bs-toggle="collapse" data-bs-target="#responsiveNav">
                         <span class="material-symbols-outlined">menu</span>
@@ -51,31 +52,25 @@
                 </div>
 
                 <div class="fw-bolder d-flex align-items-center gap-3">
-                    <span class="text-muted d-none d-md-inline">Welcome,@Context.Session.GetString("Username") </span>
+                    <span class="text-muted d-none d-md-inline">Welcome,</span>
                     <a asp-controller="Login" asp-action="LogoutController" class="btn btn-outline-info d-none d-md-inline">Logout</a>
 
                     <!-- Responsive Logout Icon for Small Screens -->
                     <a asp-controller="Login" asp-action="LogoutController" class="btn btn-outline-info d-md-none">
                         <span class="material-symbols-outlined">exit_to_app</span>
-                    </a>
-                    <button class="btn btn-outline-info text-center align-middle" id="modeSwitch">
+                    </a>                    <button class="btn btn-outline-info text-center align-middle" id="modeSwitch">
                         <span class="material-symbols-outlined">dark_mode</span>
                     </button>
                 </div>
+
+                <!-- Responsive Navigation Toggle -->
+
             </section>
 
-            <!-- Responsive Navigation Toggle -->
-        </header>
-
-        <!-- Responsive Navigation Sidebar -->
-        <div class="offcanvas offcanvas-start" tabindex="-1" id="responsiveNav" aria-labelledby="responsiveNavLabel">
-            <div class="offcanvas-header">
-                <h5 class="offcanvas-title" id="responsiveNavLabel">Navigation</h5>
-                <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-            </div>
-            <div class="offcanvas-body">
-                <ul class="nav flex-column">
-                    <li class="nav-item">
+            <!-- Responsive Navigation -->
+            <div class="collapse d-sm-none" id="responsiveNav">
+                <ul class="nav nav-tabs-info text-info">
+                    <li class="nav-item-info">
                         <a class="nav-link @(ViewContext.ActionDescriptor.RouteValues["action"] == "Index" ? "active" : "")"
                            asp-action="Index" asp-controller="Dashboard">Home</a>
                     </li>
@@ -85,19 +80,65 @@
                     </li>
                 </ul>
             </div>
+
+
+        </header>
+
+        <div class="w-100 shadow  px-2 px-md-5 position-relative z-2 pt-2 border-bottom d-none d-sm-block">
+            <ul class="nav nav-tabs-info text-info mb-3" id="pills-tab" role="tablist">
+                <li class="nav-item text-info">
+                    <a class="nav-link @(ViewContext.ActionDescriptor.RouteValues["action"] == "Index" ? "active" : "")"
+                       asp-action="Index" asp-controller="Dashboard">Dashboard</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link @(ViewContext.ActionDescriptor.RouteValues["action"] == "Profile" ? "active" : "")"
+                       asp-action="Profile" asp-controller="Dashboard">Provider Location</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link @(ViewContext.ActionDescriptor.RouteValues["action"] == "Profile" ? "active" : "")"
+                       asp-action="Profile" asp-controller="Dashboard">My Profile</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link @(ViewContext.ActionDescriptor.RouteValues["action"] == "Profile" ? "active" : "")"
+                       asp-action="Profile" asp-controller="Dashboard">Provider</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link @(ViewContext.ActionDescriptor.RouteValues["action"] == "Profile" ? "active" : "")"
+                       asp-action="Profile" asp-controller="Dashboard">Parteners</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link @(ViewContext.ActionDescriptor.RouteValues["action"] == "Profile" ? "active" : "")"
+                       asp-action="Profile" asp-controller="Dashboard">Records</a>
+                </li>
+
+            </ul>
+
         </div>
 
-        <!-- ... Main content and other code ... -->
+        <main class="container-fluid d-flex flex-column  p-0 bg-light flex-grow-1  ">
+
+
+            @RenderBody()
+
+        </main>
+        <partial name="~/Views/Shared/_Footer.cshtml" />
     </div>
+
+
+
+
+
 
     <!-- Toastr JS -->
     <!-- Your existing scripts -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.js"></script>
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script src="~/js/custom.js" asp-append-version="true"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.js"></script>
+
 
 </body>
 </html>

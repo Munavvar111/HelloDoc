@@ -12,7 +12,7 @@ namespace HalloDocPatient.Controllers
 {
     public class DashboardController : Controller
     {
-        private readonly ApplicationDbContext _context;
+            private readonly ApplicationDbContext _context;
         private readonly IPatientRequest _patientRequest;
         private readonly IWebHostEnvironment _hostingEnvironment;
 

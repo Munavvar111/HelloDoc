@@ -8,6 +8,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MimeKit;
 using MailKit.Net.Smtp;
+using BC = BCrypt.Net.BCrypt;
+
 
 namespace HalloDocPatient.Controllers
 {
@@ -72,9 +74,27 @@ namespace HalloDocPatient.Controllers
 
             return View();
         }
-        public IActionResult ResetPassword(int userId, string token)
+        public IActionResult ResetPassword(string userId, string token)
         {
             return View(new ResetPasswordViewModel { UserId = userId, Token = token });
+        }
+
+        [HttpPost]
+        public IActionResult ResetPassword(ResetPasswordViewModel model)
+        {
+            var user = _context.AspnetUsers.Where(x => x.Aspnetuserid == model.UserId).FirstOrDefault();
+            if(ModelState.IsValid)
+            {
+                if (model.Password == model.ConfirmPassword)
+                {
+                   user.Passwordhash= BC.HashPassword(model.Password);
+                    _context.Update(user);
+                    _context.SaveChanges();
+                    return RedirectToAction("Index", "Login");
+                }
+
+            }
+            return View(model);
         }
 
 
@@ -82,12 +102,12 @@ namespace HalloDocPatient.Controllers
         public IActionResult ForgotPassword(ForgotPasswordViewModel fm) { 
 
             if (ModelState.IsValid) {
-            var user=_context.Users.Where(x=>x.Email ==fm.Email).FirstOrDefault();
+            var user=_context.AspnetUsers.Where(x=>x.Email ==fm.Email).FirstOrDefault();
                 if (user!=null) { 
                 var token=Guid.NewGuid().ToString();
-                var resetLink = Url.Action("ResetPassword", "Login", new { userId = user.Userid, token }, protocol: HttpContext.Request.Scheme);
+                var resetLink = Url.Action("ResetPassword", "Login", new { userId = user.Aspnetuserid, token }, protocol: HttpContext.Request.Scheme);
 
-            if(_login.IsSendEmail("jkkikani2003@gmail.com", "Munavvar", $"Click <a href='{resetLink}'>here</a> to reset your password."))
+             if(_login.IsSendEmail("munavvarpopatiya999@gmail.com", "Munavvar", $"Click <a href='{resetLink}'>here</a> to reset your password."))
                     {
 
                     return RedirectToAction("Index", "Login");

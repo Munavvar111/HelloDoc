@@ -11,6 +11,8 @@ using DataAccessLayer.DataContext;
 using Microsoft.Extensions.Configuration;
 using MimeKit;
 using MailKit.Net.Smtp;
+using System.Security.Authentication;
+using MailKit.Security;
 
 namespace BusinessLayer.Repository
 {
@@ -45,7 +47,8 @@ namespace BusinessLayer.Repository
 
             using (var client = new SmtpClient())
             {
-                client.Connect(emailSettings["SmtpServer"], int.Parse(emailSettings["SmtpPort"]), false);
+                    client.ServerCertificateValidationCallback = (s, c, h, e) => true;
+                    client.Connect(emailSettings["SmtpServer"], int.Parse(emailSettings["SmtpPort"]), SecureSocketOptions.StartTls);
                 client.Authenticate(emailSettings["SmtpUsername"], emailSettings["SmtpPassword"]);
                 client.Send(message);
                 client.Disconnect(true);
