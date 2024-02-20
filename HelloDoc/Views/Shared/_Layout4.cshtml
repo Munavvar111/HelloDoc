@@ -173,6 +173,8 @@
             $('#searchInput').on('input', function () {
                 var searchValue = $(this).val();
                 console.log(searchValue)
+                if(searchValue!== ""){
+
                 $.ajax({
                     type:"POST",
                     url:"/Admin/SearchPatient",
@@ -180,11 +182,16 @@
                     success: function (data) {
                         // Update your partial view with the filtered data
                         $('#partialContainer').html(data);
+
                     },
                     error: function (error) {
                         console.error('Error:', error);
                     }
                 });
+                }else{
+                    location.reload();
+
+                }
             });
         });
 
@@ -211,6 +218,8 @@
         //     }
         // });
     </script>
+    <!-- Add the following script in your layout -->
+
 
 </body>
 </html>

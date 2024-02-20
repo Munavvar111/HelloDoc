@@ -43,7 +43,7 @@ namespace HelloDoc.Controllers
 
         public IActionResult Index()
         {
-            
+
             var request = from req in _context.Requests
                           join reqclient in _context.Requestclients
                           on req.Requestid equals reqclient.Requestid
@@ -61,8 +61,10 @@ namespace HelloDoc.Controllers
                               Id=reqclient.Requestclientid
 ,
                           };
+
+
             return View(request.ToList());
-        }
+        }   
 
         public IActionResult GetData()
         {
@@ -77,7 +79,10 @@ namespace HelloDoc.Controllers
                               ReqDate = req.Createddate,
                               Phone = req.Phonenumber,
                               Address = reqclient.City + reqclient.Zipcode,
-                              Notes = reqclient.Notes
+                              Notes = reqclient.Notes,
+                              ReqTypeId = req.Requesttypeid,
+                              Email = req.Email,
+                              Id = reqclient.Requestclientid
 ,
                           };
             return Json(new {data=request.ToList()}, System.Web.Mvc.JsonRequestBehavior.AllowGet);
@@ -86,7 +91,7 @@ namespace HelloDoc.Controllers
         public IActionResult SearchPatient(string searchValue)
         {
             // Assuming _context is your DbContext
-            var filteredPatients = (from req in _context.Requests
+           var filteredPatients = (from req in _context.Requests
                                    join reqclient in _context.Requestclients
                                    on req.Requestid equals reqclient.Requestid
                                    select new NewRequestTableVM
@@ -97,9 +102,12 @@ namespace HelloDoc.Controllers
                                        ReqDate = req.Createddate,
                                        Phone = req.Phonenumber,
                                        Address = reqclient.City + reqclient.Zipcode,
-                                       Notes = reqclient.Notes
+                                       Notes = reqclient.Notes,
+                                       ReqTypeId = req.Requesttypeid,
+                                       Email = req.Email,
+                                       Id = reqclient.Requestclientid
          ,
-                                   }).Where(patient=>patient.PatientName.Contains(searchValue)).ToList();
+                                   }).Where(patient => patient.Requestor.ToLower().Contains(searchValue.ToLower())).ToList();
 
             return PartialView("NewTablePartial", filteredPatients);
         }
