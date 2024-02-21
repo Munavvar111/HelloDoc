@@ -1,4 +1,5 @@
-﻿using BusinessLayer.Repository;
+﻿using BusinessLayer.InterFace;
+using BusinessLayer.Repository;
 using DataAccessLayer.CustomModel;
 using DataAccessLayer.DataContext;
 using DataAccessLayer.DataModels;
@@ -13,10 +14,11 @@ namespace HelloDoc.Controllers
     public class AdminController : Controller
     {
         private readonly ApplicationDbContext _context;
-
-        public AdminController(ApplicationDbContext context)
+        private readonly IAdmin _admin;
+        public AdminController(ApplicationDbContext context,IAdmin admin)
         {
             _context = context;
+            _admin=admin;
         }
         //main View
         public IActionResult ProviderLocation()
@@ -94,33 +96,9 @@ namespace HelloDoc.Controllers
                           };
             return Json(new {data=request.ToList()}, System.Web.Mvc.JsonRequestBehavior.AllowGet);
         }
-        public IActionResult SearchPatient(string searchValue,string selectValue,string partialName)
+        public IActionResult SearchPatient(string searchValue,string selectValue,string partialName,string selectedFilter)
         {
-            // Assuming _context is your DbContext
-            var filteredPatients = (from req in _context.Requests
-                                    join reqclient in _context.Requestclients
-                                    on req.Requestid equals reqclient.Requestid
-                                    select new NewRequestTableVM
-                                    {
-                                        PatientName = reqclient.Firstname,
-                                        Requestor = req.Firstname + " " + req.Lastname,
-                                        DateOfBirth = new DateOnly((int)reqclient.Intyear, int.Parse(reqclient.Strmonth), (int)reqclient.Intdate),
-                                        ReqDate = req.Createddate,
-                                        Phone = req.Phonenumber,
-                                        Address = reqclient.City + reqclient.Zipcode,
-                                        Notes = reqclient.Notes,
-                                        ReqTypeId = req.Requesttypeid,
-                                        Email = req.Email,
-                                        Id = reqclient.Requestclientid,
-                                        regionid = reqclient.Regionid,
-                                        Status = req.Status
-
-          ,
-                                    }).Where(item =>
-             (string.IsNullOrEmpty(searchValue) || item.PatientName.Contains(searchValue)) &&
-                                     (string.IsNullOrEmpty(selectValue) || item.regionid == int.Parse(selectValue))
-             );
-
+            var filteredPatients = _admin.SearchPatients(searchValue, selectValue, selectedFilter);
             return PartialView(partialName, filteredPatients);
         }
 

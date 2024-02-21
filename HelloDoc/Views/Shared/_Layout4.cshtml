@@ -226,6 +226,13 @@
                 filterTable(currentPartial);
             });
 
+            $('.filter-item').click(function () {
+                $('.filter-item').removeClass('active')
+                $(this).addClass('active')
+                filterTable(currentPartial)
+
+            });
+
             //ajax for render that partialview
             function loadPartialView(partialName) {
                 $.ajax({
@@ -244,13 +251,15 @@
 
             //ajax for filterthe table using search
             function filterTable(partialName) {
-
                 var searchValue = $("#searchInput").val();
                 var selectValue = $("#filterSelect").val();
+                var selectedFilter = $('.filter-item.active').data('value');
+                    
                 console.log(selectValue)
                 console.log(searchValue)
+                console.log(selectedFilter)
 
-                if (searchValue == "" && selectValue == '') {
+                if (searchValue == "" && selectValue == '' && selectedFilter=='') {
                     loadPartialView(currentPartial)
                 }
                  else{
@@ -258,7 +267,7 @@
                 $.ajax({
                     type: "GET",
                     url: "/Admin/SearchPatient",
-                        data: { searchValue: searchValue, selectValue: selectValue, partialName: partialName },
+                        data: { searchValue: searchValue, selectValue: selectValue, partialName: partialName, selectedFilter: selectedFilter },
                     success: function (data) {
                         $('#partialContainer').html(data);
 
