@@ -37,7 +37,7 @@ namespace BusinessLayer.Repository
         }
         public DataAccessLayer.DataModels.Request GetRequestByEmail(string email)
         {
-            return _context.Requests.FirstOrDefault(r => r.Email == email);
+            return _context.Requests.OrderBy(e => e.Requestid).LastOrDefault(r => r.Email == email);
         }
         public void AddRequestClient(RequestOthers requestOthers, int RequestID)
         {

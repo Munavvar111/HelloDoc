@@ -10,7 +10,7 @@
 }
 <div class="container-fluid mt-5">
     <div class="row row-cols-3 row-cols-lg-6 g-2 g-lg-3">
-        <a class="col text-decoration-none text-reset">
+        <a class="col" id="linkNew">
             <div class="border text-white p-3" style="background-color:#203f9a">
                 <div class="d-flex">
                     <span class="material-symbols-outlined d-none d-md-block">
@@ -21,7 +21,7 @@
                 <div>1452</div>
             </div>
         </a>
-        <a class="col text-decoration-none text-reset">
+        <a class="col" id="linkPanding">
             <div class="border p-3 text-info" style="background-color:#e5f2f8">
                 <div class="d-flex">
                     <span class="material-symbols-outlined d-none d-md-block">
@@ -32,7 +32,7 @@
                 <div class="fw-bold">256</div>
             </div>
         </a>
-        <a class="col" >
+        <a class="col" id="linkActive">
             <div class="border p-3" style="background-color:#e9f0e8">
                 <div class="d-flex">
                     <span class="material-symbols-outlined d-none d-md-block">
@@ -44,7 +44,7 @@
             </div>
 
         </a>
-        <a class="col" >
+        <a class="col" id="linkConclude">
             <div class="border p-3 text-pink" style="background-color:#f7e6ee">
                 <div class="d-flex">
                     <span class="material-symbols-outlined d-none d-md-block">
@@ -56,7 +56,7 @@
             </div>
 
         </a>
-        <a class="col" >
+        <a class="col" id="linkToclose">
             <div class="border p-3" style="background-color:#e5eef5">
                 <div class="d-flex">
                     <span class="material-symbols-outlined d-none d-md-block">
@@ -68,7 +68,7 @@
             </div>
 
         </a>
-        <a class="col"> 
+        <a class="col" id="linkUnpaid"> 
             <div class="border p-3" style="background-color: #efeef4">
                 <div class="d-flex ">
                     <span class="material-symbols-outlined d-none d-md-block">
@@ -128,8 +128,8 @@
     <div class="col-xl-2 col-md-4 col-sm-6">
         <div class="input-group rounded">
            
-            <select class="form-select" aria-label="Default select example">
-                <option selected>Open this select menu</option>
+            <select class="form-select" aria-label="Default select example" id="filterSelect">
+                <option selected value="">Open this select menu</option>
                 <option value="1">One</option>
                 <option value="2">Two</option>
                 <option value="3">Three</option>
@@ -165,5 +165,13 @@
 </div>
 <div id="partialContainer">
 
-<partial name="NewTablePartial" model="@Model"></partial>
+   
+    <partial name="NewTablePartial" model="@Model"></partial>
+    <partial name="PendingTablePartial" model="@Model"></partial>
+    <partial name="ActiveTablePartial" model="@Model"></partial>
+    <partial name="ConcludeTablePartial" model="@Model"></partial>
+    <partial name="ToCloseTablePartial" model="@Model"></partial>
+    <partial name="UnpaidTablePartial" model="@Model"></partial>
+</div>
+<div>
 </div>

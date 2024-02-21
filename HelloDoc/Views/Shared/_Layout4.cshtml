@@ -137,8 +137,7 @@
 
 
 
-    <!-- Toastr JS -->
-    <!-- Your existing scripts -->
+   
     <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
@@ -169,18 +168,98 @@
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js" ></script>
     <script>
 
-        $(document).ready(function () {
-            $('#searchInput').on('input', function () {
-                var searchValue = $(this).val();
+        $(document).ready(function () { 
+            var currentPartial = "NewTablePartial";
+               //intial Only NewTablePartial Will load 
+            loadPartialView(currentPartial);
+            $('PendingTablePartial').hide();
+            $('ActiveTablePartial').hide();
+            $('ConcludeTablePartial').hide();
+            $('ToCloseTablePartial').hide();
+            $('UnpaidTablePartial').hide();
+
+
+            //onclick each partial will load
+
+            $("#linkNew").click(function () {
+                currentPartial = "NewTablePartial"
+                loadPartialView("NewTablePartial");
+            });
+
+
+
+            $("#linkPanding").click(function () {
+                currentPartial = "PendingTablePartial"
+                loadPartialView("PendingTablePartial");
+            });
+
+
+            $("#linkActive").click(function () {
+                currentPartial = "ActiveTablePartial"
+                loadPartialView("ActiveTablePartial");
+            });
+
+           
+
+            $("#linkConclude").click(function () {
+                currentPartial = "ConcludeTablePartial"
+                loadPartialView("ConcludeTablePartial");
+            });
+
+            $("#linkToclose").click(function () {
+                currentPartial = "ToCloseTablePartial"
+                loadPartialView("ToCloseTablePartial");
+            });
+
+            $("#linkUnpaid").click(function () {
+                currentPartial = "UnpaidTablePartial"
+                loadPartialView("UnpaidTablePartial");
+            });
+
+            //filter the data with passed currentpartial that will load only that data
+            $("#filterSelect").on("input change", function () {
+                filterTable(currentPartial);
+            });
+
+
+            $("#searchInput").on("input", function () {
+                filterTable(currentPartial);
+            });
+
+            //ajax for render that partialview
+            function loadPartialView(partialName) {
+                $.ajax({
+                    url: '@Url.Action("NewPartial", "Admin")', 
+                    type: 'GET',
+                    data: { partialName: partialName },
+                    success: function (result) {
+                        $("#partialContainer").html(result);
+                    },
+                    error: function (error) {
+                        console.error("Error loading partial view: " + error);
+                    }
+                });
+            }
+
+
+            //ajax for filterthe table using search
+            function filterTable(partialName) {
+
+                var searchValue = $("#searchInput").val();
+                var selectValue = $("#filterSelect").val();
+                console.log(selectValue)
                 console.log(searchValue)
-                if(searchValue!== ""){
+
+                if (searchValue == "" && selectValue == '') {
+                    loadPartialView(currentPartial)
+                }
+                 else{
 
                 $.ajax({
-                    type:"POST",
-                    url:"/Admin/SearchPatient",
-                    data: { searchValue: searchValue },
+                    type: "GET",
+                    url: "/Admin/SearchPatient",
+                        data: { searchValue: searchValue, selectValue: selectValue, partialName: partialName },
                     success: function (data) {
-                        // Update your partial view with the filtered data
                         $('#partialContainer').html(data);
 
                     },
@@ -188,11 +267,8 @@
                         console.error('Error:', error);
                     }
                 });
-                }else{
-                    location.reload();
-
                 }
-            });
+            }
         });
 
 
@@ -218,7 +294,6 @@
         //     }
         // });
     </script>
-    <!-- Add the following script in your layout -->
 
 
 </body>

@@ -5,6 +5,7 @@ using DataAccessLayer.DataModels;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Org.BouncyCastle.Ocsp;
+using System.Drawing;
 using System.Linq;
 
 namespace HelloDoc.Controllers
@@ -17,30 +18,33 @@ namespace HelloDoc.Controllers
         {
             _context = context;
         }
-
+        //main View
         public IActionResult ProviderLocation()
         {
             return View();
         }
+
+        //main View
         public IActionResult Profile()
         {
             return View();
         }
-
+        //main View
         public IActionResult Provider()
         {
             return View();  
         }
-
+        //main View
         public IActionResult Parteners()
         {
             return View();
         }
+        //main View
         public IActionResult Records()
         {
             return View();
         }
-
+        //main View
         public IActionResult Index()
         {
 
@@ -51,14 +55,15 @@ namespace HelloDoc.Controllers
                           {
                               PatientName = reqclient.Firstname,
                               Requestor = req.Firstname + " " + req.Lastname,
-                              DateOfBirth = new DateTime((int)reqclient.Intyear, int.Parse(reqclient.Strmonth), (int)reqclient.Intdate),
+                              DateOfBirth = new DateOnly((int)reqclient.Intyear, int.Parse(reqclient.Strmonth), (int)reqclient.Intdate),
                               ReqDate = req.Createddate,
                               Phone = req.Phonenumber,
                               Address = reqclient.City + reqclient.Zipcode,
                               Notes = reqclient.Notes,
                               ReqTypeId=req.Requesttypeid,
                               Email=req.Email,
-                              Id=reqclient.Requestclientid
+                              Id=reqclient.Requestclientid,
+                              Status=req.Status
 ,
                           };
 
@@ -75,41 +80,48 @@ namespace HelloDoc.Controllers
                           {
                               PatientName = reqclient.Firstname,
                               Requestor = req.Firstname + " " + req.Lastname,
-                              DateOfBirth = new DateTime((int)reqclient.Intyear, int.Parse(reqclient.Strmonth), (int)reqclient.Intdate),
+                              DateOfBirth = new DateOnly((int)reqclient.Intyear, int.Parse(reqclient.Strmonth), (int)reqclient.Intdate),
                               ReqDate = req.Createddate,
                               Phone = req.Phonenumber,
                               Address = reqclient.City + reqclient.Zipcode,
                               Notes = reqclient.Notes,
                               ReqTypeId = req.Requesttypeid,
                               Email = req.Email,
-                              Id = reqclient.Requestclientid
+                              Id = reqclient.Requestclientid,
+                              Status = req.Status
+
 ,
                           };
             return Json(new {data=request.ToList()}, System.Web.Mvc.JsonRequestBehavior.AllowGet);
         }
-        [HttpPost]
-        public IActionResult SearchPatient(string searchValue)
+        public IActionResult SearchPatient(string searchValue,string selectValue,string partialName)
         {
             // Assuming _context is your DbContext
-           var filteredPatients = (from req in _context.Requests
-                                   join reqclient in _context.Requestclients
-                                   on req.Requestid equals reqclient.Requestid
-                                   select new NewRequestTableVM
-                                   {
-                                       PatientName = reqclient.Firstname,
-                                       Requestor = req.Firstname + " " + req.Lastname,
-                                       DateOfBirth = new DateTime((int)reqclient.Intyear, int.Parse(reqclient.Strmonth), (int)reqclient.Intdate),
-                                       ReqDate = req.Createddate,
-                                       Phone = req.Phonenumber,
-                                       Address = reqclient.City + reqclient.Zipcode,
-                                       Notes = reqclient.Notes,
-                                       ReqTypeId = req.Requesttypeid,
-                                       Email = req.Email,
-                                       Id = reqclient.Requestclientid
-         ,
-                                   }).Where(patient => patient.Requestor.ToLower().Contains(searchValue.ToLower())).ToList();
+            var filteredPatients = (from req in _context.Requests
+                                    join reqclient in _context.Requestclients
+                                    on req.Requestid equals reqclient.Requestid
+                                    select new NewRequestTableVM
+                                    {
+                                        PatientName = reqclient.Firstname,
+                                        Requestor = req.Firstname + " " + req.Lastname,
+                                        DateOfBirth = new DateOnly((int)reqclient.Intyear, int.Parse(reqclient.Strmonth), (int)reqclient.Intdate),
+                                        ReqDate = req.Createddate,
+                                        Phone = req.Phonenumber,
+                                        Address = reqclient.City + reqclient.Zipcode,
+                                        Notes = reqclient.Notes,
+                                        ReqTypeId = req.Requesttypeid,
+                                        Email = req.Email,
+                                        Id = reqclient.Requestclientid,
+                                        regionid = reqclient.Regionid,
+                                        Status = req.Status
 
-            return PartialView("NewTablePartial", filteredPatients);
+          ,
+                                    }).Where(item =>
+             (string.IsNullOrEmpty(searchValue) || item.PatientName.Contains(searchValue)) &&
+                                     (string.IsNullOrEmpty(selectValue) || item.regionid == int.Parse(selectValue))
+             );
+
+            return PartialView(partialName, filteredPatients);
         }
 
         public IActionResult Learning()
@@ -179,6 +191,33 @@ namespace HelloDoc.Controllers
                 throw;
             }
 
+        }
+        public IActionResult NewPartial(string partialName)
+        {
+            var request = from req in _context.Requests
+                          join reqclient in _context.Requestclients
+                          on req.Requestid equals reqclient.Requestid
+                          select new NewRequestTableVM
+                          {
+                              PatientName = reqclient.Firstname,
+                              Requestor = req.Firstname + " " + req.Lastname,
+                              DateOfBirth = new DateOnly((int)reqclient.Intyear, int.Parse(reqclient.Strmonth), (int)reqclient.Intdate),
+                              ReqDate = req.Createddate,
+                              Phone = req.Phonenumber,
+                              Address = reqclient.City + reqclient.Zipcode,
+                              Notes = reqclient.Notes,
+                              ReqTypeId = req.Requesttypeid,
+                              Email = req.Email,
+                              Id = reqclient.Requestclientid,
+                              Status=req.Status
+,
+                          };
+            return PartialView(partialName, request);
+        }
+
+        public IActionResult PendingTablePartial()
+        {
+            return PartialView("PendingTablePartial");
         }
     }
 }

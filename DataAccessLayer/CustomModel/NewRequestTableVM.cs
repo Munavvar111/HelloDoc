@@ -10,7 +10,7 @@ namespace DataAccessLayer.CustomModel
     {
         public string PatientName {  get; set; }
 
-        public DateTime DateOfBirth { get; set; }
+        public DateOnly DateOfBirth { get; set; }
 
         public string Requestor { get; set; }   
 
@@ -27,5 +27,9 @@ namespace DataAccessLayer.CustomModel
         public string Email { get; set; }   
 
         public Int32 Id { get; set; }
+
+        public int? regionid {  get; set; }
+
+        public int Status { get; set; }  
     }
 }
