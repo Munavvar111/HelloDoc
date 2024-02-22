@@ -186,6 +186,7 @@
             $("#linkNew").click(function () {
                 currentPartial = "NewTablePartial"
                 currentStatus = [1];
+                $('#statuschange').html('(new)');
                 loadPartialView("NewTablePartial", currentStatus);
             });
 
@@ -194,13 +195,17 @@
             $("#linkPanding").click(function () {
                 currentPartial = "PendingTablePartial"
                 currentStatus = [2];
+                $('#statuschange').html('(Pending)');
+
                 loadPartialView("PendingTablePartial", currentStatus);
             });
 
 
             $("#linkActive").click(function () {
                 currentStatus=[4,5]
-                currentPartial = "ActiveTablePartial"
+                currentPartial = "ActiveTablePartial";
+                $('#statuschange').html('(Active)');
+
                 loadPartialView("ActiveTablePartial", currentStatus);
             });
 
@@ -208,19 +213,23 @@
 
             $("#linkConclude").click(function () {
                 currentStatus = [6];
-                currentPartial = "ConcludeTablePartial"
+                currentPartial = "ConcludeTablePartial";
+                $('#statuschange').html('(Conclude)');
+
                 loadPartialView("ConcludeTablePartial", currentStatus);
             });
 
             $("#linkToclose").click(function () {
                 currentStatus = [3,7,8];
-                currentPartial = "ToCloseTablePartial"
+                currentPartial = "ToCloseTablePartial";
+                $('#statuschange').html('(ToClose)');
                 loadPartialView("ToCloseTablePartial", currentStatus);
             });
 
             $("#linkUnpaid").click(function () {
                 currentStatus = [9];
-                currentPartial = "UnpaidTablePartial"
+                currentPartial = "UnpaidTablePartial";
+                $('#statuschange').html('(Unpaid)');
                 loadPartialView("UnpaidTablePartial", currentStatus);
             });
 
