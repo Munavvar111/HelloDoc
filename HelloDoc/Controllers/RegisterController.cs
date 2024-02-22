@@ -32,7 +32,7 @@ namespace HalloDocPatient.Controllers
         }
 
         [HttpPost]
-        public IActionResult Index(LoginModel lc)
+        public IActionResult Index(RegisterVM lc)
         {
             if (ModelState.IsValid)
             {
@@ -58,7 +58,7 @@ namespace HalloDocPatient.Controllers
                     _context.Users.Add(uc);
                     _context.SaveChanges();
 
-                    return RedirectToAction(nameof(View1));
+                    return RedirectToAction("Index","Login");
                 }
                 else
                 {

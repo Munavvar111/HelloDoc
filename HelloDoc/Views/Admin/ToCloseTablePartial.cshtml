@@ -18,12 +18,7 @@
         @foreach (var item in Model)
         {
 
-            if (@item.Status == 5)
-            {
-
-
-                if (@item.ReqTypeId == 1)
-                {
+           
                     <tr class="table-success  d-none d-xl-table-row ">
 
 
@@ -130,108 +125,6 @@
 
 
 
-                }
-                else if (item.ReqTypeId == 2)
-                {
-                    <tr class="table-warning  d-none d-xl-table-row ">
-                        <td>@item.PatientName</td>
-                        <td>@item.DateOfBirth</td>
-                        <td>@item.Requestor </td>
-                        <td>de.jay</td>
-                        <td>5-12-2019</td>
-                        <td>
-                            <button class="btn  border-black bg-warning-subtle text-black">
-                                <i class="bi bi-telephone me-1"></i>
-                                @item.Phone
-                            </button>
-
-                        </td>
-                        <td>@item.Address</td>
-                        <td>@item.Notes</td>
-                        <td>
-                            <button class="btn border-black bg-warning-subtle text-black">
-                                <i class="bi bi-person me-1"></i> provider
-                            </button>
-
-                        </td>
-                        <td>
-                            <button class="btn border-black text-black bg-warning-subtle">Actions</button>
-
-                        </td>
-                    </tr>
-
-
-
-                    <div class="d-xl-none ">
-                        <div class="bg-info-subtle rounded-3 " data-bs-toggle="collapse" data-bs-target="#collapseExample_@item.Id"
-                             aria-expanded="false" aria-controls="collapseExample_@item.Id">
-                            <div class="flex-column gap-2 border-bottom border-5">
-                                <div class="d-flex align-items-center justify-content-between mb-2">
-                                    <span class=" fs-5 ms-2">@item.PatientName</span>
-                                    <span class=" fs-5 me-5">Patient</span>
-                                </div>
-                                <div class="d-flex align-items-center justify-content-between mb-2">
-                                    <div class="fs-5 ms-2"> @item.Address</div>
-
-                                    <button class="btn border-info text-info me-1">
-                                        Map Location
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="collapse" id="collapseExample_@item.Id">
-                            <div class=" bg-info-subtle rounded-3 flex-column">
-                                <div class="ms-2 fs-5">
-                                    <i class="bi bi-calendar3 me-1"></i>
-                                    Date Of Birth:@item.DateOfBirth
-                                </div>
-                                <div class="ms-2 fs-5">
-                                    <i class="bi bi-envelope me-1"></i>
-                                    Email:@item.Email
-                                </div>
-                                <div class="ms-2 fs-5">
-                                    <i class="bi bi-telephone me-1"></i>
-                                    Patient-No:@item.Phone
-                                </div>
-                                <div class="ms-2 fs-5">
-                                    <i class="bi bi-journal-bookmark"></i>
-                                    Notes:@item.Notes
-                                </div>
-                                <div class="ms-2 fs-5">
-                                    <i class="bi bi-calendar3 me-1"></i>
-                                    Date Of Service:3-9-2024
-                                </div>
-                                <div class="ms-2 fs-5">
-                                    <i class="bi bi-person-circle me-1"></i>
-                                    Physician:dr.dhanani
-                                </div>
-                                <div class="ms-2 fs-5">
-                                    <i class="bi bi-person me-1"></i>
-                                    Requestor:Munavvar
-                                </div>
-                                <div class="d-flex">
-                                </div>
-                                <div class="ms-2 fs-5">
-                                    Chat With:
-                                    <div>
-                                        <button type="button" class=" btn bg-info-subtle text-info border-info rounded-3">
-                                            <i class="bi bi-person me-1"></i>
-                                            Patient
-                                        </button>
-                                        <button type="button" class=" btn bg-info-subtle text-info border-info rounded-3">
-                                            <i class="bi bi-person-circle me-1"></i>
-                                            Provider
-                                        </button>
-                                    </div>
-
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                }
-            }
 
         }
 </table>

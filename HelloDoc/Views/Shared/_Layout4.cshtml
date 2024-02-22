@@ -170,8 +170,10 @@
 
         $(document).ready(function () { 
             var currentPartial = "NewTablePartial";
+            var currentStatus = [1];
+
                //intial Only NewTablePartial Will load 
-            loadPartialView(currentPartial);
+            loadPartialView(currentPartial,currentStatus);
             $('PendingTablePartial').hide();
             $('ActiveTablePartial').hide();
             $('ConcludeTablePartial').hide();
@@ -183,62 +185,69 @@
 
             $("#linkNew").click(function () {
                 currentPartial = "NewTablePartial"
-                loadPartialView("NewTablePartial");
+                currentStatus = [1];
+                loadPartialView("NewTablePartial", currentStatus);
             });
 
 
 
             $("#linkPanding").click(function () {
                 currentPartial = "PendingTablePartial"
-                loadPartialView("PendingTablePartial");
+                currentStatus = [2];
+                loadPartialView("PendingTablePartial", currentStatus);
             });
 
 
             $("#linkActive").click(function () {
+                currentStatus=[4,5]
                 currentPartial = "ActiveTablePartial"
-                loadPartialView("ActiveTablePartial");
+                loadPartialView("ActiveTablePartial", currentStatus);
             });
 
            
 
             $("#linkConclude").click(function () {
+                currentStatus = [6];
                 currentPartial = "ConcludeTablePartial"
-                loadPartialView("ConcludeTablePartial");
+                loadPartialView("ConcludeTablePartial", currentStatus);
             });
 
             $("#linkToclose").click(function () {
+                currentStatus = [3,7,8];
                 currentPartial = "ToCloseTablePartial"
-                loadPartialView("ToCloseTablePartial");
+                loadPartialView("ToCloseTablePartial", currentStatus);
             });
 
             $("#linkUnpaid").click(function () {
+                currentStatus = [9];
                 currentPartial = "UnpaidTablePartial"
-                loadPartialView("UnpaidTablePartial");
+                loadPartialView("UnpaidTablePartial", currentStatus);
             });
 
             //filter the data with passed currentpartial that will load only that data
             $("#filterSelect").on("input change", function () {
-                filterTable(currentPartial);
+                filterTable(currentPartial, currentStatus);
             });
 
 
             $("#searchInput").on("input", function () {
-                filterTable(currentPartial);
+                filterTable(currentPartial, currentStatus);
             });
 
             $('.filter-item').click(function () {
                 $('.filter-item').removeClass('active')
                 $(this).addClass('active')
-                filterTable(currentPartial)
+                filterTable(currentPartial, currentStatus)
 
             });
 
             //ajax for render that partialview
-            function loadPartialView(partialName) {
+            function loadPartialView(partialName, currentStatus) {
                 $.ajax({
                     url: '@Url.Action("NewPartial", "Admin")', 
                     type: 'GET',
-                    data: { partialName: partialName },
+                    traditional:true,
+                    data: { partialName: partialName, currentStatus: currentStatus },
                     success: function (result) {
                         $("#partialContainer").html(result);
                     },
@@ -250,7 +259,7 @@
 
 
             //ajax for filterthe table using search
-            function filterTable(partialName) {
+            function filterTable(partialName, currentStatus) {
                 var searchValue = $("#searchInput").val();
                 var selectValue = $("#filterSelect").val();
                 var selectedFilter = $('.filter-item.active').data('value');
@@ -260,14 +269,16 @@
                 console.log(selectedFilter)
 
                 if (searchValue == "" && selectValue == '' && selectedFilter=='') {
-                    loadPartialView(currentPartial)
+                    loadPartialView(currentPartial,currentStatus)
                 }
                  else{
 
                 $.ajax({
                     type: "GET",
                     url: "/Admin/SearchPatient",
-                        data: { searchValue: searchValue, selectValue: selectValue, partialName: partialName, selectedFilter: selectedFilter },
+                        traditional: true,
+
+                        data: { searchValue: searchValue, selectValue: selectValue, partialName: partialName, selectedFilter: selectedFilter, currentStatus: currentStatus },
                     success: function (data) {
                         $('#partialContainer').html(data);
 

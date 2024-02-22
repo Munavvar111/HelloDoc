@@ -47,8 +47,7 @@ namespace BusinessLayer.Repository
 
             using (var client = new SmtpClient())
             {
-                    client.ServerCertificateValidationCallback = (s, c, h, e) => true;
-                    client.Connect(emailSettings["SmtpServer"], int.Parse(emailSettings["SmtpPort"]), SecureSocketOptions.StartTls);
+                    client.Connect(emailSettings["SmtpServer"], int.Parse(emailSettings["SmtpPort"]));
                 client.Authenticate(emailSettings["SmtpUsername"], emailSettings["SmtpPassword"]);
                 client.Send(message);
                 client.Disconnect(true);

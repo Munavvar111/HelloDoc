@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NuGet.Protocol;
 using NuGet.Protocol.Core.Types;
+using Org.BouncyCastle.Asn1.Ocsp;
 
 namespace HalloDocPatient.Controllers
 {
@@ -55,11 +56,12 @@ namespace HalloDocPatient.Controllers
                 _context.Businesses.Add(business);
                 _context.SaveChanges();
 
-                Request request = new Request();
+                DataAccessLayer.DataModels.Request request = new DataAccessLayer.DataModels.Request();
                 request.Firstname = requestOther.FirstNameOther;
                 request.Requesttypeid = 4;//Business 
                 request.Lastname = requestOther.LastNameOther;
                 request.Email = requestOther.EmailOther;
+                request.Phonenumber = requestOther.PhoneNumberOther;
                 request.Status = 1;//Unsigned
                 request.Createddate = DateTime.Now;
 
@@ -75,6 +77,7 @@ namespace HalloDocPatient.Controllers
 
 
                 Requestclient requestclient = new Requestclient();
+                requestclient.Phonenumber = request.Phonenumber;
                 requestclient.Requestid = request.Requestid;
                 requestclient.Firstname = requestOther.FirstName;
                 requestclient.Lastname = requestOther.LastName;
@@ -86,7 +89,19 @@ namespace HalloDocPatient.Controllers
 
                 _context.Requestclients.Add(requestclient);
                 _context.SaveChanges();
+                var token = Guid.NewGuid().ToString();
+                var resetLink = Url.Action("Index", "Register", new { userId = request.Requestid, token }, protocol: HttpContext.Request.Scheme);
 
+                if (_login.IsSendEmail("munavvarpopatiya999@gmail.com", "Munavvar", $"Click <a href='{resetLink}'>here</a> to Create A new Account"))
+                {
+
+                    return RedirectToAction("Index", "Login");
+                }
+                else
+                {
+                    ModelState.AddModelError(string.Empty, "Email Is Not Send");
+
+                }
                 return RedirectToAction("Index", "Login");
             }
             return View(requestOther);
@@ -104,17 +119,45 @@ namespace HalloDocPatient.Controllers
             }
             else 
             {
+                
                 if(requestModel.File!=null && requestModel.File.Length > 0)
                 {
                     var uniqueFileName=await _patientRequest.AddFileInUploader(requestModel.File);
                     _patientRequest.AddPatientRequest(requestModel, ReqTypeId: 1);
                     var request = _patientRequest.GetRequestByEmail(requestModel.Email);
                     _patientRequest.AddRequestWiseFile(uniqueFileName, request.Requestid);
+                    var token = Guid.NewGuid().ToString();
+                    var resetLink = Url.Action("Index", "Register", new { userId = request.Requestid, token }, protocol: HttpContext.Request.Scheme);
+                    if (_login.IsSendEmail("munavvarpopatiya999@gmail.com", "Munavvar", $"Click <a href='{resetLink}'>here</a> to Create A new Account"))
+                    {
+
+                        return RedirectToAction("Index", "Login");
+                    }
+                    else
+                    {
+                        ModelState.AddModelError(string.Empty, "Email Is Not Send");
+
+                    }
                     return RedirectToAction("Index", "Login");
                 }
                 //_patientRequest is a interface addpatientrequest is method;
                 else {
                     _patientRequest.AddPatientRequest(requestModel, ReqTypeId: 1);
+                    var request = _patientRequest.GetRequestByEmail(requestModel.Email);
+                    var token = Guid.NewGuid().ToString();
+                    var resetLink = Url.Action("Index", "Register", new { userId = request.Requestid, token }, protocol: HttpContext.Request.Scheme);
+
+
+                    if (_login.IsSendEmail("munavvarpopatiya999@gmail.com", "Munavvar", $"Click <a href='{resetLink}'>here</a> to Create A new Account"))
+                    {
+
+                        return RedirectToAction("Index", "Login");
+                    }
+                    else
+                    {
+                        ModelState.AddModelError(string.Empty, "Email Is Not Send");
+
+                    }
                     return RedirectToAction("Index", "Login");
 
                 }
@@ -175,7 +218,22 @@ namespace HalloDocPatient.Controllers
                 }
                 else
                 {
+
                     _otherrequest.AddFriendRequest(request, ReqTypeId: 2);
+                    var request1 = _patientRequest.GetRequestByEmail(request.EmailOther);
+                    var token = Guid.NewGuid().ToString();
+                    var resetLink = Url.Action("Index", "Register", new { RequestId = request1.Requestid, token }, protocol: HttpContext.Request.Scheme);
+
+                    if (_login.IsSendEmail("munavvarpopatiya999@gmail.com", "Munavvar", $"Click <a href='{resetLink}'>here</a> to reset your password."))
+                    {
+
+                        return RedirectToAction("Index", "Login");
+                    }
+                    else
+                    {
+                        ModelState.AddModelError(string.Empty, "Email Is Not Send");
+
+                    }
                     return RedirectToAction("Index", "Login");
 
 
@@ -199,7 +257,21 @@ namespace HalloDocPatient.Controllers
 
 
                 _otherrequest.AddConceirgeRequest(requestOther, ReqTypeId: 3);
+                var request1 = _patientRequest.GetRequestByEmail(requestOther.EmailOther);
 
+                var token = Guid.NewGuid().ToString();
+                var resetLink = Url.Action("Index", "Register", new { RequestId = request1.Requestid, token }, protocol: HttpContext.Request.Scheme);
+
+                if (_login.IsSendEmail("munavvarpopatiya999@gmail.com", "Munavvar", $"Click <a href='{resetLink}'>here</a> to reset your password."))
+                {
+
+                    return RedirectToAction("Index", "Login");
+                }
+                else
+                {
+                    ModelState.AddModelError(string.Empty, "Email Is Not Send");
+
+                }
                 return RedirectToAction("Index", "Login");
             }
             return View(requestOther);

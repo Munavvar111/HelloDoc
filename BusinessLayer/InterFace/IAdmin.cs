@@ -9,7 +9,7 @@ namespace BusinessLayer.InterFace
 {
     public interface IAdmin
     {   
-        List<NewRequestTableVM> SearchPatients(string searchValue, string selectValue, string selectedFilter);
+        List<NewRequestTableVM> SearchPatients(string searchValue, string selectValue, string selectedFilter,int[] currentStatus);
 
     }
 }

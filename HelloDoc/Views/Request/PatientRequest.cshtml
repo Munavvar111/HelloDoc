@@ -92,9 +92,10 @@
                 <input type="password"
                        asp-for="Passwordhash"
                        class="form-control"
-                       id="floatingInput"
+                       id="Password"
                        placeholder="*****" />
                 <label for="floatingInput" asp-for="Passwordhash">Password</label>
+                <span asp-validation-for="Passwordhash" class="text-danger"></span>
             </div>
         </div>
         <div class="col" id="pwdrow" style="display:none">
@@ -102,9 +103,10 @@
                 <input type="password"
                        class="form-control"
                        asp-for="ConfirmPasswordhash"
-                       id="floatingInput"
+                       id="ConfirmPassword"
                        placeholder="*****" />
                 <label for="floatingInput" asp-for="ConfirmPasswordhash">Confirm Password</label>
+                <span asp-validation-for="ConfirmPasswordhash" id="divCheckPasswordMatch"></span>
             </div>
         </div>
 
@@ -192,7 +194,7 @@
     </div>
     <div class="row">
         <div class="d-flex gap-3 align-items-center justify-content-end">
-            <button class="btn btn-info text-light" type="submit">
+            <button class="btn btn-info text-light" type="submit" id="submit">
                 Submit
             </button>
             <a href="submitrequest.html" class="btn btn-outline-info d-flex align-items-center h-100">
@@ -215,6 +217,9 @@
 
 <script src="https://code.jquery.com/jquery-1.11.3.js" type="text/javascript"></script>
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+
+
+
 <script type="text/javascript">
     var pwdrow = $("#pwdrow");
     var pwdcol = $("#pwdcol");
@@ -229,11 +234,11 @@
             dataType: "json",
             success: function (response) {
                 if (response) {
-                    // Email not available.
+                    // Email  available.
                     pwdrow.show();
                     pwdcol.show();
                 } else {
-                    // Email  available.
+                    // Email not available.
                     pwdrow.hide();
                     pwdcol.hide();
                 }

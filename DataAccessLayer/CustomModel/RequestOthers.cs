@@ -11,11 +11,11 @@ namespace DataAccessLayer.CustomModel;
 public partial class RequestOthers
 {
     [Key]
-    [StringLength(256)]
+    [StringLength(50, ErrorMessage = "First Name should be between {2} and {1} characters.", MinimumLength = 2)]
     [Required(ErrorMessage = "Please Enter First Name")]
     public string FirstNameOther { get; set; } = null!;
 
-    [StringLength(256)]
+    [StringLength(50, ErrorMessage = "Last Name should be between {2} and {1} characters.", MinimumLength = 2)]
     [Required(ErrorMessage ="Please Enter Last Name")]
     public string LastNameOther { get; set; } = null!;
 
@@ -35,11 +35,11 @@ public partial class RequestOthers
     public string? PhoneNumber { get; set; }
     public string? PhoneNumberOther { get; set; }
 
-    [StringLength(256)]
+    [StringLength(50, ErrorMessage = "First Name should be between {2} and {1} characters.", MinimumLength = 2)]
     [Required(ErrorMessage ="Please Enter FirstName Of Patient")]
     public string FirstName { get; set; }= null!;
 
-    [StringLength(256)]
+    [StringLength(50, ErrorMessage = "Last Name should be between {2} and {1} characters.", MinimumLength = 2)]
     [Required(ErrorMessage ="Please Enter LastName Of Patient")]
     public string LastName { get; set; }=   null!;
 
@@ -54,12 +54,14 @@ public partial class RequestOthers
     public string Street { get; set; } = null!;
 
     [Required(ErrorMessage = "Please Enter City")]
+    [StringLength(50, ErrorMessage = "City should be between {2} and {1} characters.", MinimumLength = 2)]
     public string City { get; set; } = null!;
 
     [Required(ErrorMessage = "Please Enter State")]
     public string State { get; set; } = null!;
 
     [Required(ErrorMessage = "Please Enter Zipcode")]
+    [RegularExpression(@"^\d{5}$", ErrorMessage = "Invalid Zip Code")]
     public string Zipcode { get; set; } = null!;
 
     [FromForm]

@@ -70,6 +70,18 @@ namespace HelloDoc.Controllers
                           };
 
 
+            var newcount = (_context.Requests.Where(item => item.Status == 1)).Count();
+            var pandingcount=(_context.Requests.Where(item => item.Status==2)).Count();
+            var activecount=(_context.Requests.Where(item => item.Status==4 || item.Status==5)).Count();
+            var conclude=(_context.Requests.Where(item => item.Status==6)).Count();
+            var toclosed=(_context.Requests.Where(item => item.Status==3 || item.Status==7 || item.Status==8)).Count();
+            var unpaid=(_context.Requests.Where(item => item.Status==9)).Count();
+            ViewBag.PandingCount = pandingcount;
+            ViewBag.NewCount=newcount;
+            ViewBag.activecount = activecount;
+            ViewBag.conclude = conclude;
+            ViewBag.toclosed = toclosed;
+            ViewBag.unpaid = unpaid;
             return View(request.ToList());
         }   
 
@@ -96,10 +108,10 @@ namespace HelloDoc.Controllers
                           };
             return Json(new {data=request.ToList()}, System.Web.Mvc.JsonRequestBehavior.AllowGet);
         }
-        public IActionResult SearchPatient(string searchValue,string selectValue,string partialName,string selectedFilter)
+        public IActionResult SearchPatient(string searchValue,string selectValue,string partialName,string selectedFilter, int[] currentStatus)
         {
-            var filteredPatients = _admin.SearchPatients(searchValue, selectValue, selectedFilter);
-            return PartialView(partialName, filteredPatients);
+            var filteredPatients = _admin.SearchPatients(searchValue, selectValue, selectedFilter, currentStatus);
+                return PartialView(partialName, filteredPatients);
         }
 
         public IActionResult Learning()
@@ -170,9 +182,9 @@ namespace HelloDoc.Controllers
             }
 
         }
-        public IActionResult NewPartial(string partialName)
+        public IActionResult NewPartial(string partialName,int[] currentStatus)
         {
-            var request = from req in _context.Requests
+            var request = (from req in _context.Requests
                           join reqclient in _context.Requestclients
                           on req.Requestid equals reqclient.Requestid
                           select new NewRequestTableVM
@@ -189,7 +201,7 @@ namespace HelloDoc.Controllers
                               Id = reqclient.Requestclientid,
                               Status=req.Status
 ,
-                          };
+                          }).Where(item => currentStatus.Any(status=>item.Status==status));
             return PartialView(partialName, request);
         }
 

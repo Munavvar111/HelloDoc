@@ -16,7 +16,7 @@ namespace BusinessLayer.Repository
             _context = context;
         }
 
-        public List<NewRequestTableVM> SearchPatients(string searchValue, string selectValue, string selectedFilter)
+        public List<NewRequestTableVM> SearchPatients(string searchValue, string selectValue, string selectedFilter, int[] currentStatus)
         {
             var filteredPatients = (from req in _context.Requests
                                     join reqclient in _context.Requestclients
@@ -39,7 +39,7 @@ namespace BusinessLayer.Repository
                                     .Where(item =>
                                         (string.IsNullOrEmpty(searchValue) || item.PatientName.Contains(searchValue)) &&
                                         (string.IsNullOrEmpty(selectValue) || item.regionid == int.Parse(selectValue)) &&
-                                        (string.IsNullOrEmpty(selectedFilter) || item.ReqTypeId == int.Parse(selectedFilter))).ToList();
+                                        (string.IsNullOrEmpty(selectedFilter) || item.ReqTypeId == int.Parse(selectedFilter)) && currentStatus.Any(status=>item.Status==status)).ToList();
 
             return filteredPatients;
         }
