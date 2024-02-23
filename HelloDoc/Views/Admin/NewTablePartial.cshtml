@@ -21,31 +21,59 @@
 
 
 
-                <tr class=" @(GetRowClass(@item.ReqTypeId))  d-none d-xl-table-row ">
+                <tr class=" @(GetRowClass(@item.ReqTypeId))  d-none d-xl-table-row text-white" style="vertical-align:middle">
 
 
 
-                        <td>@item.PatientName</td>
-                        <td>@item.DateOfBirth</td>
-                        <td>@item.Requestor </td>
-                        <td>5-12-2019</td>
-                        <td>
-                            <button class="btn  border-white bg-success-subtle text-white">
+                <td style="background-color:@(GetRowClass(@item.ReqTypeId))!important">@item.PatientName</td>
+                <td style="background-color:@(GetRowClass(@item.ReqTypeId))!important">@item.DateOfBirth</td>
+                <td style="background-color:@(GetRowClass(@item.ReqTypeId))!important">@item.Requestor </td>
+                <td style="background-color:@(GetRowClass(@item.ReqTypeId))!important">5-12-2019</td>
+                <td style="background-color:@(GetRowClass(@item.ReqTypeId))!important">
+                            <button class="btn  border-white text-white" >
                                 <i class="bi bi-telephone me-1"></i>
                                 @item.Phone
-                            </button>
+                            </button><br>
+                    <span class="text-white">Patient</span>
+                    @if (@item.ReqTypeId==2)
+                    {
+                        <br />
+                        <button class="btn  border-white text-white">
+                            <i class="bi bi-telephone me-1"></i>
+                            @item.PhoneOther
+                        </button><br />
+                        <span class="text-white">(Family/Friend)</span>
+                    }
+                    @if (@item.ReqTypeId==3)
+                    {
+                        <br />
+                        <button class="btn  border-white text-white">
+                            <i class="bi bi-telephone me-1"></i>
+                            @item.PhoneOther
+                        </button><br />
+                        <span class="text-white">(Business)</span>
+                    }
+                    @if (@item.ReqTypeId==4)
+                    {
+                        <br />
+                        <button class="btn  border-white text-white">
+                            <i class="bi bi-telephone me-1"></i>
+                            @item.PhoneOther
+                        </button><br />
+                        <span class="text-white">(Conciege)</span>
+                    }
 
-                        </td>
-                        <td>@item.Address</td>
-                        <td>@item.Notes</td>
-                        <td>
-                        <button class="btn border-white @(GetRowClass(@item.ReqTypeId)) text-white">
+                        </td >
+                <td style="background-color:@(GetRowClass(@item.ReqTypeId))!important">@item.Address</td>
+                <td style="background-color:@(GetRowClass(@item.ReqTypeId))!important">@item.Notes</td>
+                <td style="background-color:@(GetRowClass(@item.ReqTypeId))!important">
+                    <button class="btn border-white @(GetRowClass(@item.ReqTypeId)) text-white">
                                 <i class="bi bi-person me-1"></i> provider
                             </button>
 
                         </td>
-                        <td>
-                            <button class="btn border-white text-white bg-success-subtle">Actions</button>
+                <td style="background-color:@(GetRowClass(@item.ReqTypeId))!important">
+                            <button class="btn border-white text-white ">Actions</button>
 
                         </td>
                     </tr>
@@ -139,13 +167,13 @@
         switch (requestTypeId)
         {
             case 1:
-                return "table-success";
+                return "green";
             case 2:
-                return "table-warning";
+                return "orange";
             case 3:
-                return "table-danger";
+                return "red";
             case 4:
-                return "table-info";
+                return "#54B4D3";
             default:
                 return "";
         }

@@ -23,32 +23,66 @@
 
 
                 
-                    <tr class="table-success  d-none d-xl-table-row ">
+                    <tr class="d-none d-xl-table-row" style="vertical-align:middle">
 
 
 
-                        <td>@item.PatientName</td>
-                        <td>@item.DateOfBirth</td>
-                        <td>@item.Requestor </td>
-                        <td>de.jay</td>
-                        <td>5-12-2019</td>
-                        <td>
-                            <button class="btn  border-white bg-success-subtle text-white">
-                                <i class="bi bi-telephone me-1"></i>
-                                @item.Phone
-                            </button>
+                <td style="background-color:@(GetRowClass(@item.ReqTypeId))!important">@item.PatientName</td>
+                <td style="background-color:@(GetRowClass(@item.ReqTypeId))!important">@item.DateOfBirth</td>
+                <td style="background-color:@(GetRowClass(@item.ReqTypeId))!important">@item.Requestor </td>
+                <td style="background-color:@(GetRowClass(@item.ReqTypeId))!important">de.jay</td>
+                <td style="background-color:@(GetRowClass(@item.ReqTypeId))!important">5-12-2019</td>
+                <td style="background-color:@(GetRowClass(@item.ReqTypeId))!important">
+                    <button class="btn  border-white text-white">
+                        <i class="bi bi-telephone me-1"></i>
+                        @item.Phone
+                    </button><br>
+                    <span class="text-white">Patient</span>
+                    @if (@item.ReqTypeId == 2)
+                    {
+                        <br />
+                        <button class="btn  border-white text-white">
+                            <i class="bi bi-telephone me-1"></i>
+                            @item.PhoneOther
+                        </button>
 
-                        </td>
-                        <td>@item.Address</td>
-                        <td>@item.Notes</td>
-                        <td>
-                            <button class="btn border-white bg-success-subtle text-white">
+                        <br />
+                        <span class="text-white">(Family/Friend)</span>
+                    }
+                    @if (@item.ReqTypeId == 3)
+                    {
+                        <br />
+                        <button class="btn  border-white text-white">
+                            <i class="bi bi-telephone me-1"></i>
+                            @item.PhoneOther
+                        </button>
+
+                        <br />
+                        <span class="text-white">(Business)</span>
+                    }
+                    @if (@item.ReqTypeId == 4)
+                    {
+                        <br />
+                        <button class="btn  border-white text-white">
+                            <i class="bi bi-telephone me-1"></i>
+                            @item.PhoneOther
+                        </button>
+
+                        <br />
+                        <span class="text-white">(Conciege)</span>
+                    }
+
+                </td>
+                <td style="background-color:@(GetRowClass(@item.ReqTypeId))!important">@item.Address</td>
+                <td style="background-color:@(GetRowClass(@item.ReqTypeId))!important">@item.Notes</td>
+                <td style="background-color:@(GetRowClass(@item.ReqTypeId))!important">
+                            <button class="btn border-white text-white">
                                 <i class="bi bi-person me-1"></i> provider
                             </button>
 
                         </td>
-                        <td>
-                            <button class="btn border-white text-white bg-success-subtle">Actions</button>
+                <td style="background-color:@(GetRowClass(@item.ReqTypeId))!important">
+                            <button class="btn border-white text-white">Actions</button>
 
                         </td>
                     </tr>
@@ -135,3 +169,21 @@
 </table>
 
 
+@functions {
+    public string GetRowClass(int requestTypeId)
+    {
+        switch (requestTypeId)
+        {
+            case 1:
+                return "green";
+            case 2:
+                return "orange";
+            case 3:
+                return "red";
+            case 4:
+                return "#54B4D3";
+            default:
+                return "";
+        }
+    }
+}

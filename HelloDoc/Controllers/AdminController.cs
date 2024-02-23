@@ -59,16 +59,17 @@ namespace HelloDoc.Controllers
                               Requestor = req.Firstname + " " + req.Lastname,
                               DateOfBirth = new DateOnly((int)reqclient.Intyear, int.Parse(reqclient.Strmonth), (int)reqclient.Intdate),
                               ReqDate = req.Createddate,
-                              Phone = req.Phonenumber,
+                              Phone = reqclient.Phonenumber,
                               Address = reqclient.City + reqclient.Zipcode,
                               Notes = reqclient.Notes,
                               ReqTypeId=req.Requesttypeid,
                               Email=req.Email,
                               Id=reqclient.Requestclientid,
-                              Status=req.Status
-,
+                              Status=req.Status,
+                              PhoneOther=req.Phonenumber,
                           };
 
+            
 
             var newcount = (_context.Requests.Where(item => item.Status == 1)).Count();
             var pandingcount=(_context.Requests.Where(item => item.Status==2)).Count();
@@ -102,9 +103,7 @@ namespace HelloDoc.Controllers
                               ReqTypeId = req.Requesttypeid,
                               Email = req.Email,
                               Id = reqclient.Requestclientid,
-                              Status = req.Status
-
-,
+                              Status = req.Status,
                           };
             return Json(new {data=request.ToList()}, System.Web.Mvc.JsonRequestBehavior.AllowGet);
         }
@@ -120,70 +119,9 @@ namespace HelloDoc.Controllers
         }
 
 
-        public IActionResult AjaxMethod()
-        {
-            try
+       
+        public IActionResult NewPartial(string partialName,int[] currentStatus,int page , int pageSize = 5)
             {
-                var draw = HttpContext.Request.Form["draw"].FirstOrDefault();
-
-                // Skip number of Rows count  
-                var start = Request.Form["start"].FirstOrDefault();
-
-                // Paging Length 10,20  
-                var length = Request.Form["length"].FirstOrDefault();
-
-                // Sort Column Name  
-                var sortColumn = Request.Form["columns[" + Request.Form["order[0][column]"].FirstOrDefault() + "][name]"].FirstOrDefault();
-
-                // Sort Column Direction (asc, desc)  
-                var sortColumnDirection = Request.Form["order[0][dir]"].FirstOrDefault();
-
-                // Search Value from (Search box)  
-                var searchValue = Request.Form["search[value]"].FirstOrDefault();
-
-                //Paging Size (10, 20, 50,100)  
-                int pageSize = length != null ? Convert.ToInt32(length) : 0;
-
-                int skip = start != null ? Convert.ToInt32(start) : 0;
-
-                int recordsTotal = 0;
-
-                // getting all Customer data  
-                var customerData = (from req in _context.Requests
-                                    join reqfile in _context.Requestclients
-                                    on req.Requestid equals reqfile.Requestid
-                                    select new
-                                    {
-                                        requestid=req.Requestid,
-                                        firstname=req.Firstname,
-                                        lastname=req.Lastname,
-                                        email=req.Email
-                                    }).ToList();
-                //Sorting  
-
-                //Search  
-                if (!string.IsNullOrEmpty(searchValue))
-                {
-                    customerData = customerData.Where(item => item.firstname.Contains(searchValue)).ToList();
-                }
-
-
-                //total number of rows counts   
-                recordsTotal = customerData.Count();
-                //Paging   
-                var data = customerData.Skip(skip).Take(pageSize).ToList();
-                //Returning Json Data  
-               return Json(new { draw = draw, recordsFiltered = recordsTotal, recordsTotal = recordsTotal, data = data });
-
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-
-        }
-        public IActionResult NewPartial(string partialName,int[] currentStatus)
-        {
             var request = (from req in _context.Requests
                           join reqclient in _context.Requestclients
                           on req.Requestid equals reqclient.Requestid
@@ -193,16 +131,24 @@ namespace HelloDoc.Controllers
                               Requestor = req.Firstname + " " + req.Lastname,
                               DateOfBirth = new DateOnly((int)reqclient.Intyear, int.Parse(reqclient.Strmonth), (int)reqclient.Intdate),
                               ReqDate = req.Createddate,
-                              Phone = req.Phonenumber,
+                              Phone = reqclient.Phonenumber,
                               Address = reqclient.City + reqclient.Zipcode,
                               Notes = reqclient.Notes,
                               ReqTypeId = req.Requesttypeid,
                               Email = req.Email,
                               Id = reqclient.Requestclientid,
-                              Status=req.Status
+                              Status=req.Status,
+                              PhoneOther=req.Phonenumber
+                              
 ,
                           }).Where(item => currentStatus.Any(status=>item.Status==status));
-            return PartialView(partialName, request);
+
+            int totalItems = request.Count();
+            int totalPages = (int)Math.Ceiling((double)totalItems / pageSize);
+            var paginatedRequest = request.Skip((page - 1) * pageSize).Take(pageSize).ToList();
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages = totalPages;
+            return PartialView(partialName, paginatedRequest);
         }
 
         public IActionResult PendingTablePartial()

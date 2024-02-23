@@ -31,5 +31,7 @@ namespace DataAccessLayer.CustomModel
         public int? regionid {  get; set; }
 
         public int Status { get; set; }  
+
+        public string PhoneOther { get; set; }
     }
 }

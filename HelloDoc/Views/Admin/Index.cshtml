@@ -167,6 +167,8 @@
 
 </div>
 
+
+
 <div id="partialContainer">
 
    
@@ -178,4 +180,16 @@
     <partial name="UnpaidTablePartial" model="@Model"></partial>
 </div>
 <div>
+</div>
+
+
+<div>
+    <nav id="pagination" >
+            @for (int i = 1; i <= ViewBag.TotalPages; i++)
+            {
+                <div class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                    <a class="page-link"  data-page="@i">@i</a>
+                </div>
+            }
+    </nav>
 </div>

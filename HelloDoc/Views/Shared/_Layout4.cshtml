@@ -143,61 +143,52 @@
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script src="~/js/custom.js" asp-append-version="true"></script>
-    <script type="text/javascript">
-            console.log("hii")
-        $(document).ready(function () {
-           $('#dataTable').DataTable({
-                "ajax": {
-                    "url": "/Admin/GetData",
-                    "type": "GET",
-                    "data": "json"
-                },
-                "columns": [
-                    {
-                        "data": "Name",
-                        "data": "Date Of Birth",
-                        "data": "Requestor",
-                        "data": "Physician",
-                        "data": "Date Of Service"
-                    }
-                ]
-            });
-        });
-    </script>
+   
 
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js" ></script>
     <script>
-
+        
         $(document).ready(function () { 
+         console.log("1")
+
+            
             var currentPartial = "NewTablePartial";
             var currentStatus = [1];
+            var currentPage = 1;
+            var pageSize = 5;
 
                //intial Only NewTablePartial Will load 
-            loadPartialView(currentPartial,currentStatus);
+            loadPartialView(currentPartial, currentStatus, currentPage);
             $('PendingTablePartial').hide();
             $('ActiveTablePartial').hide();
             $('ConcludeTablePartial').hide();
             $('ToCloseTablePartial').hide();
             $('UnpaidTablePartial').hide();
 
-
+            $("#pagination").on("click", "a.page-link", function () {
+               currentPage= $(this).data("page")
+                loadPartialView(currentPartial,currentStatus,currentPage)
+            });
+            
             //onclick each partial will load
-
-            $("#linkNew").click(function () {
+            
+            $("#linkNew").click(function (e) {
+                e.preventDefault();
                 currentPartial = "NewTablePartial"
                 currentStatus = [1];
+
                 $('#statuschange').html('(new)');
-                loadPartialView("NewTablePartial", currentStatus);
+                loadPartialView("NewTablePartial", currentStatus, currentPage);
             });
 
-
+           
 
             $("#linkPanding").click(function () {
                 currentPartial = "PendingTablePartial"
                 currentStatus = [2];
                 $('#statuschange').html('(Pending)');
 
-                loadPartialView("PendingTablePartial", currentStatus);
+                loadPartialView("PendingTablePartial", currentStatus, currentPage);
             });
 
 
@@ -206,7 +197,7 @@
                 currentPartial = "ActiveTablePartial";
                 $('#statuschange').html('(Active)');
 
-                loadPartialView("ActiveTablePartial", currentStatus);
+                loadPartialView("ActiveTablePartial", currentStatus, currentPage);
             });
 
            
@@ -216,47 +207,48 @@
                 currentPartial = "ConcludeTablePartial";
                 $('#statuschange').html('(Conclude)');
 
-                loadPartialView("ConcludeTablePartial", currentStatus);
+                loadPartialView("ConcludeTablePartial", currentStatus, currentPage);
             });
 
             $("#linkToclose").click(function () {
                 currentStatus = [3,7,8];
                 currentPartial = "ToCloseTablePartial";
                 $('#statuschange').html('(ToClose)');
-                loadPartialView("ToCloseTablePartial", currentStatus);
+                loadPartialView("ToCloseTablePartial", currentStatus, currentPage);
             });
 
             $("#linkUnpaid").click(function () {
                 currentStatus = [9];
                 currentPartial = "UnpaidTablePartial";
                 $('#statuschange').html('(Unpaid)');
-                loadPartialView("UnpaidTablePartial", currentStatus);
+                loadPartialView("UnpaidTablePartial", currentStatus, currentPage);
             });
 
             //filter the data with passed currentpartial that will load only that data
             $("#filterSelect").on("input change", function () {
-                filterTable(currentPartial, currentStatus);
+                filterTable(currentPartial, currentStatus, currentPage);
             });
 
 
             $("#searchInput").on("input", function () {
-                filterTable(currentPartial, currentStatus);
+                filterTable(currentPartial, currentStatus, currentPage);
             });
 
             $('.filter-item').click(function () {
                 $('.filter-item').removeClass('active')
                 $(this).addClass('active')
-                filterTable(currentPartial, currentStatus)
+                filterTable(currentPartial, currentStatus, currentPage)
 
             });
+            
 
             //ajax for render that partialview
-            function loadPartialView(partialName, currentStatus) {
+            function loadPartialView(partialName, currentStatus,page) {
                 $.ajax({
                     url: '@Url.Action("NewPartial", "Admin")', 
                     type: 'GET',
                     traditional:true,
-                    data: { partialName: partialName, currentStatus: currentStatus },
+                    data: { partialName: partialName, currentStatus: currentStatus,page:page },
                     success: function (result) {
                         $("#partialContainer").html(result);
                     },
@@ -271,7 +263,7 @@
             function filterTable(partialName, currentStatus) {
                 var searchValue = $("#searchInput").val();
                 var selectValue = $("#filterSelect").val();
-                var selectedFilter = $('.filter-item.active').data('value');
+                var selectedFilter = $('.page-link.active').data('value');
                     
                 console.log(selectValue)
                 console.log(searchValue)
