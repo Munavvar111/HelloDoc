@@ -35,7 +35,8 @@ namespace BusinessLayer.Repository
                                         Email = req.Email,
                                         Id = reqclient.Requestclientid,
                                         regionid = reqclient.Regionid,
-                                        Status = req.Status
+                                        Status = req.Status,
+                                        RequestClientId=reqclient.Requestclientid
                                     })
                                     .Where(item =>
                                         (string.IsNullOrEmpty(searchValue) || item.PatientName.Contains(searchValue)) &&

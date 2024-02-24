@@ -67,6 +67,7 @@ namespace HelloDoc.Controllers
                               Id=reqclient.Requestclientid,
                               Status=req.Status,
                               PhoneOther=req.Phonenumber,
+                              RequestClientId=reqclient.Requestclientid,
                           };
 
             
@@ -120,7 +121,7 @@ namespace HelloDoc.Controllers
 
 
        
-        public IActionResult NewPartial(string partialName,int[] currentStatus,int page , int pageSize = 5)
+        public IActionResult NewPartial(string partialName,int[] currentStatus,int page , int pageSize = 3)
             {
             var request = (from req in _context.Requests
                           join reqclient in _context.Requestclients
@@ -138,9 +139,8 @@ namespace HelloDoc.Controllers
                               Email = req.Email,
                               Id = reqclient.Requestclientid,
                               Status=req.Status,
-                              PhoneOther=req.Phonenumber
-                              
-,
+                              PhoneOther=req.Phonenumber,
+                              RequestClientId= reqclient.Requestclientid,
                           }).Where(item => currentStatus.Any(status=>item.Status==status));
 
             int totalItems = request.Count();
@@ -154,6 +154,50 @@ namespace HelloDoc.Controllers
         public IActionResult PendingTablePartial()
         {
             return PartialView("PendingTablePartial");
+        }
+        public IActionResult ViewCase(int id)
+        {
+            var requestclient = (from req in _context.Requests
+                                join reqclient in _context.Requestclients
+                                on req.Requestid equals reqclient.Requestid
+                                where reqclient.Requestclientid == id
+                                select new ViewCaseVM
+                                {
+                                    Notes=reqclient.Notes,
+                                    FirstName=reqclient.Firstname,
+                                    LastName=reqclient.Lastname,
+                                    DateOfBirth = new DateOnly((int)reqclient.Intyear, int.Parse(reqclient.Strmonth), (int)reqclient.Intdate),
+                                    Phone=reqclient.Phonenumber,
+                                    Email=reqclient.Email,
+                                    Location=reqclient.Location,
+                                    RequestClientId=reqclient.Requestclientid,
+                                }).FirstOrDefault();
+                               
+            return View(requestclient);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ViewCase(ViewCaseVM viewCaseVM,int id)
+        {
+            var requestclient = await _context.Requestclients.FindAsync(id);
+            if (ModelState.IsValid)
+            {
+                requestclient.Firstname = viewCaseVM.FirstName;
+                requestclient.Lastname = viewCaseVM.LastName;
+                requestclient.Location = viewCaseVM.Location;
+                requestclient.Email= viewCaseVM.Email;
+                requestclient.Notes= viewCaseVM.Notes;
+                requestclient.Phonenumber = viewCaseVM.Phone;
+                requestclient.Intdate = viewCaseVM.DateOfBirth.Day; 
+                requestclient.Intyear = viewCaseVM.DateOfBirth.Year;
+                requestclient.Strmonth = viewCaseVM.DateOfBirth.Month.ToString();
+
+                _context.Update(requestclient);
+                _context.SaveChanges();
+
+                return RedirectToAction("ViewCase", new { id });
+            }
+            return View();  
         }
     }
 }

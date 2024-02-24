@@ -10,7 +10,15 @@ namespace DataAccessLayer.CustomModel
     {
         public string PatientName {  get; set; }
 
+        public int RequestClientId { get; set; }    
+
         public DateOnly DateOfBirth { get; set; }
+
+        public string FirstName { get; set; }
+
+        public string Location { get; set; }
+
+        public string LastName { get; set; }   
 
         public string Requestor { get; set; }   
 

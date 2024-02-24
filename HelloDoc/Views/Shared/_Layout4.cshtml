@@ -165,11 +165,14 @@
             $('ToCloseTablePartial').hide();
             $('UnpaidTablePartial').hide();
 
-            $("#pagination").on("click", "a.page-link", function () {
-               currentPage= $(this).data("page")
-                loadPartialView(currentPartial,currentStatus,currentPage)
+
+            $(document).on("click", "#pagination a.page-link", function () {
+                console.log("Pagination link clicked!");
+                currentPage = $(this).text().trim();
+                console.log("Current Page: " + currentPage);
+                loadPartialView(currentPartial, currentStatus, currentPage);
             });
-            
+
             //onclick each partial will load
             
             $("#linkNew").click(function (e) {

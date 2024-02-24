@@ -1,0 +1,209 @@
+﻿@model DataAccessLayer.CustomModel.ViewCaseVM
+
+
+@{
+    Layout = "~/Views/Shared/_Layout4.cshtml";
+}
+<div class="container bg-light mt-4">
+    <div class="d-flex justify-content-between my-3">
+        <div class="d-flex">
+            <span class="fs-2 text-muted fw-bold">New Request</span>
+        </div>
+        <div class="d-flex justify-content-end">
+            <a asp-controller="Admin" asp-action="Index" asp-area=""
+               class="btn btn-outline-info d-flex align-items-center">
+                <span class="material-symbols-outlined"> chevron_left </span> Back
+            </a>
+        </div>
+    </div>
+    <form asp-action="ViewCase" method="post" asp-route-id="@Model.RequestClientId">
+    <div class="container bg-white border mt-3">
+        <div class="mt-3">
+            <span class="text-muted fs-2">Patient Information</span>
+        </div>
+        <div class="d-flex flex-column mt-3">
+            <span>Confirmation Number</span>
+            <span class="text-info fw-bold">MD09122023TETE0002</span>
+        </div>
+        <div class="row row-cols-1 row-cols-md-2 g-3 mt-3">
+            <div class="col-12 col-md-12 mb-3">
+                <div class="form-floating">
+                    <textarea class="form-control"
+                              placeholder="Patient Notes"
+                              id="floatingTextarea2"
+                              style="height: 100px"
+                              asp-for="@Model.Notes" disabled
+                              ></textarea>
+                    <label for="floatingTextarea2">
+                        Patient Notes
+                       
+                    </label>
+                </div>
+            </div>
+
+            <div class="col">
+                <div class="form-floating">
+                    <input type="text"
+                           class="form-control"
+                           id="floatingInput"
+                           placeholder="name@example.com"
+                           asp-for="@Model.FirstName" disabled />
+                    <label for="floatingInput" asp-for="@Model.FirstName">First Name</label>
+                    <span  class="text-danger" asp-validation-for="@Model.FirstName"></span>
+                </div>
+            </div>
+            <div class="col">
+                <div class="form-floating">
+                    <input type="text"
+                           class="form-control"
+                           id="floatingInput"
+                           placeholder="name@example.com"
+                           asp-for="@Model.LastName" disabled />
+                    <label for="floatingInput" asp-for="@Model.LastName">Last Name</label>
+                    <span class="text-danger" asp-validation-for="@Model.LastName"></span>
+
+                </div>
+            </div>
+
+            <div class="col">
+                <div class="form-floating">
+    <input type="date"
+           class="form-control"
+           id="floatingInput"
+           asp-for="DateOfBirth"
+                           value="@Model.DateOfBirth.ToString("yyyy-MM-dd")" disabled />
+    <label for="floatingInput" asp-for="DateOfBirth">Date of Birth</label>
+    <span class="text-danger" asp-validation-for="DateOfBirth"></span>
+</div>
+
+            </div>
+
+            <div class="col">
+                <div class="border rounded-2 tel-container">
+                    <input id="phone1"
+                           type="tel"
+                           class="form-control border-0 tel-input"
+                           asp-for="@Model.Phone" disabled />
+                </div>
+            </div>
+
+            <div class="col">
+                <div class="form-floating">
+                    <input type="email"
+                           class="form-control"
+                           id="Email"
+                           placeholder="name@example.com"
+                           asp-for="@Model.Email"
+                           onchange="CheckAvailability()" disabled />
+                    <label for="floatingInput" asp-for="@Model.Email">Email</label>
+                    <span class="text-danger" asp-validation-for="@Model.Email"></span>
+
+                </div>
+            </div>
+            <div class="col">
+                <button class="btn btn-outline-info text-info" id="EditBtn" type="button" onclick="toggleEdit()">
+                    Edit
+                </button>
+                    <button class="btn btn-outline-info text-info" type="Submit" id="SubBtn">
+                    Submit
+                    </button><button class="btn btn-outline-info text-info" type="button" id="CanBtn" onclick="toggleCancel()">
+                    Cancel
+                </button>
+            </div>
+            <div class="col-12 col-md-12">
+                <h5 class="fw-semibold">Location Information</h5>
+            </div>
+
+        
+
+        <div class="col">
+            <div class="form-floating">
+                <input type="text"
+                       class="form-control"
+                       id="floatingInput"
+                       placeholder="Rajpath Road"
+                               asp-for="@Model.Location" disabled />
+                <label for="floatingInput" asp-for="@Model.Location">Region</label>
+                    <span class="text-danger" asp-validation-for="@Model.Location"></span>
+
+            </div>
+        </div>
+
+            <div class="col">
+                <div class="form-floating">
+                    <input type="text"
+                           class="form-control"
+                           id="floatingInput"
+                               placeholder="Rajpath Road" disabled />
+                    <label for="floatingInput">Business Name/Address</label>
+                    <span class="text-danger"></span>
+
+                </div>
+            </div>
+
+            <div class="col">
+                <div class="form-floating">
+                    <input type="text"
+                           class="form-control"
+                           id="floatingInput"
+                               placeholder="Rajpath Road" disabled />
+                    <label for="floatingInput">Room#</label>
+                    <span class="text-danger"></span>
+
+                </div>
+            </div>
+
+        </div>
+        <div class="row mb-3 mt-3">
+            <div class="d-flex gap-3 align-items-center justify-content-end">
+                <button class="btn btn-info text-light" type="submit" id="submit">
+                    Assign
+                </button>
+                <button class="btn btn-info text-light mx-3" type="submit" id="submit">
+                    View Notes
+                </button>
+                <a href="submitrequest.html" class="btn btn-danger d-flex align-items-center h-100 text-light">
+                    Cancel
+                </a>
+            </div>
+        </div>
+        </div>
+    </form>
+</div>
+
+<script>
+    $("#SubBtn").hide();
+    $("#CanBtn").hide();
+    const phone1 = document.querySelector("#phone1");
+    const phoneInput1 = window.intlTelInput(phone1, {
+        utilsScript:
+            "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",
+    });
+
+    function toggleEdit() {
+        // Get all input fields within the form excluding the input with id "Email"
+        var inputFields = document.querySelectorAll('form input,form textarea');
+
+        // Toggle the disabled attribute for each input field
+        inputFields.forEach(function (input) {
+            input.disabled = !input.disabled;
+        });
+
+        $("#EditBtn").hide();
+        $("#SubBtn").show();
+        $("#CanBtn").show();
+    }
+
+    function toggleCancel() {
+        var inputFields = document.querySelectorAll('form input,form textarea');
+
+        // Toggle the disabled attribute for each input field
+        inputFields.forEach(function (input) {
+            input.disabled = !input.disabled;
+        });
+
+        $("#EditBtn").show();
+        $("#SubBtn").hide();
+        $("#CanBtn").hide();
+    }
+</script>
