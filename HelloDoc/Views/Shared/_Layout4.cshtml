@@ -155,10 +155,10 @@
             var currentPartial = "NewTablePartial";
             var currentStatus = [1];
             var currentPage = 1;
-            var pageSize = 5;
+            var pageSize = 3;
 
                //intial Only NewTablePartial Will load 
-            loadPartialView(currentPartial, currentStatus, currentPage);
+            filterTable(currentPartial, currentStatus, currentPage,pageSize);
             $('PendingTablePartial').hide();
             $('ActiveTablePartial').hide();
             $('ConcludeTablePartial').hide();
@@ -170,7 +170,7 @@
                 console.log("Pagination link clicked!");
                 currentPage = $(this).text().trim();
                 console.log("Current Page: " + currentPage);
-                loadPartialView(currentPartial, currentStatus, currentPage);
+                filterTable(currentPartial, currentStatus, currentPage, pageSize);
             });
 
             //onclick each partial will load
@@ -181,7 +181,7 @@
                 currentStatus = [1];
 
                 $('#statuschange').html('(new)');
-                loadPartialView("NewTablePartial", currentStatus, currentPage);
+                filterTable("NewTablePartial", currentStatus, currentPage, pageSize);
             });
 
            
@@ -191,7 +191,7 @@
                 currentStatus = [2];
                 $('#statuschange').html('(Pending)');
 
-                loadPartialView("PendingTablePartial", currentStatus, currentPage);
+                filterTable("PendingTablePartial", currentStatus, currentPage, pageSize);
             });
 
 
@@ -200,7 +200,7 @@
                 currentPartial = "ActiveTablePartial";
                 $('#statuschange').html('(Active)');
 
-                loadPartialView("ActiveTablePartial", currentStatus, currentPage);
+                filterTable("ActiveTablePartial", currentStatus, currentPage, pageSize);
             });
 
            
@@ -210,62 +210,49 @@
                 currentPartial = "ConcludeTablePartial";
                 $('#statuschange').html('(Conclude)');
 
-                loadPartialView("ConcludeTablePartial", currentStatus, currentPage);
+                filterTable("ConcludeTablePartial", currentStatus, currentPage, pageSize);
             });
 
             $("#linkToclose").click(function () {
                 currentStatus = [3,7,8];
                 currentPartial = "ToCloseTablePartial";
                 $('#statuschange').html('(ToClose)');
-                loadPartialView("ToCloseTablePartial", currentStatus, currentPage);
+                filterTable("ToCloseTablePartial", currentStatus, currentPage, pageSize);
             });
 
             $("#linkUnpaid").click(function () {
                 currentStatus = [9];
                 currentPartial = "UnpaidTablePartial";
                 $('#statuschange').html('(Unpaid)');
-                loadPartialView("UnpaidTablePartial", currentStatus, currentPage);
+                filterTable("UnpaidTablePartial", currentStatus, currentPage, pageSize);
             });
 
             //filter the data with passed currentpartial that will load only that data
             $("#filterSelect").on("input change", function () {
-                filterTable(currentPartial, currentStatus, currentPage);
+                filterTable(currentPartial, currentStatus, currentPage, pageSize);
             });
 
 
             $("#searchInput").on("input", function () {
-                filterTable(currentPartial, currentStatus, currentPage);
+                filterTable(currentPartial, currentStatus, currentPage, pageSize);
             });
 
             $('.filter-item').click(function () {
                 $('.filter-item').removeClass('active')
                 $(this).addClass('active')
-                filterTable(currentPartial, currentStatus, currentPage)
+                filterTable(currentPartial, currentStatus, currentPage, pageSize)
 
             });
             
 
             //ajax for render that partialview
-            function loadPartialView(partialName, currentStatus,page) {
-                $.ajax({
-                    url: '@Url.Action("NewPartial", "Admin")', 
-                    type: 'GET',
-                    traditional:true,
-                    data: { partialName: partialName, currentStatus: currentStatus,page:page },
-                    success: function (result) {
-                        $("#partialContainer").html(result);
-                    },
-                    error: function (error) {
-                        console.error("Error loading partial view: " + error);
-                    }
-                });
-            }
-
+            
 
             //ajax for filterthe table using search
-            function filterTable(partialName, currentStatus) {
+            function filterTable(partialName, currentStatus,page,pageSize) {
                 var searchValue = $("#searchInput").val();
                 var selectValue = $("#filterSelect").val();
+                currentPage = 1;
                 var selectedFilter = $('.filter-item.active').data('value');
                     
                 console.log(selectValue)
@@ -273,7 +260,7 @@
                 console.log(selectedFilter)
 
                 if (searchValue == "" && selectValue == '' && selectedFilter=='') {
-                    loadPartialView(currentPartial,currentStatus)
+                    filterTable(currentPartial, currentStatus, page, pageSize)
                 }
                  else{
 
@@ -282,7 +269,7 @@
                     url: "/Admin/SearchPatient",
                         traditional: true,
 
-                        data: { searchValue: searchValue, selectValue: selectValue, partialName: partialName, selectedFilter: selectedFilter, currentStatus: currentStatus },
+                        data: { searchValue: searchValue, selectValue: selectValue, partialName: partialName, selectedFilter: selectedFilter, currentStatus: currentStatus,page:page,pageSize:pageSize },
                     success: function (data) {
                         $('#partialContainer').html(data);
 

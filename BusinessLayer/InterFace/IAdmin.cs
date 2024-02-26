@@ -11,5 +11,12 @@ namespace BusinessLayer.InterFace
     {   
         List<NewRequestTableVM> SearchPatients(string searchValue, string selectValue, string selectedFilter,int[] currentStatus);
 
+        List<NewRequestTableVM> GetAllData();
+
+        ViewCaseVM GetCaseById(int id);
+
+        Task UpdateRequestClient(ViewCaseVM viewCaseVM, int id);
+
+
     }
 }

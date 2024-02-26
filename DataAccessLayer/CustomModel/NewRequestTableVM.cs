@@ -8,6 +8,8 @@ namespace DataAccessLayer.CustomModel
 {
     public class NewRequestTableVM
     {
+
+        public string PhysicianName { get; set; }   
         public string PatientName {  get; set; }
 
         public int RequestClientId { get; set; }    

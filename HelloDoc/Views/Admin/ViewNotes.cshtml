@@ -1,0 +1,103 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout4.cshtml";
+}
+@model DataAccessLayer.DataModels.Requestnote
+<div class="container bg-light mt-4">
+    <div class="d-flex justify-content-between my-3">
+        <div class="d-flex">
+            <span class="fs-2 text-muted fw-bold">Notes</span>
+        </div>
+        <div class="d-flex justify-content-end">
+            <a asp-controller="Admin" asp-action="Index" asp-area=""
+               class="btn btn-outline-info d-flex align-items-center">
+                <span class="material-symbols-outlined"> chevron_left </span> Back
+            </a>
+        </div>
+    </div>
+    <div class="row row-cols-1 row-cols-md-2 g-3">
+        <div class="col ">
+            <div class="bg-white border p-3 ">
+                <div class="d-flex">
+                    <div>
+                        <span class="material-symbols-outlined">
+                            sync_alt
+                        </span>
+                    </div>
+                    <div class="d-flex flex-column ps-3">
+                        <div>
+                            <span class="fw-bolder">@if (Model== null)
+                                {
+                                    <span>hii</span>
+                                }
+                            </span>
+                        </div>
+                        <div>
+                            <p class="text-muted">Admin transferred To Dr.Tatva on 13/12/23 at 5:47:19 AM:test </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+  <div class="col">
+            <div class="bg-white border p-3">
+                <div class="d-flex">
+                    <div>
+                        <span class="material-symbols-outlined">
+                            person
+                        </span>
+                    </div>
+                    <div class="d-flex flex-column ps-3">
+                        <div>
+                            <span class="fw-bolder">Physician Notes</span>
+                        </div>
+                        <div>
+                            <p class="text-muted">Admin transferred To Dr.Tatva on 13/12/23 at 5:47:19 AM:test </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+   <div class="col-12 ">
+            <div class="bg-white border p-3">
+                <div class="d-flex">
+                    <div>
+                        <span class="material-symbols-outlined">
+                            person
+                        </span>
+                    </div>
+                    <div class="d-flex flex-column ps-3">
+                        <div>
+                            <span class="fw-bolder">Admin Notes</span>
+                        </div>
+                        <div>
+                            <p class="text-muted">Admin transferred To Dr.Tatva on 13/12/23 at 5:47:19 AM:test </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-md-12 mb-5">
+            <div class="bg-white border p-3">
+                <div class="form-floating">
+                    <textarea class="form-control"
+                              placeholder="Leave a comment here"
+                              id="floatingTextarea2"
+                              style="height: 100px"
+                              ></textarea>
+                    <label for="floatingTextarea2">
+                        Admin Notes
+                    </label>
+                </div>
+
+                <div class="d-flex gap-3 align-items-center justify-content-end mt-3">
+                    <button class="btn btn-info text-light" type="submit" id="submit">
+                        Save Changes
+                    </button>
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</div>
