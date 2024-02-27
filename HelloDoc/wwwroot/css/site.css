@@ -1,0 +1,72 @@
+.triangle {
+    width: 0;
+    height: 0;
+    border-left: 17px solid transparent;
+    border-right: 17px solid transparent;
+    border-top: 17px solid #203f9a;
+    position: absolute;
+    bottom: -17px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+#statuslink1 {
+    border: 2px solid #203f9a !important;
+    background-color: #e9eaef !important;
+    color: #203f9a !important;
+}
+
+#statuslink2 {
+    border: 2px solid #00adef !important;
+    background-color: #e5f2f8 !important;
+}
+
+#statuslink3 {
+    border: 2px solid #228c20 !important;
+    background-color: #e9f0e8 !important;
+}
+
+#statuslink4 {
+    border: 2px solid #da0f82 !important;
+    background-color: #f7e6ee !important;
+}
+
+#statuslink5 {
+    border: 2px solid #0370d7 !important;
+    background-color: #e5eef5 !important;
+}
+
+#statuslink6 {
+    border: 2px solid #9966cd !important;
+    background-color: #efeef4 !important;
+}
+
+#statuslink1:active, #statuslink1 button:active {
+    background-color: #203f9a !important;
+    color: #e9eaef !important;
+}
+
+#statuslink2:active, #statuslink2 button:active {
+    background-color: #00adef !important;
+    color: #e5f2f8 !important;
+}
+
+#statuslink3:active, #statuslink3 button:active {
+    background-color: #228c20 !important;
+    color: #e9f0e8 !important;
+}
+    
+#statuslink4:active, #statuslink4 button:active {
+    background-color: #da0f82 !important;
+    color: #f7e6ee !important;
+}
+
+#statuslink5:active, #statuslink5 button:active {
+    background-color: #0370d7 !important;
+    color: #e5eef5 !important;
+}
+
+#statuslink6:active, #statuslink6 button:active {
+    background-color: #9966cd !important;
+    color: #efeef4 !important;
+}

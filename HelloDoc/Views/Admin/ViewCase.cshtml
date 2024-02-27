@@ -101,9 +101,12 @@
                 </div>
             </div>
             <div class="col">
+                @if(Model.status!=1 ){
+
                 <button class="btn btn-outline-info text-info" id="EditBtn" type="button" onclick="toggleEdit()">
                     Edit
                 </button>
+                }
                     <button class="btn btn-outline-info text-info" type="Submit" id="SubBtn">
                     Submit
                     </button><button class="btn btn-outline-info text-info" type="button" id="CanBtn" onclick="toggleCancel()">
@@ -122,7 +125,7 @@
                        class="form-control"
                        id="floatingInput"
                        placeholder="Rajpath Road"
-                               asp-for="@Model.Location" disabled />
+                       asp-for="@Model.Location" disabled />
                 <label for="floatingInput" asp-for="@Model.Location">Region</label>
                     <span class="text-danger" asp-validation-for="@Model.Location"></span>
 

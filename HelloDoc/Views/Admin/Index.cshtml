@@ -8,10 +8,12 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     
 }
-<div class="container-fluid mt-5">
+@* <div class="container-fluid mt-5">
     <div class="row row-cols-3 row-cols-lg-6 g-2 g-lg-3">
-        <a class="col" id="linkNew">
-            <div class="border text-white p-3" style="background-color:#203f9a">
+        <div class="col" >
+            <a id="linkNew"">
+
+            <div class="border text-white p-3" style="background-color:#203f9a" >
                 <div class="d-flex">
                     <span class="material-symbols-outlined d-none d-md-block">
                         person
@@ -20,20 +22,24 @@
                 </div>
                 <div>@ViewBag.NewCount</div>
             </div>
-        </a>
-        <a class="col" id="linkPanding">
-            <div class="border p-3 text-info" style="background-color:#e5f2f8">
+            </a>
+        </div>
+        <div class="col" >
+
+            <div class="border p-3 text-info" style="background-color:#e5f2f8" >
+            <a id="linkPanding">
                 <div class="d-flex">
                     <span class="material-symbols-outlined d-none d-md-block">
                         group
                     </span>
                     <span>Pending</span>
                 </div>
+            </a>
                 <div class="fw-bold">@ViewBag.PandingCount</div>
             </div>
-        </a>
+        </div>
         <a class="col" id="linkActive">
-            <div class="border p-3" style="background-color:#e9f0e8">
+            <div class="border p-3" style="background-color:#e9f0e8" id="link">
                 <div class="d-flex">
                     <span class="material-symbols-outlined d-none d-md-block">
                         check_circle
@@ -83,6 +89,54 @@
         </a>
 
     </div>
+</div> *@
+<div class="container-fluid px-4 text-center py-4">
+    <ul class=" nav gx-5 row  gy-4 mt-0 row row-cols-3 row-cols-lg-6">
+
+        <li class="col nav-item col-4 col-sm-4 col-lg-2 rounded-4 text-start position-relative px-2" role="presentation">
+            <a class="btn w-100 text-start rounded-4 shadow-none border-0 Status-btn" id="statuslink1" >
+                <div class="py-2  d-flex fs-5 Status-btn-text ">New</div>
+                <h4 class="fw-bolder ps-1 pb-2 Status-Count">@ViewBag.NewCount</h4>
+            </a>
+            <div id="triangle1" class="triangle"></div>
+        </li>
+        <li class="col nav-item col-4 col-sm-4 col-lg-2 rounded-4 text-primary text-start position-relative px-2" role="presentation">
+            <a class="btn text-decoration-none rounded-4 text-primary w-100 text-start shadow-none border-0 Status-btn" id="statuslink2" >
+                <div class="py-2  d-flex fs-5 Status-btn-text">Pending</div>
+                <h4 class="fw-bolder ps-1 pb-2 Status-Coun">@ViewBag.PandingCount</h4>
+            </a>
+            <div id="triangle2" class="triangle" style="display: none;"></div>
+        </li>
+        <li class="col nav-item col-4 col-sm-4 col-lg-2 rounded-4 text-success text-start position-relative px-2" role="presentation">
+            <a class="btn text-decoration-none rounded-4 text-success w-100 text-start shadow-none border-0 Status-btn" id="statuslink3" >
+                <div class="py-2 d-flex fs-5 Status-btn-text">Active</div>
+                <h4 class="fw-bolder ps-1 pb-2 Status-Coun">@ViewBag.activecount</h4>
+            </a>
+            <div id="triangle3" class="triangle" style="display: none;"></div>
+        </li>
+        <li class="col nav-item col col-lg-2 rounded-4 text-danger text-start position-relative px-2" role="presentation">
+            <a class="btn text-decoration-none rounded-4 text-danger w-100 text-start shadow-none border-0 Status-btn" id="statuslink4" >
+                <div class="py-2 d-flex fs-5 Status-btn-text">Conclude</div>
+                <h4 class="fw-bolder ps-1 pb-2 Status-Coun">@ViewBag.conclude</h4>
+            </a>
+            <div id="triangle4" class="triangle " style="display: none;"> </div>
+        </li>
+        <li class="col nav-item col col-lg-2 rounded-4 text-start position-relative px-2" role="presentation">
+            <a class="btn text-decoration-none rounded-4 text-primary w-100 text-start shadow-none border-0 Status-btn" id="statuslink5">
+                <div class="py-2 d-flex fs-5 Status-btn-text">To Close</div>
+                <h4 class="fw-bolder ps-1 pb-2 Status-Coun">@ViewBag.toclosed</h4>
+            </a>
+            <div id="triangle5" class="triangle" style="display: none;"></div>
+        </li>
+        <li class="col position-relative col col-lg-2 nav-item rounded-4 text-start px-2" role="presentation">
+            <a class="btn text-decoration-none rounded-4 text-danger w-100 text-start shadow-none border-0 Status-btn" id="statuslink6">
+                <div class="py-2 d-flex fs-5 Status-btn-text">Unpaid</div>
+                <h4 class="fw-bolder ps-1 pb-2 Status-Count">@ViewBag.unpaid</h4>
+            </a>
+            <div id="triangle6" class="triangle" style="display: none;"></div>
+        </li>
+
+    </ul>
 </div>
 <div class="mt-3 mt-md-5 d-flex-column d-sm-flex justify-content-between align-items-center">
     <div class="">

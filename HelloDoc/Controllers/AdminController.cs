@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using Org.BouncyCastle.Asn1.Ocsp;
 using Org.BouncyCastle.Ocsp;
 using System.Drawing;
 using System.Drawing.Printing;
@@ -98,7 +99,7 @@ namespace HelloDoc.Controllers
         }
         public IActionResult ViewCase(int id)
         {
-            var ViewCase = _admin.GetCaseById(id);
+                var ViewCase = _admin.GetCaseById(id);
 
             return View(ViewCase);
         }
@@ -114,13 +115,55 @@ namespace HelloDoc.Controllers
             }
             return View();  
         }
+        public async Task<IActionResult> ViewNotes(int requestid)
+        {
+            var notes = (from reqnotes in _context.Requestnotes
+                         join reqstatuslog in _context.Requeststatuslogs
+                         on reqnotes.Requestid equals reqstatuslog.Requestid into requestAllNotes
+                         where reqnotes.Requestid == requestid
+                         group requestAllNotes by new
+                         {
+                             reqnotes.Adminnotes,
+                             reqnotes.Physiciannotes,
+                             reqnotes.Requestid
+                         } into grouped
+                         select new ViewNotesVM
+                         {
+                             TransferedNotes = grouped.SelectMany(g => g.Select(note => note.Notes)).DefaultIfEmpty().ToArray(),
+                             AdminNotes = grouped.Key.Adminnotes,
+                             PhysicianNotes = grouped.Key.Physiciannotes,
+                             RequestId = grouped.Key.Requestid
+                         }).FirstOrDefault();
 
-        public async Task<IActionResult> ViewNotes(int id) {
-
-            var notes = await _context.Requestnotes
-                                 .FirstOrDefaultAsync(item => item.Requestid == id)
-                                 .ConfigureAwait(false);
             return View(notes);
+        }
+
+
+        [HttpPost]
+        public async Task<IActionResult> ViewNotesPost(ViewNotesVM viewNotesVM)
+        {
+            if (ModelState.IsValid)
+            {
+                var requestvisenotes = _context.Requestnotes.Where(item => item.Requestid == viewNotesVM.RequestId).FirstOrDefault();
+                if (requestvisenotes != null) {
+                    
+                    requestvisenotes.Adminnotes = viewNotesVM.AdditionalNotes;
+                    _context.Update(requestvisenotes);
+                     _context.SaveChanges();
+                }
+                else
+                {
+                    var requestnotes = new Requestnote();
+                    requestnotes.Requestid= viewNotesVM.RequestId;
+                    requestnotes.Adminnotes= viewNotesVM.AdditionalNotes;
+                    requestnotes.Createddate = DateTime.Now;
+                    requestnotes.Createdby = "admin";
+
+                    _context.Add(requestnotes);
+                    _context.SaveChanges(); 
+                }
+            }
+            return RedirectToAction("ViewNotes",new { requestid =viewNotesVM.RequestId});
         }
     }
 }

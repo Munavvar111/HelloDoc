@@ -36,7 +36,8 @@ namespace BusinessLayer.Repository
                                         Id = reqclient.Requestclientid,
                                         regionid = reqclient.Regionid,
                                         Status = req.Status,
-                                        RequestClientId=reqclient.Requestclientid
+                                        RequestClientId=reqclient.Requestclientid,
+                                        RequestId = reqclient.Requestid,
                                     })
                                     .Where(item =>
                                         (string.IsNullOrEmpty(searchValue) || item.PatientName.Contains(searchValue)) &&
@@ -66,6 +67,7 @@ namespace BusinessLayer.Repository
                                 Status = req.Status,
                                 PhoneOther = req.Phonenumber,
                                 RequestClientId = reqclient.Requestclientid,
+                                RequestId = reqclient.Requestid,
                             };
             return GetAllData.ToList();
         }
@@ -77,6 +79,8 @@ namespace BusinessLayer.Repository
                                  where reqclient.Requestclientid == id
                                  select new ViewCaseVM
                                  {
+                                     status=req.Status,
+                                     RequestId=req.Requestid,
                                      Notes = reqclient.Notes,
                                      FirstName = reqclient.Firstname,
                                      LastName = reqclient.Lastname,

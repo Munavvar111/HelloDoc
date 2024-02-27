@@ -43,5 +43,7 @@ namespace DataAccessLayer.CustomModel
         public int Status { get; set; }  
 
         public string PhoneOther { get; set; }
+
+        public int RequestId { get;set; }   
     }
 }
