@@ -83,6 +83,7 @@
                             <a class="dropdown-item" asp-action="ViewCase" asp-controller="Admin" asp-route-id="@item.Id"><i class="bi bi-x-circle me-3"></i>View Case</a>
                             <a class="dropdown-item" asp-action="ViewNotes" asp-controller="Admin" asp-route-requestid="@item.RequestId"><i class="bi bi-x-circle me-3"></i>View Notes</a>
                             <a class="dropdown-item" href="#"><i class="bi bi-ban me-3"></i>Block Patients</a>
+
                         </div>
                     </div>
                         </td>
@@ -240,7 +241,8 @@
 
 
 
-                
+            <partial name="CancelCase" model="@item"></partial>
+
 
             
         }
@@ -277,4 +279,45 @@
         </ul>
     </nav>
 </div>
-<partial name="CancelCase"></partial>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js" ></script>
+            <script>
+
+                $(document).ready(function () {
+
+        $('.CancelConfirm').on('click', function () {
+            console.log("hii")
+            GetAllValue();
+        })
+
+        function GetAllValue() {
+            var CancelReason = $('#CancelReason').val();
+            var notes = $('#floatingTextarea2').val();
+            var Id = $('.RequestId').val();
+            console.log(CancelReason)
+            console.log(Id)
+            console.log(notes)
+            if (CancelReason == '' || notes == ' ') {
+                $('.error').html("please Add Reason")
+            }
+            $.ajax({
+                type:"GET",
+                url:"Admin/CancelCase",
+                traditional: true,
+                data: {notes:notes,CancelReason:CancelReason,Id:Id},
+                success: function (data) {
+                    if (data.success) {
+                        location.reload();
+                    }
+                    else {
+                        $('.error').html("please Add Reason")
+
+                    }
+                },
+                error: function (error) {
+                    console.error('Error:', error);
+                }
+            })
+        }
+                });
+            </script>

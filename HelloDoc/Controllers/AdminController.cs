@@ -165,5 +165,27 @@ namespace HelloDoc.Controllers
             }
             return RedirectToAction("ViewNotes",new { requestid =viewNotesVM.RequestId});
         }
+
+        public async Task<IActionResult> CancelCase(string notes,string CancelReason,int Id)
+        {
+            var requestByid=await _context.Requests.FindAsync(Id); 
+            if (requestByid != null)
+            {
+                requestByid.Status = 3;
+                _context.Requests.Update(requestByid);
+                
+                var requeststatuslog=new Requeststatuslog();    
+                requeststatuslog.Status = 5;
+                requeststatuslog.Requestid = Id;
+                requeststatuslog.Notes=notes;
+                requeststatuslog.Createddate = DateTime.Now;
+
+                _context.Requeststatuslogs.Add(requeststatuslog);
+                _context.SaveChanges();
+                return Json(new {success=true});
+            }
+            return Json(new {success=false,message="Requestis not found"});
+
+        }
     }
 }
