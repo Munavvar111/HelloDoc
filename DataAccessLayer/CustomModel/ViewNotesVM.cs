@@ -8,15 +8,14 @@ namespace DataAccessLayer.CustomModel
 {
     public class ViewNotesVM
     {
-
-        public string[]? TransferedNotes { get; set; }
-
-        public String? AdminNotes { get; set; }  
-
-        public String? PhysicianNotes { get; set; }  
-
-        public String AdditionalNotes { get; set; } 
-
-        public int RequestId { get; set; }  
+        public int? TransToPhysicianId { get; set; }
+        public int? Status { get; set; }
+        public string? AdminName { get; set; }
+        public string? PhysicianName { get; set; }
+        public string? AdminNotes { get; set; }
+        public string? PhysicianNotes { get; set; }
+        public string? TransferNotes { get; set; }
+        public int? Cancelcount { get; set; }
     }
+
 }

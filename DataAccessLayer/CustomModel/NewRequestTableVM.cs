@@ -45,5 +45,14 @@ namespace DataAccessLayer.CustomModel
         public string PhoneOther { get; set; }
 
         public int RequestId { get;set; }   
+
+        public List<CancelCase>? Cancel { get; set; }
     }
+
+    public class CancelCase
+    {
+        public string CancelCaseReson { get; set; }
+
+        public int CancelReasonId { get; set; }
+    } 
 }

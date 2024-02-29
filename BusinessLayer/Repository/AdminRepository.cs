@@ -21,6 +21,9 @@ namespace BusinessLayer.Repository
             var filteredPatients = (from req in _context.Requests
                                     join reqclient in _context.Requestclients
                                     on req.Requestid equals reqclient.Requestid
+                                    join p in _context.Physicians
+                                    on req.Physicianid equals p.Physicianid into phy
+                                    from ps in phy.DefaultIfEmpty()
                                     select new NewRequestTableVM
                                     {
                                         PatientName = reqclient.Firstname,
@@ -28,7 +31,7 @@ namespace BusinessLayer.Repository
                                         DateOfBirth = new DateOnly((int)reqclient.Intyear, int.Parse(reqclient.Strmonth), (int)reqclient.Intdate),
                                         ReqDate = req.Createddate,
                                         Phone = reqclient.Phonenumber,
-                                        PhoneOther=req.Phonenumber,
+                                        PhoneOther = req.Phonenumber,
                                         Address = reqclient.City + reqclient.Zipcode,
                                         Notes = reqclient.Notes,
                                         ReqTypeId = req.Requesttypeid,
@@ -36,22 +39,32 @@ namespace BusinessLayer.Repository
                                         Id = reqclient.Requestclientid,
                                         regionid = reqclient.Regionid,
                                         Status = req.Status,
-                                        RequestClientId=reqclient.Requestclientid,
+                                        RequestClientId = reqclient.Requestclientid,
                                         RequestId = reqclient.Requestid,
+                                        PhysicianName = ps.Firstname + "_" + ps.Lastname,
+                                        Cancel = _context.Casetags.Select(cc => new CancelCase
+                                        {
+                                            CancelCaseReson = cc.Name,
+                                            CancelReasonId = cc.Casetagid
+                                        }).ToList()
                                     })
                                     .Where(item =>
                                         (string.IsNullOrEmpty(searchValue) || item.PatientName.Contains(searchValue)) &&
                                         (string.IsNullOrEmpty(selectValue) || item.regionid == int.Parse(selectValue)) &&
                                         (string.IsNullOrEmpty(selectedFilter) || item.ReqTypeId == int.Parse(selectedFilter)) &&
                                         currentStatus.Any(status=>item.Status==status)).ToList();
-
+           
             return filteredPatients;
         }
         public List<NewRequestTableVM> GetAllData()
         {
+            
             var GetAllData= from req in _context.Requests
                             join reqclient in _context.Requestclients
                             on req.Requestid equals reqclient.Requestid
+                            join p in _context.Physicians
+                                    on req.Physicianid equals p.Physicianid into phy
+                            from ps in phy.DefaultIfEmpty()
                             select new NewRequestTableVM
                             {
                                 PatientName = reqclient.Firstname,
@@ -68,6 +81,12 @@ namespace BusinessLayer.Repository
                                 PhoneOther = req.Phonenumber,
                                 RequestClientId = reqclient.Requestclientid,
                                 RequestId = reqclient.Requestid,
+                                PhysicianName = ps.Firstname + "_" + ps.Lastname,
+                                Cancel = _context.Casetags.Select(cc => new CancelCase
+                                {
+                                    CancelCaseReson = cc.Name,
+                                    CancelReasonId = cc.Casetagid
+                                }).ToList() 
                             };
             return GetAllData.ToList();
         }

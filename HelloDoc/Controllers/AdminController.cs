@@ -115,60 +115,105 @@ namespace HelloDoc.Controllers
             }
             return View();  
         }
-        public async Task<IActionResult> ViewNotes(int requestid)
+        public IActionResult Viewnotes(int requestid)
         {
-            var notes = (from reqnotes in _context.Requestnotes
-                         join reqstatuslog in _context.Requeststatuslogs
-                         on reqnotes.Requestid equals reqstatuslog.Requestid into requestAllNotes
-                         where reqnotes.Requestid == requestid
-                         group requestAllNotes by new
-                         {
-                             reqnotes.Adminnotes,
-                             reqnotes.Physiciannotes,
-                             reqnotes.Requestid
-                         } into grouped
-                         select new ViewNotesVM
-                         {
-                             TransferedNotes = grouped.SelectMany(g => g.Select(note => note.Notes)).DefaultIfEmpty().ToArray(),
-                             AdminNotes = grouped.Key.Adminnotes,
-                             PhysicianNotes = grouped.Key.Physiciannotes,
-                             RequestId = grouped.Key.Requestid
-                         }).FirstOrDefault();
+            ViewData["ViewName"] = "Dashboard";
+            ViewData["RequestId"] = requestid;
+            var leftJoin = from rn in _context.Requestnotes
+                           join rs in _context.Requeststatuslogs on rn.Requestid equals rs.Requestid into rsJoin
+                           from rs in rsJoin.DefaultIfEmpty()
+                           join a in _context.Admins on rs.Adminid equals a.Adminid into aJoin
+                           from a in aJoin.DefaultIfEmpty()
+                           join p in _context.Physicians on rs  .Physicianid equals p.Physicianid into pJoin
+                           from p in pJoin.DefaultIfEmpty()
+                           where rn.Requestid == requestid
+                           select new ViewNotesVM
+                           {
+                               TransToPhysicianId = rs.Transtophysicianid,
+                               Status = rs.Status,
+                               AdminName = a.Firstname ?? "" + " " + a.Lastname ?? "",
+                               PhysicianName = p.Firstname ?? "" + " " + p.Lastname ?? "",
+                               AdminNotes = rn.Adminnotes,
+                               PhysicianNotes = rn.Physiciannotes,
+                               TransferNotes = rs.Notes,
+                               Cancelcount = _context.Requeststatuslogs.Count(item=>item.Status==3)
+                           };
 
-            return View(notes);
+            var rightJoin = from rs in _context.Requeststatuslogs
+                            join rn in _context.Requestnotes on rs.Requestid equals rn.Requestid into rnJoin
+                            from rn in rnJoin.DefaultIfEmpty()
+                            join a in _context.Admins on rs.Adminid equals a.Adminid into aJoin
+                            from a in aJoin.DefaultIfEmpty()
+                            join p in _context.Physicians on rs.Physicianid equals p.Physicianid into pJoin
+                            from p in pJoin.DefaultIfEmpty()
+                            where rs.Requestid == requestid && rn == null // Filter only records not in left join result
+                            select new ViewNotesVM
+                            {
+                                TransToPhysicianId = rs.Transtophysicianid,
+                                Status = rs.Status,
+                                AdminName = a.Firstname ?? "" + " " + a.Lastname ?? "",
+                                PhysicianName = p.Firstname ?? "" + " " + p.Lastname ?? "",
+                                AdminNotes = rn.Adminnotes,
+                                PhysicianNotes = rn.Physiciannotes,
+                                TransferNotes = rs.Notes,
+                                Cancelcount = _context.Requeststatuslogs.Count(item => item.Status == 3)
+                            };
+
+            var result = leftJoin.Union(rightJoin).ToList();
+
+            return View(result);
         }
-
-
         [HttpPost]
-        public async Task<IActionResult> ViewNotesPost(ViewNotesVM viewNotesVM)
+        public async Task<IActionResult> AssignRequest( int region,int physician,string notes,int requestid)
         {
-            if (ModelState.IsValid)
+            var request = _context.Requests.Where(item=>item.Requestid== requestid).FirstOrDefault();
+            if (request != null)
             {
-                var requestvisenotes = _context.Requestnotes.Where(item => item.Requestid == viewNotesVM.RequestId).FirstOrDefault();
-                if (requestvisenotes != null) {
-                    
-                    requestvisenotes.Adminnotes = viewNotesVM.AdditionalNotes;
-                    _context.Update(requestvisenotes);
-                     _context.SaveChanges();
-                }
-                else
-                {
-                    var requestnotes = new Requestnote();
-                    requestnotes.Requestid= viewNotesVM.RequestId;
-                    requestnotes.Adminnotes= viewNotesVM.AdditionalNotes;
-                    requestnotes.Createddate = DateTime.Now;
-                    requestnotes.Createdby = "admin";
-
-                    _context.Add(requestnotes);
-                    _context.SaveChanges(); 
-                }
+                request.Status = 2;
+                request.Physicianid = physician;
+                _context.Requests.Update(request);
+                var requeststatuslog = new Requeststatuslog();
+                requeststatuslog.Notes = notes;
+                requeststatuslog.Requestid = requestid;
+                requeststatuslog.Status = 2;
+                requeststatuslog.Createddate = DateTime.Now;
+                _context.Requeststatuslogs.Add(requeststatuslog);
+                _context.SaveChanges();
             }
-            return RedirectToAction("ViewNotes",new { requestid =viewNotesVM.RequestId});
+            return RedirectToAction("Index","Admin");
         }
 
-        public async Task<IActionResult> CancelCase(string notes,string CancelReason,int Id)
-        {
-            var requestByid=await _context.Requests.FindAsync(Id); 
+
+        //[HttpPost]
+        //public async Task<IActionResult> ViewNotesPost(ViewNotesVM viewNotesVM)
+        //{
+        //    if (ModelState.IsValid)
+        //    {
+        //        var requestvisenotes = _context.Requestnotes.Where(item => item.Requestid == viewNotesVM.RequestId).FirstOrDefault();
+        //        if (requestvisenotes != null) {
+
+        //            requestvisenotes.Adminnotes = viewNotesVM.AdditionalNotes;
+        //            _context.Update(requestvisenotes);
+        //             _context.SaveChanges();
+        //        }
+        //        else
+        //        {
+        //            var requestnotes = new Requestnote();
+        //            requestnotes.Requestid= viewNotesVM.RequestId;
+        //            requestnotes.Adminnotes= viewNotesVM.AdditionalNotes;
+        //            requestnotes.Createddate = DateTime.Now;
+        //            requestnotes.Createdby = "admin";
+
+        //            _context.Add(requestnotes);
+        //            _context.SaveChanges(); 
+        //        }
+        //    }
+        //    return RedirectToAction("ViewNotes",new { requestid =viewNotesVM.RequestId});
+        //}
+        [HttpPost]
+        public async  Task<IActionResult> CancelCase(string notes,string CancelReason,int requestid)
+            {
+            var requestByid=await _context.Requests.FindAsync(requestid); 
             if (requestByid != null)
             {
                 requestByid.Status = 3;
@@ -176,16 +221,21 @@ namespace HelloDoc.Controllers
                 
                 var requeststatuslog=new Requeststatuslog();    
                 requeststatuslog.Status = 5;
-                requeststatuslog.Requestid = Id;
+                requeststatuslog.Requestid = requestid;
                 requeststatuslog.Notes=notes;
                 requeststatuslog.Createddate = DateTime.Now;
 
                 _context.Requeststatuslogs.Add(requeststatuslog);
                 _context.SaveChanges();
-                return Json(new {success=true});
+                return Json(true);
             }
-            return Json(new {success=false,message="Requestis not found"});
+            return Json(false);
 
+        }
+        public IActionResult GetPhysician(string region)
+        {
+            var physician = _context.Physicians.Where(p => p.Regionid == int.Parse(region)).ToList();
+            return Ok(physician);
         }
     }
 }
