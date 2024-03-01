@@ -80,7 +80,19 @@ namespace HelloDoc.Controllers
             var paginatedData = filteredPatients.Skip((page - 1) * pageSize).Take(pageSize).ToList();
 
             // Create a ViewModel or use ViewBag/ViewData to store pagination information
-            ViewBag.CurrentPage = page;
+            var newcount = filteredPatients.Count(item => item.Status == 1);
+
+            var pandingcount = filteredPatients.Count(item => item.Status == 2);
+            var activecount = filteredPatients.Count(item => item.Status == 4 || item.Status == 5);
+            var conclude = filteredPatients.Count(item => item.Status == 6);
+            var toclosed = filteredPatients.Count(item => item.Status == 3 || item.Status == 7 || item.Status == 8);
+            var unpaid = filteredPatients.Count(item => item.Status == 9);
+            ViewBag.PandingCount = pandingcount;
+            ViewBag.NewCount = newcount;
+            ViewBag.activecount = activecount;
+            ViewBag.conclude = conclude;
+            ViewBag.toclosed = toclosed;
+            ViewBag.unpaid = unpaid; ViewBag.CurrentPage = page;
             ViewBag.TotalPages = totalPages;
             return PartialView(partialName, paginatedData);
         }
@@ -136,7 +148,7 @@ namespace HelloDoc.Controllers
                                AdminNotes = rn.Adminnotes,
                                PhysicianNotes = rn.Physiciannotes,
                                TransferNotes = rs.Notes,
-                               Cancelcount = _context.Requeststatuslogs.Count(item=>item.Status==3)
+                               Cancelcount = _context.Requeststatuslogs.Count(item=>item.Status==5)
                            };
 
             var rightJoin = from rs in _context.Requeststatuslogs
@@ -156,7 +168,7 @@ namespace HelloDoc.Controllers
                                 AdminNotes = rn.Adminnotes,
                                 PhysicianNotes = rn.Physiciannotes,
                                 TransferNotes = rs.Notes,
-                                Cancelcount = _context.Requeststatuslogs.Count(item => item.Status == 3)
+                                Cancelcount = _context.Requeststatuslogs.Count(item => item.Status == 5)
                             };
 
             var result = leftJoin.Union(rightJoin).ToList();
@@ -164,7 +176,7 @@ namespace HelloDoc.Controllers
             return View(result);
         }
         [HttpPost]
-        public async Task<IActionResult> AssignRequest( int region,int physician,string notes,int requestid)
+        public async Task<IActionResult> AssignRequest( int regionid, int physician, string description, int requestid)
         {
             var request = _context.Requests.Where(item=>item.Requestid== requestid).FirstOrDefault();
             if (request != null)
@@ -173,7 +185,7 @@ namespace HelloDoc.Controllers
                 request.Physicianid = physician;
                 _context.Requests.Update(request);
                 var requeststatuslog = new Requeststatuslog();
-                requeststatuslog.Notes = notes;
+                requeststatuslog.Notes = description;
                 requeststatuslog.Requestid = requestid;
                 requeststatuslog.Status = 2;
                 requeststatuslog.Createddate = DateTime.Now;
@@ -229,13 +241,51 @@ namespace HelloDoc.Controllers
                 _context.SaveChanges();
                 return Json(true);
             }
-            return Json(false);
+            return Json(true);
 
         }
+        public IActionResult GetStatusCounts(int id)
+        {
+            var counts = new
+            {
+                NewCount = _context.Requests.Where(item=>item.Status==1).Count(),
+                PendingCount = _context.Requests.Where(item=>item.Status==2).Count(),
+                ActiveCount=_context.Requests.Where(item => item.Status == 4 || item.Status == 5).Count(),
+                ToClosedCount = _context.Requests.Where(item => item.Status == 3 || item.Status == 7 ||item.Status==8).Count(),
+                ConcludeCount=_context.Requests.Where(item => item.Status == 6).Count(),
+                UnpaidCount = _context.Requests.Where(item => item.Status == 9).Count(),
+
+
+            };
+            return Json(counts);
+        }
+
         public IActionResult GetPhysician(string region)
         {
             var physician = _context.Physicians.Where(p => p.Regionid == int.Parse(region)).ToList();
             return Ok(physician);
+        }
+        [HttpPost]
+        public IActionResult BlockRequest(string blockreason,int requestid)
+        {
+            var request=_context.Requests.Find(requestid);
+            request.Status = 11;
+            _context.Requests.Update(request);  
+            var block=new Blockrequest();
+            block.Email = request.Email;
+            block.Phonenumber=request.Phonenumber;
+            block.Requestid =requestid.ToString();
+            block.Createddate= DateTime.Now;    
+            block.Reason= blockreason;
+            _context.Blockrequests.Add(block);  
+            var requeststatuslog=new Requeststatuslog();    
+            requeststatuslog.Status = 11;
+            requeststatuslog.Createddate= DateTime.Now;
+            requeststatuslog.Requestid = requestid;
+            requeststatuslog.Notes = blockreason;
+            _context.Requeststatuslogs.Add(requeststatuslog);
+            _context.SaveChanges();
+            return RedirectToAction("Index");
         }
     }
 }

@@ -43,7 +43,7 @@
 
 
 </head>
-<body>
+<body style="overflow-y:scroll !important">
 
     <div class="container-fluid d-flex flex-column max-vw-100 vh-100 p-0 bg-light">
         <header class="w-100 shadow px-2 px-md-5 position-relative z-2">
@@ -138,227 +138,15 @@
 
 
    
-    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script src="~/js/custom.js" asp-append-version="true"></script>
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
    
 
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js" ></script>
-    <script>
-        
-        $(document).ready(function () {
-            
-         console.log("1")
-
-            var storedPartial = localStorage.getItem('currentPartial');
-            var storedStatus = JSON.parse(localStorage.getItem('currentStatus'));
-            var storedTringle = localStorage.getItem("currentTringle")
-
-            var currentPartial = storedPartial || "NewTablePartial";
-            var currentStatus = storedStatus || [1];
-            var currentPage = 1;
-            var pageSize = 3;
-
-            if (storedTringle) {
-                $(".triangle").css('display', 'none');
-                $("#triangle" + storedTringle).css('display','block')
-
-            }
-
-               //intial Only NewTablePartial Will load 
-            filterTable(currentPartial, currentStatus, currentPage,pageSize);
-            $('PendingTablePartial').hide();
-            $('ActiveTablePartial').hide();
-            $('ConcludeTablePartial').hide();
-            $('ToCloseTablePartial').hide();
-            $('UnpaidTablePartial').hide();
-
-
-            $(document).on("click", "#pagination a.page-link", function () {
-                console.log("Pagination link clicked!");
-                currentPage = $(this).text().trim();
-                console.log("Current Page: " + currentPage);
-                filterTable(currentPartial, currentStatus, currentPage, pageSize);
-            });
-
-            //onclick each partial will load
-            
-            $("#statuslink1").click(function (e) {
-                $(".triangle").css('display', 'none');
-                $("#triangle1").css('display', 'block').css('border-top-color', '#203f9a');
-
-                e.preventDefault();
-                currentPartial = "NewTablePartial"
-                currentStatus = [1];
-                localStorage.setItem('currentPartial', currentPartial);
-                localStorage.setItem('currentStatus', JSON.stringify(currentStatus));
-                localStorage.setItem("currentTringle", 1);
-
-
-                $('#statuschange').html('(new)');
-                filterTable("NewTablePartial", currentStatus, currentPage, pageSize);
-            });
-
-           
-
-            $("#statuslink2").click(function () {
-                $(".triangle").css('display', 'none');
-                $("#triangle2").css('display', 'block').css('border-top-color', '#00adef');
-
-                currentPartial = "PendingTablePartial"
-                currentStatus = [2];
-                $('#statuschange').html('(Pending)');
-                localStorage.setItem('currentPartial', currentPartial);
-                localStorage.setItem('currentStatus', JSON.stringify(currentStatus));
-                localStorage.setItem("currentTringle", 2);
-
-                filterTable("PendingTablePartial", currentStatus, currentPage, pageSize);
-            });
-
-
-            $("#statuslink3").click(function () {
-                $(".triangle").css('display', 'none');
-                $("#triangle3").css('display', 'block').css('border-top-color', '#228c20');
-
-                currentStatus=[4,5]
-                currentPartial = "ActiveTablePartial";
-                localStorage.setItem('currentPartial', currentPartial);
-                localStorage.setItem('currentStatus', JSON.stringify(currentStatus));
-                localStorage.setItem("currentTringle", 3);
-
-                $('#statuschange').html('(Active)');
-
-                filterTable("ActiveTablePartial", currentStatus, currentPage, pageSize);
-            });
-
-           
-
-            $("#statuslink4").click(function () {
-                $(".triangle").css('display', 'none');
-                $("#triangle4").css('display', 'block').css('border-top-color', '#da0f82');
-
-                currentStatus = [6];
-                currentPartial = "ConcludeTablePartial";
-                $('#statuschange').html('(Conclude)');
-                localStorage.setItem('currentPartial', currentPartial);
-                localStorage.setItem('currentStatus', JSON.stringify(currentStatus));
-                localStorage.setItem("currentTringle", 4);
-
-                filterTable("ConcludeTablePartial", currentStatus, currentPage, pageSize);
-            });
-
-            $("#statuslink5").click(function () {
-                $(".triangle").css('display', 'none');
-                $("#triangle5").css('display', 'block').css('border-top-color', '#0370d7');
-
-                currentStatus = [3,7,8];
-                currentPartial = "ToCloseTablePartial";
-                $('#statuschange').html('(ToClose)');
-                localStorage.setItem('currentPartial', currentPartial);
-                localStorage.setItem('currentStatus', JSON.stringify(currentStatus));
-                localStorage.setItem("currentTringle", 5);
-
-                filterTable("ToCloseTablePartial", currentStatus, currentPage, pageSize);
-            });
-
-            $("#statuslink6").click(function () {
-                $(".triangle").css('display', 'none');
-                $("#triangle6").css('display', 'block').css('border-top-color', '#9966cd');
-
-                currentStatus = [9];
-                currentPartial = "UnpaidTablePartial";
-                $('#statuschange').html('(Unpaid)');
-                localStorage.setItem('currentPartial', currentPartial);
-                localStorage.setItem('currentStatus', JSON.stringify(currentStatus));
-                localStorage.setItem("currentTringle", 6);
-
-                filterTable("UnpaidTablePartial", currentStatus, currentPage, pageSize);
-            });
-
-            //filter the data with passed currentpartial that will load only that data
-            $("#filterSelect").on("input change", function () {
-                filterTable(currentPartial, currentStatus, currentPage, pageSize);
-            });
-
-
-            $("#searchInput").on("input", function () {
-                filterTable(currentPartial, currentStatus, currentPage, pageSize);
-            });
-
-            $('.filter-item').click(function () {
-                $('.filter-item').removeClass('active')
-                $(this).addClass('active')
-                filterTable(currentPartial, currentStatus, currentPage, pageSize)
-
-            });
-            
-
-            //ajax for render that partialview
-            
-
-            //ajax for filterthe table using search
-            function filterTable(partialName, currentStatus,page,pageSize) {
-                var searchValue = $("#searchInput").val();
-                var selectValue = $("#filterSelect").val();
-                currentPage = 1;
-                var selectedFilter = $('.filter-item.active').data('value');
-                    
-                console.log(selectValue)
-                console.log(searchValue)
-                console.log(selectedFilter)
-
-                if (searchValue == "" && selectValue == '' && selectedFilter=='') {
-                    filterTable(currentPartial, currentStatus, page, pageSize)
-                }
-                 else{
-
-                $.ajax({
-                    type: "GET",
-                    url: "/Admin/SearchPatient",
-                        traditional: true,
-
-                        data: { searchValue: searchValue, selectValue: selectValue, partialName: partialName, selectedFilter: selectedFilter, currentStatus: currentStatus,page:page,pageSize:pageSize },
-                    success: function (data) {
-                        $('#partialContainer').html(data);
-
-                    },
-                    error: function (error) {
-                        console.error('Error:', error);
-                    }
-                });
-                }
-            }
-
-           
-        });
-
-
-
-        // $.ajax({
-        //     type: "POST",
-        //     contentType: "application/json; charset=utf-8",
-        //     url: SiteURL + "AutoCompleteData.aspx/" + method,
-        //     data: "{'SearchText':'" + escape(document.getElementById('txtSearch').value) + "'}",
-        //     dataType: "json",
-        //     success: function (data) {
-        //         response($.map(data.d, function (item) {
-        //             return {
-        //                 label: item.split('#~#')[0],
-        //                 val: item.split('#~#')[1],
-        //                 num: item.split('#~#')[2],
-        //                 fkModuleType: item.split('#~#')[3]
-        //             }
-        //         }));
-        //     },
-        //     error: function (result) {
-
-        //     }
-        // });
-    </script>
-
-
+    
 
 </body>
 </html>

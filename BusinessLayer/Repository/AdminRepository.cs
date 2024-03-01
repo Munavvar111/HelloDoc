@@ -18,7 +18,7 @@ namespace BusinessLayer.Repository
 
         public List<NewRequestTableVM> SearchPatients(string searchValue, string selectValue, string selectedFilter, int[] currentStatus)
         {
-            var filteredPatients = (from req in _context.Requests
+                var filteredPatients = (from req in _context.Requests
                                     join reqclient in _context.Requestclients
                                     on req.Requestid equals reqclient.Requestid
                                     join p in _context.Physicians

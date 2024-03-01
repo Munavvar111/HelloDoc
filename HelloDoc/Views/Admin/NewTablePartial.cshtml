@@ -15,77 +15,78 @@
         </tr>
     </thead>
     <tbody>
+       
+            
         @foreach(var item in Model)
         {
+                if (@item.Status == 1)
+                {
+
+                    <tr class=" @(GetRowClass(@item.ReqTypeId))  d-none d-xl-table-row text-white" style="vertical-align:middle">
 
 
 
-
-                <tr class=" @(GetRowClass(@item.ReqTypeId))  d-none d-xl-table-row text-white" style="vertical-align:middle">
-
-
-
-                <td style="background-color:@(GetRowClass(@item.ReqTypeId))!important">@item.PatientName</td>
-                <td style="background-color:@(GetRowClass(@item.ReqTypeId))!important">@item.DateOfBirth</td>
-                <td style="background-color:@(GetRowClass(@item.ReqTypeId))!important">@item.Requestor </td>
-                <td style="background-color:@(GetRowClass(@item.ReqTypeId))!important">5-12-2019</td>
-                <td style="background-color:@(GetRowClass(@item.ReqTypeId))!important">
+                        <td style="background-color:@(GetRowClass(@item.ReqTypeId))!important">@item.PatientName</td>
+                        <td style="background-color:@(GetRowClass(@item.ReqTypeId))!important">@item.DateOfBirth</td>
+                        <td style="background-color:@(GetRowClass(@item.ReqTypeId))!important">@item.Requestor </td>
+                        <td style="background-color:@(GetRowClass(@item.ReqTypeId))!important">5-12-2019</td>
+                        <td style="background-color:@(GetRowClass(@item.ReqTypeId))!important">
                             <button class="btn  border-white text-white" >
                                 <i class="bi bi-telephone me-1"></i>
                                 @item.Phone
                             </button><br>
-                    <span class="text-white">Patient</span>
-                    @if (@item.ReqTypeId==2)
-                    {
-                        <br />
-                        <button class="btn  border-white text-white">
-                            <i class="bi bi-telephone me-1"></i>
-                            @item.PhoneOther
-                        </button><br />
-                        <span class="text-white">(Family/Friend)</span>
-                    }
-                    @if (@item.ReqTypeId==3)
-                    {
-                        <br />
-                        <button class="btn  border-white text-white">
-                            <i class="bi bi-telephone me-1"></i>
-                            @item.PhoneOther
-                        </button><br />
-                        <span class="text-white">(Business)</span>
-                    }
-                    @if (@item.ReqTypeId==4)
-                    {
-                        <br />
-                        <button class="btn  border-white text-white">
-                            <i class="bi bi-telephone me-1"></i>
-                            @item.PhoneOther
-                        </button><br />
-                        <span class="text-white">(Conciege)</span>
-                    }
+                            <span class="text-white">Patient</span>
+                            @if (@item.ReqTypeId == 2)
+                            {
+                                <br />
+                                <button class="btn  border-white text-white">
+                                    <i class="bi bi-telephone me-1"></i>
+                                    @item.PhoneOther
+                                </button><br />
+                                <span class="text-white">(Family/Friend)</span>
+                            }
+                            @if (@item.ReqTypeId == 3)
+                            {
+                                <br />
+                                <button class="btn  border-white text-white">
+                                    <i class="bi bi-telephone me-1"></i>
+                                    @item.PhoneOther
+                                </button><br />
+                                <span class="text-white">(Business)</span>
+                            }
+                            @if (@item.ReqTypeId == 4)
+                            {
+                                <br />
+                                <button class="btn  border-white text-white">
+                                    <i class="bi bi-telephone me-1"></i>
+                                    @item.PhoneOther
+                                </button><br />
+                                <span class="text-white">(Conciege)</span>
+                            }
 
                         </td >
-                <td style="background-color:@(GetRowClass(@item.ReqTypeId))!important">@item.Address</td>
-                <td style="background-color:@(GetRowClass(@item.ReqTypeId))!important">@item.Notes</td>
-                <td style="background-color:@(GetRowClass(@item.ReqTypeId))!important">
-                    <button class="btn border-white @(GetRowClass(@item.ReqTypeId)) text-white">
+                        <td style="background-color:@(GetRowClass(@item.ReqTypeId))!important">@item.Address</td>
+                        <td style="background-color:@(GetRowClass(@item.ReqTypeId))!important">@item.Notes</td>
+                        <td style="background-color:@(GetRowClass(@item.ReqTypeId))!important">
+                            <button class="btn border-white @(GetRowClass(@item.ReqTypeId)) text-white">
                                 <i class="bi bi-person me-1"></i> provider
                             </button>
 
                         </td>
-                <td style="background-color:@(GetRowClass(@item.ReqTypeId))!important">
-                    <div class="dropdown">
-                        <button class="btn border-white @(GetRowClass(@item.ReqTypeId)) text-white" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            Actions
-                        </button>
-                        <div class="dropdown-menu dropdown-menu-right dropdown-menu-lg-left" aria-labelledby="dropdownMenuButton">
-                            <button class="dropdown-item"  data-bs-toggle="modal" data-bs-target="#assigncase" id="assigncase2" data-bs-requestid="@item.RequestId"><i class="bi bi-x-circle me-3"></i>Assign Case</button>
-                            <button class="dropdown-item"  data-bs-toggle="modal" data-bs-target="#exampleModal" id="assigncase2" data-bs-requestid="@item.RequestId" data-bs-patientname="@item.PatientName"><i class="bi bi-x-circle me-3"></i>Cancel  Case</button>
-                            <a class="dropdown-item" asp-action="ViewCase" asp-controller="Admin" asp-route-id="@item.Id"><i class="bi bi-x-circle me-3"></i>View Case</a>
-                            <a class="dropdown-item" asp-action="ViewNotes" asp-controller="Admin" asp-route-requestid="@item.RequestId"><i class="bi bi-x-circle me-3"></i>View Notes</a>
-                            <a class="dropdown-item" href="#"><i class="bi bi-ban me-3"></i>Block Patients</a>
+                        <td style="background-color:@(GetRowClass(@item.ReqTypeId))!important">
+                            <div class="dropdown">
+                                <button class="btn border-white @(GetRowClass(@item.ReqTypeId)) text-white" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    Actions
+                                </button>   
+                                <div class="dropdown-menu dropdown-menu-right dropdown-menu-lg-left" aria-labelledby="dropdownMenuButton">
+                                    <button class="dropdown-item"  data-bs-toggle="modal" data-bs-target="#assigncase" data-bs-requestid="@item.RequestId"><i class="bi bi-x-circle me-3"></i>Assign Case</button>
+                                    <button class="dropdown-item"  data-bs-toggle="modal" data-bs-target="#exampleModal" id="examplemodal"  data-bs-requestid="@item.RequestId" data-bs-patientname="@item.PatientName"><i class="bi bi-x-circle me-3"></i>Cancel  Case</button>
+                                    <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#BlockModal" id="bloclmodal"  data-bs-requestid="@item.RequestId" data-bs-patientname="@item.PatientName"><i class="bi bi-x-circle me-3"></i>Block  Case</button>
+                                    <a class="dropdown-item" asp-action="ViewCase" asp-controller="Admin" asp-route-id="@item.Id"><i class="bi bi-x-circle me-3"></i>View Case</a>
+                                    <a class="dropdown-item" asp-action="ViewNotes" asp-controller="Admin" asp-route-requestid="@item.RequestId"><i class="bi bi-x-circle me-3"></i>View Notes</a>
 
-                        </div>
-                    </div>
+                                </div>
+                            </div>
                         </td>
                     </tr>
 
@@ -158,97 +159,95 @@
                         </div>
                     </div> *@
 
-            <div class="d-xl-none ">
-                <div class="bg-info-subtle " data-bs-toggle="collapse" data-bs-target="#collapseexample_@item.Id"
-                     aria-expanded="false" aria-controls="collapseexample">
-                    <div class="flex-column gap-2 border-bottom border-5 pt-3 pb-5 px-4">
-                        <div class="d-flex  justify-content-between mb-3">
-                            <span class=" fs-5 ">@item.PatientName</span>
-                            @if (item.ReqTypeId == 1)
-                            {
-                                <span class=" fs-5  ">Business</span>
-                            }
-                            else if (item.ReqTypeId == 2)
-                            {
-                                <span class=" fs-5  ">Patient</span>
-                            }
-                            else if (item.ReqTypeId == 3)
-                            {
-                                <span class=" fs-5  ">Family/Friend</span>
-                            }
-                            else if (item.ReqTypeId == 4)
-                            {
-                                <span class=" fs-5 ">Concierge</span>
-                            }
-                        </div>
-                        <div class="d-flex justify-content-between ">
-                            <div class="">
-                                <span class="fs-5">@item.Address</span>
+                    <div class="d-xl-none ">
+                        <div class="bg-info-subtle " data-bs-toggle="collapse" data-bs-target="#collapseexample_@item.Id"
+                        aria-expanded="false" aria-controls="collapseexample">
+                            <div class="flex-column gap-2 border-bottom border-5 pt-3 pb-5 px-4">
+                                <div class="d-flex  justify-content-between mb-3">
+                                    <span class=" fs-5 ">@item.PatientName</span>
+                                    @if (item.ReqTypeId == 1)
+                                    {
+                                        <span class=" fs-5  ">Business</span>
+                                    }
+                                    else if (item.ReqTypeId == 2)
+                                    {
+                                        <span class=" fs-5  ">Patient</span>
+                                    }
+                                    else if (item.ReqTypeId == 3)
+                                    {
+                                        <span class=" fs-5  ">Family/Friend</span>
+                                    }
+                                    else if (item.ReqTypeId == 4)
+                                    {
+                                        <span class=" fs-5 ">Concierge</span>
+                                    }
+                                </div>
+                                <div class="d-flex justify-content-between ">
+                                    <div class="">
+                                        <span class="fs-5">@item.Address</span>
+                                    </div>
+                                    <button class="btn btn-transparent border border-1 border-info text-info rounded-5">Map Location</button>
+                                </div>
+
                             </div>
-                            <button class="btn btn-transparent border border-1 border-info text-info rounded-5">Map Location</button>
                         </div>
 
+                        <div class="collapse position-relative" id="collapseexample_@item.Id">
+                            <button class="btn position-absolute btn-transparent border-2 rounded-5 viewBtn">View Case</button>
+                            <div class="d-flex flex-column gap-2 bg-info-subtle   mb-2 py-3 px-4 ">
+
+                                <div class="d-flex align-items-center ">
+                                    <i class="fa-regular fa-calendar  border border-1 border-info rounded-5 p-2 me-2"></i>
+                                    <span class="fs-5">Date of Birth:<strong>@item.DateOfBirth</strong> </span>
+                                </div>
+
+                                <div class="d-flex align-items-center ">
+                                    <i class="fa-regular fa-envelope  border border-1 border-info rounded-5 p-2 me-2"></i>
+                                    <span class="fs-5">Email: <strong>@item.Email</strong></span>
+                                </div>
+
+                                <div class="d-flex align-items-center ">
+                                    <i class="fas fa-phone  border border-1 border-info rounded-5 p-2 me-2"></i>
+                                    <span class="fs-5">Phone: <strong>@item.Phone</strong></span>
+                                </div>
+
+
+                                <div class="d-flex align-items-center ">
+                                    <i class="fa-regular fa-user  border border-1 border-info rounded-5 p-2 me-2"></i>
+                                    <span class="fs-5">Requestor: <strong>@item.Requestor</strong></span>
+                                </div>
+
+                                <div class="d-flex flex-column mt-3 gap-3">
+                                    <div class="d-flex gap-3 ">
+                                        <button class="btn w-50 btn-transparent border border-1 text-white rounded-5" style="background-color: #943DB8">Assign Case</button>
+                                        <button class="btn w-50 btn-transparent border border-1 text-white  rounded-5" style="background-color:  #E42929">Cancel Case</button>
+                                    </div>
+                                    <div class="d-flex gap-3 ">
+                                        <button class="btn w-50 btn-transparent border border-1 text-white rounded-5" style="background-color: #228B22">View Notes</button>
+                                        <button class="btn w-50 btn-transparent border border-1 text-white rounded-5" style="background-color: #E42929">Block Patient</button>
+                                    </div>
+                                    <div class="d-flex gap-3">
+                                        <button class="btn w-50 btn-transparent border border-1 text-white rounded-5" style="background-color: #228B22">Email</button>
+
+                                    </div>
+                                </div>
+
+                            </div>
+
+                        </div>
                     </div>
-                </div>
-
-                <div class="collapse position-relative" id="collapseexample_@item.Id">
-                    <button class="btn position-absolute btn-transparent border-2 rounded-5 viewBtn">View Case</button>
-                    <div class="d-flex flex-column gap-2 bg-info-subtle   mb-2 py-3 px-4 ">
-                        
-                            <div class="d-flex align-items-center ">
-                                <i class="fa-regular fa-calendar  border border-1 border-info rounded-5 p-2 me-2"></i>
-                                <span class="fs-5">Date of Birth:<strong>@item.DateOfBirth</strong> </span>
-                            </div>
-                        
-                        <div class="d-flex align-items-center ">
-                            <i class="fa-regular fa-envelope  border border-1 border-info rounded-5 p-2 me-2"></i>
-                            <span class="fs-5">Email: <strong>@item.Email</strong></span>
-                        </div>
-                        
-                            <div class="d-flex align-items-center ">
-                                <i class="fas fa-phone  border border-1 border-info rounded-5 p-2 me-2"></i>
-                                <span class="fs-5">Phone: <strong>@item.Phone</strong></span>
-                            </div>
-                       
-                       
-                            <div class="d-flex align-items-center ">
-                                <i class="fa-regular fa-user  border border-1 border-info rounded-5 p-2 me-2"></i>
-                            <span class="fs-5">Requestor: <strong>@item.Requestor</strong></span>
-                            </div>
-
-                            <div class="d-flex flex-column mt-3 gap-3">
-                                <div class="d-flex gap-3 ">
-                                    <button class="btn w-50 btn-transparent border border-1 text-white rounded-5" style="background-color: #943DB8">Assign Case</button>
-                                    <button class="btn w-50 btn-transparent border border-1 text-white  rounded-5" style="background-color:  #E42929">Cancel Case</button>
-                                </div>
-                                <div class="d-flex gap-3 ">
-                                    <button class="btn w-50 btn-transparent border border-1 text-white rounded-5" style="background-color: #228B22">View Notes</button>
-                                    <button class="btn w-50 btn-transparent border border-1 text-white rounded-5" style="background-color: #E42929">Block Patient</button>
-                                </div>
-                                <div class="d-flex gap-3">
-                                    <button class="btn w-50 btn-transparent border border-1 text-white rounded-5" style="background-color: #228B22">Email</button>
-
-                                </div>
-                            </div>
-                        
-                    </div>
-
-                </div>
-            </div>
 
 
 
 
+                
 
 
-
-            
+            }
         }
-            </table>
-                <partial name="CancelCase" model="@Model"></partial>
-            <partial name="AssignCase" ></partial>
-
-
+       
+</table>
+      
 @functions {
     public string GetRowClass(int requestTypeId)
     {
@@ -267,6 +266,11 @@
         }
     }
 }
+@* Cancel Case *@
+
+@* Assign Case *@
+
+
 
 <div>
     <nav id="pagination" aria-label="Page navigation">
@@ -283,84 +287,56 @@
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js" ></script>
 
-
 <script>
     $(document).ready(function () {
-        $('.regionDropdown').on('change', function () {
-            console.log("hii")
-            var selectregion = $(this).val();
-            $.ajax({
-                method: 'GET',
-                url: '/Admin/GetPhysician',
-                data: { region: selectregion },
-                success: function (physicians) {
-                    $('#physicianDropdown').empty();
-                    $.each(physicians, function (index, physician) {
-                        console.log(physician)
-                        $('#physicianDropdown').append($('<option>', {
-                            value: physician.physicianid,
-                            text: physician.firstname + ' ' + physician.lastname
-                        }));
 
-                    });
-                }
-            })
-        })
-    })
+        $('#assigncase').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget);
+            console.log(button)
+            var recipient = button.data('bs-requestid');
+            console.log(recipient);
+            var modal = $(this);
+            modal.find('#requestIdInputCancel1').val(recipient);
+        });
+
+    });
+
+
 </script>
+
 <script>
         $(document).ready(function () {
 
-    $('#assigncase').on('show.bs.modal', function (event) {
-    var button = $(event.relatedTarget);
-    console.log(button)
-    var recipient = button.data('bs-requestid');
-    console.log(recipient)
-    var modal = $(this);
-    modal.find('#requestIdInput').val(recipient);
-});
+        $('#exampleModal').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget);
+            console.log(button)
+            var recipient = button.data('bs-requestid');
+            var patientName = button.data('bs-patientname')
+            console.log(recipient)
+            var modal = $(this);
+            modal.find('#patientname').text(patientName)
+            modal.find('#requestIdInputCancel').val(recipient);
         });
 
-   
+    });
+
 </script>
+  
 <script>
-        $(document).ready(function () {
+    $(document).ready(function () {
+        $('#BlockModal').on('show.bs.modal', function (event) {
+        console.log("block")
+            var button = $(event.relatedTarget);
+            console.log(button)
+            var recipient = button.data('bs-requestid');
+            var patientName = button.data('bs-patientname')
+            console.log(recipient)
+            var modal = $(this);
+            modal.find('#patientname').text(patientName)
 
-    $('#exampleModal').on('show.bs.modal', function (event) {
-    var button = $(event.relatedTarget);
-    console.log(button)
-    var recipient = button.data('bs-requestid');
-    var patientName=button.data('bs-patientname')
-    console.log(recipient)
-    var modal = $(this);
-    modal.find('#patientname').text(patientName)
-    modal.find('#requestIdInputCancel').val(recipient);
-});
+            modal.find('#requestIdInputBlock').val(recipient);
         });
+    });
+
 
 </script>
-    <script>
-               $(document).ready(function () {
-
-
-            $("#CancelConfirm").click(function () {
-                    var requestid=$('#requestIdInputCancel').val();
-                    var cancelReason=$('#cancelReason').val();
-                    var additionalnote=$('.additionalnote').val();
-                    $.ajax({
-                        method:'POST',
-                        url:'/Admin/CancelCase',
-                        data:{requestid:requestid,notes:additionalnote,CancelReason:cancelReason},
-                    success: function (data) {
-                            if(data){
-                                 var storedPartial = localStorage.getItem('currentPartial');
-                          var storedStatus = JSON.parse(localStorage.getItem('currentStatus'));
-                          var storedTringle = localStorage.getItem("currentTringle");
-
-                                filterTable(storedPartial,storedStatus,1,3);
-                            }
-                        }
-                    })
-                })
-            });
-    </script>
