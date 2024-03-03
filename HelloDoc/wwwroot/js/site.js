@@ -1,4 +1,13 @@
-﻿
+﻿toastr.options = {
+    positionClass: 'toast-top-right',
+    closeButton: true,
+    progressBar: true,
+    showDuration: 400,
+    hideDuration: 1000,
+    timeOut: 2000,
+    extendedTimeOut: 1000,
+    toastClass: 'toast-red', // Add a custom class for red color styling
+};
 $(document).ready(function () {
     function updateUIWithCounts() {
         $.ajax({
@@ -234,6 +243,8 @@ $(document).ready(function () {
 
                     filterTable(storedPartial, storedStatus, 1, 3);
                     updateUIWithCounts();
+                    toastr.success('Block successful!');
+
                 }
             }
         })
@@ -246,6 +257,7 @@ $(document).ready(function () {
         var requestid = $('#requestIdInputCancel').val();
         var cancelReason = $('#cancelReason').val();
         var additionalnote = $('.additionalnote').val();
+
         $('#exampleModal').hide();
         $('.modal-backdrop').hide();
         $('body').css('overflow', '');
@@ -261,6 +273,8 @@ $(document).ready(function () {
 
                     filterTable(storedPartial, storedStatus, 1, 3);
                     updateUIWithCounts();
+                    toastr.success('CancelPatient successful!');
+
                 }
             }
         })
@@ -288,6 +302,9 @@ $(document).ready(function () {
                     var storedStatus = JSON.parse(localStorage.getItem('currentStatus'));
                     filterTable(storedPartial, storedStatus, 1, 3);
                     updateUIWithCounts();
+                    console.log("toaster", toastr.success)
+                    toastr.success('Assign successful!');
+
                 }
             }
         })

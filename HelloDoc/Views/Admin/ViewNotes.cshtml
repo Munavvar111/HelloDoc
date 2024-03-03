@@ -1,7 +1,13 @@
 ﻿@{
     Layout = "~/Views/Shared/_Layout4.cshtml";
 }
+
+@{
+    // Get the value of the requestid parameter from the URL
+    int requestId = (int)ViewData["RequestId"];
+}
 @model List<DataAccessLayer.CustomModel.ViewNotesVM>
+
 <div class="container bg-light mt-4">
     <div class="d-flex justify-content-between my-3">
         <div class="d-flex">
@@ -35,7 +41,7 @@
                         <div>
                            @for (var i = 0; i < @Model.Count; i++)
                                             {
-                                                if(@Model[i].TransferNotes != null && Model[i].Status != 5)
+                                                if(@Model[i].TransferNotes != null && Model[i].Status != 3)
                                                 {
                                                     <p class="notesbtn m-0">(@(i + 1)) @Model[i].TransferNotes</p>
                                                 }
@@ -104,25 +110,30 @@
                         <div>
                             @for (var i = 0; i < @Model.Count; i++)
                                                 {
-                                                    if (@Model[i].TransferNotes != null && Model[i].Status == 5)
+                                                    if (@Model[i].TransferNotes != null && Model[i].Status == 3)
                                                     {
                             
-                            <p class="text-muted">@Model[0].PhysicianNotes</p>
+                            <p class="text-muted">@Model[0].TransferNotes</p>
                                                     }
                                                 }
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+                </div>
+            
+                
             }
-        <form asp-action="ViewNotesPost" class="col-12 col-md-12 mb-5" method="post">
+        
+            <form asp-action="ViewNotesPost" class="col-12 col-md-12 mb-5" method="post" asp-route-id="@requestId"> 
             <input type="hidden"/>
         <div class="col-12 col-md-12 mb-5">
             <div class="bg-white border p-3">
                 <div class="form-floating">
                     <textarea class="form-control"
                               placeholder="Leave a comment here"
+                                      name="adminnotes"
+                                      asp-for="@Model[0].AdminNotes"
                               id="floatingTextarea2"
                               style="height: 100px"
                               ></textarea>
@@ -142,7 +153,99 @@
         </div>
         </form>
 
-    </div>
-        }
+        </div>
 
+    }
+    else
+    {
+        <div class="row row-cols-1 row-cols-md-2 g-3">
+            <div class="col ">
+                <div class="bg-white border p-3 ">
+                    <div class="d-flex">
+                        <div>
+                            <span class="material-symbols-outlined">
+                                sync_alt
+                            </span>
+                        </div>
+                        <div class="d-flex flex-column ps-3">
+                            <div>
+                                <span class="fw-bolder">
+                                    Transfer Notes
+                                </span>
+                            </div>
+                            <div>
+                                <span>-</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="bg-white border p-3">
+                    <div class="d-flex">
+                        <div>
+                            <span class="material-symbols-outlined">
+                                person
+                            </span>
+                        </div>
+                        <div class="d-flex flex-column ps-3">
+                            <div>
+                                <span class="fw-bolder">Physician Notes</span>
+                            </div>
+                            <div>
+
+                                <span>-</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 ">
+                <div class="bg-white border p-3">
+                    <div class="d-flex">
+                        <div>
+                            <span class="material-symbols-outlined">
+                                person
+                            </span>
+                        </div>
+                        <div class="d-flex flex-column ps-3">
+                            <div>
+                                <span class="fw-bolder">Admin Notes</span>
+                            </div>
+                            <div>
+                                <span>-</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <form asp-action="ViewNotesPost" class="col-12 col-md-12 mb-5" method="post" asp-route-id="@requestId">
+                <input type="hidden" />
+                <div class="col-12 col-md-12 mb-5">
+                    <div class="bg-white border p-3">
+                        <div class="form-floating">
+                            <textarea class="form-control",
+                            name="adminnotes"
+                                      placeholder="Leave a comment here"
+                                      id="floatingTextarea2"
+                                      style="height: 100px"></textarea>
+                            <label for="floatingTextarea2">
+                                Admin Notes
+                            </label>
+                        </div>
+
+                        <div class="d-flex gap-3 align-items-center justify-content-end mt-3">
+                            <button class="btn btn-info text-light" type="submit" id="submit">
+                                Save Changes
+                            </button>
+
+                        </div>
+                    </div>
+
+                </div>
+            </form>
+        </div>
+    }
 </div>

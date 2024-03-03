@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using NuGet.Protocol.Core.Types;
 using Org.BouncyCastle.Asn1.Ocsp;
 using Org.BouncyCastle.Ocsp;
 using System.Drawing;
@@ -131,117 +132,35 @@ namespace HelloDoc.Controllers
         {
             ViewData["ViewName"] = "Dashboard";
             ViewData["RequestId"] = requestid;
-            var leftJoin = from rn in _context.Requestnotes
-                           join rs in _context.Requeststatuslogs on rn.Requestid equals rs.Requestid into rsJoin
-                           from rs in rsJoin.DefaultIfEmpty()
-                           join a in _context.Admins on rs.Adminid equals a.Adminid into aJoin
-                           from a in aJoin.DefaultIfEmpty()
-                           join p in _context.Physicians on rs  .Physicianid equals p.Physicianid into pJoin
-                           from p in pJoin.DefaultIfEmpty()
-                           where rn.Requestid == requestid
-                           select new ViewNotesVM
-                           {
-                               TransToPhysicianId = rs.Transtophysicianid,
-                               Status = rs.Status,
-                               AdminName = a.Firstname ?? "" + " " + a.Lastname ?? "",
-                               PhysicianName = p.Firstname ?? "" + " " + p.Lastname ?? "",
-                               AdminNotes = rn.Adminnotes,
-                               PhysicianNotes = rn.Physiciannotes,
-                               TransferNotes = rs.Notes,
-                               Cancelcount = _context.Requeststatuslogs.Count(item=>item.Status==5)
-                           };
 
-            var rightJoin = from rs in _context.Requeststatuslogs
-                            join rn in _context.Requestnotes on rs.Requestid equals rn.Requestid into rnJoin
-                            from rn in rnJoin.DefaultIfEmpty()
-                            join a in _context.Admins on rs.Adminid equals a.Adminid into aJoin
-                            from a in aJoin.DefaultIfEmpty()
-                            join p in _context.Physicians on rs.Physicianid equals p.Physicianid into pJoin
-                            from p in pJoin.DefaultIfEmpty()
-                            where rs.Requestid == requestid && rn == null // Filter only records not in left join result
-                            select new ViewNotesVM
-                            {
-                                TransToPhysicianId = rs.Transtophysicianid,
-                                Status = rs.Status,
-                                AdminName = a.Firstname ?? "" + " " + a.Lastname ?? "",
-                                PhysicianName = p.Firstname ?? "" + " " + p.Lastname ?? "",
-                                AdminNotes = rn.Adminnotes,
-                                PhysicianNotes = rn.Physiciannotes,
-                                TransferNotes = rs.Notes,
-                                Cancelcount = _context.Requeststatuslogs.Count(item => item.Status == 5)
-                            };
-
-            var result = leftJoin.Union(rightJoin).ToList();
+            var result = _admin.GetNotesForRequest(requestid);
 
             return View(result);
         }
         [HttpPost]
         public async Task<IActionResult> AssignRequest( int regionid, int physician, string description, int requestid)
         {
-            var request = _context.Requests.Where(item=>item.Requestid== requestid).FirstOrDefault();
-            if (request != null)
-            {
-                request.Status = 2;
-                request.Physicianid = physician;
-                _context.Requests.Update(request);
-                var requeststatuslog = new Requeststatuslog();
-                requeststatuslog.Notes = description;
-                requeststatuslog.Requestid = requestid;
-                requeststatuslog.Status = 2;
-                requeststatuslog.Createddate = DateTime.Now;
-                _context.Requeststatuslogs.Add(requeststatuslog);
-                _context.SaveChanges();
-            }
-            return RedirectToAction("Index","Admin");
+            var result = await _admin.AssignRequest(regionid, physician, description, requestid);
+
+            return Json(result);
         }
 
-
-        //[HttpPost]
-        //public async Task<IActionResult> ViewNotesPost(ViewNotesVM viewNotesVM)
-        //{
-        //    if (ModelState.IsValid)
-        //    {
-        //        var requestvisenotes = _context.Requestnotes.Where(item => item.Requestid == viewNotesVM.RequestId).FirstOrDefault();
-        //        if (requestvisenotes != null) {
-
-        //            requestvisenotes.Adminnotes = viewNotesVM.AdditionalNotes;
-        //            _context.Update(requestvisenotes);
-        //             _context.SaveChanges();
-        //        }
-        //        else
-        //        {
-        //            var requestnotes = new Requestnote();
-        //            requestnotes.Requestid= viewNotesVM.RequestId;
-        //            requestnotes.Adminnotes= viewNotesVM.AdditionalNotes;
-        //            requestnotes.Createddate = DateTime.Now;
-        //            requestnotes.Createdby = "admin";
-
-        //            _context.Add(requestnotes);
-        //            _context.SaveChanges(); 
-        //        }
-        //    }
-        //    return RedirectToAction("ViewNotes",new { requestid =viewNotesVM.RequestId});
-        //}
         [HttpPost]
-        public async  Task<IActionResult> CancelCase(string notes,string CancelReason,int requestid)
+        public async Task<IActionResult> ViewNotesPost(string adminNotes, int id)
+        {
+            if (adminNotes != null)
             {
-            var requestByid=await _context.Requests.FindAsync(requestid); 
-            if (requestByid != null)
-            {
-                requestByid.Status = 3;
-                _context.Requests.Update(requestByid);
-                
-                var requeststatuslog=new Requeststatuslog();    
-                requeststatuslog.Status = 5;
-                requeststatuslog.Requestid = requestid;
-                requeststatuslog.Notes=notes;
-                requeststatuslog.Createddate = DateTime.Now;
-
-                _context.Requeststatuslogs.Add(requeststatuslog);
-                _context.SaveChanges();
-                return Json(true);
+                await _admin.UpdateAdminNotes(id, adminNotes);
             }
-            return Json(true);
+
+            return RedirectToAction("ViewNotes", new { requestid = id });
+        }
+
+        [HttpPost]
+        public async  Task<IActionResult> CancelCase(string notes,string cancelReason, int requestid)
+            {
+            var result = await _admin.CancelCase(requestid, notes, cancelReason);
+            return Json(result);
 
         }
         public IActionResult GetStatusCounts(int id)

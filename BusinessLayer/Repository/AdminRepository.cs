@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using BusinessLayer.InterFace;
 using DataAccessLayer.CustomModel;
 using DataAccessLayer.DataContext;
+using DataAccessLayer.DataModels;
+using Microsoft.EntityFrameworkCore;
 
 namespace BusinessLayer.Repository
 {
@@ -132,5 +134,155 @@ namespace BusinessLayer.Repository
                 await _context.SaveChangesAsync();
             }
         }
+        public List<ViewNotesVM> GetNotesForRequest(int requestid)
+        {
+            var leftJoin = from rn in _context.Requestnotes
+                           join rs in _context.Requeststatuslogs on rn.Requestid equals rs.Requestid into rsJoin
+                           from rs in rsJoin.DefaultIfEmpty()
+                           join a in _context.Admins on rs.Adminid equals a.Adminid into aJoin
+                           from a in aJoin.DefaultIfEmpty()
+                           join p in _context.Physicians on rs.Physicianid equals p.Physicianid into pJoin
+                           from p in pJoin.DefaultIfEmpty()
+                           where rn.Requestid == requestid
+                           select new ViewNotesVM
+                           {
+                               TransToPhysicianId = rs.Transtophysicianid,
+                               Status = rs.Status,
+                               AdminName = a.Firstname ?? "" + " " + a.Lastname ?? "",
+                               PhysicianName = p.Firstname ?? "" + " " + p.Lastname ?? "",
+                               AdminNotes = rn.Adminnotes,
+                               PhysicianNotes = rn.Physiciannotes,
+                               TransferNotes = rs.Notes,
+                               Cancelcount = _context.Requeststatuslogs.Count(item => item.Status == 5)
+                           };
+
+            var rightJoin = from rs in _context.Requeststatuslogs
+                            join rn in _context.Requestnotes on rs.Requestid equals rn.Requestid into rnJoin
+                            from rn in rnJoin.DefaultIfEmpty()
+                            join a in _context.Admins on rs.Adminid equals a.Adminid into aJoin
+                            from a in aJoin.DefaultIfEmpty()
+                            join p in _context.Physicians on rs.Physicianid equals p.Physicianid into pJoin
+                            from p in pJoin.DefaultIfEmpty()
+                            where rs.Requestid == requestid && rn == null // Filter only records not in left join result
+                            select new ViewNotesVM
+                            {
+                                TransToPhysicianId = rs.Transtophysicianid,
+                                Status = rs.Status,
+                                AdminName = a.Firstname ?? "" + " " + a.Lastname ?? "",
+                                PhysicianName = p.Firstname ?? "" + " " + p.Lastname ?? "",
+                                AdminNotes = rn.Adminnotes,
+                                PhysicianNotes = rn.Physiciannotes,
+                                TransferNotes = rs.Notes,
+                                Cancelcount = _context.Requeststatuslogs.Count(item => item.Status == 5)
+                            };
+            var result = leftJoin.Union(rightJoin).ToList();
+            return result;
+
+        }
+
+        public async Task<bool> AssignRequest(int regionId, int physician, string description, int requestId)
+        {
+            try
+            {
+                var request = await _context.Requests.FindAsync(requestId);
+
+                if (request != null)
+                {
+                    request.Status = 2;
+                    request.Physicianid = physician;
+                    _context.Requests.Update(request);
+
+                    var requestStatusLog = new Requeststatuslog
+                    {
+                        Notes = description,
+                        Requestid = requestId,
+                        Status = 2,
+                        Createddate = DateTime.Now
+                    };
+
+                    _context.Requeststatuslogs.Add(requestStatusLog);
+                    await _context.SaveChangesAsync();
+
+                    return true;
+                }
+
+                return false;
+            }
+            catch (Exception)
+            {
+                // Handle exceptions according to your application's needs
+                return false;
+            }
+        }
+
+        public async Task<bool> UpdateAdminNotes(int requestId, string adminNotes)
+        {
+            try
+            {
+                var requestVisenotes = await _context.Requestnotes.FirstOrDefaultAsync(item => item.Requestid == requestId);
+
+                if (requestVisenotes != null)
+                {
+                    requestVisenotes.Adminnotes = adminNotes;
+                    _context.Update(requestVisenotes);
+                }
+                else
+                {
+                    var requestNotes = new Requestnote
+                    {
+                        Requestid = requestId,
+                        Adminnotes = adminNotes,
+                        Createddate = DateTime.Now,
+                        Createdby = "admin"
+                    };
+
+                    _context.Add(requestNotes);
+                }
+
+                await _context.SaveChangesAsync();
+
+                return true;
+            }
+            catch (Exception)
+            {
+                // Handle exceptions according to your application's needs
+                return false;
+            }
+        }
+
+        public async Task<bool> CancelCase(int requestId, string notes, string cancelReason)
+        {
+            try
+            {
+                var requestById = await _context.Requests.FindAsync(requestId);
+
+                if (requestById != null)
+                {
+                    requestById.Status = 3;
+                    _context.Requests.Update(requestById);
+
+                    var requestStatusLog = new Requeststatuslog
+                    {
+                        Status = 3,
+                        Requestid = requestId,
+                        Notes = notes,
+                        Createddate = DateTime.Now
+                    };
+
+                    _context.Requeststatuslogs.Add(requestStatusLog);
+                    await _context.SaveChangesAsync();
+
+                    return true;
+                }
+
+                return false;
+            }
+            catch (Exception)
+            {
+                // Handle exceptions according to your application's needs
+                return false;
+            }
+        }
+
     }
 }

@@ -10,13 +10,13 @@ namespace BusinessLayer.InterFace
     public interface IAdmin
     {   
         List<NewRequestTableVM> SearchPatients(string searchValue, string selectValue, string selectedFilter,int[] currentStatus);
-
         List<NewRequestTableVM> GetAllData();
-
         ViewCaseVM GetCaseById(int id);
-
         Task UpdateRequestClient(ViewCaseVM viewCaseVM, int id);
-
+        List<ViewNotesVM> GetNotesForRequest(int requestid);
+        Task<bool> AssignRequest(int regionId, int physician, string description, int requestId);
+        Task<bool> UpdateAdminNotes(int requestId, string adminNotes);
+        Task<bool> CancelCase(int requestId, string notes, string cancelReason);
 
     }
 }
