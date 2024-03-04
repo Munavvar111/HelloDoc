@@ -1,4 +1,5 @@
-﻿toastr.options = {
+﻿
+toastr.options = {
     positionClass: 'toast-top-right',
     closeButton: true,
     progressBar: true,
@@ -342,8 +343,10 @@ $(document).ready(function () {
             method: 'POST',
             url: '/Admin/DeleteFile',
             data: { filename: fileUrl },
-            success: function (result) {    
-                window.location.href = '/Admin/ViewUploads/' + result.id
+            success: function (result) {
+                $.get('/Admin/ViewUploads' + result.requestid, function (data) {
+                    $('#view').html(data);
+                });
             },
             error: function (error) {
                 console.log(error)

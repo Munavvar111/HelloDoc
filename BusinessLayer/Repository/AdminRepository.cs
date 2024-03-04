@@ -297,7 +297,7 @@ namespace BusinessLayer.Repository
         }
 
         public bool IsSendEmail(string toEmail, string subject, string body, List<string> filenames)
-        {
+            {
             try
             {
                 var emailSettings = _configuration.GetSection("EmailSettings");
