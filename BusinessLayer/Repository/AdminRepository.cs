@@ -1,21 +1,33 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.NetworkInformation;
 using System.Text;
 using System.Threading.Tasks;
 using BusinessLayer.InterFace;
 using DataAccessLayer.CustomModel;
 using DataAccessLayer.DataContext;
 using DataAccessLayer.DataModels;
+using MailKit.Net.Smtp;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using MimeKit;
 
 namespace BusinessLayer.Repository
 {
     public class AdminRepository:IAdmin
     {
         private readonly ApplicationDbContext _context;
-        public AdminRepository(ApplicationDbContext context) { 
+        private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly IConfiguration _configuration;
+        public AdminRepository(ApplicationDbContext context, IConfiguration configuration, IHostingEnvironment hostingEnvironment)
+        {
             _context = context;
+
+            _configuration = configuration;
+            _hostingEnvironment = hostingEnvironment;
         }
 
         public List<NewRequestTableVM> SearchPatients(string searchValue, string selectValue, string selectedFilter, int[] currentStatus)
@@ -280,6 +292,66 @@ namespace BusinessLayer.Repository
             catch (Exception)
             {
                 // Handle exceptions according to your application's needs
+                return false;
+            }
+        }
+
+        public bool IsSendEmail(string toEmail, string subject, string body, List<string> filenames)
+        {
+            try
+            {
+                var emailSettings = _configuration.GetSection("EmailSettings");
+                var message = new MimeMessage();
+                var from = new MailboxAddress(emailSettings["SenderName"], emailSettings["SenderEmail"]);
+                var to = new MailboxAddress("", toEmail);
+                message.From.Add(from);
+                message.To.Add(to);
+                message.Subject = subject;
+
+                var bodyBuilder = new BodyBuilder();
+                bodyBuilder.HtmlBody = body;
+
+                foreach (var filename in filenames)
+                {
+                    // Attach the files to the email
+                    var filePath = Path.Combine(_hostingEnvironment.ContentRootPath, "wwwroot/uploads", filename);
+
+                    // Create an attachment
+                    var attachment = new MimePart("application", "octet-stream")
+                    {
+                        Content = new MimeContent(File.OpenRead(filePath), ContentEncoding.Default),
+                        ContentDisposition = new ContentDisposition(ContentDisposition.Attachment),
+                        ContentTransferEncoding = ContentEncoding.Base64,
+                        FileName = filename
+                    };
+
+                    // Add the attachment to the email
+                    bodyBuilder.Attachments.Add(attachment);
+
+                    // Update IsDeleted using BitArray
+                    var file = _context.Requestwisefiles.FirstOrDefault(item => item.Filename == filename);
+                    
+                }
+
+                // Set the email body
+                message.Body = bodyBuilder.ToMessageBody();
+
+                // Use your existing SmtpClient logic to send the email
+                using (var client = new SmtpClient())
+                {
+                    client.Connect(emailSettings["SmtpServer"], int.Parse(emailSettings["SmtpPort"]));
+                    client.Authenticate(emailSettings["SmtpUsername"], emailSettings["SmtpPassword"]);
+                    client.Send(message);
+                    client.Disconnect(true);
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                // Handle exceptions here, you can log the exception for debugging purposes
+                // and return false to indicate that the email sending failed
+                Console.WriteLine($"Error sending email: {ex.Message}");
                 return false;
             }
         }

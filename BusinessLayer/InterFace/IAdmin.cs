@@ -18,5 +18,8 @@ namespace BusinessLayer.InterFace
         Task<bool> UpdateAdminNotes(int requestId, string adminNotes);
         Task<bool> CancelCase(int requestId, string notes, string cancelReason);
 
+        public bool IsSendEmail(string toEmail, string subject, string body, List<string> filenames);
+
+
     }
 }

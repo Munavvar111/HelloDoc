@@ -3,6 +3,7 @@ using BusinessLayer.Repository;
 using DataAccessLayer.CustomModel;
 using DataAccessLayer.DataContext;
 using DataAccessLayer.DataModels;
+using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
@@ -10,6 +11,8 @@ using Newtonsoft.Json;
 using NuGet.Protocol.Core.Types;
 using Org.BouncyCastle.Asn1.Ocsp;
 using Org.BouncyCastle.Ocsp;
+using System;
+using System.Collections;
 using System.Drawing;
 using System.Drawing.Printing;
 using System.Linq;
@@ -20,10 +23,15 @@ namespace HelloDoc.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly IAdmin _admin;
-        public AdminController(ApplicationDbContext context,IAdmin admin)
+        private readonly IPatientRequest _patient;
+        private readonly IWebHostEnvironment _hostingEnvironment;
+
+        public AdminController(ApplicationDbContext context,IAdmin admin, IPatientRequest patient, IWebHostEnvironment hostingEnvironment)
         {
             _context = context;
-            _admin=admin;
+            _admin = admin;
+            _patient = patient;
+            _hostingEnvironment = hostingEnvironment;
         }
         //main View
         public IActionResult ProviderLocation()
@@ -73,7 +81,7 @@ namespace HelloDoc.Controllers
         }   
 
         
-        public IActionResult SearchPatient(string searchValue,string selectValue,string partialName,string selectedFilter, int[] currentStatus,int page=1,int pageSize=3)
+        public IActionResult SearchPatient(string searchValue,string selectValue,string partialName,string selectedFilter, int[] currentStatus,int page,int pageSize=3)
             {
             var filteredPatients = _admin.SearchPatients(searchValue, selectValue, selectedFilter, currentStatus);
             int totalItems = filteredPatients.Count();
@@ -205,6 +213,132 @@ namespace HelloDoc.Controllers
             _context.Requeststatuslogs.Add(requeststatuslog);
             _context.SaveChanges();
             return RedirectToAction("Index");
+        }
+
+        public async Task<IActionResult> ViewUploads(int id)
+        {
+            var reqfile = await _patient.GetRequestwisefileByIdAsync(id);
+            var reqfiledeleted=reqfile.Where(item=>item.Isdeleted.Length== 0 || !item.Isdeleted[0]).ToList();
+            var request = _context.Requests.Find(id);
+            var requestwiseviewmodel = new RequestFileViewModel
+            {
+                Request = request,
+                Requestid = id,
+                Requestwisefileview = reqfiledeleted
+            };
+            return View(requestwiseviewmodel);
+        }
+        public BitArray ConvertBoolToBitArray(bool boolValue)
+        {
+            return new BitArray(new[] { boolValue });   
+        }
+        [HttpPost]
+        public IActionResult DeleteFile(string filename)
+        {
+
+            try
+            {
+                var file = _context.Requestwisefiles.FirstOrDefault(item => item.Filename == filename);
+                var filePath = Path.Combine(_hostingEnvironment.ContentRootPath, "wwwroot/uploads", filename);
+                if (System.IO.File.Exists(filePath))
+                {
+                    file.Isdeleted = new BitArray(new[] { true });
+                    _context.Requestwisefiles.Update(file);
+                    _context.SaveChanges();
+                    System.IO.File.Delete(filePath);
+                    return Ok(new { message = "File deleted successfully" ,id=file.Requestid});
+                }
+                else
+                {
+                    return NotFound(new { message = "File not found" });
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = $"Error deleting file: {ex.Message}" });
+            }
+        }
+        [HttpPost]
+        public IActionResult DeleteSelectedFiles(List<string> filenames)
+        {
+            var url = Request.GetDisplayUrl;
+            try
+            {
+                foreach (var filename in filenames)
+                {
+                    var file = _context.Requestwisefiles.FirstOrDefault(item => item.Filename == filename);
+
+                    if (file != null)
+                    {
+                        var filePath = Path.Combine(_hostingEnvironment.ContentRootPath, "wwwroot/uploads", filename);
+
+                        if (System.IO.File.Exists(filePath))
+                        {
+                            // Update IsDeleted using BitArray
+                            file.Isdeleted = new BitArray(new[] { true });
+                            _context.SaveChanges();
+
+                            // Delete the physical file
+                            System.IO.File.Delete(filePath);
+                        }
+                    }
+                }
+
+                return Ok(new { message = "Files deleted successfully" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = $"Error deleting files: {ex.Message}" });
+            }
+        }
+        [HttpPost]
+        public async Task<IActionResult> UploadFile(RequestFileViewModel rm, int id)
+        {
+            if (rm.File != null)
+            {
+                var uniqueFileName = await _patient.AddFileInUploader(rm.File);
+                _patient.AddRequestWiseFile(uniqueFileName, id);
+                return RedirectToAction("ViewUploads", "Admin", new { id = id });
+            }
+            else
+            {
+                return RedirectToAction("ViewUploads", "Admin", new { id = id });
+
+            }
+        }
+
+        [HttpPost]
+        public IActionResult SendEmailWithSelectedFiles(List<string> filenames)
+        {
+            try
+            {
+                // Ensure filenames are not null or empty before proceeding
+                if (filenames == null || filenames.Count == 0)
+                {
+                    return BadRequest(new { message = "No files selected to send in the email." });
+                }
+
+                // Get recipient email, subject, and body from your ViewModel or wherever it's stored
+                string toEmail = "munavvarpopatiya777@gmail.com"; // Replace with your recipient email
+                string subject = "Selected Files";
+                string body = "Please find attached files.";
+
+                // Call your repository method to send email
+                bool isEmailSent = _admin.IsSendEmail(toEmail, subject, body, filenames);
+
+                if (isEmailSent)
+                {
+                    return Ok(new { message = "Email sent successfully" });
+                }
+                else
+                {
+                    return StatusCode(500, new { message = "Error sending email" });
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = $"Error sending email: {ex.Message}" });
+            }
         }
     }
 }

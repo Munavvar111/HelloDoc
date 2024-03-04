@@ -1,0 +1,195 @@
+﻿
+@{
+    ViewData["Title"] = "ViewUploads";
+    Layout = "~/Views/Shared/_Layout4.cshtml";
+}
+@model DataAccessLayer.CustomModel.RequestFileViewModel
+
+
+<div class="container   mt-4" id="view">
+    <div class="d-flex justify-content-between my-3">
+        <div class="d-flex">
+            <span class="fs-2 text-muted fw-bold">Documents</span>
+        </div>
+        <div class="d-flex justify-content-end">
+            <a asp-controller="Admin" asp-action="Index" asp-area=""
+               class="btn btn-outline-info d-flex align-items-center">
+                <span class="material-symbols-outlined"> chevron_left </span> Back
+            </a>
+        </div>
+    </div>
+
+    <div class="container bg-white border mt-4">
+        <div><span>Patient Name:@Model.Request.Firstname</span></div>
+        <div class="mb-3"><span class="text-info"></span></div>
+        <div><p>Check here for any file that you or doctors of your subsequents have attached for you to review</p></div>
+
+        <form id="patientRequestForm" method="post" enctype="multipart/form-data" asp-action="UploadFile" asp-route-id="@Model.Requestid">
+            <div class="input-group input-group-lg">
+                <div id="fileName" asp-for="FileName" class="form-control fs-6 align-middle">
+                    Select File
+                </div>
+                <input type="file" asp-for="File"  class="form-control" id="fileInput" hidden />
+                <label class="input-group-text btn btn-info text-light" for="fileInput">
+                    <span class="material-symbols-outlined me-2">cloud_upload</span>
+                    <span class="d-none d-md-inline">Upload</span>
+                </label>
+            </div>
+            <div class="d-flex justify-content-end mt-2">
+                <button class="btn btn-outline-info" type="submit" id="filesubmit">
+                    Submit
+                </button>
+            </div>
+        </form>
+
+        <div class="d-flex justify-content-between mt-5">
+            <div class="fs-3 mt-2 mx-4">
+                <span>Documents</span>
+            </div>
+            <div class="mt-2 mx-4 fs-3">
+                <a id="downloadAllBtn" class="btn btn-outline-info">Download All</a>
+                <a id="sendMailBtn" class="btn btn-outline-info">Send Mail</a>
+                <a id="deleteSelectedBtn" class="btn btn-outline-info">Delet All   </a>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table">
+                <thead class="thead-secondry">
+                    <tr>
+                        <th scope="col"><input type="checkbox" id="selectAllCheckbox" /></th>
+                        <th scope="col">Documents</th>
+                        <th scope="col">Updated Date </th>
+                        <th scope="col">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Requestwisefileview)
+                    {
+                      
+                            
+                        <tr>
+                            <td>
+                                <input type="checkbox" class="fileCheckbox" data-filename="@item.Filename" />
+
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelitem => item.Filename)
+                            </td>
+                            <td>
+                                test tester
+                            </td>
+                            
+                            <td class="d-flex justify-content-around">
+                                <a class="btn btn-outline-info"
+                                   href="~/uploads/@item.Filename" target="_blank">
+                                    <span class="material-symbols-outlined">cloud_download</span>
+                                </a>
+                                <button class="btn btn-outline-info deletbtn"
+                                       id="deletbtn" data-filename="@item.Filename" data-requestid="@item.Requestid">
+                                <span class="material-symbols-outlined">
+                                    delete
+                                </span>
+                                </button>
+                                 </td>
+                        </tr>
+                        
+                    }
+                </tbody>
+                           </table>
+        </div>
+    </div>
+</div>
+<script>
+    document.getElementById("fileInput").onchange = function () {
+        let path = this.value.substr(this.value.lastIndexOf('\\') + 1);
+        document.getElementById("fileName").innerText = path;
+    };
+
+    document.getElementById("selectAllCheckbox").addEventListener("change", function () {
+        // Toggle all checkboxes based on the state of the "Select All" checkbox
+        let checkboxes = document.querySelectorAll(".fileCheckbox");
+        checkboxes.forEach(function (checkbox) {
+            checkbox.checked = document.getElementById("selectAllCheckbox").checked;
+        });
+    });
+
+    document.getElementById("downloadAllBtn").addEventListener("click", function () {
+        // Get selected filenames
+        let selectedFiles = [];
+        let checkboxes = document.querySelectorAll(".fileCheckbox:checked");
+        checkboxes.forEach(function (checkbox) {
+            selectedFiles.push(checkbox.dataset.filename);
+        });
+
+        // Download selected files
+        selectedFiles.forEach(function (filename) {
+            var link = document.createElement("a");
+            link.href = "/uploads/" + filename; // Adjust the path accordingly
+            link.download = filename;
+            link.style.display = "none";
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        });
+    });
+
+    document.getElementById("deleteSelectedBtn").addEventListener("click", function () {
+        // Get selected filenames
+        let selectedFiles = [];
+        let checkboxes = document.querySelectorAll(".fileCheckbox:checked");
+        checkboxes.forEach(function (checkbox) {
+            selectedFiles.push(checkbox.dataset.filename);
+        });
+        if (selectedFiles.length > 0) {
+            // Make AJAX call to delete selected files
+            $.ajax({
+                method: 'POST',
+                url: '/Admin/DeleteSelectedFiles',
+                data: { filenames: selectedFiles },
+                success: function (result) {
+                    // Refresh the page or update content as needed
+                    window.location.href = '/Admin/ViewUploads/' + @Model.Requestid;
+                },
+                    
+                
+                error: function (error) {
+                    console.log(error);
+                }
+            });
+        } else {
+            alert("Please select files to delete.");
+        }
+    });
+
+
+    document.getElementById("sendMailBtn").addEventListener("click", function () {
+
+        
+        // Get selected filenames
+        let selectedFiles = [];
+        let checkboxes = document.querySelectorAll(".fileCheckbox:checked");
+        checkboxes.forEach(function (checkbox) {
+            selectedFiles.push(checkbox.dataset.filename);
+        });
+
+        // Check if any file is selected
+        if (selectedFiles.length > 0) {
+            // Make AJAX call to send email with selected files
+            $.ajax({
+                method: 'POST',
+                url: '/Admin/SendEmailWithSelectedFiles',
+                data: { filenames: selectedFiles },
+                success: function (result) {
+                    toastr.success("Email sent successfully!");
+                },
+                error: function (error) {
+                    console.log(error);
+                }
+            });
+        } else {
+            alert("Please select files to send in the email.");
+        }
+    });
+</script>
+

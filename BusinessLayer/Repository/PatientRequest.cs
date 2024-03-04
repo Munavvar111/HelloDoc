@@ -14,6 +14,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Http;
+using System.Collections;
 
 namespace BusinessLayer.Repository
 {
@@ -191,6 +192,7 @@ namespace BusinessLayer.Repository
                 requestWiseFile.Filename = Filename;
                 requestWiseFile.Createddate = DateTime.Now;
                 requestWiseFile.Requestid= RequestID;
+                requestWiseFile.Isdeleted = new BitArray(new[] { false });
             }
             _context.Requestwisefiles.Add(requestWiseFile);
 

@@ -331,6 +331,30 @@ $(document).ready(function () {
             }
         })
     })
+
+
+    $('.deletbtn').click(function () {
+        var fileUrl = $(this).data("filename");
+        var requestid = $(this).data("requestid");
+        console.log(requestid);
+
+        $.ajax({
+            method: 'POST',
+            url: '/Admin/DeleteFile',
+            data: { filename: fileUrl },
+            success: function (result) {    
+                window.location.href = '/Admin/ViewUploads/' + result.id
+            },
+            error: function (error) {
+                console.log(error)
+            }
+        });
+
+        return true;
+    })
+
+
+   
 });
 
 
