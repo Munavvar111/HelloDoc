@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using DataAccessLayer.DataModels;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -72,5 +73,7 @@ namespace DataAccessLayer.CustomModel
         public IFormFile? File { get; set; }
 
         public string? Notes { get; set; }
+
+        public List<Region>? Regions { get; set; }
     }
 }

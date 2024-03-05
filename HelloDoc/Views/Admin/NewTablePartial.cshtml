@@ -193,7 +193,7 @@
                         </div>
 
                         <div class="collapse position-relative" id="collapseexample_@item.Id">
-                            <button class="btn position-absolute btn-transparent border-2 rounded-5 viewBtn">View Case</button>
+                        <a class="btn position-absolute btn-transparent border-2 rounded-5 viewBtn" asp-action="ViewCase" asp-controller="Admin" asp-route-id="@item.Id">View Case</a>
                             <div class="d-flex flex-column gap-2 bg-info-subtle   mb-2 py-3 px-4 ">
 
                                 <div class="d-flex align-items-center ">

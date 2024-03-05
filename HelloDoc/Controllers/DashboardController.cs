@@ -25,6 +25,8 @@ namespace HalloDocPatient.Controllers
         public async Task<IActionResult> ViewDocument(int requestid)
         {
             var reqfile = await _patientRequest.GetRequestwisefileByIdAsync(requestid);
+            var reqfiledeleted = reqfile.Where(item => item.Isdeleted.Length == 0 || !item.Isdeleted[0]).ToList();
+
             var id = HttpContext.Session.GetInt32("id");
             var user = _patientRequest.GetUserById((int)id);
             ViewData["Name"] = user.Firstname;
@@ -32,7 +34,7 @@ namespace HalloDocPatient.Controllers
             {
                 User = user,
                 Requestid = requestid,
-                Requestwisefileview = reqfile
+                Requestwisefileview = reqfiledeleted
             };
             return View(viewmodel);
         }

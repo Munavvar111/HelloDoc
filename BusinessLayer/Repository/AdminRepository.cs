@@ -40,7 +40,7 @@ namespace BusinessLayer.Repository
                                     from ps in phy.DefaultIfEmpty()
                                     select new NewRequestTableVM
                                     {
-                                        PatientName = reqclient.Firstname,
+                                        PatientName = reqclient.Firstname.ToLower(),
                                         Requestor = req.Firstname + " " + req.Lastname,
                                         DateOfBirth = new DateOnly((int)reqclient.Intyear, int.Parse(reqclient.Strmonth), (int)reqclient.Intdate),
                                         ReqDate = req.Createddate,
@@ -165,7 +165,7 @@ namespace BusinessLayer.Repository
                                AdminNotes = rn.Adminnotes,
                                PhysicianNotes = rn.Physiciannotes,
                                TransferNotes = rs.Notes,
-                               Cancelcount = _context.Requeststatuslogs.Count(item => item.Status == 5)
+                               Cancelcount = _context.Requeststatuslogs.Count(item => item.Status == 3)
                            };
 
             var rightJoin = from rs in _context.Requeststatuslogs
@@ -185,7 +185,7 @@ namespace BusinessLayer.Repository
                                 AdminNotes = rn.Adminnotes,
                                 PhysicianNotes = rn.Physiciannotes,
                                 TransferNotes = rs.Notes,
-                                Cancelcount = _context.Requeststatuslogs.Count(item => item.Status == 5)
+                                Cancelcount = _context.Requeststatuslogs.Count(item => item.Status == 3)
                             };
             var result = leftJoin.Union(rightJoin).ToList();
             return result;
@@ -313,10 +313,8 @@ namespace BusinessLayer.Repository
 
                 foreach (var filename in filenames)
                 {
-                    // Attach the files to the email
                     var filePath = Path.Combine(_hostingEnvironment.ContentRootPath, "wwwroot/uploads", filename);
 
-                    // Create an attachment
                     var attachment = new MimePart("application", "octet-stream")
                     {
                         Content = new MimeContent(File.OpenRead(filePath), ContentEncoding.Default),
@@ -324,19 +322,9 @@ namespace BusinessLayer.Repository
                         ContentTransferEncoding = ContentEncoding.Base64,
                         FileName = filename
                     };
-
-                    // Add the attachment to the email
                     bodyBuilder.Attachments.Add(attachment);
-
-                    // Update IsDeleted using BitArray
-                    var file = _context.Requestwisefiles.FirstOrDefault(item => item.Filename == filename);
-                    
-                }
-
-                // Set the email body
+               }
                 message.Body = bodyBuilder.ToMessageBody();
-
-                // Use your existing SmtpClient logic to send the email
                 using (var client = new SmtpClient())
                 {
                     client.Connect(emailSettings["SmtpServer"], int.Parse(emailSettings["SmtpPort"]));
@@ -349,8 +337,6 @@ namespace BusinessLayer.Repository
             }
             catch (Exception ex)
             {
-                // Handle exceptions here, you can log the exception for debugging purposes
-                // and return false to indicate that the email sending failed
                 Console.WriteLine($"Error sending email: {ex.Message}");
                 return false;
             }

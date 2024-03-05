@@ -76,3 +76,6 @@ li {
 .bg-light-invert {
     background-color: transparent !important;
 }
+.viewBtn {
+    right: 0;
+}

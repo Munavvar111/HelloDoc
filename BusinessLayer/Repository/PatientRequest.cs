@@ -15,6 +15,8 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Http;
 using System.Collections;
+using System.Security.Policy;
+using Org.BouncyCastle.Asn1.Ocsp;
 
 namespace BusinessLayer.Repository
 {
@@ -22,7 +24,6 @@ namespace BusinessLayer.Repository
     {
         private readonly ApplicationDbContext _context;
         private readonly ILogger<PatientRequest> _logger; // Inject the logger
-
         public PatientRequest(ApplicationDbContext context, ILogger<PatientRequest> logger) {
         _context = context;
             _logger = logger;
@@ -42,7 +43,7 @@ namespace BusinessLayer.Repository
             
          
         }
-        public Request GetRequestByEmail(string email)
+        public DataAccessLayer.DataModels.Request GetRequestByEmail(string email)
         {
             return _context.Requests.OrderBy(e=>e.Requestid).LastOrDefault(r => r.Email == email);
         }
@@ -111,6 +112,7 @@ namespace BusinessLayer.Repository
 
                 try
                 {
+                    
 
 
                     var user = GetUserByEmail(requestModel.Email);
@@ -120,6 +122,22 @@ namespace BusinessLayer.Repository
                         AddRequest(requestModel, user.Userid, ReqTypeId);
                         var request = GetRequestByEmail(requestModel.Email);
                         AddRequestClient(requestModel, request.Requestid);
+                        int count = _context.Requests.Where(x => x.Createddate.Date == request.Createddate.Date).Count() + 1;
+                        var region = _context.Regions.Where(x => x.Regionid == int.Parse(requestModel.State)).FirstOrDefault();
+                        if (region != null)
+                        {
+                            var confirmNum = string.Concat(region.Abbreviation.ToUpper(), request.Createddate.ToString("ddMMyy"), requestModel.Lastname.Substring(0, 2).ToUpper() ?? "",
+                           requestModel.Firstname.Substring(0, 2).ToUpper(), count.ToString("D4"));
+                            request.Confirmationnumber = confirmNum;
+                        }
+                        else
+                        {
+                            var confirmNum = string.Concat("ML", request.Createddate.ToString("ddMMyy"), requestModel.Lastname.Substring(0, 2).ToUpper() ?? "",
+                          requestModel.Firstname.Substring(0, 2).ToUpper(), count.ToString("D4"));
+                            request.Confirmationnumber = confirmNum;
+                        }
+                        _context.Update(request);
+                        _context.SaveChanges();
                     }
                     else
                     {
@@ -130,6 +148,22 @@ namespace BusinessLayer.Repository
                         AddRequest(requestModel, user1.Userid, ReqTypeId);
                         var request = GetRequestByEmail(requestModel.Email);
                         AddRequestClient(requestModel, request.Requestid);
+                        int count = _context.Requests.Where(x => x.Createddate.Date == request.Createddate.Date).Count() + 1;
+                        var region = _context.Regions.Where(x => x.Regionid == int.Parse(requestModel.State)).FirstOrDefault();
+                        if (region != null)
+                        {
+                            var confirmNum = string.Concat(region.Abbreviation.ToUpper(), request.Createddate.ToString("ddMMyy"), requestModel.Lastname.Substring(0, 2).ToUpper() ?? "",
+                           requestModel.Firstname.Substring(0, 2).ToUpper(), count.ToString("D4"));
+                            request.Confirmationnumber = confirmNum;
+                        }
+                        else
+                        {
+                            var confirmNum = string.Concat("ML", request.Createddate.ToString("ddMMyy"), requestModel.Lastname.Substring(0, 2).ToUpper() ?? "",
+                          requestModel.Firstname.Substring(0, 2).ToUpper(), count.ToString("D4"));
+                            request.Confirmationnumber = confirmNum;
+                        }
+                        _context.Update(request);
+                        _context.SaveChanges();
 
                     }
                     transactionScope.Complete(); // Commit the transaction
@@ -147,7 +181,7 @@ namespace BusinessLayer.Repository
         {
             
 
-                var request =new Request();
+                var request =new DataAccessLayer.DataModels.Request();
             {
 
             request.Userid = UserId;
@@ -166,13 +200,16 @@ namespace BusinessLayer.Repository
 
         public void AddRequestClient(RequestModel requestModel,int RequestID)
         {
+            var statebyregionid = _context.Regions.Where(item => item.Regionid == int.Parse(requestModel.State)).FirstOrDefault();
             var requestClient = new Requestclient();
             {
                 requestClient.Notes= requestModel.Notes;
+                requestClient.Email= requestModel.Email;    
                 requestClient.Requestid = RequestID;
                 requestClient.Firstname = requestModel.Firstname;
                 requestClient.Lastname = requestModel.Lastname;
-                requestClient.State = requestModel.State;
+                requestClient.State = statebyregionid.Name;
+                requestClient.Regionid = int.Parse(requestModel.State);
                 requestClient.Street = requestModel.Street;
                 requestClient.Phonenumber = requestModel.PhoneNo;
                 requestClient.City = requestModel.City;

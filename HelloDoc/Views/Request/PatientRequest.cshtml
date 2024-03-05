@@ -142,11 +142,14 @@
         </div>
         <div class="col">
             <div class="form-floating">
-                <input type="text"
-                       class="form-control"
-                       id="floatingInput"
-                       placeholder="Rajpath Road" asp-for="State"/>
-                <label for="floatingInput" asp-for="State">State</label>
+                <select class="form-select " aria-label="Default select example" name="state" id="cancelReason" asp-for="State">
+                    
+                    <option selected>Select The State</option>
+                        <option value="1">Kundla</option>
+                        <option value="1">amreli</option>
+                        <option value="1">Savar</option>
+                    
+                </select>
                 <span asp-validation-for="State" class="text-danger"></span>
 
             </div>

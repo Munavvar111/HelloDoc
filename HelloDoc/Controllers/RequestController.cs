@@ -30,6 +30,7 @@ namespace HalloDocPatient.Controllers
         }
         public IActionResult PatientRequest()
         {
+            
             return View();
         }
         public IActionResult Index()
@@ -122,22 +123,13 @@ namespace HalloDocPatient.Controllers
                 
                 if(requestModel.File!=null && requestModel.File.Length > 0)
                 {
+                    var user = _patientRequest.GetUserByEmail(requestModel.Email);
+                        
                     var uniqueFileName=await _patientRequest.AddFileInUploader(requestModel.File);
                     _patientRequest.AddPatientRequest(requestModel, ReqTypeId: 1);
                     var request = _patientRequest.GetRequestByEmail(requestModel.Email);
                     _patientRequest.AddRequestWiseFile(uniqueFileName, request.Requestid);
-                    var token = Guid.NewGuid().ToString();
-                    var resetLink = Url.Action("Index", "Register", new { userId = request.Requestid, token }, protocol: HttpContext.Request.Scheme);
-                    if (_login.IsSendEmail("munavvarpopatiya999@gmail.com", "Munavvar", $"Click <a href='{resetLink}'>here</a> to Create A new Account"))
-                    {
-
-                        return RedirectToAction("Index", "Login");
-                    }
-                    else
-                    {
-                        ModelState.AddModelError(string.Empty, "Email Is Not Send");
-
-                    }
+                    
                     return RedirectToAction("Index", "Login");
                 }
                 //_patientRequest is a interface addpatientrequest is method;

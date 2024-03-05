@@ -81,7 +81,7 @@ namespace HelloDoc.Controllers
         }   
 
         
-        public IActionResult SearchPatient(string searchValue,string selectValue,string partialName,string selectedFilter, int[] currentStatus,int page,int pageSize=3)
+        public IActionResult SearchPatient(string searchValue,string selectValue,string partialName,string selectedFilter, int[] currentStatus,int page,int pageSize=5)
             {
             var filteredPatients = _admin.SearchPatients(searchValue, selectValue, selectedFilter, currentStatus);
             int totalItems = filteredPatients.Count();
@@ -219,10 +219,10 @@ namespace HelloDoc.Controllers
         {
             var reqfile = await _patient.GetRequestwisefileByIdAsync(id);
             var reqfiledeleted=reqfile.Where(item=>item.Isdeleted.Length== 0 || !item.Isdeleted[0]).ToList();
-            var request = _context.Requests.Find(id);
+            var requestclient = _context.Requests.Where(item=>item.Requestid==id).FirstOrDefault(); 
             var requestwiseviewmodel = new RequestFileViewModel
             {
-                Request = request,
+                Request = requestclient,
                 Requestid = id,
                 Requestwisefileview = reqfiledeleted
             };
@@ -239,19 +239,11 @@ namespace HelloDoc.Controllers
             try
             {
                 var file = _context.Requestwisefiles.FirstOrDefault(item => item.Filename == filename);
-                var filePath = Path.Combine(_hostingEnvironment.ContentRootPath, "wwwroot/uploads", filename);
-                if (System.IO.File.Exists(filePath))
-                {
                     file.Isdeleted = new BitArray(new[] { true });
                     _context.Requestwisefiles.Update(file);
                     _context.SaveChanges();
-                    System.IO.File.Delete(filePath);
                     return Ok(new { message = "File deleted successfully" ,id=file.Requestid});
-                }
-                else
-                {
-                    return NotFound(new { message = "File not found" });
-                }
+               
             }
             catch (Exception ex)
             {
@@ -270,19 +262,12 @@ namespace HelloDoc.Controllers
 
                     if (file != null)
                     {
-                        var filePath = Path.Combine(_hostingEnvironment.ContentRootPath, "wwwroot/uploads", filename);
 
-                        if (System.IO.File.Exists(filePath))
-                        {
-                            // Update IsDeleted using BitArray
+                    
                             file.Isdeleted = new BitArray(new[] { true });
                             _context.SaveChanges();
-
-                            // Delete the physical file
-                            System.IO.File.Delete(filePath);
-                        }
                     }
-                }
+                    }
 
                 return Ok(new { message = "Files deleted successfully" });
             }

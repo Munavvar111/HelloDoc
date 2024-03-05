@@ -20,7 +20,8 @@
     </div>
 
     <div class="container bg-white border mt-4">
-        <div><span>Patient Name:@Model.Request.Firstname</span></div>
+        <div><span >Patient Name</span></div>
+        <div><spna class="fw-bold text-info">@Model.Request.Firstname</spna><span>(@Model.Request.Confirmationnumber)</span></div>
         <div class="mb-3"><span class="text-info"></span></div>
         <div><p>Check here for any file that you or doctors of your subsequents have attached for you to review</p></div>
 
@@ -135,20 +136,17 @@
     });
 
     document.getElementById("deleteSelectedBtn").addEventListener("click", function () {
-        // Get selected filenames
         let selectedFiles = [];
         let checkboxes = document.querySelectorAll(".fileCheckbox:checked");
         checkboxes.forEach(function (checkbox) {
             selectedFiles.push(checkbox.dataset.filename);
         });
         if (selectedFiles.length > 0) {
-            // Make AJAX call to delete selected files
             $.ajax({
                 method: 'POST',
                 url: '/Admin/DeleteSelectedFiles',
                 data: { filenames: selectedFiles },
                 success: function (result) {
-                    // Refresh the page or update content as needed
                     window.location.href = '/Admin/ViewUploads/' + @Model.Requestid;
                 },
                     

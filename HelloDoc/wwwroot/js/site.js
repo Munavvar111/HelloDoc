@@ -44,7 +44,7 @@ $(document).ready(function () {
     var currentPartial = storedPartial || "NewTablePartial";
     var currentStatus = storedStatus || [1];
     var currentPage = 1;
-    var pageSize = 3;
+    var pageSize = 5;
 
     if (storedTringle) {
         $(".triangle").css('display', 'none');
@@ -193,6 +193,9 @@ $(document).ready(function () {
         console.log(partialName)
         var searchValue = $("#searchInput").val();
         var selectValue = $("#filterSelect").val();
+        if (searchValue != null) {
+            searchValue = searchValue.toLowerCase();
+        }
         currentPage = 1;
         var selectedFilter = $('.filter-item.active').data('value');
 
@@ -242,7 +245,7 @@ $(document).ready(function () {
                     var storedPartial = localStorage.getItem('currentPartial');
                     var storedStatus = JSON.parse(localStorage.getItem('currentStatus'));
 
-                    filterTable(storedPartial, storedStatus, 1, 3);
+                    filterTable(storedPartial, storedStatus, 1, 5);
                     updateUIWithCounts();
                     toastr.success('Block successful!');
 
@@ -272,7 +275,7 @@ $(document).ready(function () {
                     var storedPartial = localStorage.getItem('currentPartial');
                     var storedStatus = JSON.parse(localStorage.getItem('currentStatus'));
 
-                    filterTable(storedPartial, storedStatus, 1, 3);
+                    filterTable(storedPartial, storedStatus, 1, 5);
                     updateUIWithCounts();
                     toastr.success('CancelPatient successful!');
 
@@ -301,7 +304,7 @@ $(document).ready(function () {
                 if (data) {
                     var storedPartial = localStorage.getItem('currentPartial');
                     var storedStatus = JSON.parse(localStorage.getItem('currentStatus'));
-                    filterTable(storedPartial, storedStatus, 1, 3);
+                    filterTable(storedPartial, storedStatus, 1, 5);
                     updateUIWithCounts();
                     console.log("toaster", toastr.success)
                     toastr.success('Assign successful!');
@@ -344,9 +347,7 @@ $(document).ready(function () {
             url: '/Admin/DeleteFile',
             data: { filename: fileUrl },
             success: function (result) {
-                $.get('/Admin/ViewUploads' + result.requestid, function (data) {
-                    $('#view').html(data);
-                });
+                window.location.href = "/Admin/ViewUploads/" + result.id
             },
             error: function (error) {
                 console.log(error)
