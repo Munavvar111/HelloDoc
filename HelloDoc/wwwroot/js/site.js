@@ -190,42 +190,50 @@ $(document).ready(function () {
     //ajax for filterthe table using search
     function filterTable(partialName, currentStatus, page, pageSize) {
 
-        console.log(partialName)
-        var searchValue = $("#searchInput").val();
-        var selectValue = $("#filterSelect").val();
-        if (searchValue != null) {
-            searchValue = searchValue.toLowerCase();
-        }
-        currentPage = 1;
-        var selectedFilter = $('.filter-item.active').data('value');
+        $.get('/Admin/CheckSession', function (sessionCheckData) {
+            if (sessionCheckData.sessionExists) {
 
-        console.log(selectValue)
-        console.log(searchValue)
-        console.log(selectedFilter)
-
-
-
-        $.ajax({
-            type: "GET",
-            url: "/Admin/SearchPatient",
-            traditional: true,
-
-            data: { searchValue: searchValue, selectValue: selectValue, partialName: partialName, selectedFilter: selectedFilter, currentStatus: currentStatus, page: page, pageSize: pageSize },
-            success: function (data) {
-                if (data != null && data.length > 0) {
-
-                    $('#partialContainer').html(data);
-                } else {
-                    $('#partialContainer').html('<p>No data is Found</p>');
-
+                console.log(partialName)
+                var searchValue = $("#searchInput").val();
+                var selectValue = $("#filterSelect").val();
+                if (searchValue != null) {
+                    searchValue = searchValue.toLowerCase();
                 }
+                currentPage = 1;
+                var selectedFilter = $('.filter-item.active').data('value');
 
-            },
-            error: function (error) {
-                console.error('Error:', error);
+                console.log(selectValue)
+                console.log(searchValue)
+                console.log(selectedFilter)
+
+
+
+
+                $.ajax({
+                    type: "GET",
+                    url: "/Admin/SearchPatient",
+                    traditional: true,
+
+                    data: { searchValue: searchValue, selectValue: selectValue, partialName: partialName, selectedFilter: selectedFilter, currentStatus: currentStatus, page: page, pageSize: pageSize },
+                    success: function (data) {
+                        if (data != null && data.length > 0) {
+
+                            $('#partialContainer').html(data);
+                        } else {
+                            $('#partialContainer').html('<p>No data is Found</p>');
+
+                        }
+
+                    },
+                    error: function (error) {
+                        console.error('Error:', error);
+                    }
+                });
+            }
+            else {
+                window.location.href = '/Login';
             }
         });
-
     }
 
     $('#BlockCase').click(function (e) {

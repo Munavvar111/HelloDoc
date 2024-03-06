@@ -52,14 +52,14 @@ namespace HalloDocPatient.Controllers
                     var aspnetuser = _context.AspnetUsers.FirstOrDefault(x=>x.Email==a.Email);
                     var role = _context.AspnetUserroles.FirstOrDefault(x => aspnetuser.Aspnetuserid == x.Userid);
                     var rolefromroleid = _context.AspnetRoles.FirstOrDefault(x => x.Id == role.Roleid);
-                    var token = _jwtAuth.GenerateToken(user.Email, rolefromroleid.Name);
-                    HttpContext.Session.SetString("Role", rolefromroleid.Name);
+                    var token = _jwtAuth.GenerateToken(user.Email, rolefromroleid.Name.Trim());
+                    HttpContext.Session.SetString("Role", rolefromroleid.Name.Trim());
                     HttpContext.Session.SetString("token", token);  
                     HttpContext.Session.SetString("Email", user.Email);
                     HttpContext.Session.SetInt32("id", user.Userid);
                     HttpContext.Session.SetString("Username", user.Firstname);
                     TempData["ShowToaster"] = true;
-                    if (rolefromroleid.Name == "admin")
+                    if (rolefromroleid.Name.Trim() == "admin")
                     {
                         return RedirectToAction("Index", "Admin");
                     }

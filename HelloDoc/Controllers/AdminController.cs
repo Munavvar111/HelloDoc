@@ -105,6 +105,12 @@ namespace HelloDoc.Controllers
             ViewBag.toclosed = toclosed;
             ViewBag.unpaid = unpaid; ViewBag.CurrentPage = page;
             ViewBag.TotalPages = totalPages;
+            string sessionData = HttpContext.Session.GetString("token");
+
+            // Pass session data to the view
+            ViewBag.SessionData = sessionData;
+
+
             return PartialView(partialName, paginatedData);
         }
 
@@ -327,5 +333,20 @@ namespace HelloDoc.Controllers
                 return StatusCode(500, new { message = $"Error sending email: {ex.Message}" });
             }
         }
+
+        public JsonResult CheckSession()
+        {
+            string sessionData = HttpContext.Session.GetString("token");
+
+            if (string.IsNullOrEmpty(sessionData))
+            {
+                return Json(new { sessionExists = false });
+            }
+            else
+            {
+                return Json(new { sessionExists = true });
+            }
+        }
+
     }
 }
