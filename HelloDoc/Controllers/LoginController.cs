@@ -19,12 +19,14 @@ namespace HalloDocPatient.Controllers
         private readonly ILogin _login;
         private readonly ApplicationDbContext _context;
         private readonly IConfiguration _configuration;
+        private readonly IJwtAuth _jwtAuth;
 
-        public LoginController(ApplicationDbContext context, ILogin login, IConfiguration configuration)
+        public LoginController(ApplicationDbContext context, ILogin login, IConfiguration configuration,IJwtAuth jwtAuth)
         {
             _login = login;        
             _context = context;
             _configuration = configuration;
+            _jwtAuth = jwtAuth;
         }
 
         
@@ -34,9 +36,10 @@ namespace HalloDocPatient.Controllers
             return View();
         }
 
+
         
 
-            [HttpPost]
+        [HttpPost]
         public async Task<IActionResult> Index(LoginModel a)
 
         {
@@ -46,11 +49,25 @@ namespace HalloDocPatient.Controllers
                     if (_login.isLoginValid(a))
                     {
                 var user = await _context.Users.FirstOrDefaultAsync(x=>x.Email==a.Email);
+                    var aspnetuser = _context.AspnetUsers.FirstOrDefault(x=>x.Email==a.Email);
+                    var role = _context.AspnetUserroles.FirstOrDefault(x => aspnetuser.Aspnetuserid == x.Userid);
+                    var rolefromroleid = _context.AspnetRoles.FirstOrDefault(x => x.Id == role.Roleid);
+                    var token = _jwtAuth.GenerateToken(user.Email, rolefromroleid.Name);
+                    HttpContext.Session.SetString("Role", rolefromroleid.Name);
+                    HttpContext.Session.SetString("token", token);  
                     HttpContext.Session.SetString("Email", user.Email);
                     HttpContext.Session.SetInt32("id", user.Userid);
                     HttpContext.Session.SetString("Username", user.Firstname);
                     TempData["ShowToaster"] = true;
+                    if (rolefromroleid.Name == "admin")
+                    {
+                        return RedirectToAction("Index", "Admin");
+                    }
+                    else
+                    {
+
                         return RedirectToAction("Index", "Dashboard");
+                    }
                     }
                     else
                     {

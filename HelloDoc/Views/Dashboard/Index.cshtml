@@ -41,7 +41,7 @@
                 {
                     if (uniqueRequestIds.Add(item.Request.Requestid))
                     {
-                        var fileCount = Model.Count(m => m.Request.Requestid == item.Request.Requestid  && (m.Requestwisefile.Isdeleted.Length == 0 || !m.Requestwisefile.Isdeleted[0]));
+                        var fileCount = Model.Count(m => m.Request.Requestid == item.Request.Requestid );
 
 
                         <tr data-toggle="collapse" data-target="#details@(item.Request.Createddate)" class="accordion-toggle">

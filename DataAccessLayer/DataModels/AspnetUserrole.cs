@@ -17,8 +17,7 @@ public partial class AspnetUserrole
 
     [Key]
     [Column("roleid")]
-    [StringLength(128)]
-    public string Roleid { get; set; } = null!;
+    public int Roleid { get; set; }
 
     [ForeignKey("Userid")]
     [InverseProperty("AspnetUserroles")]

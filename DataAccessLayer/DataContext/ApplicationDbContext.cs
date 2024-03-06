@@ -119,6 +119,8 @@ public partial class ApplicationDbContext : DbContext
         modelBuilder.Entity<AspnetRole>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("aspnet_roles_pkey");
+
+            entity.Property(e => e.Id).ValueGeneratedNever();
         });
 
         modelBuilder.Entity<AspnetUser>(entity =>

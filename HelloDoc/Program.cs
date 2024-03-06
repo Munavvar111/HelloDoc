@@ -11,7 +11,8 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<ILogin, Login>();    
 builder.Services.AddScoped<IPatientRequest,PatientRequest>();    
 builder.Services.AddScoped<IOtherRequest,OtherRequest>(); 
-builder.Services.AddScoped<IAdmin,AdminRepository>();   
+builder.Services.AddScoped<IAdmin,AdminRepository>();
+builder.Services.AddScoped<IJwtAuth, JwtAuthRepo>();
 
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -24,7 +25,7 @@ builder.Services.Configure<FormOptions>(options =>
 });
 builder.Services.AddSession(options =>
 {
-    options.IdleTimeout = TimeSpan.FromMinutes(30); // Set your desired timeout
+    options.IdleTimeout = TimeSpan.FromSeconds(10); // Set your desired timeout
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });

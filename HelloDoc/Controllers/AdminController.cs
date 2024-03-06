@@ -19,6 +19,7 @@ using System.Linq;
 
 namespace HelloDoc.Controllers
 {
+    [CustomAuthorize("admin")]
     public class AdminController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -60,6 +61,7 @@ namespace HelloDoc.Controllers
             return View();
         }
         //main View
+        
         public IActionResult Index()
         {
 

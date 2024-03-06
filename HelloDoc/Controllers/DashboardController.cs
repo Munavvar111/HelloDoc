@@ -10,6 +10,7 @@ using System.Linq;
 
 namespace HalloDocPatient.Controllers
 {
+    [CustomAuthorize("user")]
     public class DashboardController : Controller
     {
             private readonly ApplicationDbContext _context;

@@ -9,12 +9,11 @@ namespace DataAccessLayer.DataModels;
 [Table("aspnet_roles")]
 public partial class AspnetRole
 {
-    [Key]
-    [Column("id")]
-    [StringLength(128)]
-    public string Id { get; set; } = null!;
-
     [Column("name")]
     [StringLength(256)]
     public string Name { get; set; } = null!;
+
+    [Key]
+    [Column("id")]
+    public int Id { get; set; }
 }

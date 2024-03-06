@@ -13,6 +13,14 @@ using MimeKit;
 using MailKit.Net.Smtp;
 using System.Security.Authentication;
 using MailKit.Security;
+using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Routing;
+using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.DependencyInjection;
+using System.IdentityModel.Tokens.Jwt;
+using System.Text.Unicode;
 
 namespace BusinessLayer.Repository
 {
@@ -79,6 +87,52 @@ namespace BusinessLayer.Repository
                 // authentication successful
                 return true;
             }
+        }
+    }
+
+
+    public class CustomAuthorizeAttribute : Attribute, IAuthorizationFilter
+    {
+        private readonly string _role;
+        public CustomAuthorizeAttribute(string role="") {
+            this._role = role;
+        }
+
+        
+
+        public void OnAuthorization(AuthorizationFilterContext context)
+        {
+            var jwtServices = context.HttpContext.RequestServices.GetService<IJwtAuth>();
+
+            if (jwtServices == null)
+            {
+                return;
+            }
+
+            var token = context.HttpContext.Session.GetString("token");
+
+            if (token == null || !jwtServices.ValidateToken(token, out JwtSecurityToken validatedToken))
+            {
+                context.Result = new RedirectToRouteResult(new RouteValueDictionary(new { controller = "Login", action = "Index" }));
+                
+                return;
+            }
+
+            var roleClaim = validatedToken.Claims.Where(m => m.Type == "role").FirstOrDefault();
+            var roleType = roleClaim.Value;
+            if (roleClaim == null)
+            {
+                context.Result = new RedirectToRouteResult(new RouteValueDictionary(new { controller = "Login", action = "Index" }));
+               
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(_role) || roleType != _role)
+            {
+                context.Result = new RedirectToRouteResult(new RouteValueDictionary(new { controller = "Login", action = "Index" }));
+                return;
+            }
+
         }
     }
 }
