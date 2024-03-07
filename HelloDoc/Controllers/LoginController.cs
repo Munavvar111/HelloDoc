@@ -33,6 +33,7 @@ namespace HalloDocPatient.Controllers
 
         public IActionResult Index()
         {
+
             return View();
         }
 
@@ -63,11 +64,12 @@ namespace HalloDocPatient.Controllers
                     {
                         return RedirectToAction("Index", "Admin");
                     }
-                    else
+                    else if(rolefromroleid.Name.Trim() == "user")
                     {
 
                         return RedirectToAction("Index", "Dashboard");
                     }
+                    
                     }
                     else
                     {
@@ -151,7 +153,11 @@ namespace HalloDocPatient.Controllers
             return Json(collection);
         }
 
-
+        public string Ajaxlogout()
+        {
+            HttpContext.Session.Clear();
+            return "<script>window.loction.href='/Login'</script>";
+        }
 
     }
 }

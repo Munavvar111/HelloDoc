@@ -236,10 +236,7 @@ namespace HelloDoc.Controllers
             };
             return View(requestwiseviewmodel);
         }
-        public BitArray ConvertBoolToBitArray(bool boolValue)
-        {
-            return new BitArray(new[] { boolValue });   
-        }
+       
         [HttpPost]
         public IActionResult DeleteFile(string filename)
         {
@@ -347,6 +344,42 @@ namespace HelloDoc.Controllers
                 return Json(new { sessionExists = true });
             }
         }
+        public IActionResult SendOrder(int requestid)
+        {
+            var profession=_context.Healthprofessionaltypes.ToList();
+            var business = _context.Healthprofessionals.ToList();
+            var sendorder = new SendOrderModel();
+            sendorder.requestid=requestid;
+            sendorder.Healthprofessionaltypes=profession;
+            sendorder.helthProfessional=business;
+            return View(sendorder);
+        }
+        public IActionResult VendorNameByHelthProfession(int helthprofessionaltype)
+        {
+            var vendorname=_context.Healthprofessionals.Where(item=>item.Healthprofessionalid==helthprofessionaltype).ToList();
+            return Ok(vendorname);
+        }
+
+        public IActionResult BusinessDetails(int vendorname)
+        {
+            var businessdetails=_context.Healthprofessionals.Where(item=>item.Healthprofessionalid == vendorname).FirstOrDefault();
+            return Ok(businessdetails);
+        }
+        [HttpPost]
+        public IActionResult SendOrder(int requestid,int business,string contact,string Email,string FaxNumber,string Prescription)
+        {
+            var orderdetail = new Orderdetail();
+            orderdetail.Requestid=requestid;
+            orderdetail.Email = Email;
+            orderdetail.Prescription=Prescription;
+            orderdetail.Vendorid = business;
+            orderdetail.Faxnumber = FaxNumber;
+            orderdetail.Businesscontact = contact;
+            _context.Orderdetails.Add(orderdetail);  
+            _context.SaveChanges();
+            return Ok(new { message = "Order successfully", id = requestid });
+        }
+
 
     }
 }

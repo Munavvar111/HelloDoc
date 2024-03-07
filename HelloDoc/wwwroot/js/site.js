@@ -188,10 +188,12 @@ $(document).ready(function () {
     //ajax for render that partialview
 
     //ajax for filterthe table using search
-    function filterTable(partialName, currentStatus, page, pageSize) {
-
+    function filterTable(partialName, currentStatus, page, pageSize)
+    {
         $.get('/Admin/CheckSession', function (sessionCheckData) {
             if (sessionCheckData.sessionExists) {
+
+
 
                 console.log(partialName)
                 var searchValue = $("#searchInput").val();
@@ -230,10 +232,10 @@ $(document).ready(function () {
                     }
                 });
             }
-            else {
-                window.location.href = '/Login';
-            }
-        });
+             else {
+                    window.location.href = '/Login';
+                }
+            });
     }
 
     $('#BlockCase').click(function (e) {
@@ -242,8 +244,7 @@ $(document).ready(function () {
         var requestid = $('#requestIdInputBlock').val();
         $('#BlockModal').hide();
         $('body').css('overflow', '');
-
-        $('.modal-backdrop').hide();
+                $('.modal-backdrop').hide();
         $.ajax({
             method: 'POST',
             url: '/Admin/BlockRequest',
@@ -365,7 +366,71 @@ $(document).ready(function () {
         return true;
     })
 
+    $('#healthprofessionaltype').on('change', function () {
+        console.log("hii");
+        var helthprofessionaltype = $(this).val();
+        console.log(helthprofessionaltype);
 
+        $.ajax({
+            method: "POST",
+            url: "/Admin/VendorNameByHelthProfession",
+            data: { helthprofessionaltype: helthprofessionaltype },
+            success: function (vendorname) {
+                $('#business').empty();
+                $('#business').append($('<option>', {
+                    value:'ac',
+                    text: "select Business"
+                }));
+                $.each(vendorname, function (index, vendor) {
+                    $('#business').append($('<option>', {
+                        value: vendor.vendorid,
+                        text: vendor.vendorname
+                    }));
+
+                });
+            }
+        })
+    })
+
+    $('#business').on('change', function () {
+        var vendorname = $(this).val();
+        console.log(vendorname)
+        $.ajax({
+            method: "POST",
+            url: "/Admin/BusinessDetails",
+            data: { vendorname: vendorname },
+            success: function (response) {
+                console.log(response)
+                console.log($('#contact'))
+
+                $('#contact').val(response.businesscontact)
+                $('#Email').val(response.email)
+                $('#FaxNumber').val(response.faxnumber)
+            }
+        })
+    })
+    $("#ordersubmit").click(function () {
+        var requestid = $('#sendorderrequestid').val();
+        var business = $('#business').val();
+        var contact = $('#contact').val();
+        var Email = $('#Email').val();
+        var FaxNumber = $('#FaxNumber').val();
+        var Prescription = $('#Prescription').val();
+
+        $.ajax({
+            method: "POST",
+            url: "/Admin/SendOrder",
+            data: { requestid: requestid, business: business, contact: contact, Email: Email, FaxNumber: FaxNumber, Prescription: Prescription },
+            success: function (response) {
+                if (response) {
+                    window.location.href = '/Admin/SendOrder/?requestid=' + response.id;
+
+                    toastr.success('Order successful!');
+                }
+            }
+        })
+        
+    })
    
 });
 
