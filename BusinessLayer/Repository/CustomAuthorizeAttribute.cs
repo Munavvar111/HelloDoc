@@ -30,8 +30,19 @@ public class CustomAuthorizeAttribute : Attribute, IAuthorizationFilter
         if (token == null || !jwtServices.ValidateToken(token, out JwtSecurityToken validatedToken))
         {
             context.HttpContext.Session.SetString("returnurl", context.HttpContext.Request.Path);
-           
+
+            if (IsAjaxRequest(context.HttpContext.Request))
+            {
+                context.Result = new JsonResult(new { error = "Access denied", redirectToLogin = true })
+                {
+                    StatusCode = StatusCodes.Status403Forbidden
+                };
+            }
+            else
+            {
+                // If it's not an AJAX request, redirect to the login page
                 context.Result = new RedirectToRouteResult(new RouteValueDictionary(new { controller = "Login", action = "Index" }));
+            }
             
             return;
 
@@ -55,5 +66,8 @@ public class CustomAuthorizeAttribute : Attribute, IAuthorizationFilter
 
     }
 
-   
+    private bool IsAjaxRequest(HttpRequest request)
+    {
+        return string.Equals(request.Headers["X-Requested-With"], "XMLHttpRequest", StringComparison.OrdinalIgnoreCase);
+    }
 }

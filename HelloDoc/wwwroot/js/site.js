@@ -190,9 +190,7 @@ $(document).ready(function () {
     //ajax for filterthe table using search
     function filterTable(partialName, currentStatus, page, pageSize)
     {
-        $.get('/Admin/CheckSession', function (sessionCheckData) {
-            if (sessionCheckData.sessionExists) {
-
+      
 
 
                 console.log(partialName)
@@ -227,15 +225,23 @@ $(document).ready(function () {
                         }
 
                     },
-                    error: function (error) {
-                        console.error('Error:', error);
-                    }
+                    error: function (xhr) {
+                        if (xhr.status === 403) {
+                            var response = JSON.parse(xhr.responseText);
+                            if (response.redirectToLogin) {
+                                // Redirect to login page or reload the page
+                                window.location.href = '/Login';
+                                // or
+                                // window.location.reload();
+                            } else {
+                                // Handle other cases...
+                            }
+                        } else {
+                            // Display toastr notification for other errors
+                            toastr.error('An error occurred during the AJAX request.');
+                        }                    }
                 });
-            }
-             else {
-                    window.location.href = '/Login';
-                }
-            });
+            
     }
 
     $('#BlockCase').click(function (e) {
@@ -341,7 +347,24 @@ $(document).ready(function () {
                     }));
 
                 });
+            },
+            error: function (xhr) {
+                if (xhr.status === 403) {
+                    var response = JSON.parse(xhr.responseText);
+                    if (response.redirectToLogin) {
+                        // Redirect to login page or reload the page
+                        window.location.href = '/Login';
+                        // or
+                        // window.location.reload();
+                    } else {
+                        // Handle other cases...
+                    }
+                } else {
+                    // Display toastr notification for other errors
+                    toastr.error('An error occurred during the AJAX request.');
+                }
             }
+        });
         })
     })
 
@@ -432,7 +455,7 @@ $(document).ready(function () {
         
     })
    
-});
+
 
 
 

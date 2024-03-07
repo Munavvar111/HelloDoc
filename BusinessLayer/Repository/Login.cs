@@ -33,7 +33,7 @@ namespace BusinessLayer.Repository
         {
             _context = context;
             _configuration = configuration;
-        }
+            }
 
         public bool IsSendEmail(string toEmail, string subject, string body)
         {

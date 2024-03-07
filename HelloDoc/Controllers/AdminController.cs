@@ -335,6 +335,7 @@ namespace HelloDoc.Controllers
         {
             string sessionData = HttpContext.Session.GetString("token");
 
+        
             if (string.IsNullOrEmpty(sessionData))
             {
                 return Json(new { sessionExists = false });
