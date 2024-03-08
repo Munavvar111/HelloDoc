@@ -1,0 +1,40 @@
+﻿<div class="modal fade" id="sendagrrement" tabindex="-1" role="dialog" aria-labelledby="SendAgreementCase" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-info">
+                <h1 class="modal-title fs-5" id="staticBackdropLabel">Send Agreement</h1>
+                <button type="button" class="btn-close bg-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form  id="sendcase">
+                <input type="hidden" name="requestid" id="requestIdInputAgreement" />
+                <div class="modal-body">
+                    <div class="d-flex flex-column">
+                        <div>
+                            <span>Patient</span>
+                        </div>
+                        <div>
+                            <p>To Send Agrrement Papers Make Sure yor are updating the correct contact information Below for the responsiblelity party</p>
+                        </div>
+                        <div class="mb-3  text-muted">
+                                
+
+                            <div class="form-floating mb-3">
+                                <input class="form-control" placeholder="Leave a comment here" id="agreementemail"  name="blockreason">
+                                <label for="floatingTextarea2" class="text-muted">Email</label>
+                            </div>
+                            <div class="form-floating">
+                                <input class="form-control" placeholder="Leave a comment here" id="agreementphoneno"  name="blockreason">
+                                <label for="floatingTextarea2" class="text-muted">Phone No</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer border-0">
+                        <button type="button" class="btn bg-info text-white" id="SendAgreementBtn">Confirm</button>
+                        <button type="reset" class="btn border-info text-info">Cancel</button>
+                    </div>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>

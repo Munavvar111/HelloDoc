@@ -3,6 +3,7 @@ using BusinessLayer.Repository;
 using DataAccessLayer.CustomModel;
 using DataAccessLayer.DataContext;
 using DataAccessLayer.DataModels;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NuGet.Protocol;
@@ -19,14 +20,16 @@ namespace HalloDocPatient.Controllers
 
         private readonly IPatientRequest _patientRequest;
         private readonly ILogger<RequestController> _logger;
+        private readonly IDataProtectionProvider _dataProtectionProvider;
 
-        public RequestController(ApplicationDbContext context, IPatientRequest patientRequest, ILogger<RequestController> logger, IOtherRequest otherrequest,ILogin login)
+        public RequestController(ApplicationDbContext context, IDataProtectionProvider dataProtectionProvider, IPatientRequest patientRequest, ILogger<RequestController> logger, IOtherRequest otherrequest,ILogin login)
         {
             _context = context;
             _patientRequest = patientRequest;
             _logger = logger;
             _login=login;
             _otherrequest = otherrequest;
+            _dataProtectionProvider= dataProtectionProvider;    
         }
         public IActionResult PatientRequest()
         {
@@ -267,6 +270,23 @@ namespace HalloDocPatient.Controllers
                 return RedirectToAction("Index", "Login");
             }
             return View(requestOther);
+        }
+
+        public IActionResult ReviewAgreement(string requestid)
+        {
+
+            // Use the DataProtectionProvider to unprotect the bytes:
+            var protector = _dataProtectionProvider.CreateProtector("munavvar");
+            string decryptedValue = protector.Unprotect(requestid);
+
+
+            var requesiddec = int.Parse(decryptedValue);
+            var request = _context.Requests.Where(item => item.Requestid == requesiddec).FirstOrDefault();
+            var sendagrement = new AgreementVM();
+            sendagrement.status = request.Status;
+            sendagrement.RequestId = request.Requestid;
+
+            return View(sendagrement);
         }
 
     }

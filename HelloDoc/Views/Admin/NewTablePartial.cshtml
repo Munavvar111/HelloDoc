@@ -79,7 +79,7 @@
                                     Actions
                                 </button>   
                                 <div class="dropdown-menu dropdown-menu-right dropdown-menu-lg-left" aria-labelledby="dropdownMenuButton">
-                                    <button class="dropdown-item"  data-bs-toggle="modal" data-bs-target="#assigncase" data-bs-requestid="@item.RequestId"><i class="bi bi-x-circle me-3"></i>Assign Case</button>
+                                <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#assigncase" data-bs-requestid="@item.RequestId" data-bs-status="@item.Status"><i class="bi bi-x-circle me-3"></i>Assign Case</button>
                                     <button class="dropdown-item"  data-bs-toggle="modal" data-bs-target="#exampleModal" id="examplemodal"  data-bs-requestid="@item.RequestId" data-bs-patientname="@item.PatientName"><i class="bi bi-x-circle me-3"></i>Cancel  Case</button>
                                     <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#BlockModal" id="bloclmodal"  data-bs-requestid="@item.RequestId" data-bs-patientname="@item.PatientName"><i class="bi bi-x-circle me-3"></i>Block  Case</button>
                                     <a class="dropdown-item" asp-action="ViewCase" asp-controller="Admin" asp-route-id="@item.Id"><i class="bi bi-x-circle me-3"></i>View Case</a>
@@ -284,59 +284,3 @@
         </ul>
     </nav>
 </div>
-
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js" ></script>
-
-<script>
-    $(document).ready(function () {
-
-        $('#assigncase').on('show.bs.modal', function (event) {
-            var button = $(event.relatedTarget);
-            console.log(button)
-            var recipient = button.data('bs-requestid');
-            console.log(recipient);
-            var modal = $(this);
-            modal.find('#requestIdInputCancel1').val(recipient);
-        });
-
-    });
-
-
-</script>
-
-<script>
-        $(document).ready(function () {
-
-        $('#exampleModal').on('show.bs.modal', function (event) {
-            var button = $(event.relatedTarget);
-            console.log(button)
-            var recipient = button.data('bs-requestid');
-            var patientName = button.data('bs-patientname')
-            console.log(recipient)
-            var modal = $(this);
-            modal.find('#patientname').text(patientName)
-            modal.find('#requestIdInputCancel').val(recipient);
-        });
-
-    });
-
-</script>
-  
-<script>
-    $(document).ready(function () {
-        $('#BlockModal').on('show.bs.modal', function (event) {
-        console.log("block")
-            var button = $(event.relatedTarget);
-            console.log(button)
-            var recipient = button.data('bs-requestid');
-            var patientName = button.data('bs-patientname')
-            console.log(recipient)
-            var modal = $(this);
-            modal.find('#patientname').text(patientName)
-
-            modal.find('#requestIdInputBlock').val(recipient);
-        });
-    });
-
-
-</script>

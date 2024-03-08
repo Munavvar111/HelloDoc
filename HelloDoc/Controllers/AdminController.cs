@@ -3,12 +3,15 @@ using BusinessLayer.Repository;
 using DataAccessLayer.CustomModel;
 using DataAccessLayer.DataContext;
 using DataAccessLayer.DataModels;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using NuGet.Protocol.Core.Types;
+using NuGet.Protocol.Plugins;
+using Org.BouncyCastle.Asn1.Crmf;
 using Org.BouncyCastle.Asn1.Ocsp;
 using Org.BouncyCastle.Ocsp;
 using System;
@@ -16,6 +19,7 @@ using System.Collections;
 using System.Drawing;
 using System.Drawing.Printing;
 using System.Linq;
+using System.Text;
 
 namespace HelloDoc.Controllers
 {
@@ -26,13 +30,19 @@ namespace HelloDoc.Controllers
         private readonly IAdmin _admin;
         private readonly IPatientRequest _patient;
         private readonly IWebHostEnvironment _hostingEnvironment;
+        private readonly IJwtAuth _jwtAuth;
+        private readonly ILogin _login;
+        private readonly IDataProtectionProvider _dataProtectionProvider;
 
-        public AdminController(ApplicationDbContext context,IAdmin admin, IPatientRequest patient, IWebHostEnvironment hostingEnvironment)
+        public AdminController(ApplicationDbContext context,IAdmin admin, IPatientRequest patient, IDataProtectionProvider dataProtectionProvider , IWebHostEnvironment hostingEnvironment,IJwtAuth jwtAuth,ILogin login)
         {
             _context = context;
             _admin = admin;
             _patient = patient;
+            _jwtAuth = jwtAuth;
             _hostingEnvironment = hostingEnvironment;
+            _login = login;
+            _dataProtectionProvider = dataProtectionProvider;   
         }
         //main View
         public IActionResult ProviderLocation()
@@ -154,11 +164,34 @@ namespace HelloDoc.Controllers
             return View(result);
         }
         [HttpPost]
-        public async Task<IActionResult> AssignRequest( int regionid, int physician, string description, int requestid)
+        public async Task<IActionResult> AssignRequest( int regionid, int physician, string description, int requestid,int status)
         {
+            if (status == 1)
+            {
             var result = await _admin.AssignRequest(regionid, physician, description, requestid);
-
             return Json(result);
+
+            }
+            if (status == 2)
+            {
+                var request = _context.Requests.FirstOrDefault(item => item.Requestid == requestid);
+                request.Status = (short)status;
+                request.Physicianid= physician;
+                _context.Requests.Update(request);
+                
+
+                
+               var requeststatuslog = new Requeststatuslog();
+                requeststatuslog.Status = 2;
+                requeststatuslog.Requestid=requestid;
+                requeststatuslog.Notes = description;
+                requeststatuslog.Createddate= DateTime.Now;
+                requeststatuslog.Transtophysicianid = physician;
+                _context.Requeststatuslogs.Add(requeststatuslog);
+                _context.SaveChanges();
+                return Json(true);
+            }
+            return Json(false); 
         }
 
         [HttpPost]
@@ -380,7 +413,31 @@ namespace HelloDoc.Controllers
             _context.SaveChanges();
             return Ok(new { message = "Order successfully", id = requestid });
         }
+        [HttpPost]
+        public IActionResult SendAgreement(int requestid, string agreementemail, string agreementphoneno)
+        {
+            var token = _jwtAuth.GenerateToken(agreementemail, agreementphoneno);
+            var protector = _dataProtectionProvider.CreateProtector("munavvar");
+            string requestidto=protector.Protect(requestid.ToString());
 
 
+            var Agreemnet = Url.Action("ReviewAgreement", "Request", new { requestid = requestidto }, protocol: HttpContext.Request.Scheme);
+            
+            
+            if (_login.IsSendEmail("tatva.dotnet.munavvarpopatiya@outlook.com", "Munavvar", $"Click <a href='{Agreemnet}'>here</a> to reset your password.")) {
+                return Ok(new {Message="send a mail",id=requestid});
+            
+            }
+            return Json(false);
+        }
+
+        public IActionResult agree(int id)
+        {
+            var request = _context.Requests.Where(item => item.Requestid == id).FirstOrDefault();
+            request.Status = 4;
+            _context.Update(request);
+            _context.SaveChanges();
+            return RedirectToAction("Index", "Login");
+        }
     }
 }

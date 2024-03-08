@@ -1,5 +1,4 @@
-﻿
-toastr.options = {
+﻿toastr.options = {
     positionClass: 'toast-top-right',
     closeButton: true,
     progressBar: true,
@@ -7,9 +6,11 @@ toastr.options = {
     hideDuration: 1000,
     timeOut: 2000,
     extendedTimeOut: 1000,
-    toastClass: 'toast-red', // Add a custom class for red color styling
-};
+    toastClass: 'toast-red' // Add a custom class for red color styling
+}
 $(document).ready(function () {
+
+
     function updateUIWithCounts() {
         $.ajax({
             type: "GET",
@@ -56,13 +57,7 @@ $(document).ready(function () {
     filterTable(currentPartial, currentStatus, currentPage, pageSize);
     updateUIWithCounts();
 
-    $('PendingTablePartial').hide();
-    $('ActiveTablePartial').hide();
-    $('ConcludeTablePartial').hide();
-    $('ToCloseTablePartial').hide();
-    $('UnpaidTablePartial').hide();
-
-
+   
     $(document).on("click", "#pagination a.page-link", function () {
         console.log("Pagination link clicked!");
         currentPage = $(this).text().trim();
@@ -190,8 +185,7 @@ $(document).ready(function () {
     //ajax for filterthe table using search
     function filterTable(partialName, currentStatus, page, pageSize)
     {
-      
-
+        
 
                 console.log(partialName)
                 var searchValue = $("#searchInput").val();
@@ -208,16 +202,20 @@ $(document).ready(function () {
 
 
 
-
+        $('#loader').show();
                 $.ajax({
                     type: "GET",
                     url: "/Admin/SearchPatient",
                     traditional: true,
 
+                    beforSend: function () {
+                        $('#loader').show();
+                    },
                     data: { searchValue: searchValue, selectValue: selectValue, partialName: partialName, selectedFilter: selectedFilter, currentStatus: currentStatus, page: page, pageSize: pageSize },
                     success: function (data) {
-                        if (data != null && data.length > 0) {
 
+                        if (data != null && data.length > 0) {
+                        $('#loader').hide();
                             $('#partialContainer').html(data);
                         } else {
                             $('#partialContainer').html('<p>No data is Found</p>');
@@ -229,15 +227,10 @@ $(document).ready(function () {
                         if (xhr.status === 403) {
                             var response = JSON.parse(xhr.responseText);
                             if (response.redirectToLogin) {
-                                // Redirect to login page or reload the page
                                 window.location.href = '/Login';
-                                // or
-                                // window.location.reload();
                             } else {
-                                // Handle other cases...
                             }
                         } else {
-                            // Display toastr notification for other errors
                             toastr.error('An error occurred during the AJAX request.');
                         }                    }
                 });
@@ -248,9 +241,8 @@ $(document).ready(function () {
         e.preventDefault();
         var blockreason = $('#blockreason').val();
         var requestid = $('#requestIdInputBlock').val();
-        $('#BlockModal').hide();
-        $('body').css('overflow', '');
-                $('.modal-backdrop').hide();
+        $('#BlockModal').modal('hide');
+       
         $.ajax({
             method: 'POST',
             url: '/Admin/BlockRequest',
@@ -277,9 +269,7 @@ $(document).ready(function () {
         var cancelReason = $('#cancelReason').val();
         var additionalnote = $('.additionalnote').val();
 
-        $('#exampleModal').hide();
-        $('.modal-backdrop').hide();
-        $('body').css('overflow', '');
+        $('#exampleModal').modal('hide');
 
         $.ajax({
             method: 'POST',
@@ -307,15 +297,16 @@ $(document).ready(function () {
         var regionid = $('#regionid').val();
         var physician = $('#physicianDropdown').val();
         var description = $('#description').val();
-        $('#assigncase').hide();
-        $('.modal-backdrop').hide();
-        $('body').css('overflow', '');
+        var status = $('#status').val();
+        $('#assigncase').modal('hide');
+       
 
         $.ajax({
             method: "POST",
             url: "Admin/AssignRequest",
-            data: { requestid: requestid, regionid: regionid, physician: physician, description: description },
+            data: { requestid: requestid, regionid: regionid, physician: physician, description: description, status: status },
             success: function (data) {
+                console.log(data)
                 if (data) {
                     var storedPartial = localStorage.getItem('currentPartial');
                     var storedStatus = JSON.parse(localStorage.getItem('currentStatus'));
@@ -352,12 +343,8 @@ $(document).ready(function () {
                 if (xhr.status === 403) {
                     var response = JSON.parse(xhr.responseText);
                     if (response.redirectToLogin) {
-                        // Redirect to login page or reload the page
                         window.location.href = '/Login';
-                        // or
-                        // window.location.reload();
                     } else {
-                        // Handle other cases...
                     }
                 } else {
                     // Display toastr notification for other errors
@@ -366,7 +353,7 @@ $(document).ready(function () {
             }
         });
         })
-    })
+    
 
 
     $('.deletbtn').click(function () {
@@ -401,7 +388,7 @@ $(document).ready(function () {
             success: function (vendorname) {
                 $('#business').empty();
                 $('#business').append($('<option>', {
-                    value:'ac',
+                    value:'selected hidden disable',
                     text: "select Business"
                 }));
                 $.each(vendorname, function (index, vendor) {
@@ -454,9 +441,31 @@ $(document).ready(function () {
         })
         
     })
-   
 
+    $('#SendAgreementBtn').click(function () {
+        var requestid = $('#requestIdInputAgreement').val();
+        var agreementemail = $('#agreementemail').val();
+        var agreementphoneno = $('#agreementphoneno').val();
 
+        $.ajax({
+            method: "POST",
+            url: '/Admin/SendAgreement',
+            data: { requestid: requestid, agreementemail: agreementemail, agreementphoneno: agreementphoneno },
+            success: function (response) {
+                console.log(response)
+                if (response) {
+                    toastr.success('Agrement successful!');
+                    window.location.href='/Admin'
+                }
+                else {
+                    toastr.error("Agreement Unsuccessful!")
+                }
+            }
+        })
+    })
+
+    
+})
 
 
         // $.ajax({

@@ -9,7 +9,8 @@ using Microsoft.EntityFrameworkCore;
 using MimeKit;
 using MailKit.Net.Smtp;
 using BC = BCrypt.Net.BCrypt;
-
+using Microsoft.AspNetCore.DataProtection;
+using System.Text;
 
 namespace HalloDocPatient.Controllers
 {
@@ -21,12 +22,13 @@ namespace HalloDocPatient.Controllers
         private readonly IConfiguration _configuration;
         private readonly IJwtAuth _jwtAuth;
 
-        public LoginController(ApplicationDbContext context, ILogin login, IConfiguration configuration,IJwtAuth jwtAuth)
+
+        public LoginController(ApplicationDbContext context ,ILogin login, IConfiguration configuration,IJwtAuth jwtAuth, IDataProtectionProvider dataProtectionBuilder)
         {
             _login = login;        
             _context = context;
             _configuration = configuration;
-            _jwtAuth = jwtAuth;
+                _jwtAuth = jwtAuth;
         }
 
         
@@ -158,6 +160,9 @@ namespace HalloDocPatient.Controllers
             HttpContext.Session.Clear();
             return "<script>window.loction.href='/Login'</script>";
         }
+        
+
+
 
     }
 }

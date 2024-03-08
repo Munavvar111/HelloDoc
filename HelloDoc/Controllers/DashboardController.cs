@@ -3,6 +3,7 @@ using BusinessLayer.Repository;
 using DataAccessLayer.CustomModel;
 using DataAccessLayer.DataContext;
 using DataAccessLayer.DataModels;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Globalization;
@@ -17,7 +18,7 @@ namespace HalloDocPatient.Controllers
         private readonly IPatientRequest _patientRequest;
         private readonly IWebHostEnvironment _hostingEnvironment;
 
-        public DashboardController(ApplicationDbContext context, IPatientRequest patientRequest, IWebHostEnvironment hostingEnvironment)
+        public DashboardController(ApplicationDbContext context, IPatientRequest patientRequest,IWebHostEnvironment hostingEnvironment)
         {
             _context = context;
             _patientRequest = patientRequest;
@@ -270,6 +271,7 @@ namespace HalloDocPatient.Controllers
                 }
             return View(requestModel);
         }
+        
     }
 
 }

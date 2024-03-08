@@ -25,7 +25,7 @@ builder.Services.Configure<FormOptions>(options =>
 });
 builder.Services.AddSession(options =>
 {
-    options.IdleTimeout = TimeSpan.FromSeconds(10); // Set your desired timeout
+    options.IdleTimeout = TimeSpan.FromDays(1); // Set your desired timeout
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });

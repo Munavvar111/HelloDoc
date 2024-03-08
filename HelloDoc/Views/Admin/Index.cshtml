@@ -223,15 +223,10 @@
 
 
 
+<div id="loader" class="loader"></div>
 <div id="partialContainer">
 
-   
-    <partial name="NewTablePartial" model="@Model"></partial>
-    <partial name="PendingTablePartial" model="@Model"></partial>
-    <partial name="ActiveTablePartial" model="@Model"></partial>
-    <partial name="ConcludeTablePartial" model="@Model"></partial>
-    <partial name="ToCloseTablePartial" model="@Model"></partial>
-    <partial name="UnpaidTablePartial" model="@Model"></partial>
+    
 </div>
 <div>
 </div>
@@ -239,3 +234,123 @@
 <partial name="CancelCase" model="@Model"> </partial>
 <partial name="BlockPatient"></partial>
 <partial name="AssignCase"></partial>
+<partial name="SendAgreement"></partial>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+
+        $('#assigncase').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget);
+            console.log(button)
+            var recipient = button.data('bs-requestid');
+            console.log(recipient);
+            var status=button.data('bs-status');
+            if(status==2){
+                $('.title').html('Transfer Case');
+                $('#trnasfertext').html('To Transfer This Request,Search and Select Another Physician')
+            }
+            var modal = $(this);
+            modal.find('#status').val(status)
+            modal.find('#requestIdInputCancel1').val(recipient);
+        });
+        $('#assigncase').on('hidden.bs.modal', function () {
+            console.log("hidden")
+            $('#assigncaseform').each(function () {
+                this.reset();
+            })
+
+        });
+    });
+
+
+</script>
+
+<script>
+    $(document).ready(function () {
+
+        $('#exampleModal').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget);
+            console.log(button)
+            var recipient = button.data('bs-requestid');
+            var patientName = button.data('bs-patientname')
+            console.log(recipient)
+            var modal = $(this);
+            modal.find('#patientname').text(patientName)
+            modal.find('#requestIdInputCancel').val(recipient);
+        });
+        $('#exampleModal').on('hidden.bs.modal', function () {
+            console.log("hidden")
+            $('#cancelCaseForm').each(function () {
+                this.reset();
+            })
+
+        });
+
+    });
+    
+</script>
+<script>
+
+    $(document).ready(function () {
+    })
+</script>
+
+<script>
+    $(document).ready(function () {
+        $('#BlockModal').on('show.bs.modal', function (event) {
+            console.log("block")
+            var button = $(event.relatedTarget);
+            console.log(button)
+            var recipient = button.data('bs-requestid');
+            var patientName = button.data('bs-patientname')
+            console.log(recipient)
+            var modal = $(this);
+            modal.find('#patientname').text(patientName)
+
+            modal.find('#requestIdInputBlock').val(recipient);
+        });
+
+        $('#BlockModal').on('hidden.bs.modal', function () {
+            
+            $('#blockCaseForm').each(function () {
+                this.reset();
+            })
+
+        });
+
+    });
+
+
+</script>
+
+<script>
+    $(document).ready(function () {
+        $('#sendagrrement').on('show.bs.modal', function (event) {
+            console.log("block")
+            var button = $(event.relatedTarget);
+            console.log(button)
+            var recipient = button.data('bs-requestid');
+            var email = button.data('bs-email');
+            var phoneno = button.data('bs-phoneno');
+            console.log(email)
+            var modal = $(this);
+            modal.find('#agreementemail').val(email)
+            modal.find('#agreementphoneno').val(phoneno)
+
+            modal.find('#requestIdInputAgreement').val(recipient);
+        });
+
+        $('#sendagrrement').on('hidden.bs.modal', function () {
+            
+            $('#blockCaseForm').each(function () {
+                this.reset();
+            })
+
+        });
+
+    });
+
+
+</script>

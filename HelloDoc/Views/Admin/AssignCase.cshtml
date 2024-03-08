@@ -1,15 +1,16 @@
 ﻿    <div class="modal fade" id="assigncase" tabindex="-1" role="dialog" aria-labelledby="assigncase " aria-hidden="true">
-    <div class="modal-dialog" role="document">
+    <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header bg-info text-white">
-                <h1 class="modal-title fs-5" id="exampleModalLabel">Assign Request</h1>
+                <h1 class="modal-title fs-5 title" id="exampleModalLabel">Assign Request</h1>
                 <button type="button" class="close bg-info border border-info" data-bs-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true" class="fs-1">&times;</span>
                 </button>
             </div>
             <div class="modal-body text-start">
-                <span class="text-start">To assign this request, search and select another physician</span>
-                <form asp-action="">
+                <span class="text-start" id="trnasfertext">To assign this request, search and select another physician</span>
+                <form asp-action="" id="assigncaseform">
+                    <input type="hidden" name="status" id="status"/>
                     <input type="hidden" name="requestid" id="requestIdInputCancel1" />
                     <select class="form-select mb-4 mt-4 regionDropdown" name="region" aria-label="Default select example" id="regionid">
                         <option value="" disabled selected>Narrow Search By Region</option>
