@@ -424,20 +424,12 @@ namespace HelloDoc.Controllers
             var Agreemnet = Url.Action("ReviewAgreement", "Request", new { requestid = requestidto }, protocol: HttpContext.Request.Scheme);
             
             
-            if (_login.IsSendEmail("tatva.dotnet.munavvarpopatiya@outlook.com", "Munavvar", $"Click <a href='{Agreemnet}'>here</a> to reset your password.")) {
+            if (_login.IsSendEmail("munavvarpopatiya777@gmail.com", "Munavvar", $"Click <a href='{Agreemnet}'>here</a> to reset your password.")) {
                 return Ok(new {Message="send a mail",id=requestid});
             
             }
             return Json(false);
         }
 
-        public IActionResult agree(int id)
-        {
-            var request = _context.Requests.Where(item => item.Requestid == id).FirstOrDefault();
-            request.Status = 4;
-            _context.Update(request);
-            _context.SaveChanges();
-            return RedirectToAction("Index", "Login");
-        }
     }
 }

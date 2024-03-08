@@ -454,7 +454,6 @@ $(document).ready(function () {
             success: function (response) {
                 console.log(response)
                 if (response) {
-                    toastr.success('Agrement successful!');
                     window.location.href='/Admin'
                 }
                 else {

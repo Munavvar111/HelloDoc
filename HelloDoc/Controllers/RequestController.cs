@@ -219,7 +219,7 @@ namespace HalloDocPatient.Controllers
                     var token = Guid.NewGuid().ToString();
                     var resetLink = Url.Action("Index", "Register", new { RequestId = request1.Requestid, token }, protocol: HttpContext.Request.Scheme);
 
-                    if (_login.IsSendEmail("munavvarpopatiya999@gmail.com", "Munavvar", $"Click <a href='{resetLink}'>here</a> to reset your password."))
+                    if (_login.IsSendEmail("munavvarpopatiya777@outlook.com", "Munavvar", $"Click <a href='{resetLink}'>here</a> to reset your password."))
                     {
 
                         return RedirectToAction("Index", "Login");
@@ -285,8 +285,42 @@ namespace HalloDocPatient.Controllers
             var sendagrement = new AgreementVM();
             sendagrement.status = request.Status;
             sendagrement.RequestId = request.Requestid;
+            if (request.Status == 2)
+            {
 
             return View(sendagrement);
+            }
+            else
+            {
+                TempData["ToasterMessage"] = "Request status is not 2. Please log in to continue.";
+                return RedirectToAction("Index", "Login");
+            }
+        }
+
+        [HttpPost]
+        public IActionResult Agree(int id)
+        {
+            var request = _context.Requests.Where(item => item.Requestid == id).FirstOrDefault();
+            request.Status = 4;
+            _context.Update(request);
+            _context.SaveChanges();
+            return RedirectToAction("Index", "Login");
+        }
+        [HttpPost]
+        public IActionResult CancelPatient(AgreementVM ag)
+        {
+            var request = _context.Requests.Where(item=>item.Requestid==ag.RequestId).FirstOrDefault();
+            request.Status = 7;
+            _context.Requests.Update(request);
+            var requeststatuslog = new Requeststatuslog();
+            requeststatuslog.Status = 7;
+            requeststatuslog.Createddate=DateTime.Now;
+            requeststatuslog.Notes = ag.Notes;
+            requeststatuslog.Requestid = ag.RequestId;
+            _context.Requeststatuslogs.Add(requeststatuslog);
+            _context.SaveChanges();
+
+            return RedirectToAction("Index", "Login");
         }
 
     }

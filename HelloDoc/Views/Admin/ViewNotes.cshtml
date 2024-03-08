@@ -113,9 +113,14 @@
                                                     if (@Model[i].TransferNotes != null && Model[i].Status == 3)
                                                     {
                             
-                            <p class="text-muted">@Model[0].TransferNotes</p>
-                                                    }
-                                                }
+                                            <p class="text-muted">@Model[0].TransferNotes</p>
+                                        } 
+                                        else if(Model[i].TransferNotes != null && Model[i].Status == 7)
+                                        {
+                                            <p class="text-muted">@Model[0].TransferNotes</p>
+
+                                        }
+                                    }
                         </div>
                     </div>
                 </div>
