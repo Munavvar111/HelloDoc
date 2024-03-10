@@ -141,8 +141,6 @@ namespace HalloDocPatient.Controllers
                     var request = _patientRequest.GetRequestByEmail(requestModel.Email);
                     var token = Guid.NewGuid().ToString();
                     var resetLink = Url.Action("Index", "Register", new { userId = request.Requestid, token }, protocol: HttpContext.Request.Scheme);
-
-
                     if (_login.IsSendEmail("munavvarpopatiya999@gmail.com", "Munavvar", $"Click <a href='{resetLink}'>here</a> to Create A new Account"))
                     {
 
@@ -157,8 +155,6 @@ namespace HalloDocPatient.Controllers
 
                 }
             }
-            
-    
         }
         public IActionResult Error()
         {
@@ -177,7 +173,6 @@ namespace HalloDocPatient.Controllers
             bool isValid = user == null;
             return Json(isValid);
         }
-
         public IActionResult FriendRequest()
         {
             return View();
@@ -191,7 +186,6 @@ namespace HalloDocPatient.Controllers
                 if (request.File != null && request.File.Length > 0)
                 {
                     var uniqueFileName=await _patientRequest.AddFileInUploader(request.File);
-
                     _otherrequest.AddFriendRequest(request, ReqTypeId: 2);
                     var request1 = _patientRequest.GetRequestByEmail(request.EmailOther);
                     _patientRequest.AddRequestWiseFile(uniqueFileName, request1.Requestid);
@@ -200,20 +194,16 @@ namespace HalloDocPatient.Controllers
 
                     if (_login.IsSendEmail("munavvarpopatiya999@gmail.com", "Munavvar", $"Click <a href='{resetLink}'>here</a> to reset your password."))
                     {
-
                         return RedirectToAction("Index", "Login");
                     }
                     else
                     {
                         ModelState.AddModelError(string.Empty, "Email Is Not Send");
-
                     }
                     return RedirectToAction("Index", "Login");
-
                 }
                 else
                 {
-
                     _otherrequest.AddFriendRequest(request, ReqTypeId: 2);
                     var request1 = _patientRequest.GetRequestByEmail(request.EmailOther);
                     var token = Guid.NewGuid().ToString();
@@ -221,7 +211,6 @@ namespace HalloDocPatient.Controllers
 
                     if (_login.IsSendEmail("munavvarpopatiya777@outlook.com", "Munavvar", $"Click <a href='{resetLink}'>here</a> to reset your password."))
                     {
-
                         return RedirectToAction("Index", "Login");
                     }
                     else
@@ -230,13 +219,7 @@ namespace HalloDocPatient.Controllers
 
                     }
                     return RedirectToAction("Index", "Login");
-
-
                 }
-
-
-
-
             }
             return View(request);
         }
@@ -274,6 +257,8 @@ namespace HalloDocPatient.Controllers
 
         public IActionResult ReviewAgreement(string requestid)
         {
+            try
+            {
 
             // Use the DataProtectionProvider to unprotect the bytes:
             var protector = _dataProtectionProvider.CreateProtector("munavvar");
@@ -287,25 +272,49 @@ namespace HalloDocPatient.Controllers
             sendagrement.RequestId = request.Requestid;
             if (request.Status == 2)
             {
-
+            
             return View(sendagrement);
             }
             else
             {
-                TempData["ToasterMessage"] = "Request status is not 2. Please log in to continue.";
+                TempData["Error"] = "Request status is not 2. Please log in to continue.";
                 return RedirectToAction("Index", "Login");
+            }
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "You Cant Change The Url";
+                return RedirectToAction("Index", "Login");
+
             }
         }
 
         [HttpPost]
         public IActionResult Agree(int id)
         {
-            var request = _context.Requests.Where(item => item.Requestid == id).FirstOrDefault();
-            request.Status = 4;
-            _context.Update(request);
-            _context.SaveChanges();
-            return RedirectToAction("Index", "Login");
+            try
+            {
+                var request = _context.Requests.Where(item => item.Requestid == id).FirstOrDefault();
+
+                if (request == null)
+                {
+                    return NotFound();
+                }
+
+                request.Status = 4;
+                _context.Update(request);
+                _context.SaveChanges();
+
+                TempData["SuccessMessage"] = "Agreement completed successfully";
+
+                return RedirectToAction("Index", "Login");
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
         }
+
         [HttpPost]
         public IActionResult CancelPatient(AgreementVM ag)
         {

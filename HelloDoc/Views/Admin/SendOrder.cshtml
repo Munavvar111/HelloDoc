@@ -2,6 +2,49 @@
 @{
     Layout = "~/Views/Shared/_Layout4.cshtml";
 }
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+@if (TempData.ContainsKey("Error"))
+{
+    <script>
+        $(document).ready(function () {
+            toastr.options = {
+                "closeButton": true,
+                "positionClass": "toast-top-right",
+                "timeOut": "5000"
+            };
+
+            toastr.error('@TempData["Error"]');
+        });
+    </script>
+}
+@if (TempData.ContainsKey("SuccessMessage"))
+{
+    <script>
+        $(document).ready(function () {
+            toastr.options = {
+                "closeButton": true,
+                "positionClass": "toast-top-right",
+                "timeOut": "5000"
+            };
+
+            toastr.success('@TempData["SuccessMessage"]');
+        });
+    </script>
+}
+
+    <script>
+            // Initialize jQuery Validation Plugin for your form
+            console.log("hiids")
+            
+    </script>
+
+<script>
+    // Initialize jQuery Validation Plugin for your form
+    $(document).ready(function () {
+        
+    });
+</script>
 
 <div class="container my-4 ">
     <div class="d-flex justify-content-between my-3">
@@ -20,13 +63,13 @@
 
 <!-- form -->
 <div class="container shadow-lg bg-body-tertiary rounded Form_Margin bg-light  mb-5">
-    <form id="ViewcaseReturnpage">
-        <input type="hidden" asp-for="@Model.requestid" value="@Model.requestid" id="sendorderrequestid">
+    <form id="ViewcaseReturnpage" asp-action="SendOrder" asp-controller="Admin">
+        <input class="d-none" asp-for="@Model.requestid" value="@Model.requestid" id="sendorderrequestid">
 
 
         <div class="row">
             <div class="form-floating  col-12 col-md-6 mb-3 mt-3">
-                <select class="form-select " aria-label="Default select example" name="healthprofessionaltype" id="healthprofessionaltype">
+                <select class="form-select " aria-label="Default select example" name="healthprofessionaltype" id="healthprofessionaltype" >
                     <option selected>Please Select The Proffesion</option>
                     @foreach (var healthprofessionaltype in Model.Healthprofessionaltypes)
                     {
@@ -35,7 +78,7 @@
                 </select>
             </div>
             <div class="form-floating  col-12 col-md-6 mb-3  mt-md-3">
-                <select class="form-select " aria-label="Default select example" name="business" id="business">
+                <select class="form-select " aria-label="Default select example" name="business" id="business" asp-for="BusinessId">
                     <option selected>Please Select The Business</option>
                     @foreach (var healthprofessional in Model.helthProfessional)
                     {
@@ -46,17 +89,22 @@
         </div>
         <div class="row">
             <div class="form-floating  col-12 col-md-6 mb-3">
-                <input class="form-control " type="tel" placeholder="Business Contact" id="contact">
-                <label class="text-muted mx-2" for="floatingnumber">Business Contact</label>
+                <input class="form-control" type="tel" placeholder="Business Contact" asp-for="Contact">
+                <label class="text-muted mx-2" for="floatingnumber" asp-for="Contact">Business Contact</label>
+                <span asp-validation-for="Contact" class="text-danger error-Contact"></span>
 
             </div>
             <div class="form-floating col-12 col-md-6 mb-3">
-                <input class="form-control" type="email" placeholder="Eamil" id="Email">
-                <label class="text-muted mx-2" for="floatingEmail">Email</label>
-            </div>
+                <input class="form-control" type="email" asp-for="Email" name="Email" id="Email">
+                <label class="text-muted mx-2" for="floatingEmail">email</label>
+                <span asp-validation-for="Email" class="text-danger error-Email"></span>
+
+            </div>  
             <div class="form-floating col-12 col-md-6 mb-3">
-                <input class="form-control" type="text" placeholder="Fax Number" id="FaxNumber">
+                <input class="form-control" type="text" id="FaxNumber" asp-for="FaxNumber" name="FaxNumber">
                 <label class="text-muted mx-2" for="floatingFax">Fax Number</label>
+                <span asp-validation-for="Email" class="text-danger error-FaxNumber" ></span>
+
             </div>
         </div>
 
@@ -65,9 +113,10 @@
 
         <div class="row">
             <div class="form-floating   col-12  mb-3">
-                <textarea class="form-control" placeholder="Prescription or Order details" id="Prescription"
-                          style="height: 100px"></textarea>
-                <label class="text-muted mx-2" for="floatingTextarea">Prescription or Order details</label>
+                <textarea class="form-control" placeholder="Prescription or Order details"  id="Prescription"
+                          style="height: 100px" asp-for="Prescription" name="Prescription"></textarea>
+                <label class="text-muted mx-2" asp-for="Prescription" for="floatingTextarea">Prescription or Order details</label>
+                <span asp-validation-for="Email" class="text-danger error-Prescription"></span>
 
             </div>
         </div>
@@ -88,7 +137,7 @@
         <!-- buttons -->
         <div class="row py-4">
             <div class="d-flex justify-content-end gap-3">
-                <button type="button" class="btn btn-info  text-light viewnote" id="ordersubmit">
+                <button type="submit" class="btn btn-info  text-light viewnote" id="ordersubmit">
                     Submit
                 </button>
                 <button type="reset" class="btn btn-danger text-light">Cancel </button>

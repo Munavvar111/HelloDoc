@@ -45,7 +45,7 @@ $(document).ready(function () {
     var currentPartial = storedPartial || "NewTablePartial";
     var currentStatus = storedStatus || [1];
     var currentPage = 1;
-    var pageSize = 5;
+    var pageSize = 3;
 
     if (storedTringle) {
         $(".triangle").css('display', 'none');
@@ -270,6 +270,7 @@ $(document).ready(function () {
         var additionalnote = $('.additionalnote').val();
 
         $('#exampleModal').modal('hide');
+        $('#cancelcaseview').modal('hide');
 
         $.ajax({
             method: 'POST',
@@ -288,8 +289,7 @@ $(document).ready(function () {
             }
         })
     })
-
-
+    
 
     $('#asigncasebutton').click(function (e) {
         e.preventDefault();
@@ -297,14 +297,14 @@ $(document).ready(function () {
         var regionid = $('#regionid').val();
         var physician = $('#physicianDropdown').val();
         var description = $('#description').val();
-        var status = $('#status').val();
         $('#assigncase').modal('hide');
-       
+        $('#transfercase').modal('hide');
+
 
         $.ajax({
             method: "POST",
             url: "Admin/AssignRequest",
-            data: { requestid: requestid, regionid: regionid, physician: physician, description: description, status: status },
+            data: { requestid: requestid, regionid: regionid, physician: physician, description: description },
             success: function (data) {
                 console.log(data)
                 if (data) {
@@ -319,6 +319,35 @@ $(document).ready(function () {
             }
         })
 
+    });
+    $('#transfercasebutton').click(function (e) {
+        e.preventDefault();
+        var requestid = $('#requestIdInputTransfer').val();
+        var regionid = $('#regionidtransfer').val();
+        var physician = $('#physicianDropdownTransfer').val();
+        var description = $('#descriptiontransfer').val();
+        $('#assigncase').modal('hide');
+        $('#transfercase').modal('hide');
+       
+
+        $.ajax({
+            method: "POST",
+            url: "Admin/TransferRequest",
+            data: { requestid: requestid, regionid: regionid, physician: physician, description: description },
+            success: function (data) {
+                console.log(data)
+                if (data) {
+                    var storedPartial = localStorage.getItem('currentPartial');
+                    var storedStatus = JSON.parse(localStorage.getItem('currentStatus'));
+                    filterTable(storedPartial, storedStatus, 1, 5);
+                    updateUIWithCounts();
+                    console.log("toaster", toastr.success)
+                    toastr.success('Transfer successful!');
+
+                }
+            }
+        })
+
     })
 
     $('.regionDropdown').on('change', function () {
@@ -326,13 +355,17 @@ $(document).ready(function () {
         var selectregion = $(this).val();
         $.ajax({
             method: 'GET',
-            url: '/Admin/GetPhysician',
+            url: '/Admin/GetPhysician',     
             data: { region: selectregion },
             success: function (physicians) {
-                $('#physicianDropdown').empty();
+                $('.physicianDropdown').empty();
                 $.each(physicians, function (index, physician) {
                     console.log(physician)
-                    $('#physicianDropdown').append($('<option>', {
+                    $('.physicianDropdown').append($('<option>', {
+                        value: 'selected',
+                        text:"please selected the value"
+                    }))
+                    $('.physicianDropdown').append($('<option>', {
                         value: physician.physicianid,
                         text: physician.firstname + ' ' + physician.lastname
                     }));
@@ -366,7 +399,9 @@ $(document).ready(function () {
             url: '/Admin/DeleteFile',
             data: { filename: fileUrl },
             success: function (result) {
-                window.location.href = "/Admin/ViewUploads/" + result.id
+                window.location.href = "/Admin/ViewUploads/" + result.id;
+                
+
             },
             error: function (error) {
                 console.log(error)
@@ -402,6 +437,59 @@ $(document).ready(function () {
         })
     })
 
+    
+        $("#ViewcaseReturnpage").validate({
+        rules: {
+                
+                Email: {
+                    required: true,
+                    email: true
+                },
+                Contact: {
+                    required:true
+                },
+                FaxNumber: {
+                    required: true
+                },
+                Prescription: {
+                    required: true,
+                }
+                
+        },
+            messages: {
+                Email: {
+                    required: "Please enter your email",
+                    email: "Please enter a valid email address"
+                },
+                Contact: {
+                    required: "Please Enter A Contact"
+                },
+                FaxNumber: {
+                    required: "Please Enter A FaxNumber"
+                },
+                Prescription: {
+                    required: "Please Enter A Prescription"
+                }     
+            },
+            errorPlacement: function (error, element) {
+                var errorSpan = $("span.error-" + element.attr("name"));
+
+                if (errorSpan.length > 0) {
+                    // If the specific span is found, append the error message to it
+                    error.appendTo(errorSpan);
+                } else {
+                    // If not found, use the default placement (after the input field)
+                    error.insertAfter(element);
+                }
+            },
+
+       
+        submitHandler: function (form) {
+            // If the form is valid, submit it
+            form.submit();
+        }
+    });
+
     $('#business').on('change', function () {
         var vendorname = $(this).val();
         console.log(vendorname)
@@ -419,28 +507,9 @@ $(document).ready(function () {
             }
         })
     })
-    $("#ordersubmit").click(function () {
-        var requestid = $('#sendorderrequestid').val();
-        var business = $('#business').val();
-        var contact = $('#contact').val();
-        var Email = $('#Email').val();
-        var FaxNumber = $('#FaxNumber').val();
-        var Prescription = $('#Prescription').val();
+    
 
-        $.ajax({
-            method: "POST",
-            url: "/Admin/SendOrder",
-            data: { requestid: requestid, business: business, contact: contact, Email: Email, FaxNumber: FaxNumber, Prescription: Prescription },
-            success: function (response) {
-                if (response) {
-                    window.location.href = '/Admin/SendOrder/?requestid=' + response.id;
-
-                    toastr.success('Order successful!');
-                }
-            }
-        })
-        
-    })
+    
 
     $('#SendAgreementBtn').click(function () {
         var requestid = $('#requestIdInputAgreement').val();

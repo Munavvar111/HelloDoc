@@ -79,9 +79,9 @@
                                     Actions
                                 </button>   
                                 <div class="dropdown-menu dropdown-menu-right dropdown-menu-lg-left" aria-labelledby="dropdownMenuButton">
-                                <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#assigncase" data-bs-requestid="@item.RequestId" data-bs-status="@item.Status"><i class="bi bi-x-circle me-3"></i>Assign Case</button>
-                                    <button class="dropdown-item"  data-bs-toggle="modal" data-bs-target="#exampleModal" id="examplemodal"  data-bs-requestid="@item.RequestId" data-bs-patientname="@item.PatientName"><i class="bi bi-x-circle me-3"></i>Cancel  Case</button>
-                                    <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#BlockModal" id="bloclmodal"  data-bs-requestid="@item.RequestId" data-bs-patientname="@item.PatientName"><i class="bi bi-x-circle me-3"></i>Block  Case</button>
+                                <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#assigncase" data-bs-requestid="@item.RequestId" data-bs-status="@item.Status" data-bs-status="@item.Status"><i class="bi bi-x-circle me-3"></i>Assign Case</a>
+                                    <a class="dropdown-item"  data-bs-toggle="modal" data-bs-target="#exampleModal" id="examplemodal"  data-bs-requestid="@item.RequestId" data-bs-patientname="@item.PatientName"><i class="bi bi-x-circle me-3"></i>Cancel  Case</a>
+                                    <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#BlockModal" id="bloclmodal"  data-bs-requestid="@item.RequestId" data-bs-patientname="@item.PatientName"><i class="bi bi-x-circle me-3"></i>Block  Case</a>
                                     <a class="dropdown-item" asp-action="ViewCase" asp-controller="Admin" asp-route-id="@item.Id"><i class="bi bi-x-circle me-3"></i>View Case</a>
                                     <a class="dropdown-item" asp-action="ViewNotes" asp-controller="Admin" asp-route-requestid="@item.RequestId"><i class="bi bi-x-circle me-3"></i>View Notes</a>
 

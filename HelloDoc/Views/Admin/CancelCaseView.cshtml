@@ -1,5 +1,5 @@
 ﻿
-<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal fade" id="cancelcaseview" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header bg-info">
@@ -14,18 +14,18 @@
                 <form asp-action="CancelCase" id="cancelCaseForm">
                     <input type="hidden" class="requestid" id="requestIdInputCancel" />
                     <div class="mb-3">
-                        
-                       
-                            
+
+
+
                         <select class="form-select " aria-label="Default select example" name="CancelReason" id="cancelReason">
-                            
-                            @foreach (var cancelReason in Model[0].Cancel)
+
+                            @foreach (var cancelReason in Model.Cancel)
                             {
                                 <option value="@cancelReason.CancelReasonId">@cancelReason.CancelCaseReson</option>
                             }
-                            </select>
-                        
-                        
+                        </select>
+
+
                         <span class="error text-danger"></span>
                     </div>
                     <div>

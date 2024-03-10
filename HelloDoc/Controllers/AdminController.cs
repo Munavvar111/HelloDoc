@@ -20,6 +20,7 @@ using System.Drawing;
 using System.Drawing.Printing;
 using System.Linq;
 using System.Text;
+using System.Web.Helpers;
 
 namespace HelloDoc.Controllers
 {
@@ -77,49 +78,18 @@ namespace HelloDoc.Controllers
 
             var request =  _admin.GetAllData();
             var newcount = request.Count(item => item.Status == 1);
-
-            var pandingcount = request.Count(item => item.Status == 2);
-            var activecount=request.Count(item=>item.Status==4 || item.Status==5);
-            var conclude=request.Count(item => item.Status == 6);
-            var toclosed=request.Count(item => item.Status == 3 || item.Status == 7 || item.Status == 8);
-            var unpaid=request.Count(item => item.Status == 9);
-            ViewBag.PandingCount = pandingcount;
-            ViewBag.NewCount=newcount;
-            ViewBag.activecount = activecount;
-            ViewBag.conclude = conclude;
-            ViewBag.toclosed = toclosed;
-            ViewBag.unpaid = unpaid;
             return View(request.ToList());
         }   
 
         
-        public IActionResult SearchPatient(string searchValue,string selectValue,string partialName,string selectedFilter, int[] currentStatus,int page,int pageSize=5)
+        public IActionResult SearchPatient(string searchValue,string selectValue,string partialName,string selectedFilter, int[] currentStatus,int page,int pageSize=3)
             {
             var filteredPatients = _admin.SearchPatients(searchValue, selectValue, selectedFilter, currentStatus);
             int totalItems = filteredPatients.Count();
             int totalPages = (int)Math.Ceiling((double)totalItems / pageSize);
             var paginatedData = filteredPatients.Skip((page - 1) * pageSize).Take(pageSize).ToList();
-
-            // Create a ViewModel or use ViewBag/ViewData to store pagination information
-            var newcount = filteredPatients.Count(item => item.Status == 1);
-
-            var pandingcount = filteredPatients.Count(item => item.Status == 2);
-            var activecount = filteredPatients.Count(item => item.Status == 4 || item.Status == 5);
-            var conclude = filteredPatients.Count(item => item.Status == 6);
-            var toclosed = filteredPatients.Count(item => item.Status == 3 || item.Status == 7 || item.Status == 8);
-            var unpaid = filteredPatients.Count(item => item.Status == 9);
-            ViewBag.PandingCount = pandingcount;
-            ViewBag.NewCount = newcount;
-            ViewBag.activecount = activecount;
-            ViewBag.conclude = conclude;
-            ViewBag.toclosed = toclosed;
-            ViewBag.unpaid = unpaid; ViewBag.CurrentPage = page;
-            ViewBag.TotalPages = totalPages;
-            string sessionData = HttpContext.Session.GetString("token");
-
-            // Pass session data to the view
-            ViewBag.SessionData = sessionData;
-
+            ViewBag.totalPages =totalPages;
+            ViewBag.CurrentPage = page; ViewBag.PageSize = pageSize;
 
             return PartialView(partialName, paginatedData);
         }
@@ -128,10 +98,6 @@ namespace HelloDoc.Controllers
         {
             return View();
         }
-
-
-       
-        
         public IActionResult PendingTablePartial()
         {
             return PartialView("PendingTablePartial");
@@ -139,7 +105,6 @@ namespace HelloDoc.Controllers
         public IActionResult ViewCase(int id)
         {
                 var ViewCase = _admin.GetCaseById(id);
-
             return View(ViewCase);
         }
 
@@ -166,33 +131,19 @@ namespace HelloDoc.Controllers
         [HttpPost]
         public async Task<IActionResult> AssignRequest( int regionid, int physician, string description, int requestid,int status)
         {
-            if (status == 1)
-            {
+            
             var result = await _admin.AssignRequest(regionid, physician, description, requestid);
             return Json(result);
 
-            }
-            if (status == 2)
-            {
-                var request = _context.Requests.FirstOrDefault(item => item.Requestid == requestid);
-                request.Status = (short)status;
-                request.Physicianid= physician;
-                _context.Requests.Update(request);
-                
-
-                
-               var requeststatuslog = new Requeststatuslog();
-                requeststatuslog.Status = 2;
-                requeststatuslog.Requestid=requestid;
-                requeststatuslog.Notes = description;
-                requeststatuslog.Createddate= DateTime.Now;
-                requeststatuslog.Transtophysicianid = physician;
-                _context.Requeststatuslogs.Add(requeststatuslog);
-                _context.SaveChanges();
-                return Json(true);
-            }
-            return Json(false); 
+            
         }
+
+        public async Task<IActionResult> TransferRequest(int regionid, int physician, string description, int requestid, int status)
+        {
+            var result = await _admin.AssignRequest(regionid, physician, description, requestid);
+            return Json(result);
+        }
+
 
         [HttpPost]
         public async Task<IActionResult> ViewNotesPost(string adminNotes, int id)
@@ -236,23 +187,15 @@ namespace HelloDoc.Controllers
         [HttpPost]
         public IActionResult BlockRequest(string blockreason,int requestid)
         {
-            var request=_context.Requests.Find(requestid);
-            request.Status = 11;
-            _context.Requests.Update(request);  
-            var block=new Blockrequest();
-            block.Email = request.Email;
-            block.Phonenumber=request.Phonenumber;
-            block.Requestid =requestid.ToString();
-            block.Createddate= DateTime.Now;    
-            block.Reason= blockreason;
-            _context.Blockrequests.Add(block);  
-            var requeststatuslog=new Requeststatuslog();    
-            requeststatuslog.Status = 11;
-            requeststatuslog.Createddate= DateTime.Now;
-            requeststatuslog.Requestid = requestid;
-            requeststatuslog.Notes = blockreason;
-            _context.Requeststatuslogs.Add(requeststatuslog);
-            _context.SaveChanges();
+            var success = _admin.BlockRequest(blockreason, requestid);
+            if (success)
+            {
+                TempData["SuccessMessage"] = "Block request successful!";
+            }
+            else
+            {
+                TempData["Error"] = "Block request Unsuccessful!";
+            }
             return RedirectToAction("Index");
         }
 
@@ -273,18 +216,21 @@ namespace HelloDoc.Controllers
         [HttpPost]
         public IActionResult DeleteFile(string filename)
         {
-
             try
             {
                 var file = _context.Requestwisefiles.FirstOrDefault(item => item.Filename == filename);
                     file.Isdeleted = new BitArray(new[] { true });
                     _context.Requestwisefiles.Update(file);
                     _context.SaveChanges();
-                    return Ok(new { message = "File deleted successfully" ,id=file.Requestid});
+                TempData["SuccessMessage"] = "Delete successful!";
+
+                return Ok(new { message = "File deleted successfully" ,id=file.Requestid});
                
             }
             catch (Exception ex)
             {
+                TempData["Error"] = "Delete Unsuccessful!";
+
                 return StatusCode(500, new { message = $"Error deleting file: {ex.Message}" });
             }
         }
@@ -300,17 +246,17 @@ namespace HelloDoc.Controllers
 
                     if (file != null)
                     {
-
-                    
                             file.Isdeleted = new BitArray(new[] { true });
                             _context.SaveChanges();
                     }
                     }
+                TempData["SuccessMessage"] = "Delete Selected successful!";
 
                 return Ok(new { message = "Files deleted successfully" });
             }
             catch (Exception ex)
             {
+                TempData["Error"] = "Delete Selected Unsuccessful!";
                 return StatusCode(500, new { message = $"Error deleting files: {ex.Message}" });
             }
         }
@@ -326,7 +272,6 @@ namespace HelloDoc.Controllers
             else
             {
                 return RedirectToAction("ViewUploads", "Admin", new { id = id });
-
             }
         }
 
@@ -335,18 +280,14 @@ namespace HelloDoc.Controllers
         {
             try
             {
-                // Ensure filenames are not null or empty before proceeding
                 if (filenames == null || filenames.Count == 0)
                 {
                     return BadRequest(new { message = "No files selected to send in the email." });
                 }
-
-                // Get recipient email, subject, and body from your ViewModel or wherever it's stored
-                string toEmail = "munavvarpopatiya999@gmail.com"; // Replace with your recipient email
+                string toEmail = "munavvarpopatiya999@gmail.com"; 
                 string subject = "Selected Files";
                 string body = "Please find attached files.";
 
-                // Call your repository method to send email
                 bool isEmailSent = _admin.IsSendEmail(toEmail, subject, body, filenames);
 
                 if (isEmailSent)
@@ -364,29 +305,12 @@ namespace HelloDoc.Controllers
             }
         }
 
-        public JsonResult CheckSession()
-        {
-            string sessionData = HttpContext.Session.GetString("token");
-
         
-            if (string.IsNullOrEmpty(sessionData))
-            {
-                return Json(new { sessionExists = false });
-            }
-            else
-            {
-                return Json(new { sessionExists = true });
-            }
-        }
         public IActionResult SendOrder(int requestid)
         {
-            var profession=_context.Healthprofessionaltypes.ToList();
-            var business = _context.Healthprofessionals.ToList();
-            var sendorder = new SendOrderModel();
-            sendorder.requestid=requestid;
-            sendorder.Healthprofessionaltypes=profession;
-            sendorder.helthProfessional=business;
-            return View(sendorder);
+            var sendOrderModel = _admin.GetSendOrder(requestid);
+
+            return View(sendOrderModel);
         }
         public IActionResult VendorNameByHelthProfession(int helthprofessionaltype)
         {
@@ -399,19 +323,28 @@ namespace HelloDoc.Controllers
             var businessdetails=_context.Healthprofessionals.Where(item=>item.Healthprofessionalid == vendorname).FirstOrDefault();
             return Ok(businessdetails);
         }
+
         [HttpPost]
-        public IActionResult SendOrder(int requestid,int business,string contact,string Email,string FaxNumber,string Prescription)
+        public IActionResult SendOrder(SendOrderModel order)
         {
-            var orderdetail = new Orderdetail();
-            orderdetail.Requestid=requestid;
-            orderdetail.Email = Email;
-            orderdetail.Prescription=Prescription;
-            orderdetail.Vendorid = business;
-            orderdetail.Faxnumber = FaxNumber;
-            orderdetail.Businesscontact = contact;
-            _context.Orderdetails.Add(orderdetail);  
-            _context.SaveChanges();
-            return Ok(new { message = "Order successfully", id = requestid });
+            
+
+
+                var result = _admin.SendOrders(order);
+
+                if (result)
+                {
+                    TempData["SuccessMessage"] = "Order successfully";
+                }
+                else
+                {
+                    TempData["Error"] = "Order Unsuccessfully";
+                }
+                return RedirectToAction("SendOrder", "Admin", new { requestid = order.requestid });
+
+            
+        
+            
         }
         [HttpPost]
         public IActionResult SendAgreement(int requestid, string agreementemail, string agreementphoneno)
@@ -419,11 +352,7 @@ namespace HelloDoc.Controllers
             var token = _jwtAuth.GenerateToken(agreementemail, agreementphoneno);
             var protector = _dataProtectionProvider.CreateProtector("munavvar");
             string requestidto=protector.Protect(requestid.ToString());
-
-
             var Agreemnet = Url.Action("ReviewAgreement", "Request", new { requestid = requestidto }, protocol: HttpContext.Request.Scheme);
-            
-            
             if (_login.IsSendEmail("munavvarpopatiya777@gmail.com", "Munavvar", $"Click <a href='{Agreemnet}'>here</a> to reset your password.")) {
                 return Ok(new {Message="send a mail",id=requestid});
             

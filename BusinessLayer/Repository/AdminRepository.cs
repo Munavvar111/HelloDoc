@@ -122,6 +122,11 @@ namespace BusinessLayer.Repository
                                      Email = reqclient.Email,
                                      Location = reqclient.Location,
                                      RequestClientId = reqclient.Requestclientid,
+                                     Cancel = _context.Casetags.Select(cc => new CancelCase
+                                     {
+                                         CancelCaseReson = cc.Name,
+                                         CancelReasonId = cc.Casetagid
+                                     }).ToList()
                                  }).FirstOrDefault();
 
             return requestclient;
@@ -222,7 +227,6 @@ namespace BusinessLayer.Repository
             }
             catch (Exception)
             {
-                // Handle exceptions according to your application's needs
                 return false;
             }
         }
@@ -257,7 +261,6 @@ namespace BusinessLayer.Repository
             }
             catch (Exception)
             {
-                // Handle exceptions according to your application's needs
                 return false;
             }
         }
@@ -342,5 +345,87 @@ namespace BusinessLayer.Repository
             }
         }
 
+        public bool BlockRequest(string blockReason, int requestId)
+        {
+            try
+            {
+                var request = _context.Requests.Find(requestId);
+
+                if (request != null)
+                {
+                    request.Status = 11;
+                    _context.Requests.Update(request);
+
+                    var block = new Blockrequest
+                    {
+                        Email = request.Email,
+                        Phonenumber = request.Phonenumber,
+                        Requestid = requestId.ToString(),
+                        Createddate = DateTime.Now,
+                        Reason = blockReason
+                    };
+
+                    _context.Blockrequests.Add(block);
+
+                    var requeststatuslog = new Requeststatuslog
+                    {
+                        Status = 11,
+                        Createddate = DateTime.Now,
+                        Requestid = requestId,
+                        Notes = blockReason
+                    };
+
+                    _context.Requeststatuslogs.Add(requeststatuslog);
+                    _context.SaveChanges();
+
+                    return true;
+                }
+
+                return false;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+        public bool SendOrders(SendOrderModel order)
+        {
+            try
+            {
+                var orderdetail = new Orderdetail
+                {
+                    Requestid = order.requestid,
+                    Email = order.Email,
+                    Prescription = order.Prescription,
+                    Vendorid = order.BusinessId,
+                    Faxnumber = order.FaxNumber,
+                    Businesscontact = order.Contact
+                };
+
+                _context.Orderdetails.Add(orderdetail);
+                _context.SaveChanges();
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+        }
+        public SendOrderModel GetSendOrder(int requestid)
+        {
+            var profession = _context.Healthprofessionaltypes.ToList();
+            var business = _context.Healthprofessionals.ToList();
+
+            var sendorder = new SendOrderModel
+            {
+                requestid = requestid,
+                Healthprofessionaltypes = profession,
+                helthProfessional = business
+            };
+
+            return sendorder;
+        }
     }
 }

@@ -159,20 +159,19 @@
         </div>
         <div class="row mb-3 mt-3">
             <div class="d-flex gap-3 align-items-center justify-content-end">
-                <button class="btn btn-info text-light" type="submit" id="submit">
-                    Assign
-                </button>
+              <button type="button" class="btn btn-info text-light mx-3" data-bs-toggle="modal" data-bs-target="#assigncase" data-bs-requestid="@Model.RequestId" data-bs-status="@Model.status">Assign Case</button>
                 <button class="btn btn-info text-light mx-3" asp-action="ViewNotes" asp-route-requestid="@Model.RequestId" id="submit">
                     View Notes
                 </button>
-                <a href="submitrequest.html" class="btn btn-danger d-flex align-items-center h-100 text-light">
-                    Cancel
-                </a>
+                    <button type="button" class="btn btn-danger text-light mx-3" data-bs-toggle="modal" data-bs-target="#cancelcaseview" id="examplemodal" data-bs-requestid="@Model.RequestId" data-bs-patientname="@Model.FirstName">Cancel  Case</button>
+                   
             </div>
         </div>
         </div>
     </form>
 </div>
+<partial name="AssignCase"></partial>
+<partial name="CancelCaseView" model="@Model"></partial>
 
 <script>
     $("#SubBtn").hide();
@@ -209,4 +208,56 @@
         $("#SubBtn").hide();
         $("#CanBtn").hide();
     }
+</script>
+<script>
+    $(document).ready(function () {
+
+        $('#assigncase').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget);
+            console.log(button)
+            var recipient = button.data('bs-requestid');
+            console.log(recipient);
+            var status = button.data('bs-status');
+            if (status == 2) {
+                $('.title').html('Transfer Case');
+                $('#trnasfertext').html('To Transfer This Request,Search and Select Another Physician')
+            }
+            var modal = $(this);
+            modal.find('#status').val(status)
+            modal.find('#requestIdInputCancel1').val(recipient);
+        });
+        $('#assigncase').on('hidden.bs.modal', function () {
+            console.log("hidden")
+            $('#assigncaseform').each(function () {
+                this.reset();
+            })
+
+        });
+    });
+
+
+</script>
+<script>
+    $(document).ready(function () {
+
+        $('#cancelcaseview').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget);
+            console.log(button)
+            var recipient = button.data('bs-requestid');
+            var patientName = button.data('bs-patientname')
+            console.log(recipient)
+            var modal = $(this);
+            modal.find('#patientname').text(patientName)
+            modal.find('#requestIdInputCancel').val(recipient);
+        });
+        $('#cancelcaseview').on('hidden.bs.modal', function () {
+            console.log("hidden")
+            $('#cancelCaseForm').each(function () {
+                this.reset();
+            })
+
+        });
+
+    });
+
 </script>

@@ -1,0 +1,41 @@
+﻿<div class="modal fade" id="transfercase" tabindex="-1" role="dialog" aria-labelledby="assigncase " aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h1 class="modal-title fs-5 title" id="exampleModalLabel">Transfer Case</h1>
+                <button type="button" class="close bg-info border border-info" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true" class="fs-1">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body text-start">
+                <span class="text-start" id="trnasfertext">To Transfer This Request,Search and Select Another Physician</span>
+                <form asp-action="" id="transformcase">
+                    <input type="hidden" name="requestid" id="requestIdInputTransfer" class="requestIdInputCancel1" />
+                    <select class="form-select mb-4 mt-4 regionDropdown regionid" name="region" aria-label="Default select example" id="regionidtransfer">
+                        <option value="" disabled selected>Narrow Search By Region</option>
+                        <option value="1">One</option>
+                        <option value="2">Two</option>
+                        <option value="3">Three</option>
+                    </select>
+                    <select class="form-select mb-4 mt-4 physicianDropdown" name="physician" aria-label="Default select example" id="physicianDropdownTransfer">
+                        <option value="" disabled selected>Select Physician</option>
+                        <option value="One">One</option>
+                        <option value="Two">Two</option>
+                        <option value="Three">Three</option>
+                    </select>
+                    <div class="form-floating mb-4">
+                        <textarea class="form-control description" placeholder="Description" name="notes"
+                                  style="height: 100px" id="descriptiontransfer"></textarea>
+                        <label for="floatingTextarea2" class="floating-label fs-6">
+                            Description
+                        </label>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-info confirmBtn asigncasebutton" id="transfercasebutton" data-id="">Submit</button>
+                        <button type="button" class="btn btn-info" data-bs-dismiss="modal">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

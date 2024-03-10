@@ -3,13 +3,22 @@
     Layout = "~/Views/Shared/_Layout2.cshtml";
     ViewData["Title"] = "Login";
 }
-@if (TempData.ContainsKey("ToasterMessage"))
+@if (TempData.ContainsKey("Error"))
 {
+      <script>
+        $(document).ready(function () {
+            toastr.options = {
+                "closeButton": true,
+                "positionClass": "toast-top-right",
+                "timeOut": "5000"
+            };
 
-
-    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+            toastr.error('@TempData["Error"]');
+        });
+    </script>
+}
+@if (TempData.ContainsKey("SuccessMessage"))
+{
     <script>
         $(document).ready(function () {
             toastr.options = {
@@ -18,7 +27,7 @@
                 "timeOut": "5000"
             };
 
-            toastr.error('@TempData["ToasterMessage"]');
+            toastr.success('@TempData["SuccessMessage"]');
         });
     </script>
 }

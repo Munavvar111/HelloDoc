@@ -19,6 +19,9 @@ namespace BusinessLayer.InterFace
         Task<bool> CancelCase(int requestId, string notes, string cancelReason);
 
         public bool IsSendEmail(string toEmail, string subject, string body, List<string> filenames);
+        bool BlockRequest(string blockReason, int requestId);
+        bool SendOrders(SendOrderModel order);
+        SendOrderModel GetSendOrder(int requestid);
 
 
     }

@@ -3,6 +3,34 @@
 @{
     Layout = "~/Views/Shared/_Layout4.cshtml";
 }
+@if (TempData.ContainsKey("Error"))
+{
+    <script>
+        $(document).ready(function () {
+            toastr.options = {
+                "closeButton": true,
+                "positionClass": "toast-top-right",
+                "timeOut": "5000"
+            };
+
+            toastr.error('@TempData["Error"]');
+        });
+    </script>
+}
+@if (TempData.ContainsKey("SuccessMessage"))
+{
+    <script>
+        $(document).ready(function () {
+            toastr.options = {
+                "closeButton": true,
+                "positionClass": "toast-top-right",
+                "timeOut": "5000"
+            };
+
+            toastr.success('@TempData["SuccessMessage"]');
+        });
+    </script>
+}
 
 @section scripts{
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
@@ -230,7 +258,7 @@
 </div>
 <div>
 </div>
-
+<partial name="TransferCase"></partial>
 <partial name="CancelCase" model="@Model"> </partial>
 <partial name="BlockPatient"></partial>
 <partial name="AssignCase"></partial>
@@ -247,12 +275,8 @@
             var recipient = button.data('bs-requestid');
             console.log(recipient);
             var status=button.data('bs-status');
-            if(status==2){
-                $('.title').html('Transfer Case');
-                $('#trnasfertext').html('To Transfer This Request,Search and Select Another Physician')
-            }
+            
             var modal = $(this);
-            modal.find('#status').val(status)
             modal.find('#requestIdInputCancel1').val(recipient);
         });
         $('#assigncase').on('hidden.bs.modal', function () {
@@ -262,10 +286,36 @@
             })
 
         });
+
+
     });
 
 
 </script>
+
+<script>
+    $(document).ready(function () {
+
+        $('#transfercase').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget);
+            console.log(button)
+            var recipient = button.data('bs-requestid');
+            console.log(recipient);
+            var modal = $(this);
+            modal.find('#requestIdInputTransfer').val(recipient);
+        });
+        $('#transfercase').on('hidden.bs.modal', function () {
+            console.log("hidden")
+            $('#transformcase').each(function () {
+                this.reset();
+            })
+
+        });
+    });
+
+
+</script>
+
 
 <script>
     $(document).ready(function () {
