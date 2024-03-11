@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.Metrics;
 using System.Linq;
 using System.Net.NetworkInformation;
 using System.Text;
@@ -32,12 +33,15 @@ namespace BusinessLayer.Repository
 
         public List<NewRequestTableVM> SearchPatients(string searchValue, string selectValue, string selectedFilter, int[] currentStatus)
         {
-                var filteredPatients = (from req in _context.Requests
+            var filteredPatients = (from req in _context.Requests
                                     join reqclient in _context.Requestclients
                                     on req.Requestid equals reqclient.Requestid
                                     join p in _context.Physicians
                                     on req.Physicianid equals p.Physicianid into phy
                                     from ps in phy.DefaultIfEmpty()
+                                    join encounter in _context.Encounterforms
+                                    on req.Requestid equals encounter.RequestId into enco
+                                    from eno in enco.Where(e => e != null).DefaultIfEmpty()
                                     select new NewRequestTableVM
                                     {
                                         PatientName = reqclient.Firstname.ToLower(),
@@ -55,6 +59,7 @@ namespace BusinessLayer.Repository
                                         Status = req.Status,
                                         RequestClientId = reqclient.Requestclientid,
                                         RequestId = reqclient.Requestid,
+                                        isfinalize = eno.IsFinalize,
                                         PhysicianName = ps.Firstname + "_" + ps.Lastname,
                                         Cancel = _context.Casetags.Select(cc => new CancelCase
                                         {
@@ -170,7 +175,7 @@ namespace BusinessLayer.Repository
                                AdminNotes = rn.Adminnotes,
                                PhysicianNotes = rn.Physiciannotes,
                                TransferNotes = rs.Notes,
-                               Cancelcount = _context.Requeststatuslogs.Count(item => item.Status == 3)
+                               Cancelcount = _context.Requeststatuslogs.Count(item => item.Status == 3 || item.Status==7)
                            };
 
             var rightJoin = from rs in _context.Requeststatuslogs
@@ -190,7 +195,7 @@ namespace BusinessLayer.Repository
                                 AdminNotes = rn.Adminnotes,
                                 PhysicianNotes = rn.Physiciannotes,
                                 TransferNotes = rs.Notes,
-                                Cancelcount = _context.Requeststatuslogs.Count(item => item.Status == 3)
+                                Cancelcount = _context.Requeststatuslogs.Count(item => item.Status == 3 || item.Status==7)
                             };
             var result = leftJoin.Union(rightJoin).ToList();
             return result;

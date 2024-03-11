@@ -5,6 +5,7 @@
 @{
     // Get the value of the requestid parameter from the URL
     int requestId = (int)ViewData["RequestId"];
+
 }
 @model List<DataAccessLayer.CustomModel.ViewNotesVM>
 
@@ -41,7 +42,7 @@
                         <div>
                            @for (var i = 0; i < @Model.Count; i++)
                                             {
-                                                if(@Model[i].TransferNotes != null && Model[i].Status != 3)
+                                                if(@Model[i].TransferNotes != null && Model[i].Status != 3 && Model[i].Status !=7)
                                                 {
                                                     <p class="notesbtn m-0">(@(i + 1)) @Model[i].TransferNotes</p>
                                                 }

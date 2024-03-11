@@ -359,12 +359,13 @@ $(document).ready(function () {
             data: { region: selectregion },
             success: function (physicians) {
                 $('.physicianDropdown').empty();
+                $('.physicianDropdown').append($('<option>', {
+                    value: 'selected',
+                    text: "please selected the value"
+                }))
                 $.each(physicians, function (index, physician) {
                     console.log(physician)
-                    $('.physicianDropdown').append($('<option>', {
-                        value: 'selected',
-                        text:"please selected the value"
-                    }))
+                   
                     $('.physicianDropdown').append($('<option>', {
                         value: physician.physicianid,
                         text: physician.firstname + ' ' + physician.lastname
@@ -523,7 +524,8 @@ $(document).ready(function () {
             success: function (response) {
                 console.log(response)
                 if (response) {
-                    window.location.href='/Admin'
+                    window.location.href = '/Admin';
+                    
                 }
                 else {
                     toastr.error("Agreement Unsuccessful!")

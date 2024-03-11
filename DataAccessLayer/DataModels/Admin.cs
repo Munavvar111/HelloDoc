@@ -87,6 +87,9 @@ public partial class Admin
     [InverseProperty("AdminAspnetusers")]
     public virtual AspnetUser Aspnetuser { get; set; } = null!;
 
+    [InverseProperty("Admin")]
+    public virtual ICollection<Encounterform> Encounterforms { get; set; } = new List<Encounterform>();
+
     [ForeignKey("Modifiedby")]
     [InverseProperty("AdminModifiedbyNavigations")]
     public virtual AspnetUser? ModifiedbyNavigation { get; set; }

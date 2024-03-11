@@ -3,6 +3,7 @@ using BusinessLayer.Repository;
 using DataAccessLayer.DataContext;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.EntityFrameworkCore;
+using Rotativa.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -48,6 +49,8 @@ app.UseSession();
 
 
 app.UseAuthorization();
+
+
 
 app.MapControllerRoute(
     name: "default",
