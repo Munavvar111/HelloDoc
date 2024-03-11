@@ -398,91 +398,31 @@ namespace HelloDoc.Controllers
         [HttpGet]
         public IActionResult GeneratePDF(int requestid)
         {
-            var encounterformbyrequestid = _context.Encounterforms.Where(item => item.RequestId == requestid).FirstOrDefault();
-            var request = _context.Requestclients.Where(item => item.Requestid == requestid).FirstOrDefault();
-            var viewencounterform = new ViewEncounterForm();
 
-            viewencounterform.FirstName = request.Firstname;
-            viewencounterform.LastName = request.Lastname;
-            viewencounterform.DateOfBirth = new DateOnly((int)request.Intyear, int.Parse(request.Strmonth), (int)request.Intdate);
-            viewencounterform.Email = request.Email;
-            viewencounterform.Location = request.Address + ',' + request.City + ',' + request.State;
-            viewencounterform.ABD = encounterformbyrequestid.Abd;
+            var viewEncounterForm = _admin.GetEncounterForm(requestid);
 
-            viewencounterform.Skin = encounterformbyrequestid.Skin;
-            viewencounterform.RR = encounterformbyrequestid.Rr;
-            viewencounterform.Procedures = encounterformbyrequestid.Procedures;
-            viewencounterform.CV = encounterformbyrequestid.Cv;
-            viewencounterform.Chest = encounterformbyrequestid.Chest;
-            viewencounterform.Allergies = encounterformbyrequestid.Allergies;
-            viewencounterform.BPDiastolic = encounterformbyrequestid.BloodPressureDiastolic;
-            viewencounterform.BPSystolic = encounterformbyrequestid.BloodPressureSystolic;
-            viewencounterform.Diagnosis = encounterformbyrequestid.Diagnosis;
-            viewencounterform.Followup = encounterformbyrequestid.FollowUp;
-            viewencounterform.Heent = encounterformbyrequestid.Heent;
-            viewencounterform.HistoryOfPresentIllness = encounterformbyrequestid.HistoryOfPresentIllnessOrInjury;
-            viewencounterform.HR = encounterformbyrequestid.Hr;
-            viewencounterform.MedicalHistory = encounterformbyrequestid.MedicalHistory;
-            viewencounterform.Medications = encounterformbyrequestid.Medications;
-            viewencounterform.MedicationsDispensed = encounterformbyrequestid.MedicationsDispensed;
-            viewencounterform.Neuro = encounterformbyrequestid.Neuro;
-            viewencounterform.O2 = encounterformbyrequestid.O2;
-            viewencounterform.Other = encounterformbyrequestid.Other;
-            viewencounterform.Pain = encounterformbyrequestid.Pain;
-            viewencounterform.Procedures = encounterformbyrequestid.Procedures;
-            viewencounterform.Temperature = encounterformbyrequestid.Temp;
-            viewencounterform.TreatmentPlan = encounterformbyrequestid.TreatmentPlan;
-
-            if (viewencounterform == null)
+            if (viewEncounterForm == null)
             {
                 return NotFound();
             }
+
             //return View("EncounterFormDetails", encounterFormView);
-            return new ViewAsPdf("EncounterFormDetails", viewencounterform)
+            return new ViewAsPdf("EncounterFormDetails", viewEncounterForm)
             {
                 FileName = "Encounter_Form.pdf"
             };
 
         }
+        
         public IActionResult EncounterForm(int requestid)
         {
-                var viewencounterform = new ViewEncounterForm();
+            var viewencounterform = new ViewEncounterForm();
             var encounterformbyrequestid = _context.Encounterforms.Where(item => item.RequestId == requestid).FirstOrDefault();
             if (encounterformbyrequestid !=null && !encounterformbyrequestid.IsFinalize)
             {
-                var request = _context.Requestclients.Where(item => item.Requestid == requestid).FirstOrDefault();
+                var viewEncounterForm = _admin.GetEncounterForm(requestid);
 
-                viewencounterform.FirstName = request.Firstname;
-                viewencounterform.LastName = request.Lastname;
-                viewencounterform.DateOfBirth = new DateOnly((int)request.Intyear, int.Parse(request.Strmonth), (int)request.Intdate);
-                viewencounterform.Email = request.Email;
-                viewencounterform.Location = request.Address + ',' + request.City + ',' + request.State;
-                viewencounterform.ABD = encounterformbyrequestid.Abd;
-
-                viewencounterform.Skin = encounterformbyrequestid.Skin;
-                viewencounterform.RR = encounterformbyrequestid.Rr;
-                viewencounterform.Procedures = encounterformbyrequestid.Procedures;
-                viewencounterform.CV = encounterformbyrequestid.Cv;
-                viewencounterform.Chest = encounterformbyrequestid.Chest;
-                viewencounterform.Allergies = encounterformbyrequestid.Allergies;
-                viewencounterform.BPDiastolic = encounterformbyrequestid.BloodPressureDiastolic;
-                viewencounterform.BPSystolic = encounterformbyrequestid.BloodPressureSystolic;
-                viewencounterform.Diagnosis = encounterformbyrequestid.Diagnosis;
-                viewencounterform.Followup = encounterformbyrequestid.FollowUp;
-                viewencounterform.Heent = encounterformbyrequestid.Heent;
-                viewencounterform.HistoryOfPresentIllness = encounterformbyrequestid.HistoryOfPresentIllnessOrInjury;
-                viewencounterform.HR = encounterformbyrequestid.Hr;
-                viewencounterform.MedicalHistory = encounterformbyrequestid.MedicalHistory;
-                viewencounterform.Medications = encounterformbyrequestid.Medications;
-                viewencounterform.MedicationsDispensed = encounterformbyrequestid.MedicationsDispensed;
-                viewencounterform.Neuro = encounterformbyrequestid.Neuro;
-                viewencounterform.O2 = encounterformbyrequestid.O2;
-                viewencounterform.Other = encounterformbyrequestid.Other;
-                viewencounterform.Pain = encounterformbyrequestid.Pain;
-                viewencounterform.Procedures = encounterformbyrequestid.Procedures;
-                viewencounterform.Temperature = encounterformbyrequestid.Temp;
-                viewencounterform.TreatmentPlan = encounterformbyrequestid.TreatmentPlan;
-                return View(viewencounterform);
+                return View(viewEncounterForm);
 
             }
             else
@@ -505,72 +445,9 @@ namespace HelloDoc.Controllers
         {
             if (viewEncounterForm.IsFinalizied == "0")
             {
-                var encounter = _context.Encounterforms.Where(item=>item.RequestId==int.Parse(requestid)).FirstOrDefault();
-                if (encounter == null)
-                {
-                    var encounterFirsttime = new Encounterform();
-                    encounterFirsttime.Abd = viewEncounterForm.ABD;
-                    encounterFirsttime.Skin = viewEncounterForm.Skin;
-                    encounterFirsttime.Rr = viewEncounterForm.RR;
-                    encounterFirsttime.Procedures = viewEncounterForm.Procedures;
-                    encounterFirsttime.Cv = viewEncounterForm.CV;
-                    encounterFirsttime.Chest = viewEncounterForm.Chest;
-                    encounterFirsttime.Allergies = viewEncounterForm.Allergies;
-                    encounterFirsttime.BloodPressureDiastolic = viewEncounterForm.BPDiastolic;
-                    encounterFirsttime.BloodPressureSystolic = viewEncounterForm.BPSystolic;
-                    encounterFirsttime.Diagnosis = viewEncounterForm.Diagnosis;
-                    encounterFirsttime.FollowUp = viewEncounterForm.Followup;
-                    encounterFirsttime.RequestId = int.Parse(requestid);
-                    encounterFirsttime.Heent = viewEncounterForm.Heent;
-                    encounterFirsttime.HistoryOfPresentIllnessOrInjury = viewEncounterForm.HistoryOfPresentIllness;
-                    encounterFirsttime.Hr = viewEncounterForm.HR;
-                    encounterFirsttime.IsFinalize = false;
-                    encounterFirsttime.MedicalHistory = viewEncounterForm.MedicalHistory;
-                    encounterFirsttime.Medications = viewEncounterForm.Medications;
-                    encounterFirsttime.MedicationsDispensed = viewEncounterForm.MedicationsDispensed;
-                    encounterFirsttime.Neuro = viewEncounterForm.Neuro;
-                    encounterFirsttime.O2 = viewEncounterForm.O2;
-                    encounterFirsttime.Other = viewEncounterForm.Other;
-                    encounterFirsttime.Pain = viewEncounterForm.Pain;
-                    encounterFirsttime.Procedures = viewEncounterForm.Procedures;
-                    encounterFirsttime.Temp = viewEncounterForm.Temperature;
-                    encounterFirsttime.TreatmentPlan = viewEncounterForm.TreatmentPlan;
-                    _context.Encounterforms.Add(encounterFirsttime);
-                    _context.SaveChanges();
-                }
-                else
-                {
-                    
-                encounter.Abd = viewEncounterForm.ABD;
-                encounter.Skin = viewEncounterForm.Skin;
-                encounter.Rr = viewEncounterForm.RR;
-                encounter.Procedures = viewEncounterForm.Procedures;
-                encounter.Cv = viewEncounterForm.CV;
-                encounter.Chest=viewEncounterForm.Chest;
-                encounter.Allergies= viewEncounterForm.Allergies;
-                encounter.BloodPressureDiastolic = viewEncounterForm.BPDiastolic;
-                encounter.BloodPressureSystolic=viewEncounterForm.BPSystolic;
-                encounter.Diagnosis= viewEncounterForm.Diagnosis;
-                encounter.FollowUp = viewEncounterForm.Followup;
-                encounter.RequestId = int.Parse(requestid);
-                encounter.Heent=viewEncounterForm.Heent;
-                encounter.HistoryOfPresentIllnessOrInjury = viewEncounterForm.HistoryOfPresentIllness;
-                encounter.Hr = viewEncounterForm.HR;
-                encounter.IsFinalize = false;
-                encounter.MedicalHistory = viewEncounterForm.MedicalHistory;
-                encounter.Medications=viewEncounterForm.Medications;
-                encounter.MedicationsDispensed = viewEncounterForm.MedicationsDispensed;
-                encounter.Neuro = viewEncounterForm.Neuro;
-                encounter.O2 = viewEncounterForm.O2;
-                encounter.Other = viewEncounterForm.Other;
-                encounter.Pain = viewEncounterForm.Pain;
-                encounter.Procedures=viewEncounterForm.Procedures;
-                encounter.Temp = viewEncounterForm.Temperature;
-                encounter.TreatmentPlan = viewEncounterForm.TreatmentPlan;
-                _context.Encounterforms.Update(encounter);    
-                _context.SaveChanges();
-                }
-            return RedirectToAction("EncounterForm", "Admin", new { requestid =requestid});
+                _admin.SaveOrUpdateEncounterForm(viewEncounterForm, requestid);
+
+                return RedirectToAction("EncounterForm", "Admin", new { requestid = requestid });
             }
             else
             {

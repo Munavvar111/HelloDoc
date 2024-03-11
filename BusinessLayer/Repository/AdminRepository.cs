@@ -432,5 +432,135 @@ namespace BusinessLayer.Repository
 
             return sendorder;
         }
+        public ViewEncounterForm GetEncounterForm(int requestid)
+        {
+            var encounterformbyrequestid = _context.Encounterforms
+                .Where(item => item.RequestId == requestid)
+                .FirstOrDefault();
+
+            var request = _context.Requestclients
+                .Where(item => item.Requestid == requestid)
+                .FirstOrDefault();
+
+            var viewencounterform = new ViewEncounterForm();
+
+            if (encounterformbyrequestid != null)
+            {
+                viewencounterform.FirstName = request.Firstname;
+                viewencounterform.LastName = request.Lastname;
+                viewencounterform.DateOfBirth = new DateOnly((int)request.Intyear, int.Parse(request.Strmonth), (int)request.Intdate);
+                viewencounterform.Email = request.Email;
+                viewencounterform.Location = $"{request.Address}, {request.City}, {request.State}";
+
+                viewencounterform.ABD = encounterformbyrequestid.Abd;
+                viewencounterform.Skin = encounterformbyrequestid.Skin;
+                viewencounterform.RR = encounterformbyrequestid.Rr;
+                viewencounterform.Procedures = encounterformbyrequestid.Procedures;
+                viewencounterform.CV = encounterformbyrequestid.Cv;
+                viewencounterform.Chest = encounterformbyrequestid.Chest;
+                viewencounterform.Allergies = encounterformbyrequestid.Allergies;
+                viewencounterform.BPDiastolic = encounterformbyrequestid.BloodPressureDiastolic;
+                viewencounterform.BPSystolic = encounterformbyrequestid.BloodPressureSystolic;
+                viewencounterform.Diagnosis = encounterformbyrequestid.Diagnosis;
+                viewencounterform.Followup = encounterformbyrequestid.FollowUp;
+                viewencounterform.Heent = encounterformbyrequestid.Heent;
+                viewencounterform.HistoryOfPresentIllness = encounterformbyrequestid.HistoryOfPresentIllnessOrInjury;
+                viewencounterform.HR = encounterformbyrequestid.Hr;
+                viewencounterform.MedicalHistory = encounterformbyrequestid.MedicalHistory;
+                viewencounterform.Medications = encounterformbyrequestid.Medications;
+                viewencounterform.MedicationsDispensed = encounterformbyrequestid.MedicationsDispensed;
+                viewencounterform.Neuro = encounterformbyrequestid.Neuro;
+                viewencounterform.O2 = encounterformbyrequestid.O2;
+                viewencounterform.Other = encounterformbyrequestid.Other;
+                viewencounterform.Pain = encounterformbyrequestid.Pain;
+                viewencounterform.Temperature = encounterformbyrequestid.Temp;
+                viewencounterform.TreatmentPlan = encounterformbyrequestid.TreatmentPlan;
+            }
+
+            return viewencounterform;
+        }
+
+        public void SaveOrUpdateEncounterForm(ViewEncounterForm viewEncounterForm, string requestid)
+    {
+        var encounter = _context.Encounterforms
+            .FirstOrDefault(item => item.RequestId == int.Parse(requestid));
+
+        if (encounter == null)
+        {
+            AddNewEncounterForm(viewEncounterForm, requestid);
+        }
+        else
+        {
+            UpdateExistingEncounterForm(encounter, viewEncounterForm, requestid);
+        }
+    }
+
+    private void AddNewEncounterForm(ViewEncounterForm viewEncounterForm, string requestid)
+    {
+        var encounterFirsttime = new Encounterform
+        {
+            Abd = viewEncounterForm.ABD,
+            Skin = viewEncounterForm.Skin,
+            Rr = viewEncounterForm.RR,
+            Procedures = viewEncounterForm.Procedures,
+            Cv = viewEncounterForm.CV,
+            Chest = viewEncounterForm.Chest,
+            Allergies = viewEncounterForm.Allergies,
+            BloodPressureDiastolic = viewEncounterForm.BPDiastolic,
+            BloodPressureSystolic = viewEncounterForm.BPSystolic,
+            Diagnosis = viewEncounterForm.Diagnosis,
+            FollowUp = viewEncounterForm.Followup,
+            RequestId = int.Parse(requestid),
+            Heent = viewEncounterForm.Heent,
+            HistoryOfPresentIllnessOrInjury = viewEncounterForm.HistoryOfPresentIllness,
+            Hr = viewEncounterForm.HR,
+            IsFinalize = false,
+            MedicalHistory = viewEncounterForm.MedicalHistory,
+            Medications = viewEncounterForm.Medications,
+            MedicationsDispensed = viewEncounterForm.MedicationsDispensed,
+            Neuro = viewEncounterForm.Neuro,
+            O2 = viewEncounterForm.O2,
+            Other = viewEncounterForm.Other,
+            Pain = viewEncounterForm.Pain,
+            Temp = viewEncounterForm.Temperature,
+            TreatmentPlan = viewEncounterForm.TreatmentPlan
+        };
+
+        _context.Encounterforms.Add(encounterFirsttime);
+        _context.SaveChanges();
+    }
+
+    private void UpdateExistingEncounterForm(Encounterform encounter, ViewEncounterForm viewEncounterForm, string requestid)
+    {
+        encounter.Abd = viewEncounterForm.ABD;
+        encounter.Skin = viewEncounterForm.Skin;
+        encounter.Rr = viewEncounterForm.RR;
+        encounter.Procedures = viewEncounterForm.Procedures;
+        encounter.Cv = viewEncounterForm.CV;
+        encounter.Chest = viewEncounterForm.Chest;
+        encounter.Allergies = viewEncounterForm.Allergies;
+        encounter.BloodPressureDiastolic = viewEncounterForm.BPDiastolic;
+        encounter.BloodPressureSystolic = viewEncounterForm.BPSystolic;
+        encounter.Diagnosis = viewEncounterForm.Diagnosis;
+        encounter.FollowUp = viewEncounterForm.Followup;
+        encounter.RequestId = int.Parse(requestid);
+        encounter.Heent = viewEncounterForm.Heent;
+        encounter.HistoryOfPresentIllnessOrInjury = viewEncounterForm.HistoryOfPresentIllness;
+        encounter.Hr = viewEncounterForm.HR;
+        encounter.IsFinalize = false;
+        encounter.MedicalHistory = viewEncounterForm.MedicalHistory;
+        encounter.Medications = viewEncounterForm.Medications;
+        encounter.MedicationsDispensed = viewEncounterForm.MedicationsDispensed;
+        encounter.Neuro = viewEncounterForm.Neuro;
+        encounter.O2 = viewEncounterForm.O2;
+        encounter.Other = viewEncounterForm.Other;
+        encounter.Pain = viewEncounterForm.Pain;
+        encounter.Procedures = viewEncounterForm.Procedures;
+        encounter.Temp = viewEncounterForm.Temperature;
+        encounter.TreatmentPlan = viewEncounterForm.TreatmentPlan;
+
+        _context.Encounterforms.Update(encounter);
+        _context.SaveChanges();
+    }
     }
 }

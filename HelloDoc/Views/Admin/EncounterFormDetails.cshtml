@@ -1,6 +1,66 @@
 ﻿@model DataAccessLayer.CustomModel.ViewEncounterForm
-<div class="encounterForm h-100">
-    <h2>Encounter Form Details</h2>
+@{
+    Layout = null;
+}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Encounter Form Details</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        .encounterForm {
+            background-color: #fff;
+            border: 2px solid #3498db;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+            margin: 20px;
+            padding: 20px;
+            max-width: 800px;
+            margin: auto;
+        }
+
+        h2 {
+            color: #3498db;
+            text-align: center;
+            font-size: 28px;
+            margin-bottom: 20px;
+        }
+
+        .details {
+            padding: 10px;
+        }
+
+        .data {
+            margin-bottom: 15px;
+            border: 2px solid #ddd;
+            padding: 15px;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+        }
+
+            .data span {
+                font-weight: bold;
+                color: #555;
+            }
+
+        .followup {
+            color: #e74c3c;
+            font-weight: bold;
+            font-size: 18px;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="encounterForm h-100">
+        <h2>Encounter Form Details</h2>
     <div class="details">
         <h5><div class="data"><span>First Name: </span> @Model.FirstName </div></h5>
         <h5><div class="data"><span>Last Name: </span> @Model.LastName </div></h5>
@@ -33,4 +93,6 @@
         <h5><div class="data"><span>Procedures: </span> @Model.Procedures </div></h5>
         <h5><div class="data followup"><span>FOLLOWUP: </span> @Model.Followup </div></h5>
     </div>
-</div>
+    </div>
+</body>
+</html>

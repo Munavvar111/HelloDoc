@@ -23,6 +23,8 @@ namespace BusinessLayer.InterFace
         bool SendOrders(SendOrderModel order);
         SendOrderModel GetSendOrder(int requestid);
 
+        ViewEncounterForm GetEncounterForm(int requestid);
+        void SaveOrUpdateEncounterForm(ViewEncounterForm viewEncounterForm, string requestid);
 
     }
 }

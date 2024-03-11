@@ -1,9 +1,11 @@
 using BusinessLayer.InterFace;
 using BusinessLayer.Repository;
 using DataAccessLayer.DataContext;
+using Humanizer;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.EntityFrameworkCore;
 using Rotativa.AspNetCore;
+using ServiceStack.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,6 +16,7 @@ builder.Services.AddScoped<IPatientRequest,PatientRequest>();
 builder.Services.AddScoped<IOtherRequest,OtherRequest>(); 
 builder.Services.AddScoped<IAdmin,AdminRepository>();
 builder.Services.AddScoped<IJwtAuth, JwtAuthRepo>();
+RotativaConfiguration.Setup(builder.Environment.WebRootPath, "Rotativa");
 
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -32,6 +35,7 @@ builder.Services.AddSession(options =>
 });
 
 var app = builder.Build();
+var hostingEnvironment = app.Services.GetRequiredService<IHostEnvironment>();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
@@ -41,15 +45,16 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
+
+
 app.UseHttpsRedirection();
+app.UseRotativa();
 app.UseStaticFiles();
 
 app.UseRouting();
 app.UseSession();
 
-
 app.UseAuthorization();
-
 
 
 app.MapControllerRoute(
