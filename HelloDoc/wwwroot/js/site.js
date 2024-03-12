@@ -24,7 +24,7 @@ $(document).ready(function () {
                 console.error('Error:', error);
             }
         });
-
+        
         function updateUIWithCountsNumber(data) {
             // Update your UI elements using the data received from the server
             $('#statuslink1 .Status-Count').text(data.newCount);
@@ -40,20 +40,23 @@ $(document).ready(function () {
 
     var storedPartial = localStorage.getItem('currentPartial');
     var storedStatus = JSON.parse(localStorage.getItem('currentStatus'));
-    var storedTringle = localStorage.getItem("currentTringle")
-
+    var statustext = localStorage.getItem('statustext');
+    
     var currentPartial = storedPartial || "NewTablePartial";
     var currentStatus = storedStatus || [1];
     var currentPage = 1;
     var pageSize = 3;
 
-    if (storedTringle) {
-        $(".triangle").css('display', 'none');
-        $("#triangle" + storedTringle).css('display', 'block')
+    var status = localStorage.getItem('statuslink');
+    $(".Status-btn").removeClass('activee');
+    $(status).addClass("activee");
+    if (statustext) {
+        $('#statuschange').html(statustext);
+    }
+    else {
+        $('#statuschange').html('(New)');
 
     }
-
-    //intial Only NewTablePartial Will load 
     filterTable(currentPartial, currentStatus, currentPage, pageSize);
     updateUIWithCounts();
 
@@ -65,52 +68,60 @@ $(document).ready(function () {
         filterTable(currentPartial, currentStatus, currentPage, pageSize);
     });
 
-    //onclick each partial will load
 
     $("#statuslink1").click(function (e) {
-        $(".triangle").css('display', 'none');
-        $("#triangle1").css('display', 'block').css('border-top-color', '#203f9a');
-
+        $("#searchInput").val("");
+         $("#filterSelect").val(" ");
+        $('.filter-item').removeClass('active')
+        $(".Status-btn").removeClass('activee');
+        $("#statuslink1").addClass("activee");
+        localStorage.setItem('statuslink', '#statuslink1')
         currentPartial = "NewTablePartial"
         currentStatus = [1];
         localStorage.setItem('currentPartial', currentPartial);
         localStorage.setItem('currentStatus', JSON.stringify(currentStatus));
-        localStorage.setItem("currentTringle", 1);
-
-
-        $('#statuschange').html('(new)');
+        $('#statuschange').html('(New)');
+        localStorage.setItem("statustext",'(New)')
         filterTable("NewTablePartial", currentStatus, currentPage, pageSize);
     });
 
 
 
     $("#statuslink2").click(function () {
-        console.log("hii2")
-        $(".triangle").css('display', 'none');
-        $("#triangle2").css('display', 'block').css('border-top-color', '#00adef');
+        $("#searchInput").val("");
+        $("#filterSelect").val(" ");
+        $('.filter-item').removeClass('active')
+        $(".Status-btn").removeClass('activee');
+        $("#statuslink2").addClass("activee");
+        localStorage.setItem('statuslink', '#statuslink2')
 
+        console.log("hii2")
+        
         currentPartial = "PendingTablePartial"
         currentStatus = [2];
         $('#statuschange').html('(Pending)');
+        localStorage.setItem("statustext", '(Pending)')
+
         localStorage.setItem('currentPartial', currentPartial);
         localStorage.setItem('currentStatus', JSON.stringify(currentStatus));
-        localStorage.setItem("currentTringle", 2);
-        console.log("jii", currentPage)
         filterTable(currentPartial, currentStatus, currentPage, pageSize);
     });
 
 
     $("#statuslink3").click(function () {
-        $(".triangle").css('display', 'none');
-        $("#triangle3").css('display', 'block').css('border-top-color', '#228c20');
-
+        $("#searchInput").val("");
+        $("#filterSelect").val(" ");
+        $('.filter-item').removeClass('active')
+        $(".Status-btn").removeClass('activee');
+        $("#statuslink3").addClass("activee");
+        localStorage.setItem('statuslink', '#statuslink3')
         currentStatus = [4, 5]
         currentPartial = "ActiveTablePartial";
         localStorage.setItem('currentPartial', currentPartial);
         localStorage.setItem('currentStatus', JSON.stringify(currentStatus));
-        localStorage.setItem("currentTringle", 3);
 
         $('#statuschange').html('(Active)');
+        localStorage.setItem("statustext", '(Active)')
 
         filterTable("ActiveTablePartial", currentStatus, currentPage, pageSize);
     });
@@ -118,44 +129,53 @@ $(document).ready(function () {
 
 
     $("#statuslink4").click(function () {
-        $(".triangle").css('display', 'none');
-        $("#triangle4").css('display', 'block').css('border-top-color', '#da0f82');
-
+        $("#searchInput").val("");
+        $("#filterSelect").val(" ");
+        $('.filter-item').removeClass('active')
+        $(".Status-btn").removeClass('activee');
+        $("#statuslink4").addClass("activee");
+        localStorage.setItem('statuslink', '#statuslink4')
         currentStatus = [6];
         currentPartial = "ConcludeTablePartial";
         $('#statuschange').html('(Conclude)');
+        localStorage.setItem("statustext", '(Conclude)')
+
         localStorage.setItem('currentPartial', currentPartial);
         localStorage.setItem('currentStatus', JSON.stringify(currentStatus));
-        localStorage.setItem("currentTringle", 4);
-
         filterTable("ConcludeTablePartial", currentStatus, currentPage, pageSize);
     });
 
     $("#statuslink5").click(function () {
-        $(".triangle").css('display', 'none');
-        $("#triangle5").css('display', 'block').css('border-top-color', '#0370d7');
-
+        $("#searchInput").val("");
+        $("#filterSelect").val(" ");
+        $('.filter-item').removeClass('active')
+        $(".Status-btn").removeClass('activee');
+        $("#statuslink5").addClass("activee");
         currentStatus = [3, 7, 8];
         currentPartial = "ToCloseTablePartial";
         $('#statuschange').html('(ToClose)');
-        localStorage.setItem('currentPartial', currentPartial);
-        localStorage.setItem('currentStatus', JSON.stringify(currentStatus));
-        localStorage.setItem("currentTringle", 5);
+        localStorage.setItem("statustext", '(ToClose)')
 
+        localStorage.setItem('currentPartial', currentPartial);
+        localStorage.setItem('statuslink', '#statuslink5');
+        localStorage.setItem('currentStatus', JSON.stringify(currentStatus));
         filterTable("ToCloseTablePartial", currentStatus, currentPage, pageSize);
     });
 
     $("#statuslink6").click(function () {
-        $(".triangle").css('display', 'none');
-        $("#triangle6").css('display', 'block').css('border-top-color', '#9966cd');
-
+        $("#searchInput").val("");
+        $("#filterSelect").val(" ");
+        $('.filter-item').removeClass('active')
+        $(".Status-btn").removeClass('activee');
+        $("#statuslink6").addClass("activee");
+        localStorage.setItem('statuslink', '#statuslink6')
         currentStatus = [9];
         currentPartial = "UnpaidTablePartial";
         $('#statuschange').html('(Unpaid)');
+        localStorage.setItem("statustext", '(Unpaid)')
+
         localStorage.setItem('currentPartial', currentPartial);
         localStorage.setItem('currentStatus', JSON.stringify(currentStatus));
-        localStorage.setItem("currentTringle", 6);
-
         filterTable("UnpaidTablePartial", currentStatus, currentPage, pageSize);
     });
 
@@ -298,12 +318,9 @@ $(document).ready(function () {
         var physician = $('#physicianDropdown').val();
         var description = $('#description').val();
         $('#assigncase').modal('hide');
-        $('#transfercase').modal('hide');
-
-
         $.ajax({
             method: "POST",
-            url: "Admin/AssignRequest",
+            url: "/Admin/AssignRequest",
             data: { requestid: requestid, regionid: regionid, physician: physician, description: description },
             success: function (data) {
                 console.log(data)
@@ -314,11 +331,9 @@ $(document).ready(function () {
                     updateUIWithCounts();
                     console.log("toaster", toastr.success)
                     toastr.success('Assign successful!');
-
                 }
             }
         })
-
     });
     $('#transfercasebutton').click(function (e) {
         e.preventDefault();

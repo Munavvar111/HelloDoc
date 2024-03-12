@@ -121,8 +121,8 @@
 <div class="container-fluid px-4 text-center py-4">
     <ul class=" nav gx-5 row  gy-4 mt-0 row row-cols-3 row-cols-lg-6">
 
-        <li class="col nav-item col-4 col-sm-4 col-lg-2 rounded-4 text-start position-relative px-2" role="presentation">
-            <a class="btn w-100 text-start rounded-4 shadow-none border-0 Status-btn" id="statuslink1" >
+        <li class="col nav-item col-4 col-sm-4 col-lg-2  text-start position-relative px-2" role="presentation">
+            <a class="btn w-100 text-start  shadow-none border-0 Status-btn" id="statuslink1" >
                 <div class="py-2  d-flex fs-5 Status-btn-text ">New</div>
                 <h4 class="fw-bolder ps-1 pb-2 Status-Count" id="newcount"></h4>
             </a>
@@ -168,7 +168,7 @@
 </div>
 <div class="mt-3 mt-md-5 d-flex-column d-sm-flex justify-content-between align-items-center">
     <div class="">
-        <p class="patient_text_size ">Patients<span class="text-primary" id="statuschange">(new)</span></p>
+        <p class="patient_text_size fw-bolder mx-3 fs-3">Patients<span class="text-primary" id="statuschange"></span></p>
     </div>
     <div class="">
         <button type="button" class="btn btn-info text-white">
@@ -264,7 +264,7 @@
 <partial name="BlockPatient"></partial>
 <partial name="AssignCase"></partial>
 <partial name="SendAgreement"></partial>
-
+<partial name="EncounterPdfModal"></partial>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
 <script>
@@ -392,7 +392,6 @@
 
     });
 
-
 </script>
 
 <script>
@@ -404,23 +403,29 @@
             var recipient = button.data('bs-requestid');
             var email = button.data('bs-email');
             var phoneno = button.data('bs-phoneno');
-            console.log(email)
+            var requesttyoeid = button.data('bs-requesttypeid');
             var modal = $(this);
+            modal.find('#patientagree').html('fkdlsjfl')
             modal.find('#agreementemail').val(email)
             modal.find('#agreementphoneno').val(phoneno)
-
             modal.find('#requestIdInputAgreement').val(recipient);
         });
-
         $('#sendagrrement').on('hidden.bs.modal', function () {
             
             $('#blockCaseForm').each(function () {
                 this.reset();
             })
+        });
+    });
+</script>
+<script>
+    $(document).ready(function () {
+        $('#finalizedModal').on('show.bs.modal', function (event) {
+            const button = $(event.relatedTarget); // Button that triggered the modal
+            const requestId = button.data('requestid');
+            var modal = $(this);
+            modal.find('#requestiddownload').val(requestId)
 
         });
-
     });
-
-
 </script>

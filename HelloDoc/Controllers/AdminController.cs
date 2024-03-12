@@ -395,7 +395,7 @@ namespace HelloDoc.Controllers
             }
         }
 
-        [HttpGet]
+        [HttpPost]
         public IActionResult GeneratePDF(int requestid)
         {
 
@@ -415,7 +415,7 @@ namespace HelloDoc.Controllers
         }
         
         public IActionResult EncounterForm(int requestid)
-        {
+            {
             var viewencounterform = new ViewEncounterForm();
             var encounterformbyrequestid = _context.Encounterforms.Where(item => item.RequestId == requestid).FirstOrDefault();
             if (encounterformbyrequestid !=null && !encounterformbyrequestid.IsFinalize)
@@ -518,6 +518,21 @@ namespace HelloDoc.Controllers
                 }
                 return RedirectToAction("Index", "Admin");
             }
+        }
+        public IActionResult CloseCase(int requestid)
+        {
+            var requestclient=_context.Requestclients.Where(item=>item.Requestid==requestid).FirstOrDefault();
+            var requestwisedocument = _context.Requestwisefiles.Where(item => item.Requestid == requestid).ToList();
+            var requestclientnumber=_context.Requests.Where(item=>item.Requestid==requestid).FirstOrDefault().Confirmationnumber;
+            var closecase = new CloseCaseVM();
+            closecase.FirstName = requestclient.Firstname;
+            closecase.LastName = requestclient.Lastname;
+            closecase.Email = requestclient.Email;
+            closecase.PhoneNo = requestclient.Phonenumber;
+            closecase.BirthDate = new DateOnly((int)requestclient.Intyear, int.Parse(requestclient.Strmonth), (int)requestclient.Intdate);
+            closecase.Requestwisefileview= requestwisedocument;
+            closecase.ConfirmNumber = requestclientnumber;
+            return View(closecase);
         }
     }
 }

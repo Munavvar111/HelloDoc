@@ -48,6 +48,7 @@
                             <a class="dropdown-item" asp-action="ViewNotes" asp-controller="Admin" asp-route-requestid="@item.RequestId"><i class="bi bi-x-circle me-3"></i>View Notes</a>
                             <a class="dropdown-item" href="#"><i class="bi bi-card-text me-3"></i> Transfer </a>
                             <a class="dropdown-item" href="#" data-toggle="modal" data-target="#exampleModal"><i class="bi bi-x-circle me-3"></i>Clear Case</a>
+                            <a class="dropdown-item" asp-action="CloseCase" asp-controller="Admin" asp-route-requestid="@item.RequestId"><i class="bi bi-x-circle me-3"></i>Close Case</a>
                             <a class="dropdown-item" href="#"><i class="bi bi-ban me-3"></i>Send Agreement</a>
                         </div>
                     </div>

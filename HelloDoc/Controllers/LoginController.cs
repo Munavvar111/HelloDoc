@@ -61,13 +61,14 @@ namespace HalloDocPatient.Controllers
                     HttpContext.Session.SetString("Email", user.Email);
                     HttpContext.Session.SetInt32("id", user.Userid);
                     HttpContext.Session.SetString("Username", user.Firstname);
-                    TempData["ShowToaster"] = true;
                     if (rolefromroleid.Name.Trim() == "admin")
                     {
+                    TempData["SuccessMessage"] = "Login  successful!";
                         return RedirectToAction("Index", "Admin");
                     }
                     else if(rolefromroleid.Name.Trim() == "user")
                     {
+                        TempData["SuccessMessage"] = "Login  successful!";
 
                         return RedirectToAction("Index", "Dashboard");
                     }
@@ -75,7 +76,9 @@ namespace HalloDocPatient.Controllers
                     }
                     else
                     {
-                        ModelState.AddModelError(string.Empty, "Invalid login attempt");
+                    TempData["Error"] = "Login  Unsuccessful!";
+
+                    ModelState.AddModelError(string.Empty, "Invalid login attempt");
                     }
                 }
 

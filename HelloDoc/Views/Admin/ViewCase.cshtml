@@ -218,12 +218,8 @@
             var recipient = button.data('bs-requestid');
             console.log(recipient);
             var status = button.data('bs-status');
-            if (status == 2) {
-                $('.title').html('Transfer Case');
-                $('#trnasfertext').html('To Transfer This Request,Search and Select Another Physician')
-            }
+            console.log(recipient)
             var modal = $(this);
-            modal.find('#status').val(status)
             modal.find('#requestIdInputCancel1').val(recipient);
         });
         $('#assigncase').on('hidden.bs.modal', function () {
@@ -233,7 +229,10 @@
             })
 
         });
+
+
     });
+   
 
 
 </script>

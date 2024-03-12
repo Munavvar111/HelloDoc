@@ -95,7 +95,7 @@
                             else if (@item.isfinalize)
                             {
 
-                                <a class="dropdown" href="#" data-toggle="modal" data-target="#finalizedModal"><i class="bi bi-ban me-3"></i>Encounter</a>
+                                <button type="button" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#finalizedModal" data-requestid="@item.RequestId"><i class="bi bi-ban me-3"></i>Encounter</button>
                             }
                             else
                             {
@@ -107,27 +107,6 @@
                     </div>
                 </td>
                     </tr>
-            <div class="modal fade" id="finalizedModal" tabindex="-1" role="dialog" aria-labelledby="finalizedModalLabel" aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered">
-                    <div class="modal-content">
-                        <div class="modal-header bg-info text-white">
-                            <h1 class="modal-title fs-5 title" id="exampleModalLabel">Assign Request</h1>
-                            <button type="button" class="close bg-info border border-info" data-bs-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true" class="fs-1">&times;</span>
-                            </button>
-                        </div>
-                        <div class="modal-body">
-                            <p>Encounter is already finalized.</p> // Customize message
-                            <a class="btn btn-info" asp-action="GeneratePDF" asp-route-requestid="@item.RequestId">Download</a>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="submit" class="btn btn-info">Submit</button>
-                            <button type="button" class="btn btn-info" data-bs-dismiss="modal">Cancel</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
             <div class="d-xl-none ">
                 <div class="bg-info-subtle " data-bs-toggle="collapse" data-bs-target="#collapseexample_@item.Id"
                      aria-expanded="false" aria-controls="collapseexample">

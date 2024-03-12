@@ -185,7 +185,7 @@ namespace BusinessLayer.Repository
                             from a in aJoin.DefaultIfEmpty()
                             join p in _context.Physicians on rs.Physicianid equals p.Physicianid into pJoin
                             from p in pJoin.DefaultIfEmpty()
-                            where rs.Requestid == requestid && rn == null // Filter only records not in left join result
+                            where rs.Requestid == requestid // Filter only records not in left join result
                             select new ViewNotesVM
                             {
                                 TransToPhysicianId = rs.Transtophysicianid,
@@ -349,7 +349,6 @@ namespace BusinessLayer.Repository
                 return false;
             }
         }
-
         public bool BlockRequest(string blockReason, int requestId)
         {
             try
