@@ -1,5 +1,10 @@
-﻿
+﻿@using Microsoft.AspNetCore.Http
 
+@{
+    // Retrieve session data
+    string username = Context.Session.GetString("Username");
+    int userId = Context.Session.GetInt32("UserId") ?? 0; // Use a default value if session data is not available
+}
 <!DOCTYPE html>
 <html lang="en" data-bs-theme="light">
 <head>
@@ -63,7 +68,7 @@
                 </div>
 
                 <div class="fw-bolder d-flex align-items-center gap-3">
-                    <span class="text-muted d-none d-md-inline">Welcome,</span>
+                    <span class="text-muted d-none d-md-inline">Welcome,@username</span>
                     <a asp-controller="Login" asp-action="LogoutController" class="btn btn-outline-info d-none d-md-inline">Logout</a>
 
                     <!-- Responsive Logout Icon for Small Screens -->

@@ -33,7 +33,20 @@
 }
 
 @model DataAccessLayer.CustomModel.RequestFileViewModel
+<style>
+    .filename {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: inline-block;
+        max-width: 150px; /* Adjust the max-width as per your preference */
+    }
 
+        .filename:hover {
+            max-width: none;
+            white-space: normal;
+        }
+</style>
 
 <div class="container   mt-4" id="view">
     <div class="d-flex justify-content-between my-3">
@@ -76,58 +89,95 @@
             <div class="fs-3 mt-2 mx-4">
                 <span>Documents</span>
             </div>
-            <div class="mt-2 mx-4 fs-3">
-                <a id="downloadAllBtn" class="btn btn-outline-info">Download All</a>
-                <a id="sendMailBtn" class="btn btn-outline-info">Send Mail</a>
-                <a id="deleteSelectedBtn" class="btn btn-outline-info">Delet All   </a>
+            <div class="mt-2 mx-4 fs-3 d-flex justify-content-between">
+                <!-- Download All button -->
+                <a id="downloadAllBtn" class="btn btn-outline-info">
+                    <span class=" d-none d-md-inline">Download All</span>
+                    <span class="material-symbols-outlined d-md-none">cloud_download</span>
+                </a>
+                <!-- Send Mail button -->
+                <a id="sendMailBtn" class="btn btn-outline-info">
+                    <span class=" d-none d-md-inline">Send Mail</span>
+                    <span class="material-symbols-outlined d-md-none">mail</span>
+                </a>
+                <!-- Delete All button -->
+                <a id="deleteSelectedBtn" class="btn btn-outline-info">
+                    <span class=" d-none d-md-inline">Delete All</span>
+                    <span class="material-symbols-outlined d-md-none">delete</span>
+                </a>
             </div>
         </div>
 
         <div class="table-responsive">
-            <table class="table">
-                <thead class="thead-secondry">
+            <table class="table d-none d-md-table">
+                <!-- Hide table on medium-sized views -->
+                <thead class="" style="background-color:dimgray!important">
                     <tr>
                         <th scope="col"><input type="checkbox" id="selectAllCheckbox" /></th>
                         <th scope="col">Documents</th>
-                        <th scope="col">Updated Date </th>
+                        <th scope="col">Updated Date</th>
                         <th scope="col">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach (var item in Model.Requestwisefileview)
                     {
-                      
-                            
                         <tr>
                             <td>
                                 <input type="checkbox" class="fileCheckbox" data-filename="@item.Filename" />
-
                             </td>
                             <td>
-                                @Html.DisplayFor(modelitem => item.Filename)
+                                <span class="filename"> @Html.DisplayFor(modelitem => item.Filename)</span>
                             </td>
                             <td>
-                                test tester
+                                <!-- Update with actual updated date -->
+                                @Html.DisplayFor(modelitem =>item.Createddate ) 
                             </td>
-                            
                             <td class="d-flex justify-content-around">
                                 <a class="btn btn-outline-info"
                                    href="~/uploads/@item.Filename" target="_blank">
                                     <span class="material-symbols-outlined">cloud_download</span>
                                 </a>
                                 <button class="btn btn-outline-info deletbtn"
-                                       id="deletbtn" data-filename="@item.Filename" data-requestid="@item.Requestid">
-                                <span class="material-symbols-outlined">
-                                    delete
-                                </span>
+                                        id="deletbtn" data-filename="@item.Filename" data-requestid="@item.Requestid">
+                                    <span class="material-symbols-outlined">
+                                        delete
+                                    </span>
                                 </button>
-                                 </td>
+                            </td>
                         </tr>
-                        
                     }
                 </tbody>
-                           </table>
+            </table>
         </div>
+        <!-- Document display and actions for medium-sized views -->
+        <div class="d-md-none">
+            <!-- Iterate through documents -->
+            @foreach (var item in Model.Requestwisefileview)
+            {
+                <div class="document">
+                    <!-- Display document name -->
+                    <input type="checkbox" class="fileCheckbox" data-filename="@item.Filename" />
+                    <p class="filename">@Html.DisplayFor(modelitem => item.Filename)</p>
+                    <!-- Display updated date -->
+                     <p>Updated: @Html.DisplayFor(modelitem => item.Createddate)</p> 
+                    <!-- Display actions -->
+                    <div class="d-flex justify-content-beween">
+                        <a class="btn btn-outline-info"
+                           href="~/uploads/@item.Filename" target="_blank">
+                            <span class="material-symbols-outlined">cloud_download</span>
+                        </a>
+                        <button class="btn btn-outline-info deletbtn"
+                                id="deletbtn" data-filename="@item.Filename" data-requestid="@item.Requestid">
+                            <span class="material-symbols-outlined">
+                                delete
+                            </span>
+                        </button>
+                    </div>
+                </div>
+            }
+        </div>
+
     </div>
 </div>
 <script>
