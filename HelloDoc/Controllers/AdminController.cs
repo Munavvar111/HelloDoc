@@ -519,6 +519,7 @@ namespace HelloDoc.Controllers
                 return RedirectToAction("Index", "Admin");
             }
         }
+
         public IActionResult CloseCase(int requestid)
         {
             var requestclient=_context.Requestclients.Where(item=>item.Requestid==requestid).FirstOrDefault();
@@ -532,7 +533,40 @@ namespace HelloDoc.Controllers
             closecase.BirthDate = new DateOnly((int)requestclient.Intyear, int.Parse(requestclient.Strmonth), (int)requestclient.Intdate);
             closecase.Requestwisefileview= requestwisedocument;
             closecase.ConfirmNumber = requestclientnumber;
+            closecase.Requestid = requestid;    
             return View(closecase);
+        }
+
+        [HttpPost]
+        public IActionResult CloseCase(CloseCaseVM closeCaseVM,int requestid)
+        {
+            if (!ModelState.IsValid)
+            {
+            return View(closeCaseVM);
+            }
+            else
+            {
+                var requestclient=_context.Requestclients.Where(item=>item.Requestid== requestid).FirstOrDefault();
+                requestclient.Phonenumber = closeCaseVM.PhoneNo;
+                requestclient.Email = closeCaseVM.Email;
+                _context.Requestclients.Update(requestclient);
+                _context.SaveChanges();
+                return RedirectToAction("CloseCase", new { requestid = requestid });
+            }
+        }
+
+        public IActionResult CloseCaseModal(int requestid)
+        {
+            var request = _context.Requests.Where(item => item.Requestid == requestid).FirstOrDefault();
+            request.Status = 9;
+            var requeststatuslog = new Requeststatuslog();
+            requeststatuslog.Status = 9;
+            requeststatuslog.Createddate=DateTime.Now;
+            requeststatuslog.Requestid=requestid;
+            _context.Requeststatuslogs.Add(requeststatuslog);
+            _context.SaveChanges();
+            TempData["SuccessMessage"] = "Close Case successfully";
+            return RedirectToAction("Index", "Admin");
         }
     }
 }

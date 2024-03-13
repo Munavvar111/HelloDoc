@@ -123,7 +123,7 @@ namespace BusinessLayer.Repository
                         var request = GetRequestByEmail(requestModel.Email);
                         AddRequestClient(requestModel, request.Requestid);
                         int count = _context.Requests.Where(x => x.Createddate.Date == request.Createddate.Date).Count() + 1;
-                        var region = _context.Regions.Where(x => x.Regionid == int.Parse(requestModel.State)).FirstOrDefault();
+                        var region = _context.Regions.Where(x => x.Name == requestModel.State).FirstOrDefault();
                         if (region != null)
                         {
                             var confirmNum = string.Concat(region.Abbreviation.ToUpper(), request.Createddate.ToString("ddMMyy"), requestModel.Lastname.Substring(0, 2).ToUpper() ?? "",
@@ -149,7 +149,7 @@ namespace BusinessLayer.Repository
                         var request = GetRequestByEmail(requestModel.Email);
                         AddRequestClient(requestModel, request.Requestid);
                         int count = _context.Requests.Where(x => x.Createddate.Date == request.Createddate.Date).Count() + 1;
-                        var region = _context.Regions.Where(x => x.Regionid == int.Parse(requestModel.State)).FirstOrDefault();
+                        var region = _context.Regions.Where(x => x.Name == requestModel.State).FirstOrDefault();
                         if (region != null)
                         {
                             var confirmNum = string.Concat(region.Abbreviation.ToUpper(), request.Createddate.ToString("ddMMyy"), requestModel.Lastname.Substring(0, 2).ToUpper() ?? "",
@@ -200,7 +200,7 @@ namespace BusinessLayer.Repository
 
         public void AddRequestClient(RequestModel requestModel,int RequestID)
         {
-            var statebyregionid = _context.Regions.Where(item => item.Regionid == int.Parse(requestModel.State)).FirstOrDefault();
+            var statebyregionid = _context.Regions.Where(item => item.Name == requestModel.State).FirstOrDefault();
             var requestClient = new Requestclient();
             {
                 requestClient.Notes= requestModel.Notes;
@@ -209,7 +209,7 @@ namespace BusinessLayer.Repository
                 requestClient.Firstname = requestModel.Firstname;
                 requestClient.Lastname = requestModel.Lastname;
                 requestClient.State = statebyregionid.Name;
-                requestClient.Regionid = int.Parse(requestModel.State);
+                requestClient.Regionid = statebyregionid.Regionid;
                 requestClient.Street = requestModel.Street;
                 requestClient.Phonenumber = requestModel.PhoneNo;
                 requestClient.City = requestModel.City;

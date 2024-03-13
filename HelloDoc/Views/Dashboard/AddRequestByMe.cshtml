@@ -6,6 +6,35 @@
 @{
     ViewData["Title"] = "AddRequestByMe";
 }
+@if (TempData.ContainsKey("Error"))
+{
+    <script>
+        $(document).ready(function () {
+            toastr.options = {
+                "closeButton": true,
+                "positionClass": "toast-top-right",
+                "timeOut": "5000"
+            };
+
+            toastr.error('@TempData["Error"]');
+        });
+    </script>
+}
+@if (TempData.ContainsKey("SuccessMessage"))
+{
+    <script>
+        $(document).ready(function () {
+            toastr.options = {
+                "closeButton": true,
+                "positionClass": "toast-top-right",
+                "timeOut": "5000"
+            };
+
+            toastr.success('@TempData["SuccessMessage"]');
+        });
+    </script>
+}
+
 <div class="d-flex justify-content-between my-3 container">
     <div class="d-flex">
         <span class="fs-3 text-muted fw-bold">Submit Information</span>
@@ -40,8 +69,8 @@
                        class="form-control"
                        id="floatingInput"
                        placeholder="name@example.com"
-                       asp-for="@Model.Firstname" />
-                <label for="floatingInput" asp-for="Firstname">First Name</label>
+                       asp-for="@Model.Firstname" readonly/>
+                <label for="floatingInput" asp-for="Firstname" >First Name</label>
                 <span asp-validation-for="Firstname" class="text-danger"></span>
             </div>
         </div>
@@ -51,7 +80,7 @@
                        class="form-control"
                        id="floatingInput"
                        placeholder="name@example.com"
-                       asp-for="@Model.Lastname" />
+                       asp-for="@Model.Lastname" readonly/>
                 <label for="floatingInput" asp-for="Lastname">Last Name</label>
                 <span asp-validation-for="Lastname" class="text-danger"></span>
 
@@ -63,7 +92,7 @@
                        class="form-control"
                        id="floatingInput"
                        placeholder="name@example.com"
-                       asp-for="@Model.BirthDate" />
+                       asp-for="@Model.BirthDate" readonly/>
                 <label for="floatingInput" asp-for="BirthDate">Date of Birth</label>
                 <span asp-validation-for="BirthDate" class="text-danger"></span>
 
@@ -81,7 +110,7 @@
                        id="Email"
                        placeholder="name@example.com"
                        asp-for="@Model.Email"
-                       onchange="CheckAvailability()" />
+                       onchange="CheckAvailability()" readonly/>
                 <label for="floatingInput" asp-for="Email">Email</label>
                 <span asp-validation-for="Email" class="text-danger"></span>
 
@@ -92,7 +121,8 @@
                 <input id="phone1"
                        type="tel"
                        class="form-control border-0 tel-input"
-                       name="phone" />
+                       asp-for="PhoneNo"
+                       />
             </div>
         </div>
 
@@ -103,7 +133,7 @@
                        asp-for="Passwordhash"
                        class="form-control"
                        id="floatingInput"
-                       placeholder="*****" />
+                       placeholder="*****" required/>
                 <label for="floatingInput" asp-for="Passwordhash">Password</label>
             </div>
         </div>
@@ -150,11 +180,15 @@
         </div>
         <div class="col">
             <div class="form-floating">
-                <input type="text"
-                       class="form-control"
-                       id="floatingInput"
-                       placeholder="Rajpath Road" asp-for="State"/>
-                <label for="floatingInput" asp-for="State">State</label>
+                <select class="form-select" aria-label="Default select example" name="state" id="cancelReason" asp-for="State">
+
+                    <option value="" selected disabled>Select The State</option>
+                    @foreach (var region in Model.Regions)
+                    {
+                        <option value="@region.Name">@region.Name</option>
+                    }
+
+                </select>
                 <span asp-validation-for="State" class="text-danger"></span>
 
             </div>
@@ -254,4 +288,3 @@
         });
     };
 </script>
-

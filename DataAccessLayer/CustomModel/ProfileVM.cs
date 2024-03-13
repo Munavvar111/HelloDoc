@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DataAccessLayer.DataModels;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -31,6 +32,7 @@ namespace DataAccessLayer.CustomModel
 
         [Required(ErrorMessage = "Plese Enter The Zipcode")]
         public string ZipCode { get; set; } = null!;
+        public List<Region>? Regions { get; set; }
 
         public string? PhoneNO { get; set; }    
     }

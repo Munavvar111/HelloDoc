@@ -114,11 +114,15 @@
         </div>
         <div class="col">
             <div class="form-floating">
-                <input type="text"
-                       class="form-control"
-                       id="floatingInput"
-                       placeholder="Rajpath Road" asp-for="State" disabled />
-                <label for="floatingInput">State</label>
+                <select class="form-select " aria-label="Default select example" name="state" id="cancelReason" asp-for="State" disabled>
+
+                    <option selected>Select The State</option>
+                    @foreach (var region in Model.Regions)
+                    {
+                        <option value="@region.Name">@region.Name</option>
+                    }
+
+                </select>
                 <span asp-validation-for="State" class="text-danger"></span>
             </div>
         </div>
@@ -182,7 +186,7 @@
     // Function to toggle the disabled attribute of input fields
     function toggleEdit() {
         // Get all input fields within the form excluding the input with id "Email"
-        var inputFields = document.querySelectorAll('form input');
+        var inputFields = document.querySelectorAll('form input,form select');
 
         // Toggle the disabled attribute for each input field
         inputFields.forEach(function (input) {

@@ -33,8 +33,10 @@ namespace HalloDocPatient.Controllers
         }
         public IActionResult PatientRequest()
         {
-            
-            return View();
+            var region = _context.Regions.ToList();
+            var requestmodal = new RequestModel();
+            requestmodal.Regions=region;
+            return View(requestmodal);
         }
         public IActionResult Index()
         {
@@ -117,6 +119,11 @@ namespace HalloDocPatient.Controllers
         public  async Task<IActionResult> PatientRequest( RequestModel requestModel)
         {
             requestModel.Username = requestModel.Firstname+requestModel.Lastname;
+            var blockrequest = _context.Blockrequests.Where(item => item.Email == requestModel.Email).FirstOrDefault();
+            if (blockrequest == null)
+            {
+
+            
             if(!ModelState.IsValid)
             {
                 return View(requestModel);
@@ -126,16 +133,30 @@ namespace HalloDocPatient.Controllers
                 
                 if(requestModel.File!=null && requestModel.File.Length > 0)
                 {
-                    var user = _patientRequest.GetUserByEmail(requestModel.Email);
-                        
+                      
                     var uniqueFileName=await _patientRequest.AddFileInUploader(requestModel.File);
                     _patientRequest.AddPatientRequest(requestModel, ReqTypeId: 1);
                     var request = _patientRequest.GetRequestByEmail(requestModel.Email);
+                    var user = _patientRequest.GetUserByEmail(requestModel.Email);
+                    if (user == null)
+                    {
+                        var token = Guid.NewGuid().ToString();
+                        var resetLink = Url.Action("Index", "Register", new { userId = request.Requestid, token }, protocol: HttpContext.Request.Scheme);
+                        if (_login.IsSendEmail("munavvarpopatiya999@gmail.com", "Munavvar", $"Click <a href='{resetLink}'>here</a> to Create A new Account"))
+                        {
+
+                            return RedirectToAction("Index", "Login");
+                        }
+                        else
+                        {
+                            return RedirectToAction("Index", "Login");
+
+                        }
+                    }
                     _patientRequest.AddRequestWiseFile(uniqueFileName, request.Requestid);
                     
                     return RedirectToAction("Index", "Login");
                 }
-                //_patientRequest is a interface addpatientrequest is method;
                 else {
                     _patientRequest.AddPatientRequest(requestModel, ReqTypeId: 1);
                     var request = _patientRequest.GetRequestByEmail(requestModel.Email);
@@ -152,9 +173,19 @@ namespace HalloDocPatient.Controllers
 
                     }
                     return RedirectToAction("Index", "Login");
+                    }
 
                 }
             }
+            else
+            {
+                TempData["Error"] = "Your Request IS Block Beacuse Of Your Unaporpriate Behivour!";
+
+
+                return RedirectToAction("PatientRequest");  
+            }
+
+
         }
         public IActionResult Error()
         {

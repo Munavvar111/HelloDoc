@@ -26,10 +26,12 @@ namespace DataAccessLayer.CustomModel
         [Column("firstname")]
         [Required(ErrorMessage = "Please Enter FirstName")]
         [StringLength(50, ErrorMessage = "First Name should be between {2} and {1} characters.", MinimumLength = 2)]
+        [RegularExpression(@"^[^\s]+$", ErrorMessage = "Invalid Name")]
         public string Firstname { get; set; } = null!;
 
         [Column("lastname")]
         [Required(ErrorMessage = "Please Enter LastName")]
+        [RegularExpression(@"^[^\s]+$", ErrorMessage = "Invalid LastName")]
         [StringLength(50, ErrorMessage = "Last Name should be between {2} and {1} characters.", MinimumLength = 2)]
         public string Lastname { get; set; } = null!;
         
@@ -70,10 +72,11 @@ namespace DataAccessLayer.CustomModel
         public string? PhoneNo { get; set; }
 
         [FromForm]
-        public IFormFile? File { get; set; }
+           public IFormFile? File { get; set; }
 
         public string? Notes { get; set; }
 
         public List<Region>? Regions { get; set; }
     }
 }
+

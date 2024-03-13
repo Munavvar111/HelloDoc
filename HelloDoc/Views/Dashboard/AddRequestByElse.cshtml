@@ -6,6 +6,34 @@
 @{
     ViewData["Title"] = "AddRequestByMe";
 }
+@if (TempData.ContainsKey("Error"))
+{
+    <script>
+        $(document).ready(function () {
+            toastr.options = {
+                "closeButton": true,
+                "positionClass": "toast-top-right",
+                "timeOut": "5000"
+            };
+
+            toastr.error('@TempData["Error"]');
+        });
+    </script>
+}
+@if (TempData.ContainsKey("SuccessMessage"))
+{
+    <script>
+        $(document).ready(function () {
+            toastr.options = {
+                "closeButton": true,
+                "positionClass": "toast-top-right",
+                "timeOut": "5000"
+            };
+
+            toastr.success('@TempData["SuccessMessage"]');
+        });
+    </script>
+}
 <div class="d-flex justify-content-between my-3 container">
     <div class="d-flex">
         <span class="fs-3 text-muted fw-bold">Submit Information</span>
@@ -61,9 +89,9 @@
             <div class="form-floating">
                 <input type="date"
                        class="form-control"
-                       id="floatingInput"
                        placeholder="name@example.com"
-                       asp-for="@Model.BirthDate" />
+                       name="birthday"
+                       asp-for="@Model.BirthDate" id="birthday"/>
                 <label for="floatingInput" asp-for="BirthDate">Date of Birth</label>
                 <span asp-validation-for="BirthDate" class="text-danger"></span>
 
@@ -91,8 +119,9 @@
             <div class="border rounded-2 tel-container">
                 <input id="phone1"
                        type="tel"
+                       asp-for="PhoneNo"
                        class="form-control border-0 tel-input"
-                       name="phone" />
+                        />
             </div>
         </div>
 
@@ -150,11 +179,15 @@
         </div>
         <div class="col">
             <div class="form-floating">
-                <input type="text"
-                       class="form-control"
-                       id="floatingInput"
-                       placeholder="Rajpath Road" asp-for="State" />
-                <label for="floatingInput" asp-for="State">State</label>
+                <select class="form-select" aria-label="Default select example" name="state" id="cancelReason" asp-for="State">
+
+                    <option value="" selected disabled>Select The State</option>
+                    @foreach (var region in Model.Regions)
+                    {
+                        <option value="@region.Name">@region.Name</option>
+                    }
+
+                </select>
                 <span asp-validation-for="State" class="text-danger"></span>
 
             </div>
@@ -241,36 +274,3 @@
             "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",
     });
 </script>
-
-<script src="https://code.jquery.com/jquery-1.11.3.js" type="text/javascript"></script>
-<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
-<script type="text/javascript">
-    var pwdrow = $("#pwdrow");
-    var pwdcol = $("#pwdcol");
-
-    function CheckAvailability() {
-        var email = $("#Email").val();
-        $.ajax({
-            type: "POST",
-            url: "@Url.Action("CheckEmail", "Request")",
-            data: JSON.stringify(email),
-            contentType: "application/json; charset=utf-8",
-            dataType: "json",
-            success: function (response) {
-                if (response) {
-                    // Email not available.
-                    pwdrow.show();
-                    pwdcol.show();
-                } else {
-                    // Email  available.
-                    pwdrow.hide();
-                    pwdcol.hide();
-                }
-            },
-            error: function (error) {
-                console.log(error);
-            }
-        });
-    };
-</script>
-

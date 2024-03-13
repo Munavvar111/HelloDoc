@@ -50,10 +50,9 @@
                     <tr>
                             
                             <td>
-                                @item.Filename
-
+                                @item.Filename.Replace(@"[0-9a-f]{8}(?:-[0-9a-f]{4}){4}[0-9a-f]{12}_", "")
                             </td>
-                            <td>
+                            <td>    
                                 @item.Admin
 
                             </td>
@@ -70,7 +69,8 @@
                 </tbody>
             </table>
         </div>
-
+        <form asp-action="CloseCase" method="post" asp-route-requestid="@Model.Requestid">
+            
         <div class="mt-4">
             <h3>Patient Information</h3>
         </div>
@@ -82,7 +82,7 @@
                            id="floatingInput"
                            asp-for="@Model.FirstName"
                            placeholder="name@example.com"
-                            disabled />
+                            disabled readonly />
                     <label for="floatingInput">First Name</label>
                 </div>
             </div>
@@ -92,7 +92,7 @@
                            class="form-control"
                            id="floatingInput"
                            asp-for="@Model.LastName"
-                           placeholder="name@example.com" disabled/>
+                           placeholder="name@example.com" disabled readonly/>
                     <label for="floatingInput">Last Name</label>
                 </div>
             </div>
@@ -104,7 +104,7 @@
                   asp-for="@Model.BirthDate"
                   value="@Model.BirthDate.ToString("yyyy-MM-dd")"
                placeholder="name@example.com"
-                 disabled />
+                 disabled readonly/>
 
     <label for="floatingInput">Date of Birth</label>
   </div>
@@ -129,7 +129,7 @@
                            placeholder="name@example.com"
                             disabled="disabled"
                             asp-for="@Model.Email"
-                           id="Email" readonly />
+                           id="Email"  />
                     <label for="floatingInput">Email</label>
                 </div>
             </div>
@@ -140,12 +140,52 @@
                 <button class="btn btn-info text-light" id="EditBtn" type="button" onclick="toggleEdit()">
                     Edit
                 </button>
-                <button class="btn btn-info text-light" type="button" id="CanBtn" onclick="toggleCancel()">
+                    <button class="btn btn-info text-light" type="Submit" id="SubBtn">
+                        Submit
+                    </button>
+                    <button class="btn btn-info text-light" type="button" data-bs-toggle="modal" data-bs-target="#CloseCaseModal">
                     Cancel
                 </button>
 
             </div>
         </div>
+        </form>
     </div>
 
 </div>
+<div class="modal fade" id="CloseCaseModal" tabindex="-1" role="dialog" aria-labelledby="finalizedModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h1 class="modal-title fs-5 title" id="exampleModalLabel">Encounter Form</h1>
+                <button type="button" class="close bg-info border border-info" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true" class="fs-1">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body align-items-center">
+                <p>Are Sure You Want Close This Case</p>
+                
+            </div>
+            <div class="modal-footer">
+                <a class="btn btn-info" asp-action="CloseCaseModal" asp-route-requestid="@Model.Requestid">Submit</a>
+                <button type="button" class="btn btn-info" data-bs-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+            <script>
+    $("#SubBtn").hide();
+
+    function toggleEdit() {
+        // Get all input fields within the form excluding the input with id "Email"
+        var inputFields = document.querySelectorAll('form input');
+
+        // Toggle the disabled attribute for each input field
+        inputFields.forEach(function (input) {
+            input.disabled = !input.disabled;
+        });
+
+        $("#EditBtn").hide();
+        $("#SubBtn").show();
+    }
+            </script>

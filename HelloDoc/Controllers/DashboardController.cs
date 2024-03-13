@@ -45,6 +45,7 @@ namespace HalloDocPatient.Controllers
             var id = HttpContext.Session.GetInt32("id");
             var User = await _context.Users.FindAsync(id);  
             DateTime BirthDate = new DateTime((int)User.Intyear, int.Parse(User.Strmonth), (int)User.Intdate);
+            var regions = _context.Regions.ToList();
             ViewBag.BirthDate = BirthDate.ToString("yyyy-MM-dd");
             var profildata = new ProfileVM();
             profildata.Email = User.Email;
@@ -56,7 +57,7 @@ namespace HalloDocPatient.Controllers
             profildata.Street = User.Street;
             profildata.ZipCode = User.Zipcode;
             profildata.LastName = User.Lastname;
-
+            profildata.Regions=regions;
             ViewBag.State = User.State;
             ViewBag.City = User.City;
             ViewBag.Street = User.Street;
@@ -70,7 +71,7 @@ namespace HalloDocPatient.Controllers
             var id = HttpContext.Session.GetInt32("id");
             var User = await _context.Users.FindAsync(id);
             ViewData["Name"] = User.Firstname;
-
+            
             if (ModelState.IsValid)
             {
                 User.Firstname = profileVM.FirstName;
@@ -197,38 +198,62 @@ namespace HalloDocPatient.Controllers
             patientrequest.Street = request.Street;
             patientrequest.City = request.City;
             patientrequest.BirthDate = new DateTime((int)request.Intyear, int.Parse(request.Strmonth), (int)request.Intdate);
-            
+            patientrequest.Regions = _context.Regions.ToList();
+            patientrequest.State = request.State;
             return View(patientrequest);
         }
         [HttpPost]
         public async Task<IActionResult> AddRequestByme(RequestModel rm)
         {
-            if (ModelState.IsValid)
+            var block=_context.Blockrequests.Where(item=>item.Email == rm.Email).FirstOrDefault();
+            if (block == null)
             {
 
 
-                var id = HttpContext.Session.GetInt32("id");
-
-                if (rm.File != null)
+                if (ModelState.IsValid)
                 {
-                    var uniqueFileName=await _patientRequest.AddFileInUploader(rm.File);  
-                    _patientRequest.AddPatientRequest(rm, ReqTypeId: 1);
-                    var request = _patientRequest.GetRequestByEmail(rm.Email);
-                    _patientRequest.AddRequestWiseFile(uniqueFileName, request.Requestid);
-                    return RedirectToAction("Index", "Dashboard");
+
+
+                    var id = HttpContext.Session.GetInt32("id");
+
+                    if (rm.File != null)
+                    {
+                        var uniqueFileName = await _patientRequest.AddFileInUploader(rm.File);
+                        _patientRequest.AddPatientRequest(rm, ReqTypeId: 1);
+                        var request = _patientRequest.GetRequestByEmail(rm.Email);
+                        _patientRequest.AddRequestWiseFile(uniqueFileName, request.Requestid);
+                        TempData["SuccessMessage"] = "Your Request Is Send Successful";
+                        return RedirectToAction("Index", "Dashboard");
+                    }
+                    else
+                    {
+                        _patientRequest.AddPatientRequest(rm, ReqTypeId: 1);
+                        TempData["SuccessMessage"] = "Your Request Is Send Successful";
+                        return RedirectToAction("Index", "Dashboard");
+                    }
                 }
             }
-           
+            else
+            {
+                TempData["Error"] = "Your Requests Is Block Please";
+                return RedirectToAction("AddRequestByme","Dashboard");
+            }
+
             return View(rm);
         }
         public IActionResult AddRequestByElse()
         {
-            return View();
+            var region =_context.Regions.ToList();
+            var requestmodal = new RequestModel();
+            requestmodal.Regions=region;
+            return View(requestmodal);
         }
 
         [HttpPost]
         public async Task<IActionResult> AddRequestByElse(RequestModel requestModel)
         {
+            var block = _context.Blockrequests.Where(item => item.Email == requestModel.Email).FirstOrDefault();
+            if(block == null) { 
             if (ModelState.IsValid)
             {
 
@@ -246,6 +271,7 @@ namespace HalloDocPatient.Controllers
                         request.Requesttypeid = 2;
                         request.Createddate = DateTime.Now;
                         request.Status = 1;
+                        request.Phonenumber = user.Mobile;
                         _context.Requests.Add(request);
                         _context.SaveChanges();
 
@@ -254,10 +280,12 @@ namespace HalloDocPatient.Controllers
                     {
                         requestclient.Firstname = requestModel.Firstname;
                         requestclient.Requestid = request.Requestid;
-                        requestclient.Lastname=request.Lastname;
+                        requestclient.Lastname=requestModel.Lastname;
+                        requestclient.Phonenumber = requestModel.PhoneNo;
                         requestclient.Email = requestModel.Email;
                         requestclient.State = requestModel.State;
                         requestclient.Street = requestModel.Street;
+                            requestclient.Regionid=_context.Regions.Where(item=>item.Name==requestModel.State).FirstOrDefault().Regionid;
                         requestclient.Zipcode = requestModel.Zipcode;
                         requestclient.Intdate = requestModel.BirthDate.Day;
                         requestclient.Intyear = requestModel.BirthDate.Year;
@@ -268,8 +296,53 @@ namespace HalloDocPatient.Controllers
                     _patientRequest.AddRequestWiseFile(uniqueFileName, request.Requestid);
                     return RedirectToAction("Index","Dashboard");
                 }
+                    else
+                    {
+                        var request = new Request();
+                        {
+                            request.Userid = user.Userid;
+                            request.Firstname = user.Firstname;
+                            request.Lastname = user.Lastname;
+                            request.Email = user.Email;
+                            request.Requesttypeid = 2;
+                            request.Createddate = DateTime.Now;
+                            request.Status = 1;
+                            request.Phonenumber = user.Mobile;
+                            _context.Requests.Add(request);
+                            _context.SaveChanges();
+
+                        }
+                        var requestclient = new Requestclient();
+                        {
+                            requestclient.Firstname = requestModel.Firstname;
+                            requestclient.Requestid = request.Requestid;
+                            requestclient.Lastname = requestModel.Lastname;
+                            requestclient.Phonenumber = requestModel.PhoneNo;
+                            requestclient.Email = requestModel.Email;
+                            requestclient.State = requestModel.State;
+                            requestclient.Street = requestModel.Street;
+                            requestclient.Zipcode = requestModel.Zipcode;
+                            requestclient.Intdate = requestModel.BirthDate.Day;
+                            requestclient.Intyear = requestModel.BirthDate.Year;
+                            requestclient.Strmonth = requestModel.BirthDate.Month.ToString();
+                            _context.Requestclients.Add(requestclient);
+                            _context.SaveChanges();
+                        }
+                        return RedirectToAction("Index", "Dashboard");
+
+                    }
                 }
-            return View(requestModel);
+                else
+                {
+                    return View(requestModel);
+                }
+            }
+            else
+            {
+                TempData["Error"] = "Your Requests Is Block Please";
+                return RedirectToAction("AddRequestByElse", "Dashboard");
+            }
+            
         }
         
     }

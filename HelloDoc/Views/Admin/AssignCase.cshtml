@@ -17,19 +17,23 @@
                             <option value="2">Two</option>
                             <option value="3">Three</option>
                         </select>
+                        <span class="text-danger" id="regionerror"></span>
                     <select class="form-select mb-4 mt-4 physicianDropdown" name="physician" aria-label="Default select example" id="physicianDropdown">
                             <option value="" disabled selected>Select Physician</option>
                             <option value="One">One</option>
                             <option value="Two">Two</option>
                             <option value="Three">Three</option>
                         </select>
+                    <span class="text-danger" id="physicianerror"></span>
+
                         <div class="form-floating mb-4">
                             <textarea class="form-control" placeholder="Description" name="notes"
                                       style="height: 100px" id="description"></textarea>
                             <label for="floatingTextarea2" class="floating-label fs-6">
                                 Description
                             </label>
-                        </div>
+                        <span class="text-danger" id="noteserror"></span>
+                    </div>
                         <div class="modal-footer">
                         <button type="submit" class="btn btn-info confirmBtn asigncasebutton" id="asigncasebutton" data-id="">Submit</button>
                             <button type="button" class="btn btn-info" data-bs-dismiss="modal">Cancel</button>
@@ -39,3 +43,6 @@
             </div>
         </div>
     </div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/jquery.validate.min.js"></script>

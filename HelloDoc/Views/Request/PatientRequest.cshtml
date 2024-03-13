@@ -3,6 +3,35 @@
 @{
     ViewData["Title"] = "Patient Request";
 }
+@if (TempData.ContainsKey("Error"))
+{
+    <script>
+        $(document).ready(function () {
+            toastr.options = {
+                "closeButton": true,
+                "positionClass": "toast-top-right",
+                "timeOut": "5000"
+            };
+
+            toastr.error('@TempData["Error"]');
+        });
+    </script>
+}
+@if (TempData.ContainsKey("SuccessMessage"))
+{
+    <script>
+        $(document).ready(function () {
+            toastr.options = {
+                "closeButton": true,
+                "positionClass": "toast-top-right",
+                "timeOut": "5000"
+            };
+
+            toastr.success('@TempData["SuccessMessage"]');
+        });
+    </script>
+}
+
 <form id="patientRequestForm"    class="container border rounded-3 p-3 p-md-5 mb-3 d-flex flex-column gap-4 bg-white" method="post" enctype="multipart/form-data">
     <div class="row row-cols-1 row-cols-md-2 g-3">
         <div class="col-12 col-md-12">
@@ -51,6 +80,7 @@
                        id="floatingInput"
                        placeholder="name@example.com"
                        asp-for="BirthDate"
+                       value=""
                        />
                 <label for="floatingInput">Date of Birth</label>
                 <span asp-validation-for="BirthDate" class="text-danger"></span>
@@ -93,7 +123,7 @@
                        asp-for="Passwordhash"
                        class="form-control"
                        id="Password"
-                       placeholder="*****" />
+                       placeholder="*****" required/>
                 <label for="floatingInput" asp-for="Passwordhash">Password</label>
                 <span asp-validation-for="Passwordhash" class="text-danger"></span>
             </div>
@@ -144,10 +174,11 @@
             <div class="form-floating">
                 <select class="form-select " aria-label="Default select example" name="state" id="cancelReason" asp-for="State">
                     
-                    <option selected>Select The State</option>
-                        <option value="1">Kundla</option>
-                        <option value="1">amreli</option>
-                        <option value="1">Savar</option>
+                    <option selected disabled>Select The State</option>
+                    @foreach (var region in Model.Regions)
+                    {
+                        <option value="@region.Name">@region.Name</option>
+                    }
                     
                 </select>
                 <span asp-validation-for="State" class="text-danger"></span>

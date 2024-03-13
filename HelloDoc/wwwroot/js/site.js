@@ -261,8 +261,11 @@ $(document).ready(function () {
         e.preventDefault();
         var blockreason = $('#blockreason').val();
         var requestid = $('#requestIdInputBlock').val();
+        if (!blockreason) {
+            toastr.error("please Enter The Reason For Block")
+            return;
+        }
         $('#BlockModal').modal('hide');
-       
         $.ajax({
             method: 'POST',
             url: '/Admin/BlockRequest',
@@ -288,6 +291,15 @@ $(document).ready(function () {
         var requestid = $('#requestIdInputCancel').val();
         var cancelReason = $('#cancelReason').val();
         var additionalnote = $('.additionalnote').val();
+
+        if (!cancelReason) {
+            toastr.error('Please Enter The Reason');
+            return;
+        }
+        if (!additionalnote) {
+            toastr.error('Please Enter The Notes');
+            return;
+        }
 
         $('#exampleModal').modal('hide');
         $('#cancelcaseview').modal('hide');
@@ -317,6 +329,20 @@ $(document).ready(function () {
         var regionid = $('#regionid').val();
         var physician = $('#physicianDropdown').val();
         var description = $('#description').val();
+        if (!regionid) {
+            toastr.error('Please Enter The Region');
+
+            return;
+        }
+        if (!physician) {
+            toastr.error('Please Enter The Physician');
+            return;
+        }
+
+        if (!description) {
+            toastr.error('Please Enter The Notes');
+            return;
+        }
         $('#assigncase').modal('hide');
         $.ajax({
             method: "POST",
@@ -341,6 +367,20 @@ $(document).ready(function () {
         var regionid = $('#regionidtransfer').val();
         var physician = $('#physicianDropdownTransfer').val();
         var description = $('#descriptiontransfer').val();
+        if (!regionid) {
+            toastr.error('Please Enter The Region');
+
+            return;
+        }
+        if (!physician) {
+            toastr.error('Please Enter The Physician');
+            return;
+        }
+
+        if (!description) {
+            toastr.error('Please Enter The Notes');
+            return;
+        }
         $('#assigncase').modal('hide');
         $('#transfercase').modal('hide');
        
@@ -505,6 +545,7 @@ $(document).ready(function () {
             form.submit();
         }
     });
+    
 
     $('#business').on('change', function () {
         var vendorname = $(this).val();
