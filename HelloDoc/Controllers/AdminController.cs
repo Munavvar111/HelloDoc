@@ -23,8 +23,11 @@ using System.Drawing;
 using System.Drawing.Printing;
 using System.Linq;
 using System.Net;
+using System.Security.Principal;
 using System.Text;
 using System.Web.Helpers;
+using BC = BCrypt.Net.BCrypt;
+
 
 namespace HelloDoc.Controllers
 {
@@ -58,8 +61,86 @@ namespace HelloDoc.Controllers
         //main View
         public IActionResult Profile()
         {
-            return View();
+            var email = HttpContext.Session.GetString("Email");
+            var id = HttpContext.Session.GetInt32("id");
+            var admin=_context.Admins.Where(item=>item.Email== email).FirstOrDefault();
+            var adminprofile = new AdminProfileVm();
+            adminprofile.FirstName = admin.Firstname;
+            adminprofile.Username = admin.Firstname;
+            adminprofile.LastName = admin.Lastname;
+            adminprofile.Email = admin.Email;
+            adminprofile.Address1 = admin.Address1;
+            adminprofile.Address2 = admin.Address2;
+            adminprofile.City = admin.City;
+            adminprofile.ZipCode = admin.Zip;
+            adminprofile.MobileNo = admin.Mobile;
+            adminprofile.Regions = _context.Regions.ToList();
+            adminprofile.WorkingRegions=_context.AdminRegions.Where(item=>item.Adminid== admin.Adminid).ToList();
+            adminprofile.State = admin.Regionid;
+            return View(adminprofile);
         }
+        [HttpPost]
+        public IActionResult ResetAdminPassword(string Password)
+        {
+            var email = HttpContext.Session.GetString("Email");
+            var admin = _context.Admins.Where(item => item.Email == email).FirstOrDefault();
+                var account = _context.AspnetUsers.Where(item => item.Email == email).FirstOrDefault();
+            if(BC.Verify(Password, account.Passwordhash))
+            {
+                TempData["Error"] = "Your Previous Password Is Same As Current";
+            }
+            else
+            {
+                var passwordhash = BC.HashPassword(Password);
+                account.Passwordhash=passwordhash;
+                _context.AspnetUsers.Update(account);
+                _context.SaveChanges();
+                TempData["SuccessMessage"] = "Your Password Update SuccessFull";
+
+            }
+            return RedirectToAction("Profile", "Admin");
+        }
+        [HttpPost]
+        public IActionResult AdministrationInfo(string email,string PhoneNumber, string[] adminRegion)
+        {
+            var sessionemail = HttpContext.Session.GetString("Email");
+            var admin =_context.Admins.Where(item=>item.Email== sessionemail).FirstOrDefault();
+
+            admin.Email= email; 
+            admin.Mobile=PhoneNumber;
+            _context.Admins.Update(admin); _context.SaveChanges();  
+            var existingregion =_context.AdminRegions.Where(item => item.Adminid == admin.Adminid).ToList();
+            _context.AdminRegions.RemoveRange(existingregion);
+
+            foreach (string regionValue in adminRegion)
+            {
+                int regionId = int.Parse(regionValue); // Assuming region values are integer IDs
+                _context.AdminRegions.Add(new AdminRegion { Adminid = admin.Adminid, Regionid = regionId });
+            }
+             _context.SaveChanges(); // Save changes to add new associations
+            TempData["SuccessMessage"] = "Your Administration Details Update SuccessFull";
+            return RedirectToAction("Profile", "Admin");
+
+        }
+
+        public IActionResult AccountingInfo(string Address1, string Address2, string City, int State,string Zipcode,string MobileNo)
+        {
+            var sessionemail = HttpContext.Session.GetString("Email");
+            var admin = _context.Admins.Where(item => item.Email == sessionemail).FirstOrDefault();
+            admin.Address1 = Address1;
+            admin.Address2 = Address2;
+            admin.City = City;
+            admin.Zip = Zipcode;
+            admin.Regionid= State;
+            admin.Mobile=MobileNo;
+            _context.Admins.Update(admin);
+            _context.SaveChanges();
+            TempData["SuccessMessage"] = "Your Accounting Details Update SuccessFull";
+
+            return RedirectToAction("Profile", "Admin");
+
+        }
+
         //main View
         public IActionResult Provider()
         {

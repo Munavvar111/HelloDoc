@@ -6,6 +6,44 @@
 @{
     ViewData["Title"] = "My Profile";
 }
+@if (TempData.ContainsKey("Error"))
+{
+    <script>
+        $(document).ready(function () {
+            toastr.options = {
+                positionClass: 'toast-top-right',
+                closeButton: true,
+                progressBar: true,
+                showDuration: 400,
+                hideDuration: 1000,
+                timeOut: 2000,
+                extendedTimeOut: 1000,
+                toastClass: 'toast-red' // Add a custom class for red color styling
+            }
+
+            toastr.error('@TempData["Error"]');
+        });
+    </script>
+}
+@if (TempData.ContainsKey("SuccessMessage"))
+{
+    <script>
+        $(document).ready(function () {
+            toastr.options = {
+                positionClass: 'toast-top-right',
+                closeButton: true,
+                progressBar: true,
+                showDuration: 400,
+                hideDuration: 1000,
+                timeOut: 2000,
+                extendedTimeOut: 1000,
+                toastClass: 'toast-red' // Add a custom class for red color styling
+            }
+            toastr.success('@TempData["SuccessMessage"]');
+        });
+    </script>
+}
+
 <section>
     <div class="container bg-light mt-4">
         <div class="d-flex justify-content-between my-3">
@@ -21,35 +59,37 @@
         </div>
         <div class="container border rounded-3 p-3 p-md-5 mb-3 d-flex flex-column gap-4 bg-white">
             <h5 class="fw-bold my-3">Account Information</h5>
-            <form method="post" asp-controller="AdminDashboard" asp-action="ResetAdminPassword">
+            <form method="post" asp-controller="Admin" asp-action="ResetAdminPassword" id="resetpassword">
                 <div class="row row-cols-1 row-cols-md-2 g-3">
                     <div class="col">
                         <div class="form-floating">
-                            <input asp-for=@Model.AdminAccountInfo.Username type="text" class="form-control" id="username" placeholder="User Name">
+                            <input asp-for=@Model.Username type="text" class="form-control" id="username" placeholder="User Name" disabled>
                             <label for="username">User Name</label>
                         </div>
                     </div>
                     <div class="col">
                         <div class="form-floating">
-                            <input asp-for=@Model.AdminAccountInfo.Password type="text" class="form-control" id="Password" placeholder="Password">
+                            <input asp-for=@Model.Password type="text" class="form-control" id="Password" placeholder="Password" name="Password">
                             <label for="Password">Password</label>
+                            <span class="error-Password text-danger"></span>
+
                         </div>
-                    </div>
-                <div class="col">
-                    <div class="form-floating mb-3">
-                        <div class="form-floating">
-                            <input asp-for=@Model.AdminAccountInfo.Username type="text" class="form-control" id="username" placeholder="User Name">
-                            <label for="username">User Name</label>
-                        </div>
-                    </div>
                     </div>
                     <div class="col">
-                    <div class="form-floating mb-3">
-                        <div class="form-floating">
-                            <input asp-for=@Model.AdminAccountInfo.Username type="text" class="form-control" id="username" placeholder="User Name">
-                            <label for="username">User Name</label>
+                        <div class="form-floating mb-3">
+                            <select name="" class="py-2 form-control mb-3 w-100 " id="" disabled>
+                                <option>Active</option>
+                                <option>Name</option>
+                            </select>
                         </div>
                     </div>
+                    <div class="col">
+                        <div class="form-floating mb-3">
+                            <select name="" class="py-2 form-control mb-3 w-100 " id="" disabled>
+                                <option>Admin</option>
+                                <option>MasterAdmin</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
                 <div class="d-flex justify-content-end">
@@ -57,91 +97,139 @@
                 </div>
             </form>
             <h5 class="fw-bold my-3">Administrator Information</h5>
-            <form>
+            <form id="administrationinfo" asp-action="AdministrationInfo" asp-controller="Admin">
                 <div class="row row-cols-1 row-cols-md-2 g-3">
                     <div class="col">
                         <div class="form-floating">
-                            <input asp-for=@Model.AdministratorInfo.FirstName type="text" class="form-control" id="firstname" placeholder="First Name" disabled>
+                            <input asp-for=@Model.FirstName type="text" class="form-control" id="firstname" placeholder="First Name" disabled name="firstname">
                             <label for="firstname">First Name</label>
                         </div>
                     </div>
                     <div class="col">
                         <div class="form-floating">
-                            <input asp-for=@Model.AdministratorInfo.LastName type="text" class="form-control" id="lastname" placeholder="Last Name" disabled>
+                            <input asp-for=@Model.LastName type="text" class="form-control" id="lastname" placeholder="Last Name" disabled>
                             <label for="lastname">Last Name</label>
                         </div>
                     </div>
                 <div class="col">
                     <div class="form-floating">
-                            <input asp-for=@Model.AdministratorInfo.Email type="text" class="form-control" id="email" placeholder="Email" disabled>
+                            <input asp-for=@Model.Email type="text" class="form-control" id="email" placeholder="Email" name="email" disabled>
                             <label for="email">Email</label>
+                            <span class="error-email text-dange"></span>
                         </div>
                     </div>
                 <div class="col">
                     <div class="form-floating">
-                            <input asp-for=@Model.AdministratorInfo.ConfirmEmail type="text" class="form-control" id="confirmemail" placeholder="Confirm Email" disabled>
+                            <input asp-for=@Model.Email type="text" class="form-control" id="confirmemail" name="confirmmail" placeholder="Confirm Email" disabled>
                             <label for="confirmemail">Confirm Email</label>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="form-floating">
-                            <input asp-for=@Model.AdministratorInfo.MobileNo name="PhoneNumber" type="tel" id='patient_phone' class="form-control" placeholder="(201)555-0123" disabled>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                    </div>
-                </div>
-                    <div class="d-flex justify-content-end">
-                        <button id="admin_edit_btn"
-                                class="btn btn-outline-info form_button d-flex align-items-center p-1 mx-2 my-3 px-3 fw-semibold" style="display:block !important;">
-                            <p id="value" class="m-0">Edit</p>
-                        </button>
-                        <input type="submit" id="admin_save_btn"
-                           class="btn btn-outline-info  d-flex align-items-center p-1 mx-2 my-3 px-3 fw-semibold" style="display:none !important;">
-                    </div>
-            </form>
+                            <span class="error-confirmmail text-danger"></span>
 
-            <h5 class="fw-bold my-3">Mailing & Billing Information</h5>
-            <form>
-                <div class="row row-cols-1 row-cols-md-2 g-3">
-                    <div class="col">
-                        <div class="form-floating">
-                            <input asp-for="@Model.adminBillingInfo.Address1" type="text" class="form-control" id="address1" placeholder="Address 1" disabled>
-                            <label for="address1">Address 1</label>
                         </div>
                     </div>
-                    <div class="col">
-                        <div class="form-floating">
-                            <input asp-for=@Model.adminBillingInfo.Address2 type="text" class="form-control" id="address2" placeholder="Address 2" disabled>
-                            <label for="address2">Address 2</label>
-                        </div>
-                    </div>
-                    <div class="col">
-                        <div class="form-floating">
-                            <input asp-for=@Model.adminBillingInfo.City type="text" class="form-control" id="city" placeholder="City" disabled>
-                            <label for="city">City</label>
-                        </div>
-                    </div>
-                    <div class="col">
-                        <div class="form-floating">
-                            
-                        </div>
-                    </div>
-                
                     <div class="col-md-6">
                         <div class="form-floating">
-                            <input name="PhoneNumber" type="tel" id='friend_phone' class="form-control" placeholder="(201)555-0123" disabled>
+                            <input asp-for=@Model.MobileNo name="PhoneNumber" type="tel" id='patient_phone' class="form-control" placeholder="(201)555-0123" disabled>
+                            <span class="error-PhoneNumber text-danger"></span>
+
                         </div>
                     </div>
+                    <div class="col-md-6">
+                        <div class="form-check form-check-inline">
+                            @foreach (var region in Model.Regions)
+                            {
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="checkbox" id="region-@region.Regionid" name="adminRegion" value="@region.Regionid" disabled
+                                    @if (Model.WorkingRegions.Any(wr => wr.Regionid == region.Regionid))
+                                    {
+                                        <text>checked="checked"</text>
+                                    }
+                                    />
+                                    <label class="form-check-label" for="region-@region.Regionid">@region.Name</label>
+                                </div>
+                            }
+                                    <span class="error-adminRegion text-danger"></span>
+                        </div>
+                    </div>
+
                 </div>
                 <div class="row">
                     <div class="d-flex flex-row-reverse">
-                        <button id="edit_btn"
-                                class="btn btn-outline-info  d-flex align-items-center p-1 mx-2 my-3 px-3 fw-semibold" style="display:block !important;">
-                            <p id="value" class="m-0">Edit</p>
+                        <button class="btn btn-outline-info" id="EditBtn" type="button" onclick="toggleEdit()">
+                            Edit
                         </button>
-                        <input type="submit" id="save_btn"
-                               class="btn btn-outline-info  d-flex align-items-center p-1 mx-2 my-3 px-3 fw-semibold" style="display:none !important;">
+                        <button class="btn btn-outline-info mx-3" type="Submit" id="SubBtn">
+                            Submit
+                        </button>
+                    </div>
+                </div>
+            </form>
+
+            <h5 class="fw-bold my-3">Mailing & Billing Information</h5>
+            <form id="accountinginfo" asp-action="AccountingInfo" asp-controller="Admin">
+                <div class="row row-cols-1 row-cols-md-2 g-3">
+                    <div class="col">
+                        <div class="form-floating">
+                            <input asp-for="@Model.Address1" type="text" class="form-control" id="address1" placeholder="Address 1" name="Address1" disabled>
+                            <label for="address1">Address 1</label>
+                            <span class="error-Address1 text-danger"></span>
+
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="form-floating">
+                            <input asp-for=@Model.Address2 type="text" class="form-control" id="address2" placeholder="Address 2" name="Address2" disabled>
+                            <label for="address2">Address 2</label>
+                            <span class="error-Address2 text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="form-floating">
+                            <input asp-for=@Model.City type="text" class="form-control" id="city" placeholder="City" name="City" disabled>
+                            <label for="city">City</label>
+                            <span class="error-City text-danger"></span>
+
+                        </div>
+                    </div>
+                    
+                    <div class="col">
+                        <div class="form-floating">
+                            <select class="form-select " aria-label="Default select example" name="state" id="cancelReason" asp-for="State" disabled>
+
+                                <option selected disabled>Select The State</option>
+                                @foreach (var region in Model.Regions)
+                                {
+                                    <option value="@region.Regionid">@region.Name</option>
+                                }
+
+                            </select>
+                            <span class="error-state text-danger"></span>
+
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="form-floating">
+                            <input asp-for=@Model.ZipCode type="text" class="form-control" id="city" placeholder="City" name="Zipcode" disabled>
+                            <label for="zip">ZipCode</label>
+                            <span class="error-Zipcode text-danger"></span>
+
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-floating">
+                            <input name="PhoneNumber" type="tel" id='friend_phone' name="MobileNo" class="form-control" placeholder="(201)555-0123" disabled asp-for="@Model.MobileNo">
+                            <span class="error-MobileNo text-danger"></span>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="d-flex flex-row-reverse">
+                        <button class="btn btn-outline-info" id="EditBtn" type="button" onclick="toggleAdminEdit()">
+                            Edit
+                        </button>
+                        <button class="btn btn-outline-info mx-3" type="Submit" id="SubAdminBtn">
+                            Submit
+                        </button>
                     </div>
                 </div>
             </form>
@@ -149,23 +237,26 @@
     </div>
 </section>
 <script>
-    document.getElementById("admin_edit_btn").addEventListener("click", function (e) {
-        document.getElementById("admin_save_btn").removeAttribute("disabled");
-        document.getElementById("admin_save_btn").removeAttribute("style");
-        document.getElementById("email").removeAttribute("disabled");
-        document.getElementById("confirmemail").removeAttribute("disabled");
-        document.getElementById("patient_phone").removeAttribute("disabled");
-        e.preventDefault();
-    })
-    document.getElementById("edit_btn").addEventListener("click", function (e) {
-        document.getElementById("save_btn").removeAttribute("disabled");
-        document.getElementById("save_btn").removeAttribute("style");
-        document.getElementById("address1").removeAttribute("disabled");
-        document.getElementById("address2").removeAttribute("disabled");
-        document.getElementById("city").removeAttribute("disabled");
-        document.getElementById("state").removeAttribute("disabled");
-        document.getElementById("zip").removeAttribute("disabled");
-        document.getElementById("friend_phone").removeAttribute("disabled");
-        e.preventDefault();
-    })
+    $("#SubBtn").hide();
+    $("#SubAdminBtn").hide();
+
+    function toggleEdit() {
+        var inputFields = document.querySelectorAll('#administrationinfo input');
+
+        inputFields.forEach(function (input) {
+            input.disabled = !input.disabled;
+        });
+
+        $("#SubBtn").toggle();  
+    }
+    function toggleAdminEdit() {
+        var inputFields = document.querySelectorAll('#accountinginfo input,#accountinginfo select');
+
+        inputFields.forEach(function (input) {
+            input.disabled = !input.disabled;
+        });
+
+        $("#SubAdminBtn").toggle();
+    }
+
 </script>

@@ -181,18 +181,21 @@
 
                     </div>
                 </div>
-                <div class="col">
-                    <div class="form-floating">
-                        <input type="text"
-                               class="form-control"
-                               id="floatingInput"
-                               placeholder="Rajpath Road"
-                               asp-for="State"/>
-                        <label for="floatingInput">State</label>
-                       <span asp-validation-for="State" class="text-danger"></span>
+        <div class="col">
+            <div class="form-floating">
+                <select class="form-select " aria-label="Default select example" name="state" id="cancelReason" asp-for="State">
 
-                    </div>
-                </div>
+                    <option selected disabled>Select The State</option>
+                    @foreach (var region in Model.Regions)
+                    {
+                        <option value="@region.Name">@region.Name</option>
+                    }
+
+                </select>
+                <span asp-validation-for="State" class="text-danger"></span>
+
+            </div>
+        </div>
                 <div class="col">
                     <div class="form-floating">
                         <input type="text"

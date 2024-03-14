@@ -44,12 +44,17 @@ namespace HalloDocPatient.Controllers
         }
         public IActionResult BusinessRequest()
         {
-            return View();
+            var region = _context.Regions.ToList();
+            var requestmodal = new RequestOthers();
+            requestmodal.Regions = region;
+            return View(requestmodal);
         }
 
         [HttpPost]
         public IActionResult BusinessRequest(RequestOthers requestOther)
         {
+            var statebyregionid = _context.Regions.Where(item => item.Name == requestOther.State).FirstOrDefault();
+
             if (ModelState.IsValid)
             {
                     Business business = new Business();
@@ -91,10 +96,29 @@ namespace HalloDocPatient.Controllers
                 requestclient.Intdate = requestOther.BirthDate.Day;
                 requestclient.Intyear = requestOther.BirthDate.Year;
                 requestclient.Strmonth = requestOther.BirthDate.Month.ToString();
+                requestclient.City = requestOther.City;
+                requestclient.State = requestOther.State;
+                requestclient.Street=requestOther.Street;
+                requestclient.Zipcode = requestOther.Zipcode;
+                requestclient.Regionid = statebyregionid.Regionid;
 
 
                 _context.Requestclients.Add(requestclient);
                 _context.SaveChanges();
+                var region = _context.Regions.Where(x => x.Name == requestOther.State).FirstOrDefault();
+                int count = _context.Requests.Where(x => x.Createddate.Date == request.Createddate.Date).Count() + 1;
+                if (region != null)
+                {
+                    var confirmNum = string.Concat(region.Abbreviation.ToUpper(), request.Createddate.ToString("ddMMyy"), requestOther.LastName.Substring(0, 2).ToUpper() ?? "",
+                   requestOther.FirstName.Substring(0, 2).ToUpper(), count.ToString("D4"));
+                    request.Confirmationnumber = confirmNum;
+                }
+                else
+                {
+                    var confirmNum = string.Concat("ML", request.Createddate.ToString("ddMMyy"), requestOther.LastName.Substring(0, 2).ToUpper() ?? "",
+                  requestOther.FirstName.Substring(0, 2).ToUpper(), count.ToString("D4"));
+                    request.Confirmationnumber = confirmNum;
+                }
                 var token = Guid.NewGuid().ToString();
                 var resetLink = Url.Action("Index", "Register", new { userId = request.Requestid, token }, protocol: HttpContext.Request.Scheme);
 
@@ -206,7 +230,11 @@ namespace HalloDocPatient.Controllers
         }
         public IActionResult FriendRequest()
         {
-            return View();
+            var region = _context.Regions.ToList();
+            var requestmodal = new RequestOthers();
+            requestmodal.Regions = region;
+            return View(requestmodal);
+           
         }
 
         [HttpPost]
@@ -256,7 +284,10 @@ namespace HalloDocPatient.Controllers
         }
             public IActionResult ConceirgeRequest()
         {
-            return View();
+            var region = _context.Regions.ToList();
+            var requestmodal = new RequestOthers();
+            requestmodal.Regions = region;
+            return View(requestmodal);
         }
         [HttpPost]
         public IActionResult ConceirgeRequest(RequestOthers requestOther)

@@ -39,7 +39,6 @@ namespace BusinessLayer.Repository
         {
             try
             {
-
             var emailSettings = _configuration.GetSection("EmailSettings");
             var message = new MimeMessage();
             var from = new MailboxAddress(emailSettings["SenderName"], emailSettings["SenderEmail"]);

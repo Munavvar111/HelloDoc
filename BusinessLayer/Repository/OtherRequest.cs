@@ -41,6 +41,7 @@ namespace BusinessLayer.Repository
         }
         public void AddRequestClient(RequestOthers requestOthers, int RequestID)
         {
+            var statebyregionid = _context.Regions.Where(item => item.Name ==requestOthers.State).FirstOrDefault();
             Requestclient requestclient = new Requestclient();
             requestclient.Requestid = RequestID;
             requestclient.Notes=requestOthers.Notes;
@@ -54,6 +55,7 @@ namespace BusinessLayer.Repository
             requestclient.Street = requestOthers.Street;
             requestclient.City = requestOthers.City;
             requestclient.State = requestOthers.State;
+            requestclient.Regionid = statebyregionid.Regionid;
             requestclient.Zipcode = requestOthers.Zipcode;
             _context.Requestclients.Add(requestclient);
             _context.SaveChanges();
@@ -63,6 +65,20 @@ namespace BusinessLayer.Repository
             AddRequest(requestOthers, RequestTypeID);
             var request1=GetRequestByEmail(requestOthers.EmailOther); 
             AddRequestClient(requestOthers, request1.Requestid);
+            var region = _context.Regions.Where(x => x.Name == requestOthers.State).FirstOrDefault();
+            int count = _context.Requests.Where(x => x.Createddate.Date == request1.Createddate.Date).Count() + 1;
+            if (region != null)
+            {
+                var confirmNum = string.Concat(region.Abbreviation.ToUpper(), request1.Createddate.ToString("ddMMyy"), requestOthers.LastName.Substring(0, 2).ToUpper() ?? "",
+               requestOthers.FirstName.Substring(0, 2).ToUpper(), count.ToString("D4"));
+                request1.Confirmationnumber = confirmNum;
+            }
+            else
+            {
+                var confirmNum = string.Concat("ML", request1.Createddate.ToString("ddMMyy"), requestOthers.LastName.Substring(0, 2).ToUpper() ?? "",
+              requestOthers.FirstName.Substring(0, 2).ToUpper(), count.ToString("D4"));
+                request1.Confirmationnumber = confirmNum;
+            }
         }
 
         public void AddConceirgeRequest(RequestOthers addconciegeRequest, int RequestTypeID)
@@ -71,7 +87,20 @@ namespace BusinessLayer.Repository
             Conceirge(addconciegeRequest);
             var request1 = GetRequestByEmail(addconciegeRequest.EmailOther);
             AddRequestClient(addconciegeRequest, request1.Requestid);
-
+            var region = _context.Regions.Where(x => x.Name == addconciegeRequest.State).FirstOrDefault();
+            int count = _context.Requests.Where(x => x.Createddate.Date == request1.Createddate.Date).Count() + 1;
+            if (region != null)
+            {
+                var confirmNum = string.Concat(region.Abbreviation.ToUpper(), request1.Createddate.ToString("ddMMyy"), addconciegeRequest.LastName.Substring(0, 2).ToUpper() ?? "",
+               addconciegeRequest.FirstName.Substring(0, 2).ToUpper(), count.ToString("D4"));
+                request1.Confirmationnumber = confirmNum;
+            }
+            else
+            {
+                var confirmNum = string.Concat("ML", request1.Createddate.ToString("ddMMyy"), addconciegeRequest.LastName.Substring(0, 2).ToUpper() ?? "",
+              addconciegeRequest.FirstName.Substring(0, 2).ToUpper(), count.ToString("D4"));
+                request1.Confirmationnumber = confirmNum;
+            }
         }
 
         public void Conceirge(RequestOthers conceirge)

@@ -9,41 +9,36 @@
                 </button>
             </div>
             <div class="modal-body">
-
                 <div class="mb-3"><span class="">Patient Name : <span class="text-info fw-1" id="patientname"></span></span></div>
                 <form asp-action="CancelCase" id="cancelCaseForm">
                     <input type="hidden" class="requestid" id="requestIdInputCancel" />
                     <div class="mb-3">
-                        
-                       
-                            
                         <select class="form-select " aria-label="Default select example" name="CancelReason" id="cancelReason">
-                            <option selected hidden>Please Select The Reason</option>
-
+                            <option selected disabled>Please Select The Reason</option>
                             @foreach (var cancelReason in Model[0].Cancel)
                             {
                                 <option value="@cancelReason.CancelReasonId">@cancelReason.CancelCaseReson</option>
                             }
                             </select>
-                        
-                        
-                        <span class="error text-danger"></span>
+                        <span class="error-CancelReason text-danger remove"></span>
                     </div>
                     <div>
                         <div class="form-floating">
                             <textarea class="form-control additionalnote"
-                                      name="notes"
+                                      name="notescancel"
                                       placeholder="Leave a comment here"
                                       id="floatingTextarea2"
                                       style="height: 100px"></textarea>
                             <label for="floatingTextarea2">
                                 Provide Additional Notes
                             </label>
+                            <span class="error-notescancel text-danger remove"></span>
+
                         </div>
                     </div>
                     <div class="mt-3 d-flex justify-content-end">
 
-                        <button class="btn btn-outline-info mx-4 CancelConfirm" type="button" id="CancelConfirm">Confirm</button>
+                        <button class="btn btn-outline-info mx-4 CancelConfirm" type="submit" id="CancelConfirm">Confirm</button>
                         <button type="button" class="btn btn-info" data-bs-dismiss="modal">Cancel</button>
                     </div>
                 </form>

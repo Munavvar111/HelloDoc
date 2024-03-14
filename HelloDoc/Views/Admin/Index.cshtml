@@ -269,7 +269,6 @@
 
 <script>
     $(document).ready(function () {
-
         $('#assigncase').on('show.bs.modal', function (event) {
             var button = $(event.relatedTarget);
             console.log(button)
@@ -279,13 +278,17 @@
             
             var modal = $(this);
             modal.find('#requestIdInputCancel1').val(recipient);
+            modal.find('#regionid').val('');
+            modal.find('#description').val('');
+             var validator = $("#assigncase").validate(); // Assuming your form has ID "cancelCaseForm"
+            validator.resetForm();
         });
         $('#assigncase').on('hidden.bs.modal', function () {
             console.log("hidden")
             $('#assigncaseform').each(function () {
                 this.reset();
             })
-
+            
         });
 
 
@@ -305,6 +308,8 @@
             
             var modal = $(this);
             modal.find('#ClearCaseModal').val(recipient);
+            var validator = $("#ClearModal").validate(); // Assuming your form has ID "cancelCaseForm"
+            validator.resetForm();
         });
         
 
@@ -317,12 +322,15 @@
     $(document).ready(function () {
 
         $('#transfercase').on('show.bs.modal', function (event) {
+
             var button = $(event.relatedTarget);
             console.log(button)
             var recipient = button.data('bs-requestid');
             console.log(recipient);
             var modal = $(this);
             modal.find('#requestIdInputTransfer').val(recipient);
+            var validator = $("#transfercase").validate(); // Assuming your form has ID "cancelCaseForm"
+            validator.resetForm();
         });
         $('#transfercase').on('hidden.bs.modal', function () {
             console.log("hidden")
@@ -349,12 +357,16 @@
             var modal = $(this);
             modal.find('#patientname').text(patientName)
             modal.find('#requestIdInputCancel').val(recipient);
+            var validator = $("#exampleModal").validate(); // Assuming your form has ID "cancelCaseForm"
+            validator.resetForm();
+
         });
         $('#exampleModal').on('hidden.bs.modal', function () {
             console.log("hidden")
             $('#cancelCaseForm').each(function () {
                 this.reset();
             })
+
 
         });
 
@@ -380,6 +392,9 @@
             modal.find('#patientname').text(patientName)
 
             modal.find('#requestIdInputBlock').val(recipient);
+            var validator = $("#BlockModal").validate(); // Assuming your form has ID "cancelCaseForm"
+            validator.resetForm();
+
         });
 
         $('#BlockModal').on('hidden.bs.modal', function () {

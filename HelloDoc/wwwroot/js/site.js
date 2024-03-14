@@ -33,7 +33,6 @@ $(document).ready(function () {
             $('#statuslink4 .Status-Coun').text(data.concludeCount);
             $('#statuslink5 .Status-Coun').text(data.toClosedCount);
             $('#statuslink6 .Status-Count').text(data.unpaidCount);
-            // Add logic to handle triangle display or any other UI updates
         }
     }
     console.log("1")
@@ -256,110 +255,155 @@ $(document).ready(function () {
                 });
             
     }
-
-    $('#BlockCase').click(function (e) {
-        e.preventDefault();
-        var blockreason = $('#blockreason').val();
-        var requestid = $('#requestIdInputBlock').val();
-        if (!blockreason) {
-            toastr.error("please Enter The Reason For Block")
-            return;
-        }
-        $('#BlockModal').modal('hide');
-        $.ajax({
-            method: 'POST',
-            url: '/Admin/BlockRequest',
-            data: { blockreason: blockreason, requestid: requestid },
-            success: function (data) {
-                if (data) {
-                    var storedPartial = localStorage.getItem('currentPartial');
-                    var storedStatus = JSON.parse(localStorage.getItem('currentStatus'));
-
-                    filterTable(storedPartial, storedStatus, 1, 5);
-                    updateUIWithCounts();
-                    toastr.success('Block successful!');
-
-                }
+    $("#blockCaseForm").validate({
+        rules: {
+            blockreason: {
+                required: true
             }
-        })
-    })
+        },
+        messages: {
+            blockreason: "Please enter your blockreason."
+        },
+        errorPlacement: function (error, element) {
+            var errorSpan = $("span.error-" + element.attr("name"));
 
-
-    $("#CancelConfirm").click(function (e) {
-        e.preventDefault();
-
-        var requestid = $('#requestIdInputCancel').val();
-        var cancelReason = $('#cancelReason').val();
-        var additionalnote = $('.additionalnote').val();
-
-        if (!cancelReason) {
-            toastr.error('Please Enter The Reason');
-            return;
-        }
-        if (!additionalnote) {
-            toastr.error('Please Enter The Notes');
-            return;
-        }
-
-        $('#exampleModal').modal('hide');
-        $('#cancelcaseview').modal('hide');
-
-        $.ajax({
-            method: 'POST',
-            url: '/Admin/CancelCase',
-            data: { requestid: requestid, notes: additionalnote, CancelReason: cancelReason },
-            success: function (data) {
-                if (data) {
-                    var storedPartial = localStorage.getItem('currentPartial');
-                    var storedStatus = JSON.parse(localStorage.getItem('currentStatus'));
-
-                    filterTable(storedPartial, storedStatus, 1, 5);
-                    updateUIWithCounts();
-                    toastr.success('CancelPatient successful!');
-
-                }
+            if (errorSpan.length > 0) {
+                // If the specific span is found, append the error message to it
+                error.appendTo(errorSpan);
+            } else {
+                // If not found, use the default placement (after the input field)
+                error.appendTo(errorSpan);
             }
-        })
-    })
+        },
+        submitHandler: function (form) {
+            // If the form is valid, submit it
+            var blockreason = $('#blockreason').val();
+            var requestid = $('#requestIdInputBlock').val();
+            $('#BlockModal').modal('hide');
+            $.ajax({
+                method: 'POST',
+                url: '/Admin/BlockRequest',
+                data: { blockreason: blockreason, requestid: requestid },
+                success: function (data) {
+                    if (data) {
+                        var storedPartial = localStorage.getItem('currentPartial');
+                        var storedStatus = JSON.parse(localStorage.getItem('currentStatus'));
+
+                        filterTable(storedPartial, storedStatus, 1, 5);
+                        updateUIWithCounts();
+                        toastr.success('Block successful!');
+
+                    }
+                }
+            })
+        }
+    });
     
-
-    $('#asigncasebutton').click(function (e) {
-        e.preventDefault();
-        var requestid = $('#requestIdInputCancel1').val();
-        var regionid = $('#regionid').val();
-        var physician = $('#physicianDropdown').val();
-        var description = $('#description').val();
-        if (!regionid) {
-            toastr.error('Please Enter The Region');
-
-            return;
-        }
-        if (!physician) {
-            toastr.error('Please Enter The Physician');
-            return;
-        }
-
-        if (!description) {
-            toastr.error('Please Enter The Notes');
-            return;
-        }
-        $('#assigncase').modal('hide');
-        $.ajax({
-            method: "POST",
-            url: "/Admin/AssignRequest",
-            data: { requestid: requestid, regionid: regionid, physician: physician, description: description },
-            success: function (data) {
-                console.log(data)
-                if (data) {
-                    var storedPartial = localStorage.getItem('currentPartial');
-                    var storedStatus = JSON.parse(localStorage.getItem('currentStatus'));
-                    filterTable(storedPartial, storedStatus, 1, 5);
-                    updateUIWithCounts();
-                    console.log("toaster", toastr.success)
-                    toastr.success('Assign successful!');
-                }
+    $("#cancelCaseForm").validate({
+        rules: {
+            CancelReason: {
+                required: true
+            },
+            notescancel: {
+                required: true
             }
-        })
+        },
+        messages: {
+            notescancel: "Please enter your Notes.",
+            CancelReason: "Please enter your CancelReason.",
+           
+        },
+        errorPlacement: function (error, element) {
+            var errorSpan = $("span.error-" + element.attr("name"));
+
+            if (errorSpan.length > 0) {
+                // If the specific span is found, append the error message to it
+                error.appendTo(errorSpan);
+            } else {
+                // If not found, use the default placement (after the input field)
+                error.insertAfter(element);
+            }
+        },
+        submitHandler: function (form) {
+            // If the form is valid, submit it
+            var requestid = $('#requestIdInputCancel').val();
+            var cancelReason = $('#cancelReason').val();
+            var additionalnote = $('.additionalnote').val();
+
+            $('#exampleModal').modal('hide');
+            $('#cancelcaseview').modal('hide');
+
+            $.ajax({
+                method: 'POST',
+                url: '/Admin/CancelCase',
+                data: { requestid: requestid, notes: additionalnote, CancelReason: cancelReason },
+                success: function (data) {
+                    if (data) {
+                        var storedPartial = localStorage.getItem('currentPartial');
+                        var storedStatus = JSON.parse(localStorage.getItem('currentStatus'));
+
+                        filterTable(storedPartial, storedStatus, 1, 5);
+                        updateUIWithCounts();
+                        toastr.success('CancelPatient successful!');
+
+                    }
+                }
+            })
+        }
+    });
+  $("#assigncaseform").validate({
+        rules: {
+            notes: {
+                required: true
+            },
+            region: {
+                required: true
+            },
+            physician: {
+                required:true
+            }
+        },
+        messages: {
+            notes: "Please enter your Notes.",
+            region: "Please enter your region.",
+            physician: "Please enter your physician.",
+          
+        },
+        errorPlacement: function (error, element) {
+            var errorSpan = $("span.error-" + element.attr("name"));
+
+            if (errorSpan.length > 0) {
+                // If the specific span is found, append the error message to it
+                error.appendTo(errorSpan);
+            } else {
+                // If not found, use the default placement (after the input field)
+                error.insertAfter(element);
+            }
+        },
+        submitHandler: function (form) {
+            // If the form is valid, submit it
+            var requestid = $('#requestIdInputCancel1').val();
+            var regionid = $('#regionid').val();
+            var physician = $('#physicianDropdown').val();
+            var description = $('#description').val();
+            $('#assigncase').modal('hide');
+            $.ajax({
+                method: "POST",
+                url: "/Admin/AssignRequest",
+                data: { requestid: requestid, regionid: regionid, physician: physician, description: description },
+                success: function (data) {
+                    console.log(data)
+                    if (data) {
+                        var storedPartial = localStorage.getItem('currentPartial');
+                        var storedStatus = JSON.parse(localStorage.getItem('currentStatus'));
+                        filterTable(storedPartial, storedStatus, 1, 5);
+                        updateUIWithCounts();
+                        console.log("toaster", toastr.success)
+                        toastr.success('Assign successful!');
+                    }
+                }
+            })
+        }
     });
     $('#transfercasebutton').click(function (e) {
         e.preventDefault();
@@ -404,7 +448,6 @@ $(document).ready(function () {
         })
 
     })
-
     $('.regionDropdown').on('change', function () {
         console.log("hii")
         var selectregion = $(this).val();
@@ -414,9 +457,10 @@ $(document).ready(function () {
             data: { region: selectregion },
             success: function (physicians) {
                 $('.physicianDropdown').empty();
-                $('.physicianDropdown').append($('<option>', {
-                    value: 'selected',
-                    text: "please selected the value"
+                $('.physicianDropdown').append($('<option >', {
+                    value: 'selected_disabled',
+                    text: "please selected the value",
+                    disabled: true
                 }))
                 $.each(physicians, function (index, physician) {
                     console.log(physician)
@@ -545,7 +589,159 @@ $(document).ready(function () {
             form.submit();
         }
     });
-    
+    $("#accountinginfo").validate({
+        rules: {
+            Address1: {
+                required: true,
+            },
+            Address2: {
+                required: true,
+            },
+            City: {
+                required: true,
+            },
+            State: {
+                required: true,
+            },
+            Zipcode: {
+                required: true,
+            },
+            MobileNo: {
+                required: true,
+            }
+        },
+        messages: {
+            Address1: {
+                required: "Please enter a Address1",
+            },
+            Address2: {
+                required: "Please enter a Address2",
+            },
+            City: {
+                required: "Please enter a City",
+            },
+            State: {
+                required: "Please enter a State",
+            },
+            Zipcode: {
+                required: "Please enter a Zipcode",
+            },
+            MobileNo: {
+                required:'Please Enter A PhoneNo'
+            }
+        },
+        errorPlacement: function (error, element) {
+            var errorSpan = $("span.error-" + element.attr("name"));
+
+            if (errorSpan.length > 0) {
+                // If the specific span is found, append the error message to it
+                error.appendTo(errorSpan);
+            } else {
+                // If not found, use the default placement (after the input field)
+                error.insertAfter(element);
+            }
+        },
+        submitHandler: function (form) {
+            // If the form is valid, submit it
+            form.submit();
+        }
+    });
+    $("#resetpassword").validate({
+        rules: {
+            Password: {
+                required: true,
+                minlength: 8, // Minimum password eelength (adjust as needed)
+                complexity: true // Custom rule for password complexity (explained below)
+            }
+        },
+        messages: {
+            Password: {
+                required: "Please enter a password",
+                minlength: "Password must be at least {0} characters long",
+                complexity: "Password must contain a mix of uppercase, lowercase letters, numbers, and special characters"
+            }
+        },
+        errorPlacement: function (error, element) {
+            var errorSpan = $("span.error-" + element.attr("name"));
+
+            if (errorSpan.length > 0) {
+                // If the specific span is found, append the error message to it
+                error.appendTo(errorSpan);
+            } else {
+                // If not found, use the default placement (after the input field)
+                error.insertAfter(element);
+            }
+        },
+        submitHandler: function (form) {
+            // If the form is valid, submit it
+            form.submit();
+        }
+    });
+    $("#administrationinfo").validate({
+        rules: {
+            firstname: {
+                required: true
+            },
+            lastname: {
+                required: true
+            },
+            email: {
+                required: true,
+                email: true
+            },
+            confirmmail: {
+                required: true,
+                equalTo: "#email"
+            },
+            PhoneNumber: {
+                required: true,
+                pattern: /^\(?([0-9]{3})\)?[-. ]([0-9]{3})[-. ]([0-9]{4})$/
+            },
+            adminRegion: {
+                required: true,
+                minlength: 1
+            }
+        },
+        messages: {
+            firstname: "Please enter your First Name.",
+            lastname: "Please enter your Last Name.",
+            email: {
+                required: "Please enter an email address.",
+                email: "Please enter a valid email address."
+            },
+            confirmmail: {
+                required: "Please confirm your email address.",
+                equalTo: "Please enter the same email as above."
+            },
+            PhoneNumber: {
+                required: "Please enter your mobile phone number.",
+                pattern: "Please enter a valid phone number (e.g., 123-456-7890)."
+            },
+            adminRegion: "Please select at least one region."
+
+        },
+        errorPlacement: function (error, element) {
+            var errorSpan = $("span.error-" + element.attr("name"));
+
+            if (errorSpan.length > 0) {
+                // If the specific span is found, append the error message to it
+                error.appendTo(errorSpan);
+            } else {
+                // If not found, use the default placement (after the input field)
+                error.insertAfter(element);
+            }
+        },
+        submitHandler: function (form) {
+            // If the form is valid, submit it
+            form.submit();
+        }
+    });
+
+    $.validator.addMethod("complexity", function (value, element) {
+        var complexityRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/; // Regular expression for password complexity
+        return this.optional(element) || complexityRegex.test(value);
+    }, "Password must contain a mix of uppercase, lowercase letters, numbers, and special characters");
+
 
     $('#business').on('change', function () {
         var vendorname = $(this).val();
