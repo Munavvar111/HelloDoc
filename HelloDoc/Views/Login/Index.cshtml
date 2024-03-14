@@ -3,35 +3,7 @@
     Layout = "~/Views/Shared/_Layout2.cshtml";
     ViewData["Title"] = "Login";
 }
-@if (TempData.ContainsKey("Error"))
-{
-      <script>
-        $(document).ready(function () {
-            toastr.options = {
-                "closeButton": true,
-                "positionClass": "toast-top-right",
-                "timeOut": "5000"
-            };
-
-            toastr.error('@TempData["Error"]');
-        });
-    </script>
-}
-@if (TempData.ContainsKey("SuccessMessage"))
-{
-    <script>
-        $(document).ready(function () {
-            toastr.options = {
-                "closeButton": true,
-                "positionClass": "toast-top-right",
-                "timeOut": "5000"
-            };
-
-            toastr.success('@TempData["SuccessMessage"]');
-        });
-    </script>
-}
-
+<partial name="ToasterPartialView"></partial>
 <a asp-controller="Home" asp-action="Index" asp-area="" class="link-info d-flex w-100 justify-content-end">
     <span class="material-symbols-outlined"> chevron_left </span>
     Back

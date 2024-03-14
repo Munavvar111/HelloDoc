@@ -1,0 +1,37 @@
+﻿@if (TempData.ContainsKey("Error"))
+{
+    <script>
+        $(document).ready(function () {
+            toastr.options = {
+                positionClass: 'toast-top-right',
+                closeButton: true,
+                progressBar: true,
+                showDuration: 400,
+                hideDuration: 1000,
+                timeOut: 2000,
+                extendedTimeOut: 1000,
+                toastClass: 'toast-red' // Add a custom class for red color styling
+            };
+
+            toastr.error('@TempData["Error"]');
+        });
+    </script>
+}
+@if (TempData.ContainsKey("SuccessMessage"))
+{
+    <script>
+        $(document).ready(function () {
+            toastr.options = {
+                positionClass: 'toast-top-right',
+                closeButton: true,
+                progressBar: true,
+                showDuration: 400,
+                hideDuration: 1000,
+                timeOut: 2000,
+                extendedTimeOut: 1000,
+                toastClass: 'toast-red' // Add a custom class for red color styling
+            };
+            toastr.success('@TempData["SuccessMessage"]');
+        });
+    </script>
+}

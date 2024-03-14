@@ -3,34 +3,8 @@
 @{
     ViewData["Title"] = "Patient Request";
 }
-@if (TempData.ContainsKey("Error"))
-{
-    <script>
-        $(document).ready(function () {
-            toastr.options = {
-                "closeButton": true,
-                "positionClass": "toast-top-right",
-                "timeOut": "5000"
-            };
+<partial name="ToasterPartialView"></partial>
 
-            toastr.error('@TempData["Error"]');
-        });
-    </script>
-}
-@if (TempData.ContainsKey("SuccessMessage"))
-{
-    <script>
-        $(document).ready(function () {
-            toastr.options = {
-                "closeButton": true,
-                "positionClass": "toast-top-right",
-                "timeOut": "5000"
-            };
-
-            toastr.success('@TempData["SuccessMessage"]');
-        });
-    </script>
-}
 
 <form id="patientRequestForm"    class="container border rounded-3 p-3 p-md-5 mb-3 d-flex flex-column gap-4 bg-white" method="post" enctype="multipart/form-data">
     <div class="row row-cols-1 row-cols-md-2 g-3">

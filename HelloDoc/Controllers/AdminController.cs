@@ -412,9 +412,6 @@ namespace HelloDoc.Controllers
         [HttpPost]
         public IActionResult SendOrder(SendOrderModel order)
         {
-            
-
-
                 var result = _admin.SendOrders(order);
 
                 if (result)

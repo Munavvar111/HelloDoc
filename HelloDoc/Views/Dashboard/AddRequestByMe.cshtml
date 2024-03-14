@@ -6,34 +6,7 @@
 @{
     ViewData["Title"] = "AddRequestByMe";
 }
-@if (TempData.ContainsKey("Error"))
-{
-    <script>
-        $(document).ready(function () {
-            toastr.options = {
-                "closeButton": true,
-                "positionClass": "toast-top-right",
-                "timeOut": "5000"
-            };
-
-            toastr.error('@TempData["Error"]');
-        });
-    </script>
-}
-@if (TempData.ContainsKey("SuccessMessage"))
-{
-    <script>
-        $(document).ready(function () {
-            toastr.options = {
-                "closeButton": true,
-                "positionClass": "toast-top-right",
-                "timeOut": "5000"
-            };
-
-            toastr.success('@TempData["SuccessMessage"]');
-        });
-    </script>
-}
+<partial name="ToasterPartialView"></partial>
 
 <div class="d-flex justify-content-between my-3 container">
     <div class="d-flex">
