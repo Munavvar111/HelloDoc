@@ -1,3 +1,65 @@
 ﻿@{
     Layout = "~/Views/Shared/_Layout4.cshtml";
+    ViewData["Title"] = "Provider Location";
 }
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+<div class="container bg-light mt-4">
+    <div class="d-flex justify-content-between my-3">
+        <div class="d-flex">
+            <span class="fs-2 text-muted fw-bold">Providers Location</span>
+        </div>
+        <div class="d-flex justify-content-end">
+            <a asp-controller="Admin" asp-action="Index" asp-area=""
+               class="btn btn-outline-info d-flex align-items-center">
+                <span class="material-symbols-outlined"> chevron_left </span> Back
+            </a>
+        </div>
+    </div>
+    <div id="map" style="height: 60vh; width: 100%;"></div>
+    </div>
+
+<script>
+    var map = L.map('map').setView([21, 78], 5);
+
+    googleStreets = L.tileLayer('http://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
+        maxZoom: 20,
+        subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
+    });
+    googleStreets.addTo(map);
+
+    // Function to toggle theme and apply styles
+    
+
+    fetch('/Admin/GetProviders')
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);
+            var geoJson = {
+                type: "FeatureCollection",
+                features: data.map(provider => ({
+                    type: "Feature",
+                    geometry: {
+                        type: "Point",
+                        coordinates: [provider.longitude, provider.latitude]
+                    },
+                    properties: {
+                        name: provider.physicianname
+                    }
+                }))
+            };
+
+            // Add GeoJSON to Leaflet map
+            L.geoJSON(geoJson, {
+                pointToLayer: function (feature, latlng) {
+                    return L.marker(latlng);
+                },
+                onEachFeature: function (feature, layer) {
+                    if (feature.properties && feature.properties.name) {
+                        layer.bindPopup(feature.properties.name);
+                    }
+                }
+            }).addTo(map);
+        });
+</script>

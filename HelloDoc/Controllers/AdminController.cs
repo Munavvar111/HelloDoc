@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.CodeAnalysis.Scripting;
+using Microsoft.DotNet.Scaffolding.Shared;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using NuGet.Protocol.Core.Types;
@@ -55,8 +56,17 @@ namespace HelloDoc.Controllers
         //main View
         public IActionResult ProviderLocation()
         {
+
             return View();
         }
+     
+        public List<PhysicianLocation> GetProviders()
+        {
+            
+                return _context.PhysicianLocations.ToList();
+            
+        }
+
 
         //main View
         public IActionResult Profile()

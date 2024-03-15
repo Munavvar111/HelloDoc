@@ -457,8 +457,8 @@ $(document).ready(function () {
             data: { region: selectregion },
             success: function (physicians) {
                 $('.physicianDropdown').empty();
-                $('.physicianDropdown').append($('<option >', {
-                    value: 'selected_disabled',
+                $('.physicianDropdown').append($('<option>', {
+                    value: 'selected disabled',
                     text: "please selected the value",
                     disabled: true
                 }))
@@ -760,7 +760,7 @@ $(document).ready(function () {
             }
         })
     })
-    
+
 
     
 

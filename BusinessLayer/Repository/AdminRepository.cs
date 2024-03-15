@@ -124,7 +124,7 @@ namespace BusinessLayer.Repository
                                      LastName = reqclient.Lastname,
                                      DateOfBirth = new DateOnly((int)reqclient.Intyear, int.Parse(reqclient.Strmonth), (int)reqclient.Intdate),
                                      Phone = reqclient.Phonenumber,
-                                     Email = reqclient.Email,
+                                     EmailView = reqclient.Email,
                                      Location = reqclient.Location,
                                      RequestClientId = reqclient.Requestclientid,
                                      Cancel = _context.Casetags.Select(cc => new CancelCase
@@ -145,7 +145,7 @@ namespace BusinessLayer.Repository
                 requestclient.Firstname = viewCaseVM.FirstName;
                 requestclient.Lastname = viewCaseVM.LastName;
                 requestclient.Location = viewCaseVM.Location;
-                requestclient.Email = viewCaseVM.Email;
+                requestclient.Email = viewCaseVM.EmailView;
                 requestclient.Notes = viewCaseVM.Notes;
                 requestclient.Phonenumber = viewCaseVM.Phone;
                 requestclient.Intdate = viewCaseVM.DateOfBirth.Day;

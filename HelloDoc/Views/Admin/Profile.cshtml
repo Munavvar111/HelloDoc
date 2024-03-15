@@ -134,7 +134,7 @@
                         </div>
                     </div>
                     <div class="col-md-6">
-                        <div class="form-check form-check-inline">
+                        <div class="form-check form-check-inline">  
                             @foreach (var region in Model.Regions)
                             {
                                 <div class="form-check form-check-inline">
@@ -143,6 +143,7 @@
                                     {
                                         <text>checked="checked"</text>
                                     }
+
                                     />
                                     <label class="form-check-label" for="region-@region.Regionid">@region.Name</label>
                                 </div>

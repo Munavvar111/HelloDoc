@@ -34,26 +34,26 @@
         <div>
             <span class="fs-4 fw-bold">Documents</span>
         </div>
-        <div class="table-responsive mt-4">
+        <div class="table table-responsive mt-4">
             <table class="table">
-                <thead class="thead-secondry" style="vertical-align:central !important">
-                    <tr>
-                        <th scope="col"></th>
-                        <th scope="col">Updated Date </th>
-                        <th scope="col">Actions</th>
+                <thead class="thead-Secondary bg-secondary">
+                    <tr class="d-none d-md-table-row">
+                        <th scope="col" class="bg-muted" style="background-color:#777 !important">Documents</th>
+                        <th scope="col" class="bg-muted" style="background-color:#777 !important">Updated Date </th>
+                        <th scope="col" class="bg-muted" style="background-color:#777 !important">Actions</th>
                     </tr>   
                 </thead>
                 <tbody>
                     @foreach (var item in Model.Requestwisefileview)
                     {
                         
-                    <tr>
-                            
-                            <td>
+                        <tr class="d-none d-md-table-row">
+
+                            <td class="filename">
                                 @item.Filename.Replace(@"[0-9a-f]{8}(?:-[0-9a-f]{4}){4}[0-9a-f]{12}_", "")
                             </td>
                             <td>    
-                                @item.Admin
+                                @item.Createddate.Date
 
                             </td>
                             <td>
@@ -68,6 +68,24 @@
                     }
                 </tbody>
             </table>
+        </div>
+
+        <div class="d-md-none border-top border-bottom">
+            <!-- Iterate through documents -->
+            @foreach (var item in Model.Requestwisefileview)
+            {
+                <div class="document">
+                    <p class="filename">@Html.DisplayFor(modelitem => item.Filename)</p>
+                    <p>Updated: @Html.DisplayFor(modelitem => item.Createddate.Day)</p>
+                    <div class="d-flex justify-content-beween">
+                        <a class="btn btn-outline-info"
+                           href="~/uploads/@item.Filename" target="_blank">
+                            <span class="material-symbols-outlined">cloud_download</span>
+                        </a>
+                        
+                    </div>
+                </div>
+            }
         </div>
         <form asp-action="CloseCase" method="post" asp-route-requestid="@Model.Requestid">
             
@@ -189,3 +207,18 @@
         $("#SubBtn").show();
     }
             </script>
+
+<script>
+    function removeGuidFromFilename() {
+        var filenameElements = document.querySelectorAll('.filename');
+        console.log(filenameElements)
+        filenameElements.forEach(function (filenameElement) {
+            var filename = filenameElement.textContent;
+
+            var cleanedFilename = filename.replace(/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/gi, '');
+
+            filenameElement.textContent = cleanedFilename;
+        });
+    }
+    removeGuidFromFilename();
+</script>

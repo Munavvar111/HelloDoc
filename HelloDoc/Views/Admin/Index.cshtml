@@ -143,7 +143,7 @@
         <p class="patient_text_size fw-bolder mx-3 fs-3">Patients<span class="text-primary" id="statuschange"></span></p>
     </div>
     <div class="">
-        <button type="button" class="btn btn-info text-white">
+        <button type="button" class="btn btn-info text-white" data-bs-toggle="modal" data-bs-target="#SendLink">
             <i class="bi bi-send  me-md-2"></i><span class="d-none d-lg-inline">Send Link</span>
         </button>
         <button type="button" class="btn btn-info  text-white">
@@ -237,6 +237,7 @@
 <partial name="AssignCase"></partial>
 <partial name="SendAgreement"></partial>
 <partial name="EncounterPdfModal"></partial>
+<partial name="SendLinkModal"></partial>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
 <script>
@@ -252,6 +253,7 @@
             modal.find('#requestIdInputCancel1').val(recipient);
             modal.find('#regionid').val('');
             modal.find('#description').val('');
+            modal.find('#physicianDropdown').val("");
              var validator = $("#assigncase").validate(); // Assuming your form has ID "cancelCaseForm"
             validator.resetForm();
         });

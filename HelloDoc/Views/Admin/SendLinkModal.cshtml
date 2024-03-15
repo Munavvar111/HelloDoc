@@ -1,0 +1,65 @@
+﻿<div class="modal fade" id="SendLink" tabindex="-1" role="dialog" aria-labelledby="assigncase " aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h1 class="modal-title fs-5 title" id="exampleModalLabel">Send Mail To Patient Submitting Request</h1>
+                <button type="button" class="close bg-info border border-info" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true" class="fs-1">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body text-start">
+           <form asp-action="" id="assigncaseform">
+                    <div class="form-floating mt-3">
+                    <input type="text"
+                           class="form-control"
+                           id="floatingInput"
+                           placeholder="name@example.com"
+                           />
+                    <label for="floatingInput" >First Name</label>
+                    <span  class="text-danger"></span>
+                </div>
+                    <div class="form-floating mt-3">
+                    <input type="text"
+                           class="form-control"
+                           id="floatingInput"
+                           placeholder="name@example.com"
+                           />
+                    <label for="floatingInput" >Last Name</label>
+                    <span  class="text-danger"></span>
+                </div>
+                    <div class="form-floating mt-3">
+                    <input type="email"
+                           class="form-control"
+                           id="floatingInput"
+                           placeholder="name@example.com"
+                           />
+                    <label for="floatingInput" >Email</label>
+                    <span  class="text-danger"></span>
+                </div>
+                    <div class="col mt-3">
+                      <div class="border rounded-2 tel-container">
+                <input id="phone1"
+                       type="tel"
+                       class="form-control border-0 tel-input"
+                       
+                        />
+
+            </div>
+                <span  class="text-danger"></span>
+        </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-info confirmBtn asigncasebutton" id="asigncasebutton" data-id="">Submit</button>
+                        <button type="button" class="btn btn-info" data-bs-dismiss="modal">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    const phone1 = document.querySelector("#phone1");
+    const phoneInput1 = window.intlTelInput(phone1, {
+        utilsScript:
+            "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",
+    });
+</script>

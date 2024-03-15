@@ -17,6 +17,10 @@ const applyDarkTheme = () => {
     for (let i = 0; i < list.length; i++) {
         list[i].classList.add("bg-light-invert");
     }
+    var elements = document.querySelectorAll('.leaflet-layer, .leaflet-control-zoom-in, .leaflet-control-zoom-out, .leaflet-control-attribution');
+    elements.forEach(function (element) {
+        element.style.filter = "invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%)";
+    });
 }
 
 const applyLightTheme = () => {
@@ -26,6 +30,10 @@ const applyLightTheme = () => {
     for (let i = 0; i < list.length; i++) {
         list[i].classList.remove("bg-light-invert");
     }
+    var elements = document.querySelectorAll('.leaflet-layer, .leaflet-control-zoom-in, .leaflet-control-zoom-out, .leaflet-control-attribution');
+    elements.forEach(function (element) {
+        element.style.filter = "";
+    });
 }
 
 window.addEventListener("DOMContentLoaded", () => {

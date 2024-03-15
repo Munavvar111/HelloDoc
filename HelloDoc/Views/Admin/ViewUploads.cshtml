@@ -6,20 +6,6 @@
 <partial name="ToasterPartialView"></partial>
 
 @model DataAccessLayer.CustomModel.RequestFileViewModel
-<style>
-    .filename {
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        display: inline-block;
-        max-width: 150px; /* Adjust the max-width as per your preference */
-    }
-
-        .filename:hover {
-            max-width: none;
-            white-space: normal;
-        }
-</style>
 
 <div class="container   mt-4" id="view">
     <div class="d-flex justify-content-between my-3">
@@ -64,7 +50,7 @@
             </div>
             <div class="mt-2 mx-4 fs-3 d-flex justify-content-between">
                 <!-- Download All button -->
-                <a id="downloadAllBtn" class="btn btn-outline-info">
+                <a id="downloadAllBtn" class="btn btn-outline-info ">
                     <span class=" d-none d-md-inline">Download All</span>
                     <span class="material-symbols-outlined d-md-none">cloud_download</span>
                 </a>
@@ -99,14 +85,14 @@
                             <td>
                                 <input type="checkbox" class="fileCheckbox" data-filename="@item.Filename" />
                             </td>
-                            <td>
-                                <span class="filename"> @Html.DisplayFor(modelitem => item.Filename)</span>
+                            <td  class="filename">
+                                @item.Filename
                             </td>
                             <td>
                                 <!-- Update with actual updated date -->
                                 @Html.DisplayFor(modelitem =>item.Createddate ) 
                             </td>
-                            <td class="d-flex justify-content-around">
+                            <td class="">
                                 <a class="btn btn-outline-info"
                                    href="~/uploads/@item.Filename" target="_blank">
                                     <span class="material-symbols-outlined">cloud_download</span>
@@ -128,14 +114,13 @@
             <!-- Iterate through documents -->
             @foreach (var item in Model.Requestwisefileview)
             {
-                <div class="document">
-                    <!-- Display document name -->
+                <div class="document border-top border-bottom mb-3 mt-3">
+                    <div class="d-flex">
                     <input type="checkbox" class="fileCheckbox" data-filename="@item.Filename" />
-                    <p class="filename">@Html.DisplayFor(modelitem => item.Filename)</p>
-                    <!-- Display updated date -->
+                    <p class="filename mx-3">@Html.DisplayFor(modelitem => item.Filename)</p>
+                        </div>
                      <p>Updated: @Html.DisplayFor(modelitem => item.Createddate)</p> 
-                    <!-- Display actions -->
-                    <div class="d-flex justify-content-beween">
+                    <div class="d-flex justify-content-beween mb-3">
                         <a class="btn btn-outline-info"
                            href="~/uploads/@item.Filename" target="_blank">
                             <span class="material-symbols-outlined">cloud_download</span>
@@ -153,6 +138,20 @@
 
     </div>
 </div>
+<script>
+    function removeGuidFromFilename() {
+        var filenameElements = document.querySelectorAll('.filename');
+        console.log(filenameElements)
+        filenameElements.forEach(function (filenameElement) {
+            var filename = filenameElement.textContent;
+
+            var cleanedFilename = filename.replace(/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/gi, '');
+
+            filenameElement.textContent = cleanedFilename;
+        });
+    }
+    removeGuidFromFilename();
+</script>
 <script>
     document.getElementById("fileInput").onchange = function () {
         let path = this.value.substr(this.value.lastIndexOf('\\') + 1);
@@ -243,3 +242,19 @@
     });
 </script>
 
+<script>
+    // Function to remove GUID from the filename
+    function removeGuidFromFilename() {
+        // Get the filename element
+        var filenameElement = document.getElementById('filenameupload');
+
+        // Get the filename text
+        var filename = filenameElement.textContent;
+
+        // Remove the GUID from the filename
+        var cleanedFilename = filename.replace(/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/gi, '');
+
+        // Update the filename text with the cleaned filename
+        filenameElement.textContent = cleanedFilename;
+    }
+</script>
