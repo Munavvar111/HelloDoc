@@ -1,5 +1,4 @@
-﻿
-@{
+﻿@{
     ViewData["Title"] = "ViewUploads";
     Layout = "~/Views/Shared/_Layout4.cshtml";
 }
@@ -21,7 +20,7 @@
     </div>
 
     <div class="container bg-white border mt-4">
-        <div><span >Patient Name</span></div>
+        <div><span>Patient Name</span></div>
         <div><spna class="fw-bold text-info">@Model.Request.Firstname</spna><span>(@Model.Request.Confirmationnumber)</span></div>
         <div class="mb-3"><span class="text-info"></span></div>
         <div><p>Check here for any file that you or doctors of your subsequents have attached for you to review</p></div>
@@ -31,7 +30,7 @@
                 <div id="fileName" asp-for="FileName" class="form-control fs-6 align-middle">
                     Select File
                 </div>
-                <input type="file" asp-for="File"  class="form-control" id="fileInput" hidden />
+                <input type="file" asp-for="File" class="form-control" id="fileInput" hidden />
                 <label class="input-group-text btn btn-info text-light" for="fileInput">
                     <span class="material-symbols-outlined me-2">cloud_upload</span>
                     <span class="d-none d-md-inline">Upload</span>
@@ -85,12 +84,12 @@
                             <td>
                                 <input type="checkbox" class="fileCheckbox" data-filename="@item.Filename" />
                             </td>
-                            <td  class="filename">
+                            <td class="filename">
                                 @item.Filename
                             </td>
                             <td>
                                 <!-- Update with actual updated date -->
-                                @Html.DisplayFor(modelitem =>item.Createddate ) 
+                                @Html.DisplayFor(modelitem => item.Createddate)
                             </td>
                             <td class="">
                                 <a class="btn btn-outline-info"
@@ -116,10 +115,10 @@
             {
                 <div class="document border-top border-bottom mb-3 mt-3">
                     <div class="d-flex">
-                    <input type="checkbox" class="fileCheckbox" data-filename="@item.Filename" />
-                    <p class="filename mx-3">@Html.DisplayFor(modelitem => item.Filename)</p>
-                        </div>
-                     <p>Updated: @Html.DisplayFor(modelitem => item.Createddate)</p> 
+                        <input type="checkbox" class="fileCheckbox" data-filename="@item.Filename" />
+                        <p class="filename mx-3">@Html.DisplayFor(modelitem => item.Filename)</p>
+                    </div>
+                    <p>Updated: @Html.DisplayFor(modelitem => item.Createddate)</p>
                     <div class="d-flex justify-content-beween mb-3">
                         <a class="btn btn-outline-info"
                            href="~/uploads/@item.Filename" target="_blank">
@@ -138,6 +137,7 @@
 
     </div>
 </div>
+
 <script>
     function removeGuidFromFilename() {
         var filenameElements = document.querySelectorAll('.filename');
@@ -192,29 +192,36 @@
         checkboxes.forEach(function (checkbox) {
             selectedFiles.push(checkbox.dataset.filename);
         });
+
         if (selectedFiles.length > 0) {
-            $.ajax({
-                method: 'POST',
-                url: '/Admin/DeleteSelectedFiles',
-                data: { filenames: selectedFiles },
-                success: function (result) {
-                    window.location.href = '/Admin/ViewUploads/' + @Model.Requestid;
-                },
-                    
-                
-                error: function (error) {
-                    console.log(error);
+            Swal.fire({
+                title: 'Are you sure?',
+                text: 'Once deleted, you will not be able to recover these files!',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete them!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        method: 'POST',
+                        url: '/Admin/DeleteSelectedFiles',
+                        data: { filenames: selectedFiles },
+                        success: function (result) {
+                            window.location.href = '/Admin/ViewUploads/@Model.Requestid';
+                        },
+                        error: function (error) {
+                            console.log(error);
+                        }
+                    });
                 }
             });
         } else {
             alert("Please select files to delete.");
         }
     });
-
-
     document.getElementById("sendMailBtn").addEventListener("click", function () {
-
-        
         // Get selected filenames
         let selectedFiles = [];
         let checkboxes = document.querySelectorAll(".fileCheckbox:checked");
@@ -224,37 +231,46 @@
 
         // Check if any file is selected
         if (selectedFiles.length > 0) {
-            // Make AJAX call to send email with selected files
-            $.ajax({
-                method: 'POST',
-                url: '/Admin/SendEmailWithSelectedFiles',
-                data: { filenames: selectedFiles },
-                success: function (result) {
-                    toastr.success("Email sent successfully!");
-                },
-                error: function (error) {
-                    console.log(error);
+            // Display a confirmation dialog using SweetAlert
+            Swal.fire({
+                title: 'Send Email',
+                text: 'Are you sure you want to send an email with the selected files?',
+                icon: 'info',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, send it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // User confirmed, proceed with sending email
+                    $.ajax({
+                        method: 'POST',
+                        url: '/Admin/SendEmailWithSelectedFiles',
+                        data: { filenames: selectedFiles },
+                        success: function (result) {
+                            Swal.fire(
+                                'Success!',
+                                'Email sent successfully!',
+                                'success'
+                            );
+                        },
+                        error: function (error) {
+                            console.log(error);
+                            Swal.fire(
+                                'Error!',
+                                'Failed to send email.',
+                                'error'
+                            );
+                        }
+                    });
                 }
             });
         } else {
-            alert("Please select files to send in the email.");
+            Swal.fire(
+                'Warning!',
+                'Please select files to send in the email.',
+                'warning'
+            );
         }
     });
-</script>
-
-<script>
-    // Function to remove GUID from the filename
-    function removeGuidFromFilename() {
-        // Get the filename element
-        var filenameElement = document.getElementById('filenameupload');
-
-        // Get the filename text
-        var filename = filenameElement.textContent;
-
-        // Remove the GUID from the filename
-        var cleanedFilename = filename.replace(/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/gi, '');
-
-        // Update the filename text with the cleaned filename
-        filenameElement.textContent = cleanedFilename;
-    }
 </script>

@@ -135,18 +135,21 @@
                     </div>
                     <div class="col-md-6">
                         <div class="form-check form-check-inline">  
+                            @if(@Model.Regions !=null && Model.WorkingRegions!=null){
+
                             @foreach (var region in Model.Regions)
                             {
                                 <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="checkbox" id="region-@region.Regionid" name="adminRegion" value="@region.Regionid" disabled
-                                    @if (Model.WorkingRegions.Any(wr => wr.Regionid == region.Regionid))
-                                    {
-                                        <text>checked="checked"</text>
-                                    }
-
-                                    />
-                                    <label class="form-check-label" for="region-@region.Regionid">@region.Name</label>
+                                    <input class="form-check-input"
+                                           type="checkbox"
+                                           id="region-@region.Regionid"
+                                           name="adminRegion"
+                                           value="@region.Regionid"
+                                    @(Model.WorkingRegions.Any(wr => wr.Regionid == region.Regionid) ? "checked" : "")
+                                           disabled />
+                                  <label class="form-check-label" for="region-@region.Regionid">@region.Name</label>
                                 </div>
+                            }
                             }
                                     <span class="error-adminRegion text-danger"></span>
                         </div>
@@ -197,9 +200,13 @@
                             <select class="form-select " aria-label="Default select example" name="state" id="cancelReason" asp-for="State" disabled>
 
                                 <option selected disabled>Select The State</option>
+                                @if (Model.Regions!=null)
+                                {
+                                    
                                 @foreach (var region in Model.Regions)
                                 {
                                     <option value="@region.Regionid">@region.Name</option>
+                                }
                                 }
 
                             </select>
@@ -238,6 +245,7 @@
     </div>
 </section>
 <script>
+
     $("#SubBtn").hide();
     $("#SubAdminBtn").hide();
 

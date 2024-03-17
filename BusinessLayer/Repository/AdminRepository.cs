@@ -1,12 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Diagnostics.Metrics;
-using System.Linq;
-using System.Net.NetworkInformation;
-using System.Text;
-using System.Threading.Tasks;
-using BusinessLayer.InterFace;
+﻿using BusinessLayer.InterFace;
 using DataAccessLayer.CustomModel;
 using DataAccessLayer.DataContext;
 using DataAccessLayer.DataModels;
@@ -30,7 +22,7 @@ namespace BusinessLayer.Repository
             _configuration = configuration;
             _hostingEnvironment = hostingEnvironment;
         }
-
+        #region SearchPatients
         public List<NewRequestTableVM> SearchPatients(string searchValue, string selectValue, string selectedFilter, int[] currentStatus)
         {
             var filteredPatients = (from req in _context.Requests
@@ -48,12 +40,12 @@ namespace BusinessLayer.Repository
                                         Requestor = req.Firstname + " " + req.Lastname,
                                         DateOfBirth = new DateOnly((int)reqclient.Intyear, int.Parse(reqclient.Strmonth), (int)reqclient.Intdate),
                                         ReqDate = req.Createddate,
-                                        Phone = reqclient.Phonenumber,
-                                        PhoneOther = req.Phonenumber,
+                                        Phone = reqclient.Phonenumber??"",
+                                        PhoneOther = req.Phonenumber ?? "",
                                         Address = reqclient.City + reqclient.Zipcode,
-                                        Notes = reqclient.Notes,
+                                        Notes = reqclient.Notes ?? "",
                                         ReqTypeId = req.Requesttypeid,
-                                        Email = req.Email,
+                                        Email = req.Email ?? "",
                                         Id = reqclient.Requestclientid,
                                         regionid = reqclient.Regionid,
                                         Status = req.Status,
@@ -75,6 +67,9 @@ namespace BusinessLayer.Repository
            
             return filteredPatients;
         }
+        #endregion
+
+        #region GetAllDataTable
         public List<NewRequestTableVM> GetAllData()
         {
             
@@ -90,14 +85,14 @@ namespace BusinessLayer.Repository
                                 Requestor = req.Firstname + " " + req.Lastname,
                                 DateOfBirth = new DateOnly((int)reqclient.Intyear, int.Parse(reqclient.Strmonth), (int)reqclient.Intdate),
                                 ReqDate = req.Createddate,
-                                Phone = reqclient.Phonenumber,
+                                Phone = reqclient.Phonenumber ?? "",
                                 Address = reqclient.City + reqclient.Zipcode,
-                                Notes = reqclient.Notes,
+                                Notes = reqclient.Notes ?? "",
                                 ReqTypeId = req.Requesttypeid,
-                                Email = req.Email,
+                                Email = req.Email ?? "",
                                 Id = reqclient.Requestclientid,
                                 Status = req.Status,
-                                PhoneOther = req.Phonenumber,
+                                PhoneOther = req.Phonenumber ?? "",
                                 RequestClientId = reqclient.Requestclientid,
                                 RequestId = reqclient.Requestid,
                                 PhysicianName = ps.Firstname + "_" + ps.Lastname,
@@ -109,6 +104,9 @@ namespace BusinessLayer.Repository
                             };
             return GetAllData.ToList();
         }
+        #endregion
+
+        #region ViewCaseById
         public ViewCaseVM GetCaseById(int id)
         {
             var requestclient = (from req in _context.Requests
@@ -121,10 +119,10 @@ namespace BusinessLayer.Repository
                                      RequestId=req.Requestid,
                                      Notes = reqclient.Notes,
                                      FirstName = reqclient.Firstname,
-                                     LastName = reqclient.Lastname,
+                                     LastName = reqclient.Lastname ?? "",
                                      DateOfBirth = new DateOnly((int)reqclient.Intyear, int.Parse(reqclient.Strmonth), (int)reqclient.Intdate),
-                                     Phone = reqclient.Phonenumber,
-                                     EmailView = reqclient.Email,
+                                     Phone = reqclient.Phonenumber ?? "",
+                                     EmailView = reqclient.Email ?? "",
                                      Location = reqclient.Location,
                                      RequestClientId = reqclient.Requestclientid,
                                      Cancel = _context.Casetags.Select(cc => new CancelCase
@@ -136,10 +134,12 @@ namespace BusinessLayer.Repository
 
             return requestclient;
         }
+        #endregion
 
+        #region UpdateViewCase
         public async Task UpdateRequestClient(ViewCaseVM viewCaseVM, int id)
         {
-            var requestclient = await _context.Requestclients.FindAsync(id);
+            Requestclient? requestclient = await _context.Requestclients.FindAsync(id);
             if (requestclient != null)
             {
                 requestclient.Firstname = viewCaseVM.FirstName;
@@ -156,6 +156,9 @@ namespace BusinessLayer.Repository
                 await _context.SaveChangesAsync();
             }
         }
+        #endregion
+
+        #region GetNotes
         public List<ViewNotesVM> GetNotesForRequest(int requestid)
         {
             var leftJoin = from rn in _context.Requestnotes
@@ -197,10 +200,10 @@ namespace BusinessLayer.Repository
                                 TransferNotes = rs.Notes,
                                 Cancelcount = _context.Requeststatuslogs.Count(item => item.Status == 3 || item.Status==7)
                             };
-            var result = leftJoin.Union(rightJoin).ToList();
+            List<ViewNotesVM> result = leftJoin.Union(rightJoin).ToList();
             return result;
-
         }
+        #endregion
 
         public async Task<bool> AssignRequest(int regionId, int physician, string description, int requestId)
         {
