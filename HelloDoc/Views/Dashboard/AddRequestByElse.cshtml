@@ -155,9 +155,12 @@
                 <select class="form-select" aria-label="Default select example" name="state" id="cancelReason" asp-for="State">
 
                     <option value="" selected disabled>Select The State</option>
+                    @if (Model.Regions != null)
+                    {
                     @foreach (var region in Model.Regions)
                     {
                         <option value="@region.Name">@region.Name</option>
+                    }
                     }
 
                 </select>

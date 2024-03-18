@@ -65,7 +65,8 @@
                        class="form-control"
                        id="floatingInput"
                        placeholder="name@example.com"
-                       asp-for="@Model.BirthDate" readonly/>
+                       asp-for="@Model.BirthDate"
+                       value="@Model.BirthDate.ToString("yyyy-MM-dd")"readonly/>
                 <label for="floatingInput" asp-for="BirthDate">Date of Birth</label>
                 <span asp-validation-for="BirthDate" class="text-danger"></span>
 
@@ -156,9 +157,13 @@
                 <select class="form-select" aria-label="Default select example" name="state" id="cancelReason" asp-for="State">
 
                     <option value="" selected disabled>Select The State</option>
+                    @if (Model.Regions != null)
+                    {
+                        
                     @foreach (var region in Model.Regions)
                     {
                         <option value="@region.Name">@region.Name</option>
+                    }
                     }
 
                 </select>

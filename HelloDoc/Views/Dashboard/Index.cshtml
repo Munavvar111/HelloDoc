@@ -42,7 +42,10 @@
                 {
                     if (uniqueRequestIds.Add(item.Request.Requestid))
                     {
-                        var fileCount = Model.Count(m => m.Request.Requestid == item.Request.Requestid );
+                        @if (item.Requestwisefile != null)
+                        {
+                            
+                        var fileCount = Model.Count(m => m.Request.Requestid == item.Requestwisefile.Requestid &&!item.Requestwisefile.Isdeleted[0]);
 
 
                         <tr data-toggle="collapse" data-target="#details@(item.Request.Createddate)" class="accordion-toggle">
@@ -78,7 +81,7 @@
                                 </a>
                             </td>
                             <td class="d-none d-md-table-cell">
-                                @if (fileCount > 0)
+                                @if (fileCount > 0 && item.Request.Status==6)
                                 {
                                     <a class="btn btn-outline-info"
                                        asp-action="ViewDocument"
@@ -91,7 +94,7 @@
                                 <div id="details@(item.Request.Createddate)" class="accordian-body collapse">
                                     <!-- Additional details here -->
                                     Status: @Html.DisplayFor(modelItem => item.Request.Status) <br />
-                                    @if (fileCount > 0)
+                                        @if (fileCount > 0 &&item.Request.Status == 6)
                                     {
                                         <a class="btn btn-outline-info"
                                            asp-action="ViewDocument"
@@ -100,7 +103,70 @@
                                     <!-- Add other fields as needed -->
                                 </div>
                             </td>
-                        </tr>
+                            </tr>
+                        }
+                        else
+                        {
+                            <tr data-toggle="collapse" data-target="#details@(item.Request.Createddate)" class="accordion-toggle">
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Request.Createddate)
+                                </td>
+                                <td class="d-none d-md-table-cell">
+                                    @if (item.Request.Status == 1)
+                                    {
+                                        <span>New</span>
+                                    }
+                                    else if (item.Request.Status == 2)
+                                    {
+                                        <span>Assign</span>
+                                    }
+                                    else if (item.Request.Status == 3)
+                                    {
+                                        <span>Cancelled</span>
+                                    }
+                                </td>
+                                <td class="d-none d-md-table-cell ">
+
+                                    <a class="btn btn-outline-info align-items-center">
+                                        <span class="material-symbols-outlined">
+                                            person
+                                        </span>Admin
+                                    </a>
+
+                                    <a class="btn btn-outline-info">
+                                        <span class="material-symbols-outlined pr">
+                                            person
+                                        </span>Provider
+                                    </a>
+                                </td>
+                                <td class="d-none d-md-table-cell">
+                                    @if (item.Request.Status == 6)
+                                    {
+                                        
+                                    <a class="btn btn-outline-info"
+                                           asp-action="ViewDocument"
+                                           asp-route-requestid="@item.Request.Requestid">Documents 0</a>
+                                   
+                                    }
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="4" class="hiddenRow">
+                                    <div id="details@(item.Request.Createddate)" class="accordian-body collapse">
+                                        <!-- Additional details here -->
+                                        Status: @Html.DisplayFor(modelItem => item.Request.Status) <br />
+                                        @if (item.Request.Status == 6)
+                                        {
+
+                                            <a class="btn btn-outline-info"
+                                               asp-action="ViewDocument"
+                                               asp-route-requestid="@item.Request.Requestid">Documents 0</a>
+                                        }   
+                                        <!-- Add other fields as needed -->
+                                    </div>
+                                </td>
+                            </tr>
+                        }
                     }
                 }
             </tbody>

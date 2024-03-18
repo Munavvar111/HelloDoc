@@ -151,9 +151,13 @@
                 <select class="form-select " aria-label="Default select example" name="state" id="cancelReason" asp-for="State">
                     
                     <option selected disabled>Select The State</option>
+                    @if (Model.Regions != null)
+                    {
+                        
                     @foreach (var region in Model.Regions)
                     {
                         <option value="@region.Name">@region.Name</option>
+                    }
                     }
                     
                 </select>
@@ -222,6 +226,10 @@
     const phoneInput1 = window.intlTelInput(phone1, {
         utilsScript:
             "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",
+        nationalMode: false,
+        showSelectedDialCode: true,
+        autoInsertDialCode: true,
+        formatOnDisplay: false,
     });
 </script>
 
@@ -257,6 +265,22 @@
                 console.log(error);
             }
         });
+    };
+    document.getElementById("fileInput").onchange = function () {
+        let filePath = this.value;
+        let allowedExtensions = [".jpg", ".pdf"];
+
+        let extension = filePath.substring(filePath.lastIndexOf('.'));
+        extension = extension.toLowerCase();
+
+        if (!allowedExtensions.includes(extension)) {
+            toastr.error("Please Select The Pdf Or Jpg")
+            this.value = ""; // Clear file selection if invalid
+            return false; // Prevent further processing
+        }
+
+        let path = filePath.substr(filePath.lastIndexOf('\\') + 1);
+        document.getElementById("fileName").innerText = path;
     };
 </script>
 

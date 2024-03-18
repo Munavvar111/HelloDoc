@@ -21,16 +21,16 @@
 
     <div class="container bg-white border mt-4">
         <div><span>Patient Name</span></div>
-        <div><spna class="fw-bold text-info">@Model.Request.Firstname</spna><span>(@Model.Request.Confirmationnumber)</span></div>
+        <div><spna class="fw-bold text-info">@Model?.Request?.Firstname</spna><span>(@Model?.Request?.Confirmationnumber)</span></div>
         <div class="mb-3"><span class="text-info"></span></div>
         <div><p>Check here for any file that you or doctors of your subsequents have attached for you to review</p></div>
 
-        <form id="patientRequestForm" method="post" enctype="multipart/form-data" asp-action="UploadFile" asp-route-id="@Model.Requestid">
+        <form id="patientRequestForm" method="post" enctype="multipart/form-data" asp-action="UploadFile" asp-route-id="@Model?.Requestid">
             <div class="input-group input-group-lg">
                 <div id="fileName" asp-for="FileName" class="form-control fs-6 align-middle">
                     Select File
                 </div>
-                <input type="file" asp-for="File" class="form-control" id="fileInput" hidden />
+                <input type="file" asp-for="File" class="form-control" id="fileInput" hidden  />
                 <label class="input-group-text btn btn-info text-light" for="fileInput">
                     <span class="material-symbols-outlined me-2">cloud_upload</span>
                     <span class="d-none d-md-inline">Upload</span>
@@ -78,6 +78,9 @@
                     </tr>
                 </thead>
                 <tbody>
+                    @if (Model != null && Model.Requestwisefileview!=null)
+                    {
+                        
                     @foreach (var item in Model.Requestwisefileview)
                     {
                         <tr>
@@ -105,12 +108,17 @@
                             </td>
                         </tr>
                     }
+                    }
                 </tbody>
             </table>
         </div>
         <!-- Document display and actions for medium-sized views -->
         <div class="d-md-none">
             <!-- Iterate through documents -->
+            
+            @if(Model!=null && Model.Requestwisefileview != null)
+            {
+            
             @foreach (var item in Model.Requestwisefileview)
             {
                 <div class="document border-top border-bottom mb-3 mt-3">
@@ -132,6 +140,7 @@
                         </button>
                     </div>
                 </div>
+            }
             }
         </div>
 
@@ -159,7 +168,6 @@
     };
 
     document.getElementById("selectAllCheckbox").addEventListener("change", function () {
-        // Toggle all checkboxes based on the state of the "Select All" checkbox
         let checkboxes = document.querySelectorAll(".fileCheckbox");
         checkboxes.forEach(function (checkbox) {
             checkbox.checked = document.getElementById("selectAllCheckbox").checked;
@@ -173,6 +181,7 @@
         checkboxes.forEach(function (checkbox) {
             selectedFiles.push(checkbox.dataset.filename);
         });
+        if (selectedFiles.length>0) {
 
         // Download selected files
         selectedFiles.forEach(function (filename) {
@@ -184,6 +193,13 @@
             link.click();
             document.body.removeChild(link);
         });
+        }else{
+            Swal.fire(
+                'Warning!',
+                'Please select files to Download .',
+                'warning'
+            );
+        }
     });
 
     document.getElementById("deleteSelectedBtn").addEventListener("click", function () {
@@ -209,7 +225,7 @@
                         url: '/Admin/DeleteSelectedFiles',
                         data: { filenames: selectedFiles },
                         success: function (result) {
-                            window.location.href = '/Admin/ViewUploads/@Model.Requestid';
+                            window.location.href = '/Admin/ViewUploads/@Model?.Requestid';
                         },
                         error: function (error) {
                             console.log(error);
@@ -218,7 +234,11 @@
                 }
             });
         } else {
-            alert("Please select files to delete.");
+            Swal.fire(
+                'Warning!',
+                'Please select files to Delet.',
+                'warning'
+            );
         }
     });
     document.getElementById("sendMailBtn").addEventListener("click", function () {
@@ -229,7 +249,6 @@
             selectedFiles.push(checkbox.dataset.filename);
         });
 
-        // Check if any file is selected
         if (selectedFiles.length > 0) {
             // Display a confirmation dialog using SweetAlert
             Swal.fire({
@@ -273,4 +292,5 @@
             );
         }
     });
+    
 </script>

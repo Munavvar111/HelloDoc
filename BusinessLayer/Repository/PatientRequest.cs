@@ -1,22 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Transactions;
+﻿using System.Transactions;
 using BC = BCrypt.Net.BCrypt;
-
 using BusinessLayer.InterFace;
 using DataAccessLayer.CustomModel;
 using DataAccessLayer.DataContext;
 using DataAccessLayer.DataModels;
 using Microsoft.Extensions.Logging;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Http;
 using System.Collections;
-using System.Security.Policy;
-using Org.BouncyCastle.Asn1.Ocsp;
 
 namespace BusinessLayer.Repository
 {
@@ -29,26 +20,26 @@ namespace BusinessLayer.Repository
             _logger = logger;
         }
        
-        public User GetUserById(int id)
+        public User? GetUserById(int id)
         {
-            return _context.Users.FirstOrDefault(x => x.Userid == id);    
+            return _context!.Users.FirstOrDefault(x => x.Userid == id);
         }
-        public AspnetUser GetUserByUserName(string userName)
+        public AspnetUser? GetUserByUserName(string userName)
         {
             return _context.AspnetUsers.FirstOrDefault(x => x.Username == userName);
         }
-        public User GetUserByEmail(string email)
+        public User? GetUserByEmail(string email)
         {
             return _context.Users.FirstOrDefault(x => x.Email == email);
             
          
         }
-        public DataAccessLayer.DataModels.Request GetRequestByEmail(string email)
+        public Request? GetRequestByEmail(string email)
         {
             return _context.Requests.OrderBy(e=>e.Requestid).LastOrDefault(r => r.Email == email);
         }
 
-        public AspnetUser GetAspnetUserBYEmail(string email)
+        public AspnetUser? GetAspnetUserBYEmail(string email)
         {
             return _context.AspnetUsers.FirstOrDefault(r => r.Email == email);
         }
@@ -84,7 +75,7 @@ namespace BusinessLayer.Repository
             {
                 user.Mobile = requestModel.PhoneNo;
                 user.Email = requestModel.Email;
-                user.Aspnetuserid = aspnetuser.Aspnetuserid;
+                user.Aspnetuserid = aspnetuser?.Aspnetuserid;
                 user.Firstname = requestModel.Firstname;
                 user.Lastname = requestModel.Lastname;
                 user.Street = requestModel.Street;
@@ -113,20 +104,20 @@ namespace BusinessLayer.Repository
                 try
                 {
                     
-
-
                     var user = GetUserByEmail(requestModel.Email);
 
                     if (user != null)
                     {
                         AddRequest(requestModel, user.Userid, ReqTypeId);
-                        var request = GetRequestByEmail(requestModel.Email);
+                        Request? request = GetRequestByEmail(requestModel.Email);
+                        if(request != null)
+                        {
                         AddRequestClient(requestModel, request.Requestid);
                         int count = _context.Requests.Where(x => x.Createddate.Date == request.Createddate.Date).Count() + 1;
                         var region = _context.Regions.Where(x => x.Name == requestModel.State).FirstOrDefault();
                         if (region != null)
                         {
-                            var confirmNum = string.Concat(region.Abbreviation.ToUpper(), request.Createddate.ToString("ddMMyy"), requestModel.Lastname.Substring(0, 2).ToUpper() ?? "",
+                            var confirmNum = string.Concat(region?.Abbreviation?.ToUpper(), request.Createddate.ToString("ddMMyy"), requestModel.Lastname.Substring(0, 2).ToUpper() ?? "",
                            requestModel.Firstname.Substring(0, 2).ToUpper(), count.ToString("D4"));
                             request.Confirmationnumber = confirmNum;
                         }
@@ -138,21 +129,28 @@ namespace BusinessLayer.Repository
                         }
                         _context.Update(request);
                         _context.SaveChanges();
+                        }
                     }
                     else
                     {
                         AddAspnetUser(requestModel);
-                        var aspnetuserId1 = GetAspnetUserBYEmail(requestModel.Email);
+                        AspnetUser? aspnetuserId1 = GetAspnetUserBYEmail(requestModel.Email);
+                        if(aspnetuserId1 != null) { 
                         AddUser(requestModel, aspnetuserId1.Aspnetuserid);
-                        var user1= GetUserByEmail(requestModel.Email);
+                        }
+                        User? user1= GetUserByEmail(requestModel.Email);
+                        if (user1!=null) {
                         AddRequest(requestModel, user1.Userid, ReqTypeId);
-                        var request = GetRequestByEmail(requestModel.Email);
+                        }
+                        Request? request = GetRequestByEmail(requestModel.Email);
+                        if(request!=null)
+                        {
                         AddRequestClient(requestModel, request.Requestid);
                         int count = _context.Requests.Where(x => x.Createddate.Date == request.Createddate.Date).Count() + 1;
                         var region = _context.Regions.Where(x => x.Name == requestModel.State).FirstOrDefault();
                         if (region != null)
                         {
-                            var confirmNum = string.Concat(region.Abbreviation.ToUpper(), request.Createddate.ToString("ddMMyy"), requestModel.Lastname.Substring(0, 2).ToUpper() ?? "",
+                            var confirmNum = string.Concat(region?.Abbreviation?.ToUpper(), request.Createddate.ToString("ddMMyy"), requestModel.Lastname.Substring(0, 2).ToUpper() ?? "",
                            requestModel.Firstname.Substring(0, 2).ToUpper(), count.ToString("D4"));
                             request.Confirmationnumber = confirmNum;
                         }
@@ -164,6 +162,7 @@ namespace BusinessLayer.Repository
                         }
                         _context.Update(request);
                         _context.SaveChanges();
+                        }
 
                     }
                     transactionScope.Complete(); // Commit the transaction
@@ -208,8 +207,8 @@ namespace BusinessLayer.Repository
                 requestClient.Requestid = RequestID;
                 requestClient.Firstname = requestModel.Firstname;
                 requestClient.Lastname = requestModel.Lastname;
-                requestClient.State = statebyregionid.Name;
-                requestClient.Regionid = statebyregionid.Regionid;
+                requestClient.State = statebyregionid?.Name;
+                requestClient.Regionid = statebyregionid?.Regionid;
                 requestClient.Street = requestModel.Street;
                 requestClient.Phonenumber = requestModel.PhoneNo;
                 requestClient.City = requestModel.City;

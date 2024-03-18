@@ -1,14 +1,9 @@
 ﻿using BusinessLayer.InterFace;
-using BusinessLayer.Repository;
 using DataAccessLayer.CustomModel;
 using DataAccessLayer.DataContext;
 using DataAccessLayer.DataModels;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using NuGet.Protocol;
-using NuGet.Protocol.Core.Types;
-using Org.BouncyCastle.Asn1.Ocsp;
 
 namespace HalloDocPatient.Controllers
 {
@@ -33,8 +28,8 @@ namespace HalloDocPatient.Controllers
         }
         public IActionResult PatientRequest()
         {
-            var region = _context.Regions.ToList();
-            var requestmodal = new RequestModel();
+            List<Region> region = _context.Regions.ToList();
+            RequestModel requestmodal = new RequestModel();
             requestmodal.Regions=region;
             return View(requestmodal);
         }
@@ -44,8 +39,8 @@ namespace HalloDocPatient.Controllers
         }
         public IActionResult BusinessRequest()
         {
-            var region = _context.Regions.ToList();
-            var requestmodal = new RequestOthers();
+            List<Region> region = _context.Regions.ToList();
+            RequestOthers requestmodal = new RequestOthers();
             requestmodal.Regions = region;
             return View(requestmodal);
         }
@@ -53,8 +48,7 @@ namespace HalloDocPatient.Controllers
         [HttpPost]
         public IActionResult BusinessRequest(RequestOthers requestOther)
         {
-            var statebyregionid = _context.Regions.Where(item => item.Name == requestOther.State).FirstOrDefault();
-
+            Region? statebyregionid = _context.Regions.Where(item => item.Name == requestOther.State).FirstOrDefault();
             if (ModelState.IsValid)
             {
                     Business business = new Business();
@@ -67,13 +61,13 @@ namespace HalloDocPatient.Controllers
                 _context.Businesses.Add(business);
                 _context.SaveChanges();
 
-                DataAccessLayer.DataModels.Request request = new DataAccessLayer.DataModels.Request();
+                Request request = new Request();
                 request.Firstname = requestOther.FirstNameOther;
-                request.Requesttypeid = 4;//Business 
+                request.Requesttypeid = 4; 
                 request.Lastname = requestOther.LastNameOther;
                 request.Email = requestOther.EmailOther;
                 request.Phonenumber = requestOther.PhoneNumberOther;
-                request.Status = 1;//Unsigned
+                request.Status = 1;
                 request.Createddate = DateTime.Now;
 
                 _context.Requests.Add(request);
@@ -100,27 +94,27 @@ namespace HalloDocPatient.Controllers
                 requestclient.State = requestOther.State;
                 requestclient.Street=requestOther.Street;
                 requestclient.Zipcode = requestOther.Zipcode;
-                requestclient.Regionid = statebyregionid.Regionid;
+                requestclient.Regionid = statebyregionid?.Regionid;
 
 
                 _context.Requestclients.Add(requestclient);
                 _context.SaveChanges();
-                var region = _context.Regions.Where(x => x.Name == requestOther.State).FirstOrDefault();
+                Region? region = _context.Regions.Where(x => x.Name == requestOther.State).FirstOrDefault();
                 int count = _context.Requests.Where(x => x.Createddate.Date == request.Createddate.Date).Count() + 1;
                 if (region != null)
                 {
-                    var confirmNum = string.Concat(region.Abbreviation.ToUpper(), request.Createddate.ToString("ddMMyy"), requestOther.LastName.Substring(0, 2).ToUpper() ?? "",
+                    string confirmNum = string.Concat(region?.Abbreviation??"".ToUpper(), request.Createddate.ToString("ddMMyy"), requestOther.LastName.Substring(0, 2).ToUpper() ?? "",
                    requestOther.FirstName.Substring(0, 2).ToUpper(), count.ToString("D4"));
                     request.Confirmationnumber = confirmNum;
                 }
                 else
                 {
-                    var confirmNum = string.Concat("ML", request.Createddate.ToString("ddMMyy"), requestOther.LastName.Substring(0, 2).ToUpper() ?? "",
+                    string confirmNum = string.Concat("ML", request.Createddate.ToString("ddMMyy"), requestOther.LastName.Substring(0, 2).ToUpper() ?? "",
                   requestOther.FirstName.Substring(0, 2).ToUpper(), count.ToString("D4"));
                     request.Confirmationnumber = confirmNum;
                 }
-                var token = Guid.NewGuid().ToString();
-                var resetLink = Url.Action("Index", "Register", new { userId = request.Requestid, token }, protocol: HttpContext.Request.Scheme);
+                string token = Guid.NewGuid().ToString();
+                string? resetLink = Url.Action("Index", "Register", new { userId = request.Requestid, token }, protocol: HttpContext.Request.Scheme);
 
                 if (_login.IsSendEmail("munavvarpopatiya999@gmail.com", "Munavvar", $"Click <a href='{resetLink}'>here</a> to Create A new Account"))
                 {
@@ -143,69 +137,57 @@ namespace HalloDocPatient.Controllers
         public  async Task<IActionResult> PatientRequest( RequestModel requestModel)
         {
             requestModel.Username = requestModel.Firstname+requestModel.Lastname;
-            var blockrequest = _context.Blockrequests.Where(item => item.Email == requestModel.Email).FirstOrDefault();
+            Blockrequest? blockrequest = _context.Blockrequests.Where(item => item.Email == requestModel.Email).FirstOrDefault();
             if (blockrequest == null)
             {
-
-            
             if(!ModelState.IsValid)
             {
                 return View(requestModel);
             }
             else 
             {
-                
                 if(requestModel.File!=null && requestModel.File.Length > 0)
                 {
-                      
-                    var uniqueFileName=await _patientRequest.AddFileInUploader(requestModel.File);
+                    string uniqueFileName=await _patientRequest.AddFileInUploader(requestModel.File);
                     _patientRequest.AddPatientRequest(requestModel, ReqTypeId: 1);
-                    var request = _patientRequest.GetRequestByEmail(requestModel.Email);
-                    var user = _patientRequest.GetUserByEmail(requestModel.Email);
-                    if (user == null)
+                    Request? request = _patientRequest.GetRequestByEmail(requestModel.Email);
+                    User? user = _patientRequest.GetUserByEmail(requestModel.Email);
+                    if (user == null && request !=null)
                     {
-                        var token = Guid.NewGuid().ToString();
-                        var resetLink = Url.Action("Index", "Register", new { userId = request.Requestid, token }, protocol: HttpContext.Request.Scheme);
+                        string token = Guid.NewGuid().ToString();
+                        string? resetLink = Url.Action("Index", "Register", new { userId = request.Requestid, token }, protocol: HttpContext.Request.Scheme);
                         if (_login.IsSendEmail("munavvarpopatiya999@gmail.com", "Munavvar", $"Click <a href='{resetLink}'>here</a> to Create A new Account"))
                         {
-
                             return RedirectToAction("Index", "Login");
                         }
                         else
                         {
                             return RedirectToAction("Index", "Login");
-
                         }
                     }
-                    _patientRequest.AddRequestWiseFile(uniqueFileName, request.Requestid);
-                    
+                    _patientRequest.AddRequestWiseFile(uniqueFileName, request?.Requestid??1);
                     return RedirectToAction("Index", "Login");
                 }
                 else {
                     _patientRequest.AddPatientRequest(requestModel, ReqTypeId: 1);
-                    var request = _patientRequest.GetRequestByEmail(requestModel.Email);
-                    var token = Guid.NewGuid().ToString();
-                    var resetLink = Url.Action("Index", "Register", new { userId = request.Requestid, token }, protocol: HttpContext.Request.Scheme);
+                    Request? request = _patientRequest.GetRequestByEmail(requestModel.Email);
+                    string token = Guid.NewGuid().ToString();
+                    string? resetLink = Url.Action("Index", "Register", new { userId = request?.Requestid ?? 1, token }, protocol: HttpContext.Request.Scheme);
                     if (_login.IsSendEmail("munavvarpopatiya999@gmail.com", "Munavvar", $"Click <a href='{resetLink}'>here</a> to Create A new Account"))
                     {
-
                         return RedirectToAction("Index", "Login");
                     }
                     else
                     {
                         ModelState.AddModelError(string.Empty, "Email Is Not Send");
-
                     }
                     return RedirectToAction("Index", "Login");
                     }
-
                 }
             }
             else
             {
                 TempData["Error"] = "Your Request IS Block Beacuse Of Your Unaporpriate Behivour!";
-
-
                 return RedirectToAction("PatientRequest");  
             }
 
@@ -214,7 +196,7 @@ namespace HalloDocPatient.Controllers
         public IActionResult Error()
         {
             // Retrieve the error message from TempData
-            var errorMessage = TempData["ErrorMessage"] as string;
+            string? errorMessage = TempData["ErrorMessage"] as string;
 
             // You can also pass the error message to the view
             ViewBag.ErrorMessage = errorMessage;
@@ -224,14 +206,14 @@ namespace HalloDocPatient.Controllers
         [HttpPost]
         public JsonResult CheckEmail([FromBody] string email)
         {
-            User user = _context.Users.FirstOrDefault(u => u.Email == email);
+            User? user = _context.Users.FirstOrDefault(u => u.Email == email);
             bool isValid = user == null;
             return Json(isValid);
         }
         public IActionResult FriendRequest()
         {
-            var region = _context.Regions.ToList();
-            var requestmodal = new RequestOthers();
+            List<Region> region = _context.Regions.ToList();
+            RequestOthers requestmodal = new RequestOthers();
             requestmodal.Regions = region;
             return View(requestmodal);
            
@@ -244,12 +226,12 @@ namespace HalloDocPatient.Controllers
             {
                 if (request.File != null && request.File.Length > 0)
                 {
-                    var uniqueFileName=await _patientRequest.AddFileInUploader(request.File);
+                    string uniqueFileName=await _patientRequest.AddFileInUploader(request.File);
                     _otherrequest.AddFriendRequest(request, ReqTypeId: 2);
-                    var request1 = _patientRequest.GetRequestByEmail(request.EmailOther);
-                    _patientRequest.AddRequestWiseFile(uniqueFileName, request1.Requestid);
-                    var token = Guid.NewGuid().ToString();
-                    var resetLink = Url.Action("Index", "Register", new { RequestId = request1.Requestid, token }, protocol: HttpContext.Request.Scheme);
+                    Request? request1 = _patientRequest.GetRequestByEmail(request.EmailOther);
+                    _patientRequest.AddRequestWiseFile(uniqueFileName, request1?.Requestid??1);
+                    string? token = Guid.NewGuid().ToString();
+                    string? resetLink = Url.Action("Index", "Register", new { RequestId = request1?.Requestid??1, token }, protocol: HttpContext.Request.Scheme);
 
                     if (_login.IsSendEmail("munavvarpopatiya999@gmail.com", "Munavvar", $"Click <a href='{resetLink}'>here</a> to reset your password."))
                     {
@@ -264,9 +246,9 @@ namespace HalloDocPatient.Controllers
                 else
                 {
                     _otherrequest.AddFriendRequest(request, ReqTypeId: 2);
-                    var request1 = _patientRequest.GetRequestByEmail(request.EmailOther);
-                    var token = Guid.NewGuid().ToString();
-                    var resetLink = Url.Action("Index", "Register", new { RequestId = request1.Requestid, token }, protocol: HttpContext.Request.Scheme);
+                    Request? request1 = _patientRequest.GetRequestByEmail(request.EmailOther);
+                    string? token = Guid.NewGuid().ToString();
+                    string? resetLink = Url.Action("Index", "Register", new { RequestId = request1?.Requestid ?? 1, token }, protocol: HttpContext.Request.Scheme);
 
                     if (_login.IsSendEmail("munavvarpopatiya777@outlook.com", "Munavvar", $"Click <a href='{resetLink}'>here</a> to reset your password."))
                     {
@@ -284,8 +266,8 @@ namespace HalloDocPatient.Controllers
         }
             public IActionResult ConceirgeRequest()
         {
-            var region = _context.Regions.ToList();
-            var requestmodal = new RequestOthers();
+            List<Region> region = _context.Regions.ToList();
+            RequestOthers requestmodal = new RequestOthers();
             requestmodal.Regions = region;
             return View(requestmodal);
         }
@@ -294,23 +276,17 @@ namespace HalloDocPatient.Controllers
         {
             if (ModelState.IsValid)
             {
-
-
                 _otherrequest.AddConceirgeRequest(requestOther, ReqTypeId: 3);
-                var request1 = _patientRequest.GetRequestByEmail(requestOther.EmailOther);
-
-                var token = Guid.NewGuid().ToString();
-                var resetLink = Url.Action("Index", "Register", new { RequestId = request1.Requestid, token }, protocol: HttpContext.Request.Scheme);
-
+                Request? request1 = _patientRequest.GetRequestByEmail(requestOther.EmailOther);
+                string? token = Guid.NewGuid().ToString();
+                string? resetLink = Url.Action("Index", "Register", new { RequestId = request1?.Requestid ?? 1, token }, protocol: HttpContext.Request.Scheme);
                 if (_login.IsSendEmail("munavvarpopatiya999@gmail.com", "Munavvar", $"Click <a href='{resetLink}'>here</a> to reset your password."))
                 {
-
                     return RedirectToAction("Index", "Login");
                 }
                 else
                 {
                     ModelState.AddModelError(string.Empty, "Email Is Not Send");
-
                 }
                 return RedirectToAction("Index", "Login");
             }
@@ -321,20 +297,19 @@ namespace HalloDocPatient.Controllers
         {
             try
             {
-
-            // Use the DataProtectionProvider to unprotect the bytes:
             var protector = _dataProtectionProvider.CreateProtector("munavvar");
             string decryptedValue = protector.Unprotect(requestid);
 
 
-            var requesiddec = int.Parse(decryptedValue);
-            var request = _context.Requests.Where(item => item.Requestid == requesiddec).FirstOrDefault();
-            var sendagrement = new AgreementVM();
+            int requesiddec = int.Parse(decryptedValue);
+            Request? request = _context.Requests.Where(item => item.Requestid == requesiddec).FirstOrDefault();
+            if(request != null)
+                {
+            AgreementVM sendagrement = new AgreementVM();
             sendagrement.status = request.Status;
             sendagrement.RequestId = request.Requestid;
             if (request.Status == 2)
             {
-            
             return View(sendagrement);
             }
             else
@@ -342,9 +317,16 @@ namespace HalloDocPatient.Controllers
                 TempData["Error"] = "Request status is not 2. Please log in to continue.";
                 return RedirectToAction("Index", "Login");
             }
+                }
+                else
+                {
+                    TempData["Error"] = "Request Is Not Found";
+                    return RedirectToAction("Index", "Login");
+                }
             }
             catch (Exception ex)
             {
+                Console.WriteLine(ex);
                 TempData["Error"] = "You Cant Change The Url";
                 return RedirectToAction("Index", "Login");
 
@@ -356,8 +338,7 @@ namespace HalloDocPatient.Controllers
         {
             try
             {
-                var request = _context.Requests.Where(item => item.Requestid == id).FirstOrDefault();
-
+                Request? request = _context.Requests.Where(item => item.Requestid == id).FirstOrDefault();
                 if (request == null)
                 {
                     return NotFound();
@@ -373,6 +354,7 @@ namespace HalloDocPatient.Controllers
             }
             catch (Exception ex)
             {
+                Console.WriteLine(ex);
                 throw;
             }
         }
@@ -380,16 +362,19 @@ namespace HalloDocPatient.Controllers
         [HttpPost]
         public IActionResult CancelPatient(AgreementVM ag)
         {
-            var request = _context.Requests.Where(item=>item.Requestid==ag.RequestId).FirstOrDefault();
+            Request? request = _context.Requests.Where(item=>item.Requestid==ag.RequestId).FirstOrDefault();
+            if (request != null)
+            {
             request.Status = 7;
             _context.Requests.Update(request);
-            var requeststatuslog = new Requeststatuslog();
+            Requeststatuslog requeststatuslog = new Requeststatuslog();
             requeststatuslog.Status = 7;
             requeststatuslog.Createddate=DateTime.Now;
             requeststatuslog.Notes = ag.Notes;
             requeststatuslog.Requestid = ag.RequestId;
             _context.Requeststatuslogs.Add(requeststatuslog);
             _context.SaveChanges();
+            }
 
             return RedirectToAction("Index", "Login");
         }

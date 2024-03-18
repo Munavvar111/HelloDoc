@@ -38,7 +38,7 @@ namespace DataAccessLayer.CustomModel
         
         [Column("birthdata")]
         [Required(ErrorMessage = "Please Enter BirthDate")]
-        public DateTime BirthDate { get; set; } 
+        public DateOnly BirthDate { get; set; } 
 
         [Column("street")]
         [Required(ErrorMessage = "Please Enter Street")]

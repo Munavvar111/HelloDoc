@@ -19,7 +19,7 @@ namespace DataAccessLayer.CustomModel
         public List<Requestwisefile>? Requestwisefileview { get; set; }
         [FromForm]
         public IFormFile? File { get; set; }
-
+       
         public BitArray? IsDeleted { get; set; } 
     }
 }

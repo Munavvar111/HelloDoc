@@ -17,7 +17,7 @@ namespace DataAccessLayer.CustomModel
         public string LastName { get; set; } = null!;
 
         [DataType(DataType.DateTime, ErrorMessage = "Please enter a valid date.")]
-        public DateTime BirthDate { get; set; } 
+        public DateOnly BirthDate { get; set; } 
 
         [Required(ErrorMessage = "Plese Enter The Email")]
         public string Email { get; set; } = null!;
@@ -33,7 +33,7 @@ namespace DataAccessLayer.CustomModel
         [Required(ErrorMessage = "Plese Enter The Zipcode")]
         public string ZipCode { get; set; } = null!;
         public List<Region>? Regions { get; set; }
-
+        public int regionid { get; set; }
         public string? PhoneNO { get; set; }    
     }
 }

@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Rotativa.AspNetCore;
 using System.Collections;
+using System.Net;
 using System.Text;
 using BC = BCrypt.Net.BCrypt;
 
@@ -104,14 +105,14 @@ namespace HelloDoc.Controllers
             return RedirectToAction("Profile", "Admin");
         }
         [HttpPost]
-        public IActionResult AdministrationInfo(string email, string PhoneNumber, string[] adminRegion)
+        public IActionResult AdministrationInfo(string email, string MobileNo, string[] adminRegion)
         {
             string? sessionemail = HttpContext.Session.GetString("Email");
             Admin? admin = _context.Admins.Where(item => item.Email == sessionemail).FirstOrDefault();
             if (admin != null)
             {
                 admin.Email = email;
-                admin.Mobile = PhoneNumber;
+                admin.Mobile = MobileNo;
                 _context.Admins.Update(admin); _context.SaveChanges();
                 List<AdminRegion> existingregion = _context.AdminRegions.Where(item => item.Adminid == admin.Adminid).ToList();
                 _context.AdminRegions.RemoveRange(existingregion);
@@ -228,19 +229,42 @@ namespace HelloDoc.Controllers
         [HttpPost]
         public async Task<IActionResult> AssignRequest(int regionid, int physician, string description, int requestid, int status)
         {
-            bool result = await _admin.AssignRequest(regionid, physician, description, requestid);
+            string? email = HttpContext.Session.GetString("Email");
+            int? id = HttpContext.Session.GetInt32("id");
+            Admin? admin = _context.Admins.FirstOrDefault(item => item.Email == email);
+            if (admin != null)
+            {
+
+            bool result = await _admin.AssignRequest(regionid, physician, description, requestid,admin.Adminid);
             return Json(result);
+            }
+            else
+            {
+                return Json(false);
+            }
         }
 
         public async Task<IActionResult> TransferRequest(int regionid, int physician, string description, int requestid, int status)
         {
-            bool result = await _admin.AssignRequest(regionid, physician, description, requestid);
+            string? email = HttpContext.Session.GetString("Email");
+            int? id = HttpContext.Session.GetInt32("id");
+            Admin? admin = _context.Admins.FirstOrDefault(item => item.Email == email);
+            if (admin != null)
+            {
+
+            bool result = await _admin.AssignRequest(regionid, physician, description, requestid,admin.Adminid);
             return Json(result);
+            }
+            else
+            {
+                return Json(false);
+            }
         }
 
         [HttpPost]
         public async Task<IActionResult> ViewNotesPost(string adminNotes, int id)
         {
+
             if (adminNotes != null)
             {
                 await _admin.UpdateAdminNotes(id, adminNotes);
@@ -293,7 +317,7 @@ namespace HelloDoc.Controllers
         public async Task<IActionResult> ViewUploads(int id)
         {
             List<Requestwisefile> reqfile = await _patient.GetRequestwisefileByIdAsync(id);
-            List<Requestwisefile> reqfiledeleted = reqfile.Where(item => item.Isdeleted !=null &&(item.Isdeleted.Length == 0 || !item.Isdeleted[0])).ToList();
+            List<Requestwisefile> reqfiledeleted = reqfile.Where(item => item.Isdeleted != null && (item.Isdeleted.Length == 0 || !item.Isdeleted[0])).ToList();
             Request? requestclient = _context.Requests.Where(item => item.Requestid == id).FirstOrDefault();
             RequestFileViewModel requestwiseviewmodel = new RequestFileViewModel
             {
@@ -315,11 +339,11 @@ namespace HelloDoc.Controllers
                 if (file != null)
                 {
 
-                file.Isdeleted = new BitArray(new[] { true });
-                _context.Requestwisefiles.Update(file);
-                _context.SaveChanges();
-                TempData["SuccessMessage"] = "Delete successful!";
-                return Ok(new { message = "File deleted successfully", id = file.Requestid });
+                    file.Isdeleted = new BitArray(new[] { true });
+                    _context.Requestwisefiles.Update(file);
+                    _context.SaveChanges();
+                    TempData["SuccessMessage"] = "Delete successful!";
+                    return Ok(new { message = "File deleted successfully", id = file.Requestid });
 
                 }
                 else
@@ -486,6 +510,7 @@ namespace HelloDoc.Controllers
             }
             catch (Exception ex)
             {
+                Console.WriteLine(ex);
                 TempData["Error"] = "Something Went Wrong Please Try Again";
                 return RedirectToAction("Index", "Admin");
             }
@@ -513,7 +538,7 @@ namespace HelloDoc.Controllers
         public IActionResult EncounterForm(int requestId)
         {
             ViewEncounterForm viewEncounterForm = new ViewEncounterForm();
-            Encounterform encounterFormByRequestId = _context.Encounterforms.FirstOrDefault(item => item.RequestId == requestId);
+            Encounterform? encounterFormByRequestId = _context.Encounterforms.FirstOrDefault(item => item.RequestId == requestId);
 
             if (encounterFormByRequestId != null && !encounterFormByRequestId.IsFinalize)
             {
@@ -528,7 +553,9 @@ namespace HelloDoc.Controllers
                 {
                     viewEncounterForm.FirstName = request.Firstname ?? "";
                     viewEncounterForm.LastName = request.Lastname ?? "";
-                    viewEncounterForm.DateOfBirth = new DateOnly((int)request.Intyear, int.Parse(request.Strmonth), (int)request.Intdate);
+                    viewEncounterForm.DateOfBirth = request.Intyear != null && request.Strmonth != null && request.Intdate != null
+                    ? new DateOnly((int)request.Intyear, int.Parse(request.Strmonth), (int)request.Intdate)
+                                                                            : new DateOnly();
                     viewEncounterForm.Email = request.Email ?? "";
                     viewEncounterForm.Location = $"{request.Address}, {request.City}, {request.State}";
                 }
@@ -622,19 +649,32 @@ namespace HelloDoc.Controllers
 
         public IActionResult CloseCase(int requestid)
         {
+
             Requestclient? requestclient = _context.Requestclients.Where(item => item.Requestid == requestid).FirstOrDefault();
             List<Requestwisefile> requestwisedocument = _context.Requestwisefiles.Where(item => item.Requestid == requestid).ToList();
-            string requestclientnumber = _context.Requests.Where(item => item != null && item.Requestid == requestid).FirstOrDefault().Confirmationnumber;
+            Request? request = _context.Requests.Where(item => item.Requestid == requestid).FirstOrDefault();
+            if (request != null)
+            {
+
+            string? requestclientnumber = request.Confirmationnumber;
             CloseCaseVM closecase = new CloseCaseVM();
-            closecase.FirstName = requestclient?.Firstname?? "";
+            closecase.FirstName = requestclient?.Firstname ?? "";
             closecase.LastName = requestclient?.Lastname ?? "";
             closecase.Email = requestclient?.Email ?? "";
             closecase.PhoneNo = requestclient?.Phonenumber ?? "";
-            closecase.BirthDate = new DateOnly((int)requestclient.Intyear, int.Parse(requestclient.Strmonth), (int)requestclient.Intdate);
+            closecase.BirthDate = requestclient !=null && requestclient.Intyear != null && requestclient.Strmonth != null && requestclient.Intdate != null
+                                  ? new DateOnly((int)requestclient.Intyear, int.Parse(requestclient.Strmonth), (int)requestclient.Intdate)
+                                  : new DateOnly();
             closecase.Requestwisefileview = requestwisedocument;
             closecase.ConfirmNumber = requestclientnumber;
             closecase.Requestid = requestid;
             return View(closecase);
+            }
+            else
+            {
+                TempData["Error"] = "Something Went Wrong Please Try Again";
+                return RedirectToAction("Index","Admin");
+            }
         }
 
         [HttpPost]
@@ -647,9 +687,13 @@ namespace HelloDoc.Controllers
             else
             {
                 Requestclient? requestclient = _context.Requestclients.Where(item => item.Requestid == requestid).FirstOrDefault();
+                if(requestclient != null)
+                {
+
                 requestclient.Phonenumber = closeCaseVM.PhoneNo;
                 requestclient.Email = closeCaseVM.Email;
                 _context.Requestclients.Update(requestclient);
+                }
                 _context.SaveChanges();
                 return RedirectToAction("CloseCase", new { requestid = requestid });
             }
@@ -658,9 +702,9 @@ namespace HelloDoc.Controllers
         public IActionResult CloseCaseModal(int requestid)
         {
             Request? request = _context.Requests.Where(item => item.Requestid == requestid).FirstOrDefault();
-            if(request != null)
+            if (request != null)
             {
-            request.Status = 9;
+                request.Status = 9;
             }
             Requeststatuslog requeststatuslog = new Requeststatuslog();
             requeststatuslog.Status = 9;

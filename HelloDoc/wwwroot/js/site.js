@@ -487,7 +487,22 @@ $(document).ready(function () {
         });
         })
     
+    document.getElementById("fileInput").onchange = function () {
+        let filePath = this.value;
+        let allowedExtensions = [".jpg", ".pdf"];
 
+        let extension = filePath.substring(filePath.lastIndexOf('.'));
+        extension = extension.toLowerCase();
+
+        if (!allowedExtensions.includes(extension)) {
+            toastr.error("Please Select The Pdf Or Jpg")
+            this.value = ""; // Clear file selection if invalid
+            return false; // Prevent further processing
+        }
+
+        let path = filePath.substr(filePath.lastIndexOf('\\') + 1);
+        document.getElementById("fileName").innerText = path;
+    };
 
     $('.deletbtn').click(function () {
         var fileUrl = $(this).data("filename");

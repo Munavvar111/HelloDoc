@@ -40,7 +40,6 @@ public class CustomAuthorizeAttribute : Attribute, IAuthorizationFilter
             }
             else
             {
-                // If it's not an AJAX request, redirect to the login page
                 context.Result = new RedirectToRouteResult(new RouteValueDictionary(new { controller = "Login", action = "Index" }));
             }
             

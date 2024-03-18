@@ -126,11 +126,13 @@
 
                         </div>
                     </div>
-                    <div class="col-md-6">
-                        <div class="form-floating">
-                            <input asp-for=@Model.MobileNo name="PhoneNumber" type="tel" id='patient_phone' class="form-control" placeholder="(201)555-0123" disabled>
-                            <span class="error-PhoneNumber text-danger"></span>
-
+                    <div class="col">
+                        <div class="border rounded-2 tel-container">
+                            <input id="phone1"
+                                   type="tel"
+                                   class="form-control border-0 tel-input"
+                                   asp-for="MobileNo"
+                                   disabled />
                         </div>
                     </div>
                     <div class="col-md-6">
@@ -224,7 +226,7 @@
                     </div>
                     <div class="col-md-6">
                         <div class="form-floating">
-                            <input name="PhoneNumber" type="tel" id='friend_phone' name="MobileNo" class="form-control" placeholder="(201)555-0123" disabled asp-for="@Model.MobileNo">
+                            <input name="PhoneNumber" type="tel" id='phone2' name="MobileNo" class="form-control" placeholder="(201)555-0123" disabled asp-for="@Model.MobileNo">
                             <span class="error-MobileNo text-danger"></span>
 
                         </div>
@@ -268,4 +270,16 @@
         $("#SubAdminBtn").toggle();
     }
 
+</script>
+
+<script>
+    const phone1 = document.querySelector("#phone1");
+    const phoneInput1 = window.intlTelInput(phone1, {
+        utilsScript:
+            "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",
+        nationalMode: false,
+        showSelectedDialCode: true,
+        autoInsertDialCode: true,
+        formatOnDisplay: false,
+    });
 </script>

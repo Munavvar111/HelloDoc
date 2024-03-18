@@ -2,8 +2,10 @@
 
 @{
     // Retrieve session data
-    string username = Context.Session.GetString("Username");
+    
+    string? username = Context.Session.GetString("Username");
     int userId = Context.Session.GetInt32("UserId") ?? 0; // Use a default value if session data is not available
+    
 }
 <!DOCTYPE html>
 <html lang="en" data-bs-theme="light">
@@ -92,11 +94,11 @@
                 <ul class="nav nav-tabs-info text-info">
                     <li class="nav-item-info">
                         <a class="nav-link @(ViewContext.ActionDescriptor.RouteValues["action"] == "Index" ? "active" : "")"
-                           asp-action="Index" asp-controller="Dashboard">Home</a>
+                           asp-action="Index" asp-controller="Admin">Home</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link @(ViewContext.ActionDescriptor.RouteValues["action"] == "Profile" ? "active" : "")"
-                           asp-action="Profile" asp-controller="Dashboard">Profile</a>
+                           asp-action="Profile" asp-controller="Admin">Profile</a>
                     </li>
                 </ul>
             </div>

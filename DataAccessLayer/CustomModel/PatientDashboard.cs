@@ -9,9 +9,9 @@ namespace DataAccessLayer.CustomModel
 {
     public class PatientDashboard
     {
-        public Request Request { get; set; }
+        public Request Request { get; set; } = null!;
 
-        public Requestwisefile Requestwisefile { get; set; }    
+        public Requestwisefile Requestwisefile { get; set; } = null!;
 
         public User? User { get; set; }
     }

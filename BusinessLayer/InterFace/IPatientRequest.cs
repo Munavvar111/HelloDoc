@@ -13,12 +13,12 @@ namespace BusinessLayer.InterFace
     {
          Task<List<Requestwisefile>> GetRequestwisefileByIdAsync(int RequestID);
 
-        User GetUserById(int id);   
-        User GetUserByEmail(string Email);
-        AspnetUser GetUserByUserName(string UserName);  
-        Request GetRequestByEmail(string email);
+        User? GetUserById(int id);   
+        User? GetUserByEmail(string Email);
+        AspnetUser? GetUserByUserName(string UserName);  
+        Request? GetRequestByEmail(string email);
 
-        AspnetUser GetAspnetUserBYEmail(string Email);
+        AspnetUser? GetAspnetUserBYEmail(string Email);
 
         void AddAspnetUser(RequestModel requestModel);
 

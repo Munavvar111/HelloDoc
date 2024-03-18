@@ -14,7 +14,7 @@ namespace BusinessLayer.InterFace
         ViewCaseVM GetCaseById(int id);
         Task UpdateRequestClient(ViewCaseVM viewCaseVM, int id);
         List<ViewNotesVM> GetNotesForRequest(int requestid);
-        Task<bool> AssignRequest(int regionId, int physician, string description, int requestId);
+        Task<bool> AssignRequest(int regionId, int physician, string description, int requestId,int adminid);
         Task<bool> UpdateAdminNotes(int requestId, string adminNotes);
         Task<bool> CancelCase(int requestId, string notes, string cancelReason);
 

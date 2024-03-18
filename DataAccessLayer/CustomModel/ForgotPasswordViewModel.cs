@@ -10,6 +10,6 @@ namespace DataAccessLayer.CustomModel
     public class ForgotPasswordViewModel
     {
         [Required]
-        public string Email { get; set; }
+        public string? Email { get; set; }
     }
 }
