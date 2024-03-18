@@ -43,7 +43,14 @@ $(document).ready(function () {
     
     var currentPartial = storedPartial || "NewTablePartial";
     var currentStatus = storedStatus || [1];
-    var currentPage = 1;
+    var currentPage = localStorage.getItem("currentPage");
+    if (currentPage) {
+        currentPage = currentPage
+    }
+    else {
+
+     currentPage = 1;
+    }
     var pageSize = 3;
 
     var status = localStorage.getItem('statuslink');
@@ -63,6 +70,7 @@ $(document).ready(function () {
     $(document).on("click", "#pagination a.page-link", function () {
         console.log("Pagination link clicked!");
         currentPage = $(this).text().trim();
+        localStorage.setItem("currentPage", currentPage);
         console.log("Current Page: " + currentPage);
         filterTable(currentPartial, currentStatus, currentPage, pageSize);
     });
@@ -80,6 +88,8 @@ $(document).ready(function () {
         localStorage.setItem('currentPartial', currentPartial);
         localStorage.setItem('currentStatus', JSON.stringify(currentStatus));
         $('#statuschange').html('(New)');
+        currentPage = 1;
+        localStorage.setItem("currentPage", currentPage);
         localStorage.setItem("statustext",'(New)')
         filterTable("NewTablePartial", currentStatus, currentPage, pageSize);
     });
@@ -93,7 +103,8 @@ $(document).ready(function () {
         $(".Status-btn").removeClass('activee');
         $("#statuslink2").addClass("activee");
         localStorage.setItem('statuslink', '#statuslink2')
-
+        currentPage = 1;
+        localStorage.setItem("currentPage", currentPage);
         console.log("hii2")
         
         currentPartial = "PendingTablePartial"
@@ -114,7 +125,9 @@ $(document).ready(function () {
         $(".Status-btn").removeClass('activee');
         $("#statuslink3").addClass("activee");
         localStorage.setItem('statuslink', '#statuslink3')
-        currentStatus = [4, 5]
+        currentStatus = [4, 5];
+        currentPage = 1;
+        localStorage.setItem("currentPage", currentPage);
         currentPartial = "ActiveTablePartial";
         localStorage.setItem('currentPartial', currentPartial);
         localStorage.setItem('currentStatus', JSON.stringify(currentStatus));
@@ -135,6 +148,8 @@ $(document).ready(function () {
         $("#statuslink4").addClass("activee");
         localStorage.setItem('statuslink', '#statuslink4')
         currentStatus = [6];
+        currentPage = 1;
+        localStorage.setItem("currentPage", currentPage);
         currentPartial = "ConcludeTablePartial";
         $('#statuschange').html('(Conclude)');
         localStorage.setItem("statustext", '(Conclude)')
@@ -151,6 +166,8 @@ $(document).ready(function () {
         $(".Status-btn").removeClass('activee');
         $("#statuslink5").addClass("activee");
         currentStatus = [3, 7, 8];
+        currentPage = 1;
+        localStorage.setItem("currentPage", currentPage);
         currentPartial = "ToCloseTablePartial";
         $('#statuschange').html('(ToClose)');
         localStorage.setItem("statustext", '(ToClose)')
@@ -169,6 +186,8 @@ $(document).ready(function () {
         $("#statuslink6").addClass("activee");
         localStorage.setItem('statuslink', '#statuslink6')
         currentStatus = [9];
+        currentPage = 1;
+        localStorage.setItem("currentPage", currentPage);
         currentPartial = "UnpaidTablePartial";
         $('#statuschange').html('(Unpaid)');
         localStorage.setItem("statustext", '(Unpaid)')
@@ -208,17 +227,20 @@ $(document).ready(function () {
 
                 console.log(partialName)
                 var searchValue = $("#searchInput").val();
-                var selectValue = $("#filterSelect").val();
+        var selectValue = $("#filterSelect").val();
                 if (searchValue != null) {
                     searchValue = searchValue.toLowerCase();
-                }
-                currentPage = 1;
+        }
+       
                 var selectedFilter = $('.filter-item.active').data('value');
 
-                console.log(selectValue)
-                console.log(searchValue)
-                console.log(selectedFilter)
-
+        if (selectValue == " " && !selectedFilter && !searchValue) {
+            currentPage = localStorage.getItem("currentPage");
+            console.log(currentPage)
+        }
+        else {
+            page = 1;
+        }
 
 
         $('#loader').show();

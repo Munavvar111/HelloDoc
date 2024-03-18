@@ -50,8 +50,8 @@ namespace HalloDocPatient.Controllers
 
                             AspnetRole? rolefromroleid = _context.AspnetRoles.FirstOrDefault(x => x.Id == role.Roleid);
 
-                            var token = _jwtAuth.GenerateToken(user?.Email ?? "", rolefromroleid?.Name ?? "".Trim());
-                            HttpContext.Session.SetString("Role", rolefromroleid?.Name ?? "".Trim());
+                            var token = _jwtAuth.GenerateToken(user?.Email ?? "", rolefromroleid.Name.Trim());
+                            HttpContext.Session.SetString("Role", rolefromroleid.Name.Trim());
                             HttpContext.Session.SetString("token", token);
                             HttpContext.Session.SetString("Email", user?.Email ?? "");
                             HttpContext.Session.SetInt32("id", user?.Userid ?? 1);
