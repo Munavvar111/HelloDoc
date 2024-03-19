@@ -87,11 +87,8 @@
                         </button>
                         <div class="dropdown-menu dropdown-menu-right dropdown-menu-lg-left" aria-labelledby="dropdownMenuButton">
                             <a class="dropdown-item" asp-action="ViewCase" asp-controller="Admin" asp-route-id="@item.RequestClientId"><i class="bi bi-x-circle me-3"></i>View Case</a>
-                            <a class="dropdown-item"><i class="bi bi-x-circle me-3"></i>View Uploads</a>
+                            <a class="dropdown-item" asp-action="ViewUploads" asp-controller="Admin" asp-route-id="@item.RequestId"><i class="bi bi-x-circle me-3"></i>View Uploads</a>
                             <a class="dropdown-item" asp-action="ViewNotes" asp-controller="Admin" asp-route-requestid="@item.RequestId"><i class="bi bi-x-circle me-3"></i>View Notes</a>
-                            <a class="dropdown-item" href="#"><i class="bi bi-card-text me-3"></i> Transfer </a>
-                            <a class="dropdown-item" href="#" data-toggle="modal" data-target="#exampleModal"><i class="bi bi-x-circle me-3"></i>Clear Case</a>
-                            <a class="dropdown-item" href="#"><i class="bi bi-ban me-3"></i>Send Agreement</a>
                         </div>
                     </div>
                 </td>

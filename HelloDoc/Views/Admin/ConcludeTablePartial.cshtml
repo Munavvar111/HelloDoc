@@ -70,11 +70,11 @@
                 </td>
                 <td style="background-color:@(GetRowClass(@item.ReqTypeId))!important">@item.Address</td>
                 <td style="background-color:@(GetRowClass(@item.ReqTypeId))!important">
-                            <button class="btn border-white  text-white">
-                                <i class="bi bi-person me-1"></i> provider
-                            </button>
+                    <button class="btn border-white  text-white">
+                        <i class="bi bi-person me-1"></i> provider
+                    </button>
 
-                        </td>
+                </td>
                 <td style="background-color:@(GetRowClass(@item.ReqTypeId)) !important">
                     <div class="dropdown">
                         <button class="btn border-white @(GetRowClass(@item.ReqTypeId)) text-white" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -87,7 +87,7 @@
                             <a class="dropdown-item" href="#"><i class="bi bi-card-text me-3"></i> Order </a>
                             <a class="dropdown-item" href="#"><i class="bi bi-card-text me-3"></i> Doctor Notes </a>
                             <a class="dropdown-item" href="#" data-toggle="modal" data-target="#exampleModal"><i class="bi bi-x-circle me-3"></i>Clear Case</a>
-                            @if (@item.isfinalize == null )
+                            @if (@item.isfinalize == null)
                             {
                                 <a class="dropdown-item" asp-action="EncounterForm" asp-route-requestid="@item.RequestId"><i class="bi bi-ban me-3"></i>Encounter</a>
 
@@ -103,10 +103,10 @@
 
                             }
 
-                            </div>
+                        </div>
                     </div>
                 </td>
-                    </tr>
+            </tr>
             <div class="d-xl-none ">
                 <div class="bg-info-subtle " data-bs-toggle="collapse" data-bs-target="#collapseexample_@item.Id"
                      aria-expanded="false" aria-controls="collapseexample">
@@ -155,7 +155,7 @@
                             <i class="fas fa-phone  border border-1 border-info rounded-5 p-2 me-2"></i>
                             <span class="fs-5">Phone: <strong>@item.Phone</strong></span>
                         </div>
-                        
+
                         <div class="d-flex align-items-center ">
                             <i class="fa-regular fa-calendar  border border-1 border-info rounded-5 p-2 me-2"></i>
                             <span class="fs-5">Date of Service: <strong></strong> </span>
@@ -166,16 +166,30 @@
                         </div>
                         <div class="d-flex flex-column mt-3 gap-3">
                             <div class="d-flex gap-3 ">
-                                <button class="btn w-50 btn-transparent border border-1 text-white  rounded-5" style="background-color:  #228B22">View Notes</button>
-                                <button class="btn w-50 btn-transparent border border-1 text-white rounded-5" style="background-color: #145545">Doctors Note</button>
+                                <a type="button" class="btn w-50 btn-transparent border border-1 text-white rounded-5" style="background-color: #228B22" asp-action="ViewNotes" asp-controller="Admin" asp-route-requestid="@item.RequestId">View Notes</a>
+                                <a class="btn w-50 btn-transparent border border-1 text-white rounded-5" style="background-color: #228B22" asp-action="ViewUploads" asp-controller="Admin" asp-route-id="@item.RequestId">View Uploads</a>
                             </div>
                             <div class="d-flex gap-3 ">
-                                <button class="btn w-50 btn-transparent border border-1 text-white rounded-5" style="background-color: #228B22">View Uploads</button>
-                                <button class="btn w-50 btn-transparent border border-1 text-white rounded-5" style="background-color: #228B22">Encounter</button>
+
+                                @if (@item.isfinalize == null)
+                                {
+                                    <a class="btn w-50 btn-transparent border border-1 text-white rounded-5" style="background-color: #228B22" asp-action="EncounterForm" asp-route-requestid="@item.RequestId">Encounter</a>
+
+                                }
+                                else if (@item.isfinalize)
+                                {
+
+                                    <button type="button" class="btn w-50 btn-transparent border border-1 text-white rounded-5" style="background-color: #228B22" data-bs-toggle="modal" data-bs-target="#finalizedModal" data-requestid="@item.RequestId">Encounter</button>
+                                }
+                                else
+                                {
+                                    <a class="btn w-50 btn-transparent border border-1 text-white rounded-5" style="background-color: #228B22" asp-action="EncounterForm" asp-route-requestid="@item.RequestId">Encounter</a>
+
+                                }
+                                <a class="btn w-50 btn-transparent border border-1 text-white rounded-5" style="background-color: #EE9125" asp-action="SendOrder" asp-controller="Admin" asp-route-requestid="@item.RequestId">Orders</a>
                             </div>
                             <div class="d-flex gap-3">
-                                <button class="btn w-50 btn-transparent border border-1 text-white rounded-5" style="background-color: #EE9125">Orders</button>
-                                <button class="btn w-50 btn-transparent border border-1 text-white rounded-5" style="background-color: #228B22">Email</button>
+                                <a href="@($"mailto:{@item.Email}")" class="btn w-50 btn-transparent border border-1 text-white rounded-5" style="background-color: #228B22">Email</a>
                             </div>
                         </div>
                     </div>

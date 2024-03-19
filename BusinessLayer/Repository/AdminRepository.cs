@@ -47,6 +47,8 @@ namespace BusinessLayer.Repository
                                                                             ? new DateOnly((int)reqclient.Intyear, int.Parse(reqclient.Strmonth), (int)reqclient.Intdate)
                                                                             : new DateOnly(),
                                                             ReqDate = req.Createddate,
+                                                            FirstName=reqclient.Firstname,
+                                                            LastName=reqclient.Lastname,
                                                             Phone = reqclient.Phonenumber ?? "",
                                                             PhoneOther = req.Phonenumber ?? "",
                                                             Address = reqclient.City + reqclient.Zipcode,
@@ -59,6 +61,7 @@ namespace BusinessLayer.Repository
                                                             RequestClientId = reqclient.Requestclientid,
                                                             RequestId = reqclient.Requestid,
                                                             isfinalize = eno.IsFinalize,
+                                                            Regions = _context.Regions.ToList(),
                                                             PhysicianName = ps.Firstname + "_" + ps.Lastname,
                                                             Cancel = _context.Casetags.Select(cc => new CancelCase
                                                             {
@@ -104,6 +107,7 @@ namespace BusinessLayer.Repository
                                                            PhoneOther = req.Phonenumber ?? "",
                                                            RequestClientId = reqclient.Requestclientid,
                                                            RequestId = reqclient.Requestid,
+                                                           Regions = _context.Regions.ToList(),
                                                            PhysicianName = ps.Firstname + "_" + ps.Lastname,
                                                            Cancel = _context.Casetags.Select(cc => new CancelCase
                                                            {
@@ -306,6 +310,7 @@ namespace BusinessLayer.Repository
                 if (requestById != null)
                 {
                     requestById.Status = 3;
+                    requestById.Casetag = _context.Casetags.FirstOrDefault(c => c.Casetagid == int.Parse(cancelReason)).Name;
                     _context.Requests.Update(requestById);
 
                     Requeststatuslog requestStatusLog = new Requeststatuslog

@@ -7,10 +7,10 @@ using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Rotativa.AspNetCore;
 using System.Collections;
-using System.Net;
-using System.Text;
 using BC = BCrypt.Net.BCrypt;
-
+using CsvHelper;
+using System.Globalization;
+using System.Collections.Generic;
 
 namespace HelloDoc.Controllers
 {
@@ -182,18 +182,61 @@ namespace HelloDoc.Controllers
         }
 
 
-        public IActionResult SearchPatient(string searchValue, string selectValue, string partialName, string selectedFilter, int[] currentStatus, int page, int pageSize = 5)
+        public IActionResult SearchPatient(string searchValue, string selectValue, string partialName, string selectedFilter, int[] currentStatus,bool exportdata,bool exportAllData, int page, int pageSize = 5)
         {
             List<NewRequestTableVM> filteredPatients = _admin.SearchPatients(searchValue, selectValue, selectedFilter, currentStatus);
+            List<NewRequestTableVM> ExportData = _admin.SearchPatients(searchValue, selectValue, selectedFilter, currentStatus);
             int totalItems = filteredPatients.Count();
             int totalPages = (int)Math.Ceiling((double)totalItems / pageSize);
             List<NewRequestTableVM> paginatedData = filteredPatients.Skip((page - 1) * pageSize).Take(pageSize).ToList();
             ViewBag.totalPages = totalPages;
             ViewBag.CurrentPage = page;
             ViewBag.PageSize = pageSize;
+            if (exportdata)
+            {
+                using (var memoryStream = new MemoryStream())
+                using (var writer = new StreamWriter(memoryStream))
+                using (var csvWriter = new CsvWriter(writer,CultureInfo.InvariantCulture))
+                {
+                    csvWriter.WriteRecords(filteredPatients);
+                    writer.Flush();
+                    var result = memoryStream.ToArray();
+                    return File(result, "text/csv", "filtered_data.csv"); // Change content type and file name as needed
+                }
+            }
+            if (exportAllData)
+            {
+                using (var memoryStream = new MemoryStream())
+                using (var writer = new StreamWriter(memoryStream))
+                using (var csvWriter = new CsvWriter(writer, CultureInfo.InvariantCulture))
+                {
+                    csvWriter.WriteRecords(filteredPatients);
+                    writer.Flush();
+                    var result = memoryStream.ToArray();
+                    return File(result, "text/csv", "filtered_data.csv"); // Change content type and file name as needed
+                }
+            }
             return PartialView(partialName, paginatedData);
         }
+        public IActionResult ExportAll(string currentStatus)
+        {
+            var statusArray = currentStatus?.Split(',')?.Select(int.Parse).ToArray(); 
+            var searchValue = "";
+            var selectValue = "";
+            var selectedFilter = "";
+            List<NewRequestTableVM> filteredPatientsd = _admin.SearchPatients(searchValue, selectValue, selectedFilter, statusArray);
+            using (var memoryStream = new MemoryStream())
+            using (var writer = new StreamWriter(memoryStream))
+            using (var csvWriter = new CsvWriter(writer, CultureInfo.InvariantCulture))
+            {
+                csvWriter.WriteRecords(filteredPatientsd);
+                writer.Flush();
+                var result = memoryStream.ToArray();
+                return File(result, "text/csv", "filtered_data.csv"); // Change content type and file name as needed
+            }
 
+            // Or return appropriate response format for export
+        }
         public IActionResult Learning()
         {
             return View();
@@ -236,7 +279,9 @@ namespace HelloDoc.Controllers
             {
 
             bool result = await _admin.AssignRequest(regionid, physician, description, requestid,admin.Adminid);
-            return Json(result);
+                TempData["SuccessMessage"] = "Assign successfully";
+
+                return Json(result);
             }
             else
             {
@@ -276,6 +321,7 @@ namespace HelloDoc.Controllers
         public async Task<IActionResult> CancelCase(string notes, string cancelReason, int requestid)
         {
             bool result = await _admin.CancelCase(requestid, notes, cancelReason);
+            TempData["SuccessMessage"] = "Cancel successfully";
             return Json(result);
 
         }

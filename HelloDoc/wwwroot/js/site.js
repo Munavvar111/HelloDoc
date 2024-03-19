@@ -10,7 +10,7 @@
 }
 $(document).ready(function () {
 
-
+    
     function updateUIWithCounts() {
         $.ajax({
             type: "GET",
@@ -24,7 +24,7 @@ $(document).ready(function () {
                 console.error('Error:', error);
             }
         });
-        
+
         function updateUIWithCountsNumber(data) {
             // Update your UI elements using the data received from the server
             $('#statuslink1 .Status-Count').text(data.newCount);
@@ -40,16 +40,19 @@ $(document).ready(function () {
     var storedPartial = localStorage.getItem('currentPartial');
     var storedStatus = JSON.parse(localStorage.getItem('currentStatus'));
     var statustext = localStorage.getItem('statustext');
-    
+
     var currentPartial = storedPartial || "NewTablePartial";
     var currentStatus = storedStatus || [1];
     var currentPage = localStorage.getItem("currentPage");
+    var exportdata = false;
+    var exportAllData = false;
+
     if (currentPage) {
         currentPage = currentPage
     }
     else {
 
-     currentPage = 1;
+        currentPage = 1;
     }
     var pageSize = 3;
 
@@ -63,22 +66,24 @@ $(document).ready(function () {
         $('#statuschange').html('(New)');
 
     }
-    filterTable(currentPartial, currentStatus, currentPage, pageSize);
+    filterTable(currentPartial, currentStatus, currentPage, pageSize, exportdata, exportAllData);
     updateUIWithCounts();
 
-   
+
     $(document).on("click", "#pagination a.page-link", function () {
         console.log("Pagination link clicked!");
         currentPage = $(this).text().trim();
         localStorage.setItem("currentPage", currentPage);
         console.log("Current Page: " + currentPage);
-        filterTable(currentPartial, currentStatus, currentPage, pageSize);
+        filterTable(currentPartial, currentStatus, currentPage, pageSize, exportdata, exportAllData);
     });
 
 
     $("#statuslink1").click(function (e) {
+        exportdata = false;
+        exportAllData = false;
         $("#searchInput").val("");
-         $("#filterSelect").val(" ");
+        $("#filterSelect").val(" ");
         $('.filter-item').removeClass('active')
         $(".Status-btn").removeClass('activee');
         $("#statuslink1").addClass("activee");
@@ -90,13 +95,15 @@ $(document).ready(function () {
         $('#statuschange').html('(New)');
         currentPage = 1;
         localStorage.setItem("currentPage", currentPage);
-        localStorage.setItem("statustext",'(New)')
-        filterTable("NewTablePartial", currentStatus, currentPage, pageSize);
+        localStorage.setItem("statustext", '(New)')
+        filterTable("NewTablePartial", currentStatus, currentPage, pageSize, exportdata, exportAllData);
     });
 
 
 
     $("#statuslink2").click(function () {
+        exportdata = false;
+        exportAllData = false;
         $("#searchInput").val("");
         $("#filterSelect").val(" ");
         $('.filter-item').removeClass('active')
@@ -106,7 +113,7 @@ $(document).ready(function () {
         currentPage = 1;
         localStorage.setItem("currentPage", currentPage);
         console.log("hii2")
-        
+
         currentPartial = "PendingTablePartial"
         currentStatus = [2];
         $('#statuschange').html('(Pending)');
@@ -114,11 +121,13 @@ $(document).ready(function () {
 
         localStorage.setItem('currentPartial', currentPartial);
         localStorage.setItem('currentStatus', JSON.stringify(currentStatus));
-        filterTable(currentPartial, currentStatus, currentPage, pageSize);
+        filterTable(currentPartial, currentStatus, currentPage, pageSize, exportdata, exportAllData);
     });
 
 
     $("#statuslink3").click(function () {
+        exportdata = false;
+        exportAllData = false;
         $("#searchInput").val("");
         $("#filterSelect").val(" ");
         $('.filter-item').removeClass('active')
@@ -135,12 +144,14 @@ $(document).ready(function () {
         $('#statuschange').html('(Active)');
         localStorage.setItem("statustext", '(Active)')
 
-        filterTable("ActiveTablePartial", currentStatus, currentPage, pageSize);
+        filterTable("ActiveTablePartial", currentStatus, currentPage, pageSize, exportdata, exportAllData);
     });
 
 
 
     $("#statuslink4").click(function () {
+        exportdata = false;
+        exportAllData = false;
         $("#searchInput").val("");
         $("#filterSelect").val(" ");
         $('.filter-item').removeClass('active')
@@ -156,10 +167,12 @@ $(document).ready(function () {
 
         localStorage.setItem('currentPartial', currentPartial);
         localStorage.setItem('currentStatus', JSON.stringify(currentStatus));
-        filterTable("ConcludeTablePartial", currentStatus, currentPage, pageSize);
+        filterTable("ConcludeTablePartial", currentStatus, currentPage, pageSize, exportdata, exportAllData);
     });
 
     $("#statuslink5").click(function () {
+        exportdata = false;
+        exportAllData = false;
         $("#searchInput").val("");
         $("#filterSelect").val(" ");
         $('.filter-item').removeClass('active')
@@ -175,10 +188,12 @@ $(document).ready(function () {
         localStorage.setItem('currentPartial', currentPartial);
         localStorage.setItem('statuslink', '#statuslink5');
         localStorage.setItem('currentStatus', JSON.stringify(currentStatus));
-        filterTable("ToCloseTablePartial", currentStatus, currentPage, pageSize);
+        filterTable("ToCloseTablePartial", currentStatus, currentPage, pageSize, exportdata, exportAllData);
     });
 
     $("#statuslink6").click(function () {
+        exportdata = false;
+        exportAllData = false;
         $("#searchInput").val("");
         $("#filterSelect").val(" ");
         $('.filter-item').removeClass('active')
@@ -194,89 +209,121 @@ $(document).ready(function () {
 
         localStorage.setItem('currentPartial', currentPartial);
         localStorage.setItem('currentStatus', JSON.stringify(currentStatus));
-        filterTable("UnpaidTablePartial", currentStatus, currentPage, pageSize);
+        filterTable("UnpaidTablePartial", currentStatus, currentPage, pageSize, exportdata, exportAllData);
     });
 
     //filter the data with passed currentpartial that will load only that data
     $("#filterSelect").on("input change", function () {
-        console.log("inputchange")
-        filterTable(currentPartial, currentStatus, currentPage, pageSize);
+        exportdata = false;
+        exportAllData = false;
+        console.log("inputchange");
+        
+        filterTable(currentPartial, currentStatus, currentPage, pageSize, exportdata, exportAllData);
     });
 
 
     $("#searchInput").on("input", function () {
+        exportdata = false;
+        exportAllData = false;
         console.log("inputchange")
-
-        filterTable(currentPartial, currentStatus, currentPage, pageSize);
+        currentPage = 1;
+        filterTable(currentPartial, currentStatus, currentPage, pageSize, exportdata, exportAllData);
     });
 
     $('.filter-item').click(function () {
+        exportdata = false;
+        exportAllData = false
         $('.filter-item').removeClass('active')
         $(this).addClass('active')
-        filterTable(currentPartial, currentStatus, currentPage, pageSize)
+        currentPage = 1;
+        filterTable(currentPartial, currentStatus, currentPage, pageSize, exportdata, exportAllData)
 
     });
 
-
+    $('#exportdata').click(function () {
+        exportdata = true;
+        exportAllData = false;
+        filterTable(currentPartial, currentStatus, currentPage, pageSize, exportdata, exportAllData)
+        currentPage = 1;
+    });
+    
     //ajax for render that partialview
-
+  
     //ajax for filterthe table using search
-    function filterTable(partialName, currentStatus, page, pageSize)
-    {
-        
+    function filterTable(partialName, currentStatus, page, pageSize, exportdata, exportAllData) {
 
-                console.log(partialName)
-                var searchValue = $("#searchInput").val();
+
+        console.log(partialName)
+        var searchValue = $("#searchInput").val();
         var selectValue = $("#filterSelect").val();
-                if (searchValue != null) {
-                    searchValue = searchValue.toLowerCase();
+        if (searchValue != null) {
+            searchValue = searchValue.toLowerCase();
         }
-       
-                var selectedFilter = $('.filter-item.active').data('value');
+
+        var selectedFilter = $('.filter-item.active').data('value');
 
         if (selectValue == " " && !selectedFilter && !searchValue) {
             currentPage = localStorage.getItem("currentPage");
+            page = currentPage
             console.log(currentPage)
         }
         else {
-            page = 1;
+            currentPage = 1;
         }
 
 
-        $('#loader').show();
-                $.ajax({
-                    type: "GET",
-                    url: "/Admin/SearchPatient",
-                    traditional: true,
+        $.ajax({
+            type: "GET",
+            url: "/Admin/SearchPatient",
+            traditional: true,
 
-                    beforSend: function () {
-                        $('#loader').show();
-                    },
-                    data: { searchValue: searchValue, selectValue: selectValue, partialName: partialName, selectedFilter: selectedFilter, currentStatus: currentStatus, page: page, pageSize: pageSize },
-                    success: function (data) {
-
-                        if (data != null && data.length > 0) {
-                        $('#loader').hide();
-                            $('#partialContainer').html(data);
-                        } else {
-                            $('#partialContainer').html('<p>No data is Found</p>');
-
-                        }
-
-                    },
-                    error: function (xhr) {
-                        if (xhr.status === 403) {
-                            var response = JSON.parse(xhr.responseText);
-                            if (response.redirectToLogin) {
-                                window.location.href = '/Login';
-                            } else {
-                            }
-                        } else {
-                            toastr.error('An error occurred during the AJAX request.');
-                        }                    }
-                });
             
+            data: { searchValue: searchValue, selectValue: selectValue, partialName: partialName, selectedFilter: selectedFilter, currentStatus: currentStatus, page: page, pageSize: pageSize, exportdata: exportdata, exportAllData: exportAllData },
+            success: function (data) {
+                if (exportdata == true) {
+                    var blob = new Blob([data], { type: 'text/csv' });
+                    var link = document.createElement('a');
+                    link.href = window.URL.createObjectURL(blob);
+                    link.download = 'filtered_data.csv';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                }
+                else if (exportAllData == true) {
+                    var blob = new Blob([data], { type: 'text/csv' });
+                    var link = document.createElement('a');
+                    link.href = window.URL.createObjectURL(blob);
+                    link.download = 'filtered_data.csv';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                }
+                else {
+
+                if (data != null && data.length > 0 && !exportdata) {
+                    $('#partialContainer').html(data);
+                } else {
+                    $('#partialContainer').html('<p>No data is Found</p>');
+
+                }
+                }
+
+            },
+            error: function (xhr) {
+                if (xhr.status === 403) {
+                    var response = JSON.parse(xhr.responseText);
+                    if (response.redirectToLogin) {
+                        window.location.href = '/Login';
+                    } else {
+                    }
+                } else {
+                    toastr.error('An error occurred during the AJAX request.');
+                }
+            }
+        });
+
     }
+  
     $("#blockCaseForm").validate({
         rules: {
             blockreason: {
@@ -314,13 +361,12 @@ $(document).ready(function () {
                         filterTable(storedPartial, storedStatus, 1, 5);
                         updateUIWithCounts();
                         toastr.success('Block successful!');
-
                     }
                 }
             })
         }
     });
-    
+
     $("#cancelCaseForm").validate({
         rules: {
             CancelReason: {
@@ -333,7 +379,7 @@ $(document).ready(function () {
         messages: {
             notescancel: "Please enter your Notes.",
             CancelReason: "Please enter your CancelReason.",
-           
+
         },
         errorPlacement: function (error, element) {
             var errorSpan = $("span.error-" + element.attr("name"));
@@ -363,7 +409,7 @@ $(document).ready(function () {
                     if (data) {
                         var storedPartial = localStorage.getItem('currentPartial');
                         var storedStatus = JSON.parse(localStorage.getItem('currentStatus'));
-
+                        window.location.href = '/admin'
                         filterTable(storedPartial, storedStatus, 1, 5);
                         updateUIWithCounts();
                         toastr.success('CancelPatient successful!');
@@ -373,7 +419,7 @@ $(document).ready(function () {
             })
         }
     });
-  $("#assigncaseform").validate({
+    $("#assigncaseform").validate({
         rules: {
             notes: {
                 required: true
@@ -382,14 +428,14 @@ $(document).ready(function () {
                 required: true
             },
             physician: {
-                required:true
+                required: true
             }
         },
         messages: {
             notes: "Please enter your Notes.",
             region: "Please enter your region.",
             physician: "Please enter your physician.",
-          
+
         },
         errorPlacement: function (error, element) {
             var errorSpan = $("span.error-" + element.attr("name"));
@@ -418,7 +464,8 @@ $(document).ready(function () {
                     if (data) {
                         var storedPartial = localStorage.getItem('currentPartial');
                         var storedStatus = JSON.parse(localStorage.getItem('currentStatus'));
-                        filterTable(storedPartial, storedStatus, 1, 5);
+                        window.location.href = '/admin'
+                        filterTable(storedPartial, storedStatus, 1, 3);
                         updateUIWithCounts();
                         console.log("toaster", toastr.success)
                         toastr.success('Assign successful!');
@@ -449,7 +496,7 @@ $(document).ready(function () {
         }
         $('#assigncase').modal('hide');
         $('#transfercase').modal('hide');
-       
+
 
         $.ajax({
             method: "POST",
@@ -475,7 +522,7 @@ $(document).ready(function () {
         var selectregion = $(this).val();
         $.ajax({
             method: 'GET',
-            url: '/Admin/GetPhysician',     
+            url: '/Admin/GetPhysician',
             data: { region: selectregion },
             success: function (physicians) {
                 $('.physicianDropdown').empty();
@@ -486,7 +533,7 @@ $(document).ready(function () {
                 }))
                 $.each(physicians, function (index, physician) {
                     console.log(physician)
-                   
+
                     $('.physicianDropdown').append($('<option>', {
                         value: physician.physicianid,
                         text: physician.firstname + ' ' + physician.lastname
@@ -507,24 +554,9 @@ $(document).ready(function () {
                 }
             }
         });
-        })
-    
-    document.getElementById("fileInput").onchange = function () {
-        let filePath = this.value;
-        let allowedExtensions = [".jpg", ".pdf"];
+    })
 
-        let extension = filePath.substring(filePath.lastIndexOf('.'));
-        extension = extension.toLowerCase();
 
-        if (!allowedExtensions.includes(extension)) {
-            toastr.error("Please Select The Pdf Or Jpg")
-            this.value = ""; // Clear file selection if invalid
-            return false; // Prevent further processing
-        }
-
-        let path = filePath.substr(filePath.lastIndexOf('\\') + 1);
-        document.getElementById("fileName").innerText = path;
-    };
 
     $('.deletbtn').click(function () {
         var fileUrl = $(this).data("filename");
@@ -537,7 +569,7 @@ $(document).ready(function () {
             data: { filename: fileUrl },
             success: function (result) {
                 window.location.href = "/Admin/ViewUploads/" + result.id;
-                
+
 
             },
             error: function (error) {
@@ -560,7 +592,7 @@ $(document).ready(function () {
             success: function (vendorname) {
                 $('#business').empty();
                 $('#business').append($('<option>', {
-                    value:'selected hidden disable',
+                    value: 'selected hidden disable',
                     text: "select Business"
                 }));
                 $.each(vendorname, function (index, vendor) {
@@ -574,53 +606,53 @@ $(document).ready(function () {
         })
     })
 
-    
-        $("#ViewcaseReturnpage").validate({
+
+    $("#ViewcaseReturnpage").validate({
         rules: {
-                
-                Email: {
-                    required: true,
-                    email: true
-                },
-                Contact: {
-                    required:true
-                },
-                FaxNumber: {
-                    required: true
-                },
-                Prescription: {
-                    required: true,
-                }
-                
+
+            Email: {
+                required: true,
+                email: true
+            },
+            Contact: {
+                required: true
+            },
+            FaxNumber: {
+                required: true
+            },
+            Prescription: {
+                required: true,
+            }
+
         },
-            messages: {
-                Email: {
-                    required: "Please enter your email",
-                    email: "Please enter a valid email address"
-                },
-                Contact: {
-                    required: "Please Enter A Contact"
-                },
-                FaxNumber: {
-                    required: "Please Enter A FaxNumber"
-                },
-                Prescription: {
-                    required: "Please Enter A Prescription"
-                }     
+        messages: {
+            Email: {
+                required: "Please enter your email",
+                email: "Please enter a valid email address"
             },
-            errorPlacement: function (error, element) {
-                var errorSpan = $("span.error-" + element.attr("name"));
-
-                if (errorSpan.length > 0) {
-                    // If the specific span is found, append the error message to it
-                    error.appendTo(errorSpan);
-                } else {
-                    // If not found, use the default placement (after the input field)
-                    error.insertAfter(element);
-                }
+            Contact: {
+                required: "Please Enter A Contact"
             },
+            FaxNumber: {
+                required: "Please Enter A FaxNumber"
+            },
+            Prescription: {
+                required: "Please Enter A Prescription"
+            }
+        },
+        errorPlacement: function (error, element) {
+            var errorSpan = $("span.error-" + element.attr("name"));
 
-       
+            if (errorSpan.length > 0) {
+                // If the specific span is found, append the error message to it
+                error.appendTo(errorSpan);
+            } else {
+                // If not found, use the default placement (after the input field)
+                error.insertAfter(element);
+            }
+        },
+
+
         submitHandler: function (form) {
             // If the form is valid, submit it
             form.submit();
@@ -664,7 +696,7 @@ $(document).ready(function () {
                 required: "Please enter a Zipcode",
             },
             MobileNo: {
-                required:'Please Enter A PhoneNo'
+                required: 'Please Enter A PhoneNo'
             }
         },
         errorPlacement: function (error, element) {
@@ -799,7 +831,7 @@ $(document).ready(function () {
     })
 
 
-    
+
 
     $('#SendAgreementBtn').click(function () {
         var requestid = $('#requestIdInputAgreement').val();
@@ -814,7 +846,7 @@ $(document).ready(function () {
                 console.log(response)
                 if (response) {
                     window.location.href = '/Admin';
-                    
+
                 }
                 else {
                     toastr.error("Agreement Unsuccessful!")
@@ -823,7 +855,7 @@ $(document).ready(function () {
         })
     })
 
-    
+
 })
 
 

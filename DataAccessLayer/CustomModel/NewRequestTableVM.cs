@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DataAccessLayer.DataModels;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -45,7 +46,8 @@ namespace DataAccessLayer.CustomModel
         public string? PhoneOther { get; set; }
 
         public int RequestId { get;set; }
-        public bool? isfinalize { get; set; }  
+        public bool? isfinalize { get; set; }
+        public List<Region>? Regions { get; set; }
 
         public List<CancelCase>? Cancel { get; set; }
     }

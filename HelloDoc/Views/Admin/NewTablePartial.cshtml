@@ -193,7 +193,7 @@
                         </div>
 
                         <div class="collapse position-relative" id="collapseexample_@item.Id">
-                        <a class="btn position-absolute btn-transparent border-2 rounded-5 viewBtn" asp-action="ViewCase" asp-controller="Admin" asp-route-id="@item.Id">View Case</a>
+                        <a class="btn position-absolute  border-2 rounded-5 viewBtn bg-secondary" style="position:relative;top:-25px" asp-action="ViewCase" asp-controller="Admin" asp-route-id="@item.Id">View Case</a>
                             <div class="d-flex flex-column gap-2 bg-info-subtle   mb-2 py-3 px-4 ">
 
                                 <div class="d-flex align-items-center fw-medium">
@@ -285,3 +285,11 @@
         </ul>
     </nav>
 </div>
+<script>
+    $(document).ready(function () {
+        $('.collapse').on('show.bs.collapse', function () {
+            var id = $(this).attr('id');
+            $('.collapse.show').not('#' + id).collapse('hide');
+        });
+    });
+</script>

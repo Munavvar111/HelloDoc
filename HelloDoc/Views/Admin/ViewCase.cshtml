@@ -160,11 +160,15 @@
         </div>
         <div class="row mb-3 mt-3">
             <div class="d-flex gap-3 align-items-center justify-content-end">
-              <button type="button" class="btn btn-info text-light mx-3" data-bs-toggle="modal" data-bs-target="#assigncase" data-bs-requestid="@Model.RequestId" data-bs-status="@Model.status">Assign Case</button>
+                    @if (Model.status == 1)
+                    {
+                        
+                    <button type="button" class="btn btn-info text-light mx-3" data-bs-toggle="modal" data-bs-target="#assigncase" data-bs-requestid="@Model.RequestId" data-bs-status="@Model.status">Assign Case</button>
+                    <button type="button" class="btn btn-danger text-light mx-3" data-bs-toggle="modal" data-bs-target="#cancelcaseview" id="examplemodal" data-bs-requestid="@Model.RequestId" data-bs-patientname="@Model.FirstName">Cancel  Case</button>
+                    }
                 <button class="btn btn-info text-light mx-3" asp-action="ViewNotes" asp-route-requestid="@Model.RequestId" id="submit">
                     View Notes
                 </button>
-                    <button type="button" class="btn btn-danger text-light mx-3" data-bs-toggle="modal" data-bs-target="#cancelcaseview" id="examplemodal" data-bs-requestid="@Model.RequestId" data-bs-patientname="@Model.FirstName">Cancel  Case</button>
                    
             </div>
         </div>
