@@ -1,12 +1,12 @@
 ﻿@model List<DataAccessLayer.CustomModel.NewRequestTableVM>
 
 @{
-	Layout = "~/Views/Shared/_Layout4.cshtml";
+    Layout = "~/Views/Shared/_Layout4.cshtml";
 }
 <partial name="ToasterPartialView"></partial>
-@section scripts {
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-
+@section scripts{
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    
 }
 @* <div class="container-fluid mt-5">
     <div class="row row-cols-3 row-cols-lg-6 g-2 g-lg-3">
@@ -74,7 +74,7 @@
             </div>
 
         </a>
-        <a class="col" id="linkUnpaid">
+        <a class="col" id="linkUnpaid"> 
             <div class="border p-3" style="background-color: #efeef4">
                 <div class="d-flex ">
                     <span class="material-symbols-outlined d-none d-md-block">
@@ -91,126 +91,134 @@
     </div>
 </div> *@
 <div class="container-fluid px-4 text-center py-4">
-	<ul class=" nav gx-5 row  gy-4 mt-0 row row-cols-3 row-cols-lg-6 g-2 g-lg-3">
+    <ul class=" nav gx-5 row  gy-4 mt-0 row row-cols-3 row-cols-lg-6 g-2 g-lg-3">
 
-		<li class="col  text-start  px-2" role="presentation">
-			<a class="btn w-100 text-start border-0 Status-btn" id="statuslink1">
-				<div class="py-2  d-flex fs-5 Status-btn-text ">New</div>
-				<h4 class="fw-bolder ps-1 pb-2 Status-Count" id="newcount"></h4>
-			</a>
-			<div id="triangle1" class="triangle"></div>
-		</li>
-		<li class="col  text-primary text-start px-2" role="presentation">
-			<a class="btn text-decoration-none text-primary w-100 text-start shadow-none border-0 Status-btn" id="statuslink2">
-				<div class="py-2  d-flex fs-5 Status-btn-text">Pending</div>
-				<h4 class="fw-bolder ps-1 pb-2 Status-Coun"></h4>
-			</a>
-			<div id="triangle2" class="triangle" style="display: none;"></div>
-		</li>
-		<li class="col  text-success text-start position-relative px-2" role="presentation">
-			<a class="btn text-decoration-none  text-success w-100 text-start shadow-none border-0 Status-btn" id="statuslink3">
-				<div class="py-2 d-flex fs-5 Status-btn-text">Active</div>
-				<h4 class="fw-bolder ps-1 pb-2 Status-Coun"></h4>
-			</a>
-			<div id="triangle3" class="triangle" style="display: none;"></div>
-		</li>
-		<li class="col  text-danger text-start  px-2" role="presentation">
-			<a class="btn text-decoration-none  text-danger w-100 text-start shadow-none border-0 Status-btn" id="statuslink4">
-				<div class="py-2 d-flex fs-5 Status-btn-text">Conclude</div>
-				<h4 class="fw-bolder ps-1 pb-2 Status-Coun"></h4>
-			</a>
-			<div id="triangle4" class="triangle " style="display: none;"> </div>
-		</li>
-		<li class="col  text-start px-2" role="presentation">
-			<a class="btn text-decoration-none  text-primary w-100 text-start shadow-none border-0 Status-btn" id="statuslink5">
-				<div class="py-2 d-flex fs-5 Status-btn-text">To Close</div>
-				<h4 class="fw-bolder ps-1 pb-2 Status-Coun"></h4>
-			</a>
-			<div id="triangle5" class="triangle" style="display: none;"></div>
-		</li>
-		<li class="col text-start px-2" role="presentation">
-			<a class="btn text-decoration-none  text-danger w-100 text-start shadow-none border-0 Status-btn" id="statuslink6">
-				<div class="py-2 d-flex fs-5 Status-btn-text">Unpaid</div>
-				<h4 class="fw-bolder ps-1 pb-2 Status-Count"></h4>
-			</a>
-			<div id="triangle6" class="triangle" style="display: none;"></div>
-		</li>
+        <li class="col  text-start  px-2" role="presentation">
+            <a class="btn w-100 text-start border-0 Status-btn" id="statuslink1" >
+                <div class="py-2  d-flex fs-5 Status-btn-text ">New</div>
+                <h4 class="fw-bolder ps-1 pb-2 Status-Count" id="newcount"></h4>
+            </a>
+            <div id="triangle1" class="triangle"></div>
+        </li>
+        <li class="col  text-primary text-start px-2" role="presentation">
+            <a class="btn text-decoration-none text-primary w-100 text-start shadow-none border-0 Status-btn" id="statuslink2" >
+                <div class="py-2  d-flex fs-5 Status-btn-text">Pending</div>
+                <h4 class="fw-bolder ps-1 pb-2 Status-Coun"></h4>
+            </a>
+            <div id="triangle2" class="triangle" style="display: none;"></div>
+        </li>
+        <li class="col  text-success text-start position-relative px-2" role="presentation">
+            <a class="btn text-decoration-none  text-success w-100 text-start shadow-none border-0 Status-btn" id="statuslink3" >
+                <div class="py-2 d-flex fs-5 Status-btn-text">Active</div>
+                <h4 class="fw-bolder ps-1 pb-2 Status-Coun"></h4>
+            </a>
+            <div id="triangle3" class="triangle" style="display: none;"></div>
+        </li>
+        <li class="col  text-danger text-start  px-2" role="presentation">
+            <a class="btn text-decoration-none  text-danger w-100 text-start shadow-none border-0 Status-btn" id="statuslink4" >
+                <div class="py-2 d-flex fs-5 Status-btn-text">Conclude</div>
+                <h4 class="fw-bolder ps-1 pb-2 Status-Coun"></h4>
+            </a>
+            <div id="triangle4" class="triangle " style="display: none;"> </div>
+        </li>
+        <li class="col  text-start px-2" role="presentation">
+            <a class="btn text-decoration-none  text-primary w-100 text-start shadow-none border-0 Status-btn" id="statuslink5">
+                <div class="py-2 d-flex fs-5 Status-btn-text">To Close</div>
+                <h4 class="fw-bolder ps-1 pb-2 Status-Coun"></h4>
+            </a>
+            <div id="triangle5" class="triangle" style="display: none;"></div>
+        </li>
+        <li class="col text-start px-2" role="presentation">
+            <a class="btn text-decoration-none  text-danger w-100 text-start shadow-none border-0 Status-btn" id="statuslink6">
+                <div class="py-2 d-flex fs-5 Status-btn-text">Unpaid</div>
+                <h4 class="fw-bolder ps-1 pb-2 Status-Count"></h4>
+            </a>
+            <div id="triangle6" class="triangle" style="display: none;"></div>
+        </li>
 
-	</ul>
+    </ul>
 </div>
 <div class="mt-3 mt-md-5 d-flex-column d-sm-flex justify-content-between align-items-center">
-	<div class="">
-		<p class="patient_text_size fw-bolder mx-3 fs-3">Patients<span class="text-primary" id="statuschange"></span></p>
-	</div>
-	<div class="">
-		<a class="btn btn-info text-white" data-bs-toggle="modal" data-bs-target="#SendLink">
-			<i class="bi bi-send  me-md-2"></i><span class="d-none d-lg-inline">Send Link</span>
-		</a>
-		<a class="btn btn-info  text-white">
-			<i class="bi bi-pencil-square me-md-2"></i><span class="d-none d-lg-inline">
-				Create
-				Requests
-			</span>
-		</a>
-		<a class="btn btn-info  text-white" id="exportdata">
-			<i class="bi bi-arrow-up-right "></i>
-			<span class="d-none d-lg-inline ">Export</span>
-		</a>
-		<a class="btn btn-info text-white" type="text/asp" id="exportAllData" asp-action="ExportAll">
-			<i class="bi bi-box-arrow-up-right "></i><span class="d-none d-lg-inline">
-				Export
-				All
-			</span>
-		</a>
-	</div>
+    <div class="">
+        <p class="patient_text_size fw-bolder mx-3 fs-3">Patients<span class="text-primary" id="statuschange"></span></p>
+    </div>
+    <div class="">
+        <a class="btn btn-info text-white" data-bs-toggle="modal" data-bs-target="#SendLink">
+            <i class="bi bi-send  me-md-2"></i><span class="d-none d-lg-inline">Send Link</span>
+        </a>
+        <a class="btn btn-info  text-white">
+            <i class="bi bi-pencil-square me-md-2"></i><span class="d-none d-lg-inline">
+                Create
+                Requests
+            </span>
+        </a>
+        <a class="btn btn-info  text-white" id="exportdata">
+            <i class="bi bi-arrow-up-right "></i>
+            <span class="d-none d-lg-inline ">Export</span>
+        </a>
+        <a class="btn btn-info text-white" type="text/asp" id="exportAllData" asp-action="ExportAll">
+            <i class="bi bi-box-arrow-up-right "></i><span class="d-none d-lg-inline">
+                Export
+                All
+            </span>
+        </a>
+    </div>
 </div>
 
+ 
+<div class=" row mt-4 mb-4 container-fluid ">
+    <div class="col-xl-3 col-md-6 col-12 mb-2">
+        <div class="form-floating">
+            <i class="bi bi-search text-muted position-absolute" style="padding-top:10px; padding-left:10px;"></i>
 
-<div class="row mt-4 mb-4 container-fluid">
-	<div class="col-xl-3 col-md-6 col-12 mb-2">
-		<div class="input-group input-group-height">
-			<i class="bi bi-search text-muted position-absolute" style="padding-top: 10px; padding-left: 10px;"></i>
-			<input class="form-control" type="search" placeholder="Search Patients"
-				   aria-label="Search" id="searchInput">
-		</div>
-	</div>
+            <input class="form-control " type="search" placeholder="Search Patients"
+                   aria-label="Search" id="searchInput">
 
-	<div class="col-xl-3 col-md-6 col-12 mb-2">
-		<div class="input-group input-group-height">
-			<select class="form-select" aria-label="Default select example" id="filterSelect">
-				<option selected value=" ">All Regions</option>
-				@foreach (var region in Model[0].Regions)
-				{
-					<option value="@region.Regionid">@region.Name</option>
-				}
-			</select>
-		</div>
-	</div>
+            </div>
+    </div>
 
-	<div class="col-xl-6 col-md-12 d-xl-flex justify-content-xl-end  mb-2">
-		<div class="d-flex flex-wrap">
-			<div class="col-auto mb-2 d-none d-lg-block filter-item mx-4" data-value="">
-				<button type="button" class="btn border-dark-subtle">All</button>
-			</div>
-			<div class="col-auto mb-2 filter-item mx-4 d-flex" data-value="1">
-				<i class="bi bi-circle-fill " style="color: #3ecc4e;"></i><span class="d-none d-sm-block">Patient</span>
-			</div>
-			<div class="col-auto mb-2 filter-item mx-4 d-flex" data-value="2">
-				<i class="bi bi-circle-fill" style="color: #FFD43B;"></i><span class="d-none d-sm-block">Family</span>
+    <div class="col-xl-3  col-md-6 col-12 mb-2">
+        <div class="form-floating">
+                <select class="form-select" aria-label="Default select example" id="filterSelect">
+                    <option selected value=" ">All Regions</option>
+                    @foreach (var region in Model[0].Regions)
+                    {
+                        <option value="@region.Regionid">@region.Name</option>
+                    }
+                </select>
 
-			</div>
-			<div class="col-auto mb-2 filter-item mx-4 d-flex" data-value="3">
-				<i class="bi bi-circle-fill" style="color: #d049b7;"></i><span class="d-none d-sm-block">Business</span>
-			</div>
-			<div class="col-auto mb-2 filter-item mx-4 d-flex" data-value="4">
-				<i class="bi bi-circle-fill" style="color: #3c5bd7;"></i><span class="d-none d-sm-block">Concierge</span>
-			</div>
-		</div>
-	</div>
+
+        </div>
+    </div>
+
+
+    <div class="col-xl-1 col-md-2 col-6 mb-2 filter-item" data-value="">
+        <button type="button" class="btn border-dark-subtle "> All</button>
+    </div>
+    <div class="col-xl-1 col-md-2 col-6 d-flex align-items-center  filter-item" data-value="1">
+        <div class="rounded-5 bg-success border-5 " style="width:12px; height:12px;"></div> Patient
+    </div>
+    <div class="col-xl-1 col-md-2 col-6 d-flex align-items-center filter-item" data-value="2">
+        <div class="rounded-5 bg-warning border-5 " style="width:12px; height:12px;"></div>
+        family/friend
+    </div>
+
+    <div class="col-xl-1 col-md-2 col-6 d-flex align-items-center  filter-item" data-value="3">
+        <div class="rounded-5 bg-danger border-5 " style="width:12px; height:12px;"></div>
+        Business
+    </div>
+    <div class="col-xl-1 col-md-2 col-6 d-flex align-items-center  filter-item" data-value="4">
+        <div class="rounded-5  bg-info border-5 " style="width:12px; height:12px;"></div>
+        Conciege
+    </div>
+
+
 </div>
 
 <div id="loader" class="loader"></div>
 <div id="partialContainer">
+
+    
 </div>
 <div>
 </div>
@@ -225,195 +233,195 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
 <script>
-	$(document).ready(function () {
-		$('#assigncase').on('show.bs.modal', function (event) {
-			var button = $(event.relatedTarget);
-			console.log(button)
-			var recipient = button.data('bs-requestid');
-			console.log(recipient);
-			var status = button.data('bs-status');
+    $(document).ready(function () {
+        $('#assigncase').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget);
+            console.log(button)
+            var recipient = button.data('bs-requestid');
+            console.log(recipient);
+            var status=button.data('bs-status');
+            
+            var modal = $(this);
+            modal.find('#requestIdInputCancel1').val(recipient);
+            modal.find('#regionid').val('');
+            modal.find('#description').val('');
+            modal.find('#physicianDropdown').val("");
+             var validator = $("#assigncase").validate(); // Assuming your form has ID "cancelCaseForm"
+            validator.resetForm();
+        });
+        $('#assigncase').on('hidden.bs.modal', function () {
+            console.log("hidden")
+            $('#assigncaseform').each(function () {
+                this.reset();
+            })
+            
+        });
 
-			var modal = $(this);
-			modal.find('#requestIdInputCancel1').val(recipient);
-			modal.find('#regionid').val('');
-			modal.find('#description').val('');
-			modal.find('#physicianDropdown').val("");
-			var validator = $("#assigncase").validate(); // Assuming your form has ID "cancelCaseForm"
-			validator.resetForm();
-		});
-		$('#assigncase').on('hidden.bs.modal', function () {
-			console.log("hidden")
-			$('#assigncaseform').each(function () {
-				this.reset();
-			})
 
-		});
-
-
-	});
+    });
 
 
 </script>
 <script>
-	$(document).ready(function () {
+    $(document).ready(function () {
 
-		$('#ClearModal').on('show.bs.modal', function (event) {
-			var button = $(event.relatedTarget);
-			console.log(button)
-			var recipient = button.data('bs-requestid');
-			console.log(recipient);
-			var status = button.data('bs-status');
+        $('#ClearModal').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget);
+            console.log(button)
+            var recipient = button.data('bs-requestid');
+            console.log(recipient);
+            var status=button.data('bs-status');
+            
+            var modal = $(this);
+            modal.find('#ClearCaseModal').val(recipient);
+            var validator = $("#ClearModal").validate(); // Assuming your form has ID "cancelCaseForm"
+            validator.resetForm();
+        });
+        
 
-			var modal = $(this);
-			modal.find('#ClearCaseModal').val(recipient);
-			var validator = $("#ClearModal").validate(); // Assuming your form has ID "cancelCaseForm"
-			validator.resetForm();
-		});
-
-
-	});
+    });
 
 
 </script>
 
 <script>
-	$(document).ready(function () {
+    $(document).ready(function () {
 
-		$('#transfercase').on('show.bs.modal', function (event) {
+        $('#transfercase').on('show.bs.modal', function (event) {
 
-			var button = $(event.relatedTarget);
-			console.log(button)
-			var recipient = button.data('bs-requestid');
-			console.log(recipient);
-			var modal = $(this);
-			modal.find('#requestIdInputTransfer').val(recipient);
-			var validator = $("#transfercase").validate(); // Assuming your form has ID "cancelCaseForm"
-			validator.resetForm();
-		});
-		$('#transfercase').on('hidden.bs.modal', function () {
-			console.log("hidden")
-			$('#transformcase').each(function () {
-				this.reset();
-			})
+            var button = $(event.relatedTarget);
+            console.log(button)
+            var recipient = button.data('bs-requestid');
+            console.log(recipient);
+            var modal = $(this);
+            modal.find('#requestIdInputTransfer').val(recipient);
+            var validator = $("#transfercase").validate(); // Assuming your form has ID "cancelCaseForm"
+            validator.resetForm();
+        });
+        $('#transfercase').on('hidden.bs.modal', function () {
+            console.log("hidden")
+            $('#transformcase').each(function () {
+                this.reset();
+            })
 
-		});
-	});
+        });
+    });
 
 
 </script>
 
 
 <script>
-	$(document).ready(function () {
+    $(document).ready(function () {
 
-		$('#exampleModal').on('show.bs.modal', function (event) {
-			var button = $(event.relatedTarget);
-			console.log(button)
-			var recipient = button.data('bs-requestid');
-			var patientName = button.data('bs-patientname')
-			console.log(recipient)
-			var modal = $(this);
-			modal.find('#patientname').text(patientName)
-			modal.find('#requestIdInputCancel').val(recipient);
-			var validator = $("#exampleModal").validate(); // Assuming your form has ID "cancelCaseForm"
-			validator.resetForm();
+        $('#exampleModal').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget);
+            console.log(button)
+            var recipient = button.data('bs-requestid');
+            var patientName = button.data('bs-patientname')
+            console.log(recipient)
+            var modal = $(this);
+            modal.find('#patientname').text(patientName)
+            modal.find('#requestIdInputCancel').val(recipient);
+            var validator = $("#exampleModal").validate(); // Assuming your form has ID "cancelCaseForm"
+            validator.resetForm();
 
-		});
-		$('#exampleModal').on('hidden.bs.modal', function () {
-			console.log("hidden")
-			$('#cancelCaseForm').each(function () {
-				this.reset();
-			})
+        });
+        $('#exampleModal').on('hidden.bs.modal', function () {
+            console.log("hidden")
+            $('#cancelCaseForm').each(function () {
+                this.reset();
+            })
 
 
-		});
+        });
 
-	});
-
+    });
+    
 </script>
 <script>
 
-	$(document).ready(function () {
-	})
+    $(document).ready(function () {
+    })
 </script>
 
 <script>
-	$(document).ready(function () {
-		$('#BlockModal').on('show.bs.modal', function (event) {
-			console.log("block")
-			var button = $(event.relatedTarget);
-			console.log(button)
-			var recipient = button.data('bs-requestid');
-			var patientName = button.data('bs-patientname')
-			console.log(recipient)
-			var modal = $(this);
-			modal.find('#patientname').text(patientName)
+    $(document).ready(function () {
+        $('#BlockModal').on('show.bs.modal', function (event) {
+            console.log("block")
+            var button = $(event.relatedTarget);
+            console.log(button)
+            var recipient = button.data('bs-requestid');
+            var patientName = button.data('bs-patientname')
+            console.log(recipient)
+            var modal = $(this);
+            modal.find('#patientname').text(patientName)
 
-			modal.find('#requestIdInputBlock').val(recipient);
-			var validator = $("#BlockModal").validate(); // Assuming your form has ID "cancelCaseForm"
-			validator.resetForm();
+            modal.find('#requestIdInputBlock').val(recipient);
+            var validator = $("#BlockModal").validate(); // Assuming your form has ID "cancelCaseForm"
+            validator.resetForm();
 
-		});
+        });
 
-		$('#BlockModal').on('hidden.bs.modal', function () {
+        $('#BlockModal').on('hidden.bs.modal', function () {
+            
+            $('#blockCaseForm').each(function () {
+                this.reset();
+            })
 
-			$('#blockCaseForm').each(function () {
-				this.reset();
-			})
+        });
 
-		});
-
-	});
+    });
 
 </script>
 
 <script>
-	$(document).ready(function () {
-		$('#sendagrrement').on('show.bs.modal', function (event) {
-			console.log("block")
-			var button = $(event.relatedTarget);
-			console.log(button)
-			var recipient = button.data('bs-requestid');
-			var email = button.data('bs-email');
-			var phoneno = button.data('bs-phoneno');
-			var requesttyoeid = button.data('bs-requesttypeid');
-			var modal = $(this);
-			modal.find('#patientagree').html('fkdlsjfl')
-			modal.find('#agreementemail').val(email)
-			modal.find('#agreementphoneno').val(phoneno)
-			modal.find('#requestIdInputAgreement').val(recipient);
-		});
-		$('#sendagrrement').on('hidden.bs.modal', function () {
-
-			$('#blockCaseForm').each(function () {
-				this.reset();
-			})
-		});
-	});
+    $(document).ready(function () {
+        $('#sendagrrement').on('show.bs.modal', function (event) {
+            console.log("block")
+            var button = $(event.relatedTarget);
+            console.log(button)
+            var recipient = button.data('bs-requestid');
+            var email = button.data('bs-email');
+            var phoneno = button.data('bs-phoneno');
+            var requesttyoeid = button.data('bs-requesttypeid');
+            var modal = $(this);
+            modal.find('#patientagree').html('fkdlsjfl')
+            modal.find('#agreementemail').val(email)
+            modal.find('#agreementphoneno').val(phoneno)
+            modal.find('#requestIdInputAgreement').val(recipient);
+        });
+        $('#sendagrrement').on('hidden.bs.modal', function () {
+            
+            $('#blockCaseForm').each(function () {
+                this.reset();
+            })
+        });
+    });
 </script>
 <script>
-	$(document).ready(function () {
-		$('#finalizedModal').on('show.bs.modal', function (event) {
-			const button = $(event.relatedTarget); // Button that triggered the modal
-			const requestId = button.data('requestid');
-			var modal = $(this);
-			modal.find('#requestiddownload').val(requestId)
+    $(document).ready(function () {
+        $('#finalizedModal').on('show.bs.modal', function (event) {
+            const button = $(event.relatedTarget); // Button that triggered the modal
+            const requestId = button.data('requestid');
+            var modal = $(this);
+            modal.find('#requestiddownload').val(requestId)
 
-		});
-	});
+        });
+    });
 </script>
 <script>
-	$(document).ready(function () {
+    $(document).ready(function () {
 
-		$("#exportAllData").click(function () {
-			var currentStatus = JSON.parse(localStorage.getItem("currentStatus"));
-			var currentStatusString = ""
-			currentStatusString = currentStatus.join(","); // Convert array to comma-separated string
-			console.log(currentStatusString)
-			// Update the link's href with query string parameters
-			var baseUrl = $(this).attr("href").split("?")[0];
+        $("#exportAllData").click(function () {
+            var currentStatus = JSON.parse(localStorage.getItem("currentStatus"));
+            var currentStatusString=""
+             currentStatusString = currentStatus.join(","); // Convert array to comma-separated string
+            console.log(currentStatusString)
+            // Update the link's href with query string parameters
+            var baseUrl = $(this).attr("href").split("?")[0];
 
-			$(this).attr("href", baseUrl + "?currentStatus=" + currentStatusString);
-		});
-	});
+            $(this).attr("href", baseUrl + "?currentStatus=" + currentStatusString);
+        });
+    });
 </script>
