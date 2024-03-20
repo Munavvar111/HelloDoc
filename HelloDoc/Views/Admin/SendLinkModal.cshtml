@@ -8,47 +8,47 @@
                 </button>
             </div>
             <div class="modal-body text-start">
-           <form asp-action="" id="assigncaseform">
+           <form asp-action="SendLink" id="SendLinkModel">
                     <div class="form-floating mt-3">
                     <input type="text"
                            class="form-control"
-                           id="floatingInput"
+                           name="FirstNameSendOrder"
                            placeholder="name@example.com"
                            />
                     <label for="floatingInput" >First Name</label>
-                    <span  class="text-danger"></span>
+                        <span class="text-danger error-FirstNameSendOrder"></span>
                 </div>
                     <div class="form-floating mt-3">
                     <input type="text"
                            class="form-control"
-                           id="floatingInput"
+                           name="LastNameSendOrder"
                            placeholder="name@example.com"
                            />
                     <label for="floatingInput" >Last Name</label>
-                    <span  class="text-danger"></span>
+                        <span class="text-danger error-LastNameSendOrder"></span>
                 </div>
                     <div class="form-floating mt-3">
                     <input type="email"
                            class="form-control"
-                           id="floatingInput"
                            placeholder="name@example.com"
+                           name="Email"
                            />
                     <label for="floatingInput" >Email</label>
-                    <span  class="text-danger"></span>
+                    <span  class="text-danger error-Email"></span>
                 </div>
                     <div class="col mt-3">
                       <div class="border rounded-2 tel-container">
                 <input id="phone1"
                        type="tel"
                        class="form-control border-0 tel-input"
-                       
+                       name="PhoenNo"
                         />
 
             </div>
-                <span  class="text-danger"></span>
+                <span  class="text-danger-PhoneNo"></span>
         </div>
                     <div class="modal-footer">
-                        <button type="submit" class="btn btn-info confirmBtn asigncasebutton" id="asigncasebutton" data-id="">Submit</button>
+                        <button type="submit" class="btn btn-info confirmBtn asigncasebutton" id="" data-id="">Submit</button>
                         <button type="button" class="btn btn-info" data-bs-dismiss="modal">Cancel</button>
                     </div>
                 </form>

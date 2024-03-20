@@ -8,6 +8,15 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     
 }
+<style>
+    .btn span.d-none {
+        display: none;
+    }
+
+    .btn:hover span.d-none {
+        display: inline !important;
+    }
+</style>
 @* <div class="container-fluid mt-5">
     <div class="row row-cols-3 row-cols-lg-6 g-2 g-lg-3">
         <div class="col" >
@@ -146,7 +155,7 @@
         <a class="btn btn-info text-white" data-bs-toggle="modal" data-bs-target="#SendLink">
             <i class="bi bi-send  me-md-2"></i><span class="d-none d-lg-inline">Send Link</span>
         </a>
-        <a class="btn btn-info  text-white">
+        <a class="btn btn-info  text-white" asp-action="CreateRequest" asp-controller="admin">
             <i class="bi bi-pencil-square me-md-2"></i><span class="d-none d-lg-inline">
                 Create
                 Requests
@@ -191,18 +200,18 @@
             <div class="col-auto mb-2 d-none d-lg-block filter-item mx-4" data-value="">
                 <button type="button" class="btn border-dark-subtle">All</button>
             </div>
-            <div class="col-auto mb-2 filter-item mx-4 d-flex" data-value="1">
-                <i class="bi bi-circle-fill " style="color: #3ecc4e;"></i><span class="d-none d-sm-block">Patient</span>
+            <div class="col-auto mb-2 filter-item mx-md-4 d-flex d-flex flex-md-row flex-column" data-value="1">
+                <i class="bi bi-circle-fill " style="color: #3ecc4e;"></i><span class="">Patient</span>
             </div>
-            <div class="col-auto mb-2 filter-item mx-4 d-flex" data-value="2">
-                <i class="bi bi-circle-fill" style="color: #FFD43B;"></i><span class="d-none d-sm-block">Family</span>
+            <div class="col-auto mb-2 filter-item mx-md-4 d-flex d-flex flex-md-row flex-column" data-value="2">
+                <i class="bi bi-circle-fill" style="color: #FFD43B;"></i><span class="">Family</span>
 
             </div>
-            <div class="col-auto mb-2 filter-item mx-4 d-flex" data-value="3">
-                <i class="bi bi-circle-fill" style="color: #d049b7;"></i><span class="d-none d-sm-block">Business</span>
+            <div class="col-auto mb-2 filter-item mx-md-4 d-flex d-flex flex-md-row flex-column" data-value="3">
+                <i class="bi bi-circle-fill" style="color: #d049b7;"></i><span class="">Business</span>
             </div>
-            <div class="col-auto mb-2 filter-item mx-4 d-flex" data-value="4">
-                <i class="bi bi-circle-fill" style="color: #3c5bd7;"></i><span class="d-none d-sm-block">Concierge</span>
+            <div class="col-auto mb-2 filter-item mx-md-4 d-flex flex-md-row flex-column" data-value="4">
+                <i class="bi bi-circle-fill" style="color: #3c5bd7;"></i><span class="">Concierge</span>
             </div>
         </div>
     </div>

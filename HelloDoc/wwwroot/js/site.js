@@ -10,7 +10,7 @@
 }
 $(document).ready(function () {
 
-    
+
     function updateUIWithCounts() {
         $.ajax({
             type: "GET",
@@ -46,6 +46,14 @@ $(document).ready(function () {
     var currentPage = localStorage.getItem("currentPage");
     var exportdata = false;
     var exportAllData = false;
+    $(document).on("click", "#pagination a.page-link", function () {
+        console.log("Pagination link clicked!");
+        var id = $(this).attr("id");
+        currentPage = $("#" + id).data("page");
+        localStorage.setItem("currentPage", currentPage);
+        console.log("Current Page: " + currentPage);
+        filterTable(currentPartial, currentStatus, currentPage, pageSize, exportdata, exportAllData);
+    });
 
     if (currentPage) {
         currentPage = currentPage
@@ -70,13 +78,6 @@ $(document).ready(function () {
     updateUIWithCounts();
 
 
-    $(document).on("click", "#pagination a.page-link", function () {
-        console.log("Pagination link clicked!");
-        currentPage = $(this).text().trim();
-        localStorage.setItem("currentPage", currentPage);
-        console.log("Current Page: " + currentPage);
-        filterTable(currentPartial, currentStatus, currentPage, pageSize, exportdata, exportAllData);
-    });
 
 
     $("#statuslink1").click(function (e) {
@@ -217,7 +218,7 @@ $(document).ready(function () {
         exportdata = false;
         exportAllData = false;
         console.log("inputchange");
-        
+
         filterTable(currentPartial, currentStatus, currentPage, pageSize, exportdata, exportAllData);
     });
 
@@ -246,9 +247,9 @@ $(document).ready(function () {
         filterTable(currentPartial, currentStatus, currentPage, pageSize, exportdata, exportAllData)
         currentPage = 1;
     });
-    
+
     //ajax for render that partialview
-  
+
     //ajax for filterthe table using search
     function filterTable(partialName, currentStatus, page, pageSize, exportdata, exportAllData) {
 
@@ -277,7 +278,7 @@ $(document).ready(function () {
             url: "/Admin/SearchPatient",
             traditional: true,
 
-            
+
             data: { searchValue: searchValue, selectValue: selectValue, partialName: partialName, selectedFilter: selectedFilter, currentStatus: currentStatus, page: page, pageSize: pageSize, exportdata: exportdata, exportAllData: exportAllData },
             success: function (data) {
                 if (exportdata == true) {
@@ -300,12 +301,12 @@ $(document).ready(function () {
                 }
                 else {
 
-                if (data != null && data.length > 0 && !exportdata) {
-                    $('#partialContainer').html(data);
-                } else {
-                    $('#partialContainer').html('<p>No data is Found</p>');
+                    if (data != null && data.length > 0 && !exportdata) {
+                        $('#partialContainer').html(data);
+                    } else {
+                        $('#partialContainer').html('<p>No data is Found</p>');
 
-                }
+                    }
                 }
 
             },
@@ -323,7 +324,43 @@ $(document).ready(function () {
         });
 
     }
-  
+    $('#SendLinkModel').validate({
+        rules: {
+            FirstNameSendOrder: {
+                required: true
+            },
+            LastNameSendOrder: {
+                required: true
+            },
+            PhoneNo: {
+                required: true
+            },
+            Email: {
+                required: true
+            },
+        },
+        messages: {
+            FirstNameSendOrder: "Please Enter FirstName",
+            LastNameSendOrder: "Please Enter Last",
+            Email: "Please Enter Email",
+            PhoneNo: "Please Enter Email",
+        },
+        errorPlacement: function (error, element) {
+            var errorSpan = $("span.error-" + element.attr("name"));
+
+            if (errorSpan.length > 0) {
+                // If the specific span is found, append the error message to it
+                error.appendTo(errorSpan);
+            } else {
+                // If not found, use the default placement (after the input field)
+                error.appendTo(errorSpan);
+            }
+        },
+        submitHandler: function (form) {
+            form.submit();
+        }
+
+    });
     $("#blockCaseForm").validate({
         rules: {
             blockreason: {
@@ -474,49 +511,64 @@ $(document).ready(function () {
             })
         }
     });
-    $('#transfercasebutton').click(function (e) {
-        e.preventDefault();
-        var requestid = $('#requestIdInputTransfer').val();
-        var regionid = $('#regionidtransfer').val();
-        var physician = $('#physicianDropdownTransfer').val();
-        var description = $('#descriptiontransfer').val();
-        if (!regionid) {
-            toastr.error('Please Enter The Region');
 
-            return;
-        }
-        if (!physician) {
-            toastr.error('Please Enter The Physician');
-            return;
-        }
-
-        if (!description) {
-            toastr.error('Please Enter The Notes');
-            return;
-        }
-        $('#assigncase').modal('hide');
-        $('#transfercase').modal('hide');
-
-
-        $.ajax({
-            method: "POST",
-            url: "Admin/TransferRequest",
-            data: { requestid: requestid, regionid: regionid, physician: physician, description: description },
-            success: function (data) {
-                console.log(data)
-                if (data) {
-                    var storedPartial = localStorage.getItem('currentPartial');
-                    var storedStatus = JSON.parse(localStorage.getItem('currentStatus'));
-                    filterTable(storedPartial, storedStatus, 1, 5);
-                    updateUIWithCounts();
-                    console.log("toaster", toastr.success)
-                    toastr.success('Transfer successful!');
-
-                }
+    $("#transformcase").validate({
+        rules: {
+            notes: {
+                required: true
+            },
+            region: {
+                required: true
+            },
+            physician: {
+                required: true
             }
-        })
+        },
+        messages: {
+            notes: "Please enter your Notes.",
+            region: "Please enter your region.",
+            physician: "Please enter your physician.",
 
-    })
+        },
+        errorPlacement: function (error, element) {
+            var errorSpan = $("span.error-" + element.attr("name"));
+
+            if (errorSpan.length > 0) {
+                // If the specific span is found, append the error message to it
+                error.appendTo(errorSpan);
+            } else {
+                // If not found, use the default placement (after the input field)
+                error.insertAfter(element);
+            }
+        },
+        submitHandler: function (form) {
+            e.preventDefault();
+            var requestid = $('#requestIdInputTransfer').val();
+            var regionid = $('#regionidtransfer').val();
+            var physician = $('#physicianDropdownTransfer').val();
+            var description = $('#descriptiontransfer').val();
+            $('#transfercase').modal('hide');
+            $.ajax({
+                method: "POST",
+                url: "Admin/TransferRequest",
+                data: { requestid: requestid, regionid: regionid, physician: physician, description: description },
+                success: function (data) {
+                    console.log(data)
+                    if (data) {
+                        var storedPartial = localStorage.getItem('currentPartial');
+                        var storedStatus = JSON.parse(localStorage.getItem('currentStatus'));
+                        filterTable(storedPartial, storedStatus, 1, 5);
+                        updateUIWithCounts();
+                        console.log("toaster", toastr.success)
+                        toastr.success('Transfer successful!');
+
+                    }
+                }
+            })
+
+        }
+    });
+
     $('.regionDropdown').on('change', function () {
         console.log("hii")
         var selectregion = $(this).val();
@@ -759,11 +811,11 @@ $(document).ready(function () {
                 email: true
             },
             confirmmail: {
-                required: true,
+                required: false,
                 equalTo: "#email"
             },
             PhoneNumber: {
-                required: true,
+                required: false,
                 pattern: /^\(?([0-9]{3})\)?[-. ]([0-9]{3})[-. ]([0-9]{4})$/
             },
             adminRegion: {
@@ -802,6 +854,7 @@ $(document).ready(function () {
         },
         submitHandler: function (form) {
             // If the form is valid, submit it
+            console.log(form)
             form.submit();
         }
     });

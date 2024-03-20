@@ -1,0 +1,156 @@
+﻿@model DataAccessLayer.CustomModel.RequestModel
+@{
+    ViewData["Title"] = "CreateRequest";
+    Layout = "~/Views/Shared/_Layout4.cshtml";
+}
+
+<!-- Back button -->
+<div class="container d-flex justify-content-between my-3">
+    <div class="d-flex">
+        <span class="fs-2 text-muted fw-bold">New Request</span>
+    </div>
+    <div class="d-flex justify-content-end">
+        <a asp-controller="Admin" asp-action="Index" asp-area=""
+           class="btn btn-outline-info d-flex align-items-center">
+            <span class="material-symbols-outlined"> chevron_left </span> Back
+        </a>
+    </div>
+</div>
+
+<!-- Form-->
+<div class="container shadow-lg bg-body-tertiary rounded Form_Margin bg-light mb-5">
+    <form id="CreateRequestData" asp-action="CreateRequest" asp-controller="admin">
+        <input type="hidden">
+        <!-- Patient Information -->
+        <h4 class="py-3">Patient </h4>
+        <div class="row">
+            <div class="form-floating   col-12 col-md-6 mb-3">
+                <input class="form-control " type="text" placeholder="First Name" asp-for="Firstname">
+                <label class="text-muted mx-2" for="floatingFirstName">First Name</label>
+                <span asp-validation-for="Firstname" class="text-danger"></span>
+
+            </div>
+            <div class="form-floating  col-12 col-md-6 mb-3">
+                <input class="form-control " type="text" placeholder="Last Name" asp-for="Lastname">
+                <label class="text-muted mx-2" for="floatingLastName">Last Name</label>
+                <span asp-validation-for="Lastname" class="text-danger"></span>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 col-md-6">
+                <div class="border rounded-2 tel-container bg-white">
+                    <input id="phone1"
+                           type="tel"
+                           asp-for="PhoneNo"
+                           class="form-control border-0 tel-input"
+                           />
+
+                </div>
+                    <span asp-validation-for="PhoneNo" class="text-danger"></span>
+            </div>
+            <div class="form-floating col-12 col-md-6 mb-3">
+                <input class="form-control input-disable" type="email" placeholder="Eamil" id="floatingEmail" asp-for="Email">
+                <label class="text-muted mx-2" for="floatingEmail">Email</label>
+                <span asp-validation-for="Email" class="text-danger"></span>
+
+            </div>
+
+        </div>
+        <div class="row">
+            <div class="form-floating  col-12 col-md-6 mb-3">
+                <input class="form-control" type="date" placeholder="Date Of Birth"
+                       id="floatingDate" asp-for="BirthDate" value="">
+                <label class="text-muted mx-2" for="floatingDate">Date Of Birth(Optional)</label>
+
+            </div>
+        </div>
+
+        <!-- patient location -->
+        <h4 class="my-3"> Location </h4>
+        <div class="row">
+            <div class="form-floating   col-12 col-md-6 mb-3">
+                <input class="form-control   " type="text" placeholder="Street" id="floatingStreet" asp-for="Street">
+                <label class="text-muted mx-2" for="floatingStreet"> Street</label>
+                <span asp-validation-for="Street" class="text-danger"></span>
+
+            </div>
+            <div class="form-floating  col-12 col-md-6 mb-3">
+                <input class="form-control   " type="text" placeholder="City" id=" floatingCity " asp-for="City">
+                <label class=" text-muted mx-2" for="floatingCity">City</label>
+                <span asp-validation-for="City" class="text-danger"></span>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="form-floating   col-12 col-md-6 mb-3">
+                <select class="form-select " aria-label="Default select example" name="state" id="cancelReason" asp-for="State">
+
+                    <option selected disabled>Select The State</option>
+                    @if (Model.Regions != null)
+                    {
+
+                        @foreach (var region in Model.Regions)
+                        {
+                            <option value="@region.Name">@region.Name</option>
+                        }
+                    }
+
+                </select>
+                <span asp-validation-for="State" class="text-danger"></span>
+
+            </div>
+            <div class="form-floating  col-12 col-md-6 mb-3">
+                <input class="form-control " type="text" placeholder="Zip Code" maxlength="6"
+                       id="floatingZipCode" asp-for="Zipcode"/>
+                <label class="text-muted mx-2" for="floatingZipCode">Zip Code(Optional)</label>
+                <span asp-validation-for="Zipcode" class="text-danger"></span>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="form-floating  col-12 col-md-6 mb-3">
+                <input class="form-control  " type="text" placeholder="Room" id="floatingRoom" />
+                <label class="text-muted mx-2" for="floatingRoom"> Room# / Suite(Optional)</label>
+            </div>
+            <div class="col-12 col-md-6 form-floating mb-3 ">
+                <button type="button" class="btn border-info text-info py-3 px-4">Verify</button>
+                @*  <a class="btn border-info p-3 text-info" type="button"
+                href="https://www.google.com/maps/search/?api=1&query={Uri.EscapeDataString(@ @Model.Address @).ToString()}"
+                target="_blank">
+                <i class="bi bi-geo-alt-fill  me-1"></i> Map
+                </a> *@
+            </div>
+        </div>
+
+        <!-- Note -->
+        <h4 class="py-3">Notes</h4>
+        <div class="form-floating col-12 mb-3">
+            <textarea class="form-control" asp-for="Notes" placeholder="Message" id="floatingTextarea2"
+                      style="height: 100px"></textarea>
+            <label for="floatingTextarea2" class="text-muted">Admin Notes (Optional)</label>
+        </div>
+
+        <!-- buttons -->
+        <div class="row py-4">
+            <div class="d-flex justify-content-end gap-3">
+                <button type="submit" class="btn  bg-info text-light ">Save</button>
+                <button type="reset" class="btn  border-info text-info">Cancel </button>
+            </div>
+        </div>
+
+    </form>
+</div>
+
+
+<script>
+    const phone1 = document.querySelector("#phone1");
+    const phoneInput1 = window.intlTelInput(phone1, {
+        utilsScript:
+            "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",
+        nationalMode: false,
+        showSelectedDialCode: true,
+        autoInsertDialCode: true,
+        formatOnDisplay: false,
+    });
+</script>

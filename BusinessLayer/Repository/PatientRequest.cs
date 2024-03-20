@@ -178,12 +178,9 @@ namespace BusinessLayer.Repository
         }
         public void AddRequest(RequestModel requestModel, int UserId, int reqTypeId)
         {
-            
-
                 var request =new DataAccessLayer.DataModels.Request();
             {
-
-            request.Userid = UserId;
+            request.Userid = UserId==0?null:UserId;
             request.Requesttypeid=reqTypeId;
             request.Firstname = requestModel.Firstname;
             request.Lastname = requestModel.Lastname;
@@ -195,7 +192,6 @@ namespace BusinessLayer.Repository
         _context.Requests.Add(request);
             _context.SaveChanges();
         }
-        
 
         public void AddRequestClient(RequestModel requestModel,int RequestID)
         {

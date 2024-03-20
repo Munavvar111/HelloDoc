@@ -17,18 +17,24 @@
                         <option value="2">Two</option>
                         <option value="3">Three</option>
                     </select>
+                    <span class="text-danger error-region remove"></span>
+
                     <select class="form-select mb-4 mt-4 physicianDropdown" name="physician" aria-label="Default select example" id="physicianDropdownTransfer">
                         <option value="" disabled selected>Select Physician</option>
                         <option value="One">One</option>
                         <option value="Two">Two</option>
                         <option value="Three">Three</option>
                     </select>
+                    <span class="text-danger error-physician remove"></span>
+
                     <div class="form-floating mb-4">
                         <textarea class="form-control description" placeholder="Description" name="notes"
                                   style="height: 100px" id="descriptiontransfer"></textarea>
                         <label for="floatingTextarea2" class="floating-label fs-6">
                             Description
                         </label>
+                        <span class="text-danger error-notes remove" id="noteserror"></span>
+
                     </div>
                     <div class="modal-footer">
                         <button type="submit" class="btn btn-info confirmBtn asigncasebutton" id="transfercasebutton" data-id="">Submit</button>

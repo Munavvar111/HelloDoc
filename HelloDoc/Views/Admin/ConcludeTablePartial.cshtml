@@ -219,15 +219,54 @@
         }
     }
 }
-<div>
+<div class="pb-3">
     <nav id="pagination" aria-label="Page navigation">
-        <ul class="pagination">
-            @for (int i = 1; i <= ViewBag.TotalPages; i++)
+        <ul class="pagination justify-content-center mb-0">
+            @if (ViewBag.CurrentPage >= 1 && ViewBag.CurrentPage <= ViewBag.TotalPages)
             {
-                <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
-                    <a class="page-link" data-page="@i">@i</a>
-                </li>
+                int prevpage = Convert.ToInt32(ViewBag.CurrentPage) - 1;
+                int currpage = Convert.ToInt32(ViewBag.CurrentPage);
+                int nextpage = Convert.ToInt32(ViewBag.CurrentPage) + 1;
+                if (ViewBag.CurrentPage > 1)
+                {
+                    <li class="page-item ">
+                        <a class="page-link" id="previous" data-page="@(prevpage)" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                            <span class="visually-hidden">Previous</span>
+                        </a>
+                    </li>
+                }
+                for (int z = 0; z < 3; z++)
+                {
+                    if (currpage + z <= ViewBag.TotalPages)
+                    {
+                        <li class="page-item @(currpage + z == ViewBag.CurrentPage ? "active" : "")">
+                            <a class="page-link" id="current_@z" data-page="@(currpage + z)" aria-label="Current">
+                                <span>@(ViewBag.CurrentPage + z)</span>
+                            </a>
+                        </li>
+                    }
+                }
+                if (ViewBag.CurrentPage < ViewBag.TotalPages)
+                {
+                    <li class="page-item ">
+                        <a class="page-link" id="next" data-page="@(nextpage)" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                            <span class="visually-hidden">Next</span>
+                        </a>
+                    </li>
+                }
+
             }
         </ul>
     </nav>
 </div>
+
+<script>
+    $(document).ready(function () {
+        $('.collapse').on('show.bs.collapse', function () {
+            var id = $(this).attr('id');
+            $('.collapse.show').not('#' + id).collapse('hide');
+        });
+    });
+</script>
