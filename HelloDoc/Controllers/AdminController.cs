@@ -203,6 +203,9 @@ namespace HelloDoc.Controllers
             providerProfile.physicianid=physician.Physicianid;  
                 providerProfile.WorkingRegions = _context.PhysicianRegions.Where(item => item.Physicianid == physician.Physicianid).ToList();
                 providerProfile.State = physician.Regionid;
+            providerProfile.SignatureFilename = physician.Signature;
+
+
             return View(providerProfile);
             
         }
@@ -232,6 +235,40 @@ namespace HelloDoc.Controllers
 
             return RedirectToAction("PhysicanProfile", "Admin", new {id=physicianid });
         }
+
+        [HttpPost]
+        public IActionResult SaveSignatureImage(IFormFile signatureImage, string id)
+        {
+            try
+            {
+                if (signatureImage != null && signatureImage.Length > 0)
+                {
+                    // Save signature image to the uploads folder
+                    string uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
+                    string fileName = "signature_" + id + ".png"; // Adjust filename as needed
+                    string filePath = Path.Combine(uploadsFolder, fileName);
+
+                    using (var fileStream = new FileStream(filePath, FileMode.Create))
+                    {
+                        signatureImage.CopyTo(fileStream);
+                    }
+                    var physician = _context.Physicians.FirstOrDefault(item=>item.Physicianid==int.Parse(id));
+                    physician.Signature = fileName;
+                    _context.Physicians.Update(physician);
+                    _context.SaveChanges(); 
+                    return Ok();
+                }
+                else
+                {
+                    return BadRequest("No signature image received.");
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error saving signature: {ex.Message}");
+            }
+        }
+
         [HttpPost]
         public IActionResult PhysicianInformation(string email, int id, string MobileNo, string[] adminRegion,string SynchronizationEmail,string NPINumber,string MedicalLicense)
         {

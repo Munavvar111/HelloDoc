@@ -82,3 +82,25 @@ li {
 .iti__country-list{
     z-index:3!important;
 }
+#canvasContainer {
+    text-align: center; /* Center the canvas */
+}
+
+#signatureArea {
+    border: 1px solid black;
+    display: inline-block;
+    padding: 10px; /* Adjust padding as needed */
+    margin-bottom: 20px; /* Adjust margin as needed */
+}
+
+#signatureCanvas {
+    width: 100%;
+}
+
+.buttons {
+    text-align: right;
+}
+
+    .buttons button {
+        margin-left: 5px; /* Adjust spacing between buttons */
+    }

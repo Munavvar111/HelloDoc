@@ -40,6 +40,7 @@ namespace DataAccessLayer.CustomModel
         public string? AdminNotes { get; set; }
         public IFormFile? File { get; set; }
         public IFormFile? signature { get; set; }
+        public string SignatureFilename { get; set; }
 
     }
 }

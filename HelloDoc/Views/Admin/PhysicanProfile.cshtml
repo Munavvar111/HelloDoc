@@ -257,15 +257,36 @@
                 <div class="col">
                         <div class="input-group input-group-lg">
                             <div id="fileName" asp-for="FileName" class="form-control fs-6 align-middle">
-                                Select Photo
+                                Select Signature
                             </div>
                             <input type="file" asp-for="File" class="form-control" id="fileInput" hidden />
                             <label class="input-group-text btn btn-info text-light" for="fileInput">
                                 <span class="material-symbols-outlined me-2">cloud_upload</span>
                                 <span class="d-none d-md-inline">Upload</span>
                             </label>
+                            <button class="btn btn-outline-info mx-2" type="button" id="createBtn">Create</button>
+                            
                         </div>
                 </div>
+                    <div class="col">
+                        @if (string.IsNullOrEmpty(Model.SignatureFilename))
+                        {
+                            <div id="canvasContainer" style="display: block;">
+                                <div id="signatureArea">
+                                    <canvas id="signatureCanvas" width="400" height="200"></canvas>
+                                </div>
+                                <div class="buttons">
+                                    <button id="clearBtn" type="button">Clear</button>
+                                    <button id="saveBtn" type="button">Save</button>
+                                </div>
+                            </div>
+                        }
+                        else
+                        {
+                            <img src="~/uploads/@Model.SignatureFilename" alt="Signature" id="signatureImage" style="max-width: 100%; max-height: 200px;" />
+                        }
+                    </div>
+
                 </div>
             </form>
         </div>
@@ -308,4 +329,91 @@
         formatOnDisplay: false,
     });
 </script>
+<script src="https://cdn.jsdelivr.net/npm/formdata-polyfill"></script>
 
+
+            <script>
+    document.getElementById('createBtn').addEventListener('click', function () {
+        document.getElementById('canvasContainer').style.display = 'block';
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+        var canvas = document.getElementById('signatureCanvas');
+        var ctx = canvas.getContext("2d");
+        var isDrawing = false;
+        var lastX = 0;
+        var lastY = 0;
+
+        canvas.addEventListener('mousedown', startDrawing);
+        canvas.addEventListener('mousemove', draw);
+        canvas.addEventListener('mouseup', stopDrawing);
+        canvas.addEventListener('mouseout', stopDrawing);
+
+        document.getElementById('clearBtn').addEventListener('click', clearSignature);
+        document.getElementById('saveBtn').addEventListener('click', saveSignature);
+
+        function startDrawing(e) {
+            isDrawing = true;
+            [lastX, lastY] = [e.offsetX, e.offsetY];
+        }
+
+        function draw(e) {
+            if (!isDrawing) return;
+            ctx.beginPath();
+            ctx.moveTo(lastX, lastY);
+            ctx.lineTo(e.offsetX, e.offsetY);
+            ctx.strokeStyle = '#000'; // color
+            ctx.lineWidth = 2; // thickness
+            ctx.lineCap = 'round';
+            ctx.stroke();
+            [lastX, lastY] = [e.offsetX, e.offsetY];
+        }
+
+        function stopDrawing() {
+            isDrawing = false;
+        }
+
+        function clearSignature() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+
+        function saveSignature() {
+            var canvas = document.getElementById('signatureCanvas');
+            var dataUrl = canvas.toDataURL('image/png');
+
+            // Convert data URL to blob
+            fetch(dataUrl)
+                .then(res => res.blob())
+                .then(blob => {
+                    // Create FormData object to send data to server
+                    var formData = new FormData();
+                    formData.append('signatureImage', blob);
+                    formData.append('id', '@Model.physicianid'); // Make sure @Model.physicianid resolves to the correct value
+
+                    // Send AJAX request to server
+                    $.ajax({
+                        url: '/Admin/SaveSignatureImage',
+                        type: 'POST',
+                        data: formData,
+                        processData: false,
+                        contentType: false,
+                        success: function (response) {
+                            // Handle success response
+                            alert('Signature saved successfully.');
+                            clearSignature(); // Clear signature after saving
+                        },
+                        error: function (xhr, status, error) {
+                            // Handle error response
+                            alert('Error occurred while saving signature.');
+                            console.error(xhr.responseText);
+                        }
+                    });
+                })
+                .catch(error => {
+                    console.error('Error converting data URL to blob:', error);
+                });
+        }
+
+    });
+
+            </script>
