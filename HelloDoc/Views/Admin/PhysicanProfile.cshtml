@@ -315,7 +315,7 @@
 
                 <div class="d-flex align-items-center gap-3 mb-3">
                     <input type="checkbox" class="form-check-input" id="agreeToICA" name="agreeToICA" @(Model.IsAgreement[0] ? "checked" : "")>
-                    <h5>Independent Contractor Agreement</h5>
+                    <span>Independent Contractor Agreement</span>
 
                     <input type="file" class="form-control" id="ICA" hidden />
                     <label class="input-group-text btn btn-info text-light" for="ICA">
@@ -328,7 +328,7 @@
                 </div>
                 <div class="d-flex align-items-center gap-3 mb-3">
                     <input type="checkbox" class="form-check-input" id="agreeToICA" name="agreeToICA" @(Model.IsBackground[0] ? "checked" : "")>
-                    <h5>Background Check</h5>
+                    <span>Background Check</span>
 
                     <input type="file" class="form-control" id="Background" hidden />
                     <label class="input-group-text btn btn-info text-light" for="Background">
@@ -341,7 +341,7 @@
                 </div>
                 <div class="d-flex align-items-center gap-3 mb-3">
                     <input type="checkbox" class="form-check-input" id="agreeToICA" name="agreeToICA" @(Model.IsHippa[0] ? "checked" : "")>
-                    <h5>Hippa Compalience</h5>
+                    <span>Hippa Compalience</span>
 
                     <input type="file" class="form-control" id="Hippa" hidden />
                     <label class="input-group-text btn btn-info text-light" for="Hippa">
@@ -354,7 +354,7 @@
                 </div>
            <div class="d-flex align-items-center gap-3 mb-3">
                     <input type="checkbox" class="form-check-input" id="agreeToICA" name="agreeToICA" @(Model.NonDiscoluser[0] ? "checked" : "")>
-                    <h5>Hippa Compalience</h5>
+                    <span>Non-disclosure-Agreement</span>
 
                     <input type="file" class="form-control" id="NonDiscoluser" hidden />
                     <label class="input-group-text btn btn-info text-light" for="NonDiscoluser">
@@ -363,6 +363,19 @@
                     @if (Model.NonDiscoluser[0])
                     {
                         <a class="btn btn-info" href="~/Physician/@Model.physicianid/Hippa.pdf">View</a>
+                    }
+                </div>
+           <div class="d-flex align-items-center gap-3 mb-3">
+                    <input type="checkbox" class="form-check-input" id="agreeToICA" name="agreeToICA" @(Model.NonDiscoluser[0] ? "checked" : "")>
+                    <span>License-Documents</span>
+
+                    <input type="file" class="form-control" id="License" hidden />
+                    <label class="input-group-text btn btn-info text-light" for="License">
+                        <span class="d-none d-md-inline">Upload</span>
+                    </label>
+                    @if (Model.License[0])
+                    {
+                        <a class="btn btn-info" href="~/Physician/@Model.physicianid/License.pdf">View</a>
                     }
                 </div>
             </form>
@@ -580,7 +593,12 @@
     const BackGroundCheck = $('#Background');
     const Hippa = $('#Hippa');
     const HippNonDiscolusera = $('#NonDiscoluser');
+    const License = $('#License');
+
     BackGroundCheck.change(function () {
+        handleFileUpload(this);
+    });
+    License.change(function () {
         handleFileUpload(this);
     });
     fileInput.change(function () {
@@ -611,7 +629,6 @@
             success: function (data) {
                 console.log('Success:', data);
                 location.reload()
-                // Handle successful upload response (e.g., show success message)
             },
             error: function (error) {
                 console.error('Error:', error);

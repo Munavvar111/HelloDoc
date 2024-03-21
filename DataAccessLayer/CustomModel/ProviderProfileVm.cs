@@ -47,5 +47,6 @@ namespace DataAccessLayer.CustomModel
         public BitArray? IsBackground { get; set; }  
         public BitArray? IsHippa { get; set; }      
         public BitArray? NonDiscoluser { get; set; }      
+        public BitArray? License { get; set; }      
     }
 }

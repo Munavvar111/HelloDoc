@@ -219,6 +219,7 @@ namespace HelloDoc.Controllers
             providerProfile.IsBackground = physician.Isbackgrounddoc;
             providerProfile.IsHippa = physician.Istrainingdoc;
             providerProfile.NonDiscoluser = physician.Isnondisclosuredoc;
+            providerProfile.License = physician.Islicensedoc;
             return View(providerProfile);
 
         }
@@ -298,6 +299,11 @@ namespace HelloDoc.Controllers
             {
                 var docfile=_uploadProvider.UploadDocFile(File,physicianid, fileName);
                 physician.Isnondisclosuredoc = new BitArray(new[] { true });
+            }
+            if (fileName == "License")
+            {
+                var docfile=_uploadProvider.UploadDocFile(File,physicianid, fileName);
+                physician.Islicensedoc = new BitArray(new[] { true });
             }
             _context.Physicians.Update(physician);
             _context.SaveChanges();
