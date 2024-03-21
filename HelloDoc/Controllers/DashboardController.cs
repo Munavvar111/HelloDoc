@@ -31,15 +31,15 @@ namespace HalloDocPatient.Controllers
             if (id.HasValue)
             {
 
-            User? user = _patientRequest.GetUserById((int)id);
-            ViewData["Name"] = user?.Firstname;
-            RequestFileViewModel viewmodel = new RequestFileViewModel
-            {
-                User = user,
-                Requestid = requestid,
-                Requestwisefileview = reqfiledeleted
-            };
-            return View(viewmodel);
+                User? user = _patientRequest.GetUserById((int)id);
+                ViewData["Name"] = user?.Firstname;
+                RequestFileViewModel viewmodel = new RequestFileViewModel
+                {
+                    User = user,
+                    Requestid = requestid,
+                    Requestwisefileview = reqfiledeleted
+                };
+                return View(viewmodel);
             }
             else
             {
@@ -85,26 +85,26 @@ namespace HalloDocPatient.Controllers
             var statebyregionid = _context.Regions.Where(item => item.Name == profileVM.State).FirstOrDefault();
             int? id = HttpContext.Session.GetInt32("id");
             User? User = await _context.Users.FindAsync(id);
-            ViewData["Name"] = User?.Firstname??"";
+            ViewData["Name"] = User?.Firstname ?? "";
 
             if (ModelState.IsValid)
             {
                 if (User != null)
                 {
 
-                User.Firstname = profileVM.FirstName;
-                User.Lastname = profileVM.LastName;
-                User.Street = profileVM.Street;
-                User.City = profileVM.City;
-                User.State = profileVM.State;
-                User.Mobile = profileVM.PhoneNO;
-                User.Zipcode = profileVM.ZipCode;
-                User.Intdate = profileVM.BirthDate.Day;
-                User.Intyear = profileVM.BirthDate.Year;
-                User.Strmonth = profileVM.BirthDate.Month.ToString();
+                    User.Firstname = profileVM.FirstName;
+                    User.Lastname = profileVM.LastName;
+                    User.Street = profileVM.Street;
+                    User.City = profileVM.City;
+                    User.State = profileVM.State;
+                    User.Mobile = profileVM.PhoneNO;
+                    User.Zipcode = profileVM.ZipCode;
+                    User.Intdate = profileVM.BirthDate.Day;
+                    User.Intyear = profileVM.BirthDate.Year;
+                    User.Strmonth = profileVM.BirthDate.Month.ToString();
                     User.Regionid = statebyregionid?.Regionid;
 
-                _context.Update(User);
+                    _context.Update(User);
                 }
                 await _context.SaveChangesAsync();
                 return RedirectToAction("Profile");
@@ -188,31 +188,31 @@ namespace HalloDocPatient.Controllers
         #endregion
 
         #region Index
-        public  IActionResult Index()
+        public IActionResult Index()
         {
-            
+
             string? email = HttpContext.Session.GetString("Email");
             int? id = HttpContext.Session.GetInt32("id");
             if (id.HasValue)
             {
 
-            User? user = _patientRequest.GetUserById((int)id);
-            IQueryable<PatientDashboard> result = from req in _context.Requests
-                                                  join reqFile in _context.Requestwisefiles
-                                                  on req.Requestid equals reqFile.Requestid into reqFilesGroup
-                                                  where req.Userid == id
-                                                  from reqFile in reqFilesGroup.DefaultIfEmpty()
-                                                  select new PatientDashboard
-                                                  {
-                                                      User = user,
-                                                      Request = req,
-                                                      Requestwisefile = reqFile
-                                                  };
+                User? user = _patientRequest.GetUserById((int)id);
+                IQueryable<PatientDashboard> result = from req in _context.Requests
+                                                      join reqFile in _context.Requestwisefiles
+                                                      on req.Requestid equals reqFile.Requestid into reqFilesGroup
+                                                      where req.Userid == id
+                                                      from reqFile in reqFilesGroup.DefaultIfEmpty()
+                                                      select new PatientDashboard
+                                                      {
+                                                          User = user,
+                                                          Request = req,
+                                                          Requestwisefile = reqFile
+                                                      };
 
-            ViewData["Name"] = user?.Firstname;
-            ViewBag.name = user?.Lastname;
+                ViewData["Name"] = user?.Firstname;
+                ViewBag.name = user?.Lastname;
 
-            return View(result.ToList());
+                return View(result.ToList());
             }
             else
             {
@@ -344,13 +344,13 @@ namespace HalloDocPatient.Controllers
                         var request = new Request();
                         {
                             request.Userid = user?.Userid;
-                            request.Firstname = user?.Firstname??"";
-                            request.Lastname = user?.Lastname??"";
-                            request.Email = user?.Email??"";
+                            request.Firstname = user?.Firstname ?? "";
+                            request.Lastname = user?.Lastname ?? "";
+                            request.Email = user?.Email ?? "";
                             request.Requesttypeid = 2;
                             request.Createddate = DateTime.Now;
                             request.Status = 1;
-                            request.Phonenumber = user?.Mobile??"";
+                            request.Phonenumber = user?.Mobile ?? "";
                             _context.Requests.Add(request);
                             _context.SaveChanges();
 

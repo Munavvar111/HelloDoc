@@ -1,6 +1,7 @@
 ﻿using DataAccessLayer.DataModels;
 using Microsoft.AspNetCore.Http;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -40,7 +41,11 @@ namespace DataAccessLayer.CustomModel
         public string? AdminNotes { get; set; }
         public IFormFile? File { get; set; }
         public IFormFile? signature { get; set; }
+        public string    PhotoFileName { get; set; }
         public string SignatureFilename { get; set; }
-
+        public BitArray? IsAgreement { get; set; }  
+        public BitArray? IsBackground { get; set; }  
+        public BitArray? IsHippa { get; set; }      
+        public BitArray? NonDiscoluser { get; set; }      
     }
 }

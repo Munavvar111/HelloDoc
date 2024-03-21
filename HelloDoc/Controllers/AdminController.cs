@@ -12,6 +12,7 @@ using BC = BCrypt.Net.BCrypt;
 using CsvHelper;
 using System.Globalization;
 using System.Collections.Generic;
+using BusinessLayer.Repository;
 
 namespace HelloDoc.Controllers
 {
@@ -24,12 +25,14 @@ namespace HelloDoc.Controllers
         private readonly IWebHostEnvironment _hostingEnvironment;
         private readonly IJwtAuth _jwtAuth;
         private readonly ILogin _login;
+        private readonly IUploadProvider _uploadProvider;
         private readonly IDataProtectionProvider _dataProtectionProvider;
 
-        public AdminController(ApplicationDbContext context, IAdmin admin, IPatientRequest patient, IDataProtectionProvider dataProtectionProvider, IWebHostEnvironment hostingEnvironment, IJwtAuth jwtAuth, ILogin login)
+        public AdminController(ApplicationDbContext context,IUploadProvider uploadProvider, IAdmin admin, IPatientRequest patient, IDataProtectionProvider dataProtectionProvider, IWebHostEnvironment hostingEnvironment, IJwtAuth jwtAuth, ILogin login)
         {
             _context = context;
             _admin = admin;
+            _uploadProvider=uploadProvider;
             _patient = patient;
             _jwtAuth = jwtAuth;
             _hostingEnvironment = hostingEnvironment;
@@ -109,17 +112,17 @@ namespace HelloDoc.Controllers
         public IActionResult AdministrationInfo(string email, string MobileNo, string[] adminRegion)
         {
             string? sessionemail = HttpContext.Session.GetString("Email");
-            AspnetUser? aspnetUser = _context.AspnetUsers.FirstOrDefault(item=>item.Email==sessionemail);
+            AspnetUser? aspnetUser = _context.AspnetUsers.FirstOrDefault(item => item.Email == sessionemail);
             Admin? admin = _context.Admins.Where(item => item.Email == sessionemail).FirstOrDefault();
-            if (admin != null && aspnetUser !=null)
+            if (admin != null && aspnetUser != null)
             {
                 admin.Email = email;
                 admin.Mobile = MobileNo;
                 _context.Admins.Update(admin);
                 _context.SaveChanges();
-                aspnetUser.Email=email;
+                aspnetUser.Email = email;
                 _context.AspnetUsers.Update(aspnetUser);
-                _context.SaveChanges(); 
+                _context.SaveChanges();
                 List<AdminRegion> existingregion = _context.AdminRegions.Where(item => item.Adminid == admin.Adminid).ToList();
                 _context.AdminRegions.RemoveRange(existingregion);
                 foreach (string regionValue in adminRegion)
@@ -162,54 +165,64 @@ namespace HelloDoc.Controllers
             return RedirectToAction("Profile", "Admin");
 
         }
-
-        //main View
         public IActionResult Provider()
+        {
+            List<Region> region = _context.Regions.ToList();
+            return View(region);
+        }
+        //main View
+        public IActionResult ProviderData(string region)
         {
             List<ProviderVM> providers = (from phy in _context.Physicians
                                           join role in _context.Roles
                                           on phy.Roleid equals role.Roleid
                                           join notify in _context.PhysicianNotifications
                                           on phy.Physicianid equals notify.Physicianid
+                                          where (string.IsNullOrEmpty(region) || phy.Regionid == int.Parse(region))
                                           select new ProviderVM
                                           {
                                               Name = phy.Firstname,
                                               status = phy.Status,
-                                              Role=role.Name,
-                                              OnCallStaus= new BitArray(new[] { notify.Isnotificationstopped[0] }),
-                                              regions =_context.Regions.ToList(),
-                                              physicianid=phy.Physicianid
+                                              Role = role.Name,
+                                              OnCallStaus = new BitArray(new[] { notify.Isnotificationstopped[0] }),
+                                              regions = _context.Regions.ToList(),
+                                              physicianid = phy.Physicianid
                                           }).ToList();
-            return View(providers);
+            return PartialView("ProviderProfileTablePartial", providers);
         }
 
         public IActionResult PhysicanProfile(int id)
         {
-            Physician? physician=_context.Physicians.FirstOrDefault(item=>item.Physicianid==id);
-            
-                ProviderProfileVm providerProfile = new ProviderProfileVm();
-                providerProfile.FirstName = physician.Firstname;
-                providerProfile.LastName = physician.Lastname ?? "";
-                providerProfile.Email = physician.Email;
-                providerProfile.Address1 = physician.Address1 ?? "";
-                providerProfile.Address2 = physician.Address2 ?? "";
-                providerProfile.City = physician.City ?? "";
-                providerProfile.ZipCode = physician.Zip ?? "";
-                providerProfile.MobileNo = physician.Mobile ?? "";
-                providerProfile.Regions = _context.Regions.ToList();
+            Physician? physician = _context.Physicians.FirstOrDefault(item => item.Physicianid == id);
+
+            ProviderProfileVm providerProfile = new ProviderProfileVm();
+            providerProfile.FirstName = physician.Firstname;
+            providerProfile.LastName = physician.Lastname ?? "";
+            providerProfile.Email = physician.Email;
+            providerProfile.Address1 = physician.Address1 ?? "";
+            providerProfile.Address2 = physician.Address2 ?? "";
+            providerProfile.City = physician.City ?? "";
+            providerProfile.ZipCode = physician.Zip ?? "";
+            providerProfile.MobileNo = physician.Mobile ?? "";
+            providerProfile.Regions = _context.Regions.ToList();
             providerProfile.MedicalLicense = physician.Medicallicense;
             providerProfile.NPINumber = physician.Npinumber;
             providerProfile.SynchronizationEmail = physician.Syncemailaddress;
-            providerProfile.physicianid=physician.Physicianid;  
-                providerProfile.WorkingRegions = _context.PhysicianRegions.Where(item => item.Physicianid == physician.Physicianid).ToList();
-                providerProfile.State = physician.Regionid;
+            providerProfile.physicianid = physician.Physicianid;
+            providerProfile.WorkingRegions = _context.PhysicianRegions.Where(item => item.Physicianid == physician.Physicianid).ToList();
+            providerProfile.State = physician.Regionid;
             providerProfile.SignatureFilename = physician.Signature;
-
-
+            providerProfile.BusinessWebsite = physician.Businesswebsite;
+            providerProfile.BusinessName = physician.Businessname;
+            providerProfile.PhotoFileName = physician.Photo;
+            providerProfile.IsAgreement = physician.Isagreementdoc;
+            providerProfile.IsBackground = physician.Isbackgrounddoc;
+            providerProfile.IsHippa = physician.Istrainingdoc;
+            providerProfile.NonDiscoluser = physician.Isnondisclosuredoc;
             return View(providerProfile);
-            
+
         }
-        public IActionResult ResetPhysicianPassword(string Password,int physicianid)
+        public IActionResult ResetPhysicianPassword(string Password, int physicianid)
         {
 
             Physician? physician = _context.Physicians.FirstOrDefault(item => item.Physicianid == physicianid);
@@ -233,29 +246,23 @@ namespace HelloDoc.Controllers
                 TempData["Error"] = "Account not found";
             }
 
-            return RedirectToAction("PhysicanProfile", "Admin", new {id=physicianid });
+            return RedirectToAction("PhysicanProfile", "Admin", new { id = physicianid });
         }
 
         [HttpPost]
-        public IActionResult SaveSignatureImage(IFormFile signatureImage, string id)
+        public IActionResult SaveSignatureImage(IFormFile signatureImage, int id)
         {
             try
             {
+                
                 if (signatureImage != null && signatureImage.Length > 0)
                 {
-                    // Save signature image to the uploads folder
-                    string uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
-                    string fileName = "signature_" + id + ".png"; // Adjust filename as needed
-                    string filePath = Path.Combine(uploadsFolder, fileName);
+                    string fileName = _uploadProvider.UploadSignature(signatureImage, id);
 
-                    using (var fileStream = new FileStream(filePath, FileMode.Create))
-                    {
-                        signatureImage.CopyTo(fileStream);
-                    }
-                    var physician = _context.Physicians.FirstOrDefault(item=>item.Physicianid==int.Parse(id));
+                    var physician = _context.Physicians.FirstOrDefault(item => item.Physicianid == id);
                     physician.Signature = fileName;
                     _context.Physicians.Update(physician);
-                    _context.SaveChanges(); 
+                    _context.SaveChanges();
                     return Ok();
                 }
                 else
@@ -268,9 +275,37 @@ namespace HelloDoc.Controllers
                 return StatusCode(500, $"Error saving signature: {ex.Message}");
             }
         }
+        [HttpPost]
+        public IActionResult UploadDoc(string fileName, IFormFile File, int physicianid)
+        {
+            Physician? physician = _context.Physicians.FirstOrDefault(item => item.Physicianid == physicianid);
+            if (fileName == "ICA")
+            {
+                var docfile=_uploadProvider.UploadDocFile(File,physicianid, fileName);
+                physician.Isagreementdoc = new BitArray(new[] { true });
+            }
+            if (fileName == "Background")
+            {
+                var docfile=_uploadProvider.UploadDocFile(File,physicianid, fileName);
+                physician.Isbackgrounddoc = new BitArray(new[] { true });
+            }
+            if (fileName == "Hippa")
+            {
+                var docfile=_uploadProvider.UploadDocFile(File,physicianid, fileName);
+                physician.Istrainingdoc = new BitArray(new[] { true });
+            }
+            if (fileName == "NonDiscoluser")
+            {
+                var docfile=_uploadProvider.UploadDocFile(File,physicianid, fileName);
+                physician.Isnondisclosuredoc = new BitArray(new[] { true });
+            }
+            _context.Physicians.Update(physician);
+            _context.SaveChanges();
+            return Ok();
+        }
 
         [HttpPost]
-        public IActionResult PhysicianInformation(string email, int id, string MobileNo, string[] adminRegion,string SynchronizationEmail,string NPINumber,string MedicalLicense)
+        public IActionResult PhysicianInformation(string email, int id, string MobileNo, string[] adminRegion, string SynchronizationEmail, string NPINumber, string MedicalLicense)
         {
             Physician? physician = _context.Physicians.FirstOrDefault(item => item.Physicianid == id);
 
@@ -279,10 +314,10 @@ namespace HelloDoc.Controllers
             {
                 physician.Email = email;
                 physician.Mobile = MobileNo;
-                physician.Npinumber=NPINumber;
-                physician.Syncemailaddress= SynchronizationEmail;   
-                physician.Medicallicense= MedicalLicense;   
-                _context.Physicians.Update(physician); 
+                physician.Npinumber = NPINumber;
+                physician.Syncemailaddress = SynchronizationEmail;
+                physician.Medicallicense = MedicalLicense;
+                _context.Physicians.Update(physician);
                 _context.SaveChanges();
                 List<PhysicianRegion> existingregion = _context.PhysicianRegions.Where(item => item.Physicianid == physician.Physicianid).ToList();
                 _context.PhysicianRegions.RemoveRange(existingregion);
@@ -303,6 +338,30 @@ namespace HelloDoc.Controllers
             return RedirectToAction("PhysicanProfile", "Admin", new { id = id });
 
         }
+        [HttpPost]
+        public IActionResult Providerprofile(int id, string Businessname, string businesswebsite, IFormFile File, IFormFile signature)
+        {
+           
+                Physician? physician = _context.Physicians.FirstOrDefault(item => item.Physicianid == id);
+                physician.Businessname = Businessname;
+                physician.Businesswebsite = businesswebsite;
+                if (signature.FileName != null)
+                 {
+                string signnature = _uploadProvider.UploadSignature(signature, id);
+                physician.Signature=signnature;
+                }
+                if(File.FileName!= null)
+            {
+                string photo = _uploadProvider.UploadPhoto(File, id);
+                physician.Photo = photo;
+
+            }
+                _context.Physicians.Update(physician);
+                _context.SaveChanges();
+
+            return RedirectToAction("PhysicanProfile", "Admin", new { id = id });
+            }
+        
 
         //main View
         public IActionResult Parteners()
@@ -338,7 +397,7 @@ namespace HelloDoc.Controllers
         }
 
 
-        public IActionResult SearchPatient(string searchValue, string selectValue, string partialName, string selectedFilter, int[] currentStatus,bool exportdata,bool exportAllData, int page, int pageSize = 5)
+        public IActionResult SearchPatient(string searchValue, string selectValue, string partialName, string selectedFilter, int[] currentStatus, bool exportdata, bool exportAllData, int page, int pageSize = 5)
         {
             List<NewRequestTableVM> filteredPatients = _admin.SearchPatients(searchValue, selectValue, selectedFilter, currentStatus);
             List<NewRequestTableVM> ExportData = _admin.SearchPatients(searchValue, selectValue, selectedFilter, currentStatus);
@@ -352,7 +411,7 @@ namespace HelloDoc.Controllers
             {
                 using (var memoryStream = new MemoryStream())
                 using (var writer = new StreamWriter(memoryStream))
-                using (var csvWriter = new CsvWriter(writer,CultureInfo.InvariantCulture))
+                using (var csvWriter = new CsvWriter(writer, CultureInfo.InvariantCulture))
                 {
                     csvWriter.WriteRecords(filteredPatients);
                     writer.Flush();
@@ -376,7 +435,7 @@ namespace HelloDoc.Controllers
         }
         public IActionResult ExportAll(string currentStatus)
         {
-            var statusArray = currentStatus?.Split(',')?.Select(int.Parse).ToArray(); 
+            var statusArray = currentStatus?.Split(',')?.Select(int.Parse).ToArray();
             var searchValue = "";
             var selectValue = "";
             var selectedFilter = "";
@@ -434,7 +493,7 @@ namespace HelloDoc.Controllers
             if (admin != null)
             {
 
-            bool result = await _admin.AssignRequest(regionid, physician, description, requestid,admin.Adminid);
+                bool result = await _admin.AssignRequest(regionid, physician, description, requestid, admin.Adminid);
                 TempData["SuccessMessage"] = "Assign successfully";
 
                 return Json(result);
@@ -453,8 +512,8 @@ namespace HelloDoc.Controllers
             if (admin != null)
             {
 
-            bool result = await _admin.AssignRequest(regionid, physician, description, requestid,admin.Adminid);
-            return Json(result);
+                bool result = await _admin.AssignRequest(regionid, physician, description, requestid, admin.Adminid);
+                return Json(result);
             }
             else
             {
@@ -485,7 +544,7 @@ namespace HelloDoc.Controllers
         public IActionResult CreateRequest()
         {
             List<Region> region = _context.Regions.ToList();
-            RequestModel requestmoel=new RequestModel();
+            RequestModel requestmoel = new RequestModel();
             requestmoel.Regions = region;
             return View(requestmoel);
         }
@@ -502,51 +561,51 @@ namespace HelloDoc.Controllers
                 Admin? admin = _context.Admins.FirstOrDefault(item => item.Email == email);
                 if (admin != null)
                 {
-                    _patient.AddRequest(requestModel,0,1);
+                    _patient.AddRequest(requestModel, 0, 1);
                     Request? request1 = _patient.GetRequestByEmail(requestModel.Email);
                     if (request1 != null)
                     {
 
-                    _patient.AddRequestClient(requestModel, request1.Requestid);
+                        _patient.AddRequestClient(requestModel, request1.Requestid);
 
-                  
-                    _context.SaveChanges();
 
-                    Requestnote requestnote = new Requestnote();
-                    requestnote.Adminnotes = requestModel.Notes;
-                    requestnote.Createddate = DateTime.Now;
-                    requestnote.Requestid = request1.Requestid;
-                    requestnote.Createdby = "admin";
-                    _context.Requestnotes.Add(requestnote);
-                    _context.SaveChanges();
-                    int count = _context.Requests.Where(x => x.Createddate.Date == request1.Createddate.Date).Count() + 1;
-                    var region = _context.Regions.Where(x => x.Name == requestModel.State).FirstOrDefault();
-                    if (region != null)
-                    {
-                        var confirmNum = string.Concat(region?.Abbreviation?.ToUpper(), request1.Createddate.ToString("ddMMyy"), requestModel.Lastname.Substring(0, 2).ToUpper() ?? "",
-                       requestModel.Firstname.Substring(0, 2).ToUpper(), count.ToString("D4"));
-                        request1.Confirmationnumber = confirmNum;
-                    }
-                    else
-                    {
-                        var confirmNum = string.Concat("ML", request1.Createddate.ToString("ddMMyy"), requestModel.Lastname.Substring(0, 2).ToUpper() ?? "",
-                      requestModel.Firstname.Substring(0, 2).ToUpper(), count.ToString("D4"));
-                        request1.Confirmationnumber = confirmNum;
-                    }
-                    _context.Update(request1);
-                    _context.SaveChanges();
-                    string token = Guid.NewGuid().ToString();
-                    string? resetLink = Url.Action("Index", "Register", new { userId = request1.Requestid, token }, protocol: HttpContext.Request.Scheme);
-                    if (_login.IsSendEmail("munavvarpopatiya999@gmail.com", "Munavvar", $"Click <a href='{resetLink}'>here</a> to Create A new Account"))
-                    {
-                        TempData["SuccessMessage"] = "Create Request successful!";
-                        return RedirectToAction("Index", "Admin");
-                    }
-                    else
-                    {
+                        _context.SaveChanges();
 
-                        return RedirectToAction("Index", "Admin");
-                    }
+                        Requestnote requestnote = new Requestnote();
+                        requestnote.Adminnotes = requestModel.Notes;
+                        requestnote.Createddate = DateTime.Now;
+                        requestnote.Requestid = request1.Requestid;
+                        requestnote.Createdby = "admin";
+                        _context.Requestnotes.Add(requestnote);
+                        _context.SaveChanges();
+                        int count = _context.Requests.Where(x => x.Createddate.Date == request1.Createddate.Date).Count() + 1;
+                        var region = _context.Regions.Where(x => x.Name == requestModel.State).FirstOrDefault();
+                        if (region != null)
+                        {
+                            var confirmNum = string.Concat(region?.Abbreviation?.ToUpper(), request1.Createddate.ToString("ddMMyy"), requestModel.Lastname.Substring(0, 2).ToUpper() ?? "",
+                           requestModel.Firstname.Substring(0, 2).ToUpper(), count.ToString("D4"));
+                            request1.Confirmationnumber = confirmNum;
+                        }
+                        else
+                        {
+                            var confirmNum = string.Concat("ML", request1.Createddate.ToString("ddMMyy"), requestModel.Lastname.Substring(0, 2).ToUpper() ?? "",
+                          requestModel.Firstname.Substring(0, 2).ToUpper(), count.ToString("D4"));
+                            request1.Confirmationnumber = confirmNum;
+                        }
+                        _context.Update(request1);
+                        _context.SaveChanges();
+                        string token = Guid.NewGuid().ToString();
+                        string? resetLink = Url.Action("Index", "Register", new { userId = request1.Requestid, token }, protocol: HttpContext.Request.Scheme);
+                        if (_login.IsSendEmail("munavvarpopatiya999@gmail.com", "Munavvar", $"Click <a href='{resetLink}'>here</a> to Create A new Account"))
+                        {
+                            TempData["SuccessMessage"] = "Create Request successful!";
+                            return RedirectToAction("Index", "Admin");
+                        }
+                        else
+                        {
+
+                            return RedirectToAction("Index", "Admin");
+                        }
                     }
 
                 }
@@ -760,7 +819,7 @@ namespace HelloDoc.Controllers
             {
                 string? email = HttpContext.Session.GetString("Email");
                 int? id = HttpContext.Session.GetInt32("id");
-                
+
                 Admin? admin = _context.Admins.FirstOrDefault(item => item.Email == email);
                 Request? request = _context.Requests.Where(item => item.Requestid == requestidclearcase).FirstOrDefault();
                 if (request != null)
@@ -933,24 +992,24 @@ namespace HelloDoc.Controllers
             if (request != null)
             {
 
-            string? requestclientnumber = request.Confirmationnumber;
-            CloseCaseVM closecase = new CloseCaseVM();
-            closecase.FirstName = requestclient?.Firstname ?? "";
-            closecase.LastName = requestclient?.Lastname ?? "";
-            closecase.Email = requestclient?.Email ?? "";
-            closecase.PhoneNo = requestclient?.Phonenumber ?? "";
-            closecase.BirthDate = requestclient !=null && requestclient.Intyear != null && requestclient.Strmonth != null && requestclient.Intdate != null
-                                  ? new DateOnly((int)requestclient.Intyear, int.Parse(requestclient.Strmonth), (int)requestclient.Intdate)
-                                  : new DateOnly();
-            closecase.Requestwisefileview = requestwisedocument;
-            closecase.ConfirmNumber = requestclientnumber;
-            closecase.Requestid = requestid;
-            return View(closecase);
+                string? requestclientnumber = request.Confirmationnumber;
+                CloseCaseVM closecase = new CloseCaseVM();
+                closecase.FirstName = requestclient?.Firstname ?? "";
+                closecase.LastName = requestclient?.Lastname ?? "";
+                closecase.Email = requestclient?.Email ?? "";
+                closecase.PhoneNo = requestclient?.Phonenumber ?? "";
+                closecase.BirthDate = requestclient != null && requestclient.Intyear != null && requestclient.Strmonth != null && requestclient.Intdate != null
+                                      ? new DateOnly((int)requestclient.Intyear, int.Parse(requestclient.Strmonth), (int)requestclient.Intdate)
+                                      : new DateOnly();
+                closecase.Requestwisefileview = requestwisedocument;
+                closecase.ConfirmNumber = requestclientnumber;
+                closecase.Requestid = requestid;
+                return View(closecase);
             }
             else
             {
                 TempData["Error"] = "Something Went Wrong Please Try Again";
-                return RedirectToAction("Index","Admin");
+                return RedirectToAction("Index", "Admin");
             }
         }
 
@@ -964,12 +1023,12 @@ namespace HelloDoc.Controllers
             else
             {
                 Requestclient? requestclient = _context.Requestclients.Where(item => item.Requestid == requestid).FirstOrDefault();
-                if(requestclient != null)
+                if (requestclient != null)
                 {
 
-                requestclient.Phonenumber = closeCaseVM.PhoneNo;
-                requestclient.Email = closeCaseVM.Email;
-                _context.Requestclients.Update(requestclient);
+                    requestclient.Phonenumber = closeCaseVM.PhoneNo;
+                    requestclient.Email = closeCaseVM.Email;
+                    _context.Requestclients.Update(requestclient);
                 }
                 _context.SaveChanges();
                 return RedirectToAction("CloseCase", new { requestid = requestid });

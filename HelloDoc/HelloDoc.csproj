@@ -36,6 +36,7 @@
 
   <ItemGroup>
     <Folder Include="wwwroot\content\NewFolder\" />
+    <Folder Include="wwwroot\Physician\" />
     <Folder Include="wwwroot\Rotativa\" />
     <Folder Include="wwwroot\uploads\" />
   </ItemGroup>

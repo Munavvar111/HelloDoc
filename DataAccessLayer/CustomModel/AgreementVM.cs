@@ -9,10 +9,7 @@ namespace DataAccessLayer.CustomModel
     public class AgreementVM
     {
         public int RequestId { get; set; }  
-
         public int status { get; set; } 
         public string? Notes { get; set; }  
-
-
      }
 }

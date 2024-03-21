@@ -1,0 +1,51 @@
+﻿<div class="table-responsive mt-4 mb-4">
+    <table class="table table-hover d-md-table d-none">
+        <thead class="table-light">
+            <tr>
+                <th scope="col">Stop Notification</th>
+                <th scope="col">Provider Name <i class="bi bi-arrow-up"></i></th>
+                <th scope="col">Role</th>
+                <th scope="col">On Call Status</th>
+                <th scope="col">Status</th>
+                <th scope="col">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td scope="row">
+                        <input type="checkbox" class="form-check-input" name="fileIds" @(item.OnCallStaus[0] ? "checked" : "")>
+                    </td>
+                    <td scope="row">@item.Name</td>
+                    <td scope="row">@item.Role</td>
+                    <td scope="row">Unavailable</td>
+                    <td scope="row">
+                        @if (item.status == 1)
+                        {
+                            <span class="badge bg-success">Active</span>
+                        }
+                        else if (item.status == 2)
+                        {
+                            <span class="badge bg-warning text-dark">Pending</span>
+                        }
+                        else if (item.status == 3)
+                        {
+                            <span class="badge bg-secondary">Conclude</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-danger">Unknown</span>
+                        }
+                    </td>
+                    <td scope="row">
+                        <div class="d-flex">
+                            <button class="btn btn-outline-info rounded me-2" onclick="sendEmailModal(@item.physicianid)">Contact</button>
+                            <a asp-action="PhysicanProfile" asp-route-id="@item.physicianid" class="btn btn-outline-info rounded">Edit</a>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

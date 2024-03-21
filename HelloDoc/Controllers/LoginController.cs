@@ -164,7 +164,7 @@ namespace HalloDocPatient.Controllers
         [HttpPost]
         public IActionResult SubmitFORM(IFormCollection collection)
         {
-            return Json(collection);
+            return Ok(collection);
         }
 
         public string Ajaxlogout()
