@@ -277,8 +277,6 @@ $(document).ready(function () {
             type: "GET",
             url: "/Admin/SearchPatient",
             traditional: true,
-
-
             data: { searchValue: searchValue, selectValue: selectValue, partialName: partialName, selectedFilter: selectedFilter, currentStatus: currentStatus, page: page, pageSize: pageSize, exportdata: exportdata, exportAllData: exportAllData },
             success: function (data) {
                 if (exportdata == true) {

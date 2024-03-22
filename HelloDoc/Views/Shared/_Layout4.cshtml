@@ -146,6 +146,10 @@
                        asp-action="Parteners" asp-controller="Admin">Parteners</a>
                 </li>
                 <li class="nav-item">
+                    <a class="nav-link @(ViewContext.ActionDescriptor.RouteValues["action"] == "Access" ? "active" : "")"
+                       asp-action="Access" asp-controller="Admin">Access</a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link @(ViewContext.ActionDescriptor.RouteValues["action"] == "Records" ? "active" : "")"
                        asp-action="Records" asp-controller="Admin">Records</a>
                 </li>

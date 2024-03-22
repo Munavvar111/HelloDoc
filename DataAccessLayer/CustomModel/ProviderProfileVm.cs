@@ -40,7 +40,6 @@ namespace DataAccessLayer.CustomModel
         public string? BusinessWebsite { get; set; }
         public string? AdminNotes { get; set; }
         public IFormFile? File { get; set; }
-        public IFormFile? signature { get; set; }
         public string    PhotoFileName { get; set; }
         public string SignatureFilename { get; set; }
         public BitArray? IsAgreement { get; set; }  

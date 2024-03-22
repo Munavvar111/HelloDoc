@@ -4,7 +4,7 @@
     ViewData["Title"] = "PhysicanProfile";
     Layout = "~/Views/Shared/_Layout4.cshtml";
 }
-
+<partial name="ToasterPartialView"></partial>
 <section>
     <div class="container bg-light mt-4">
         <div class="d-flex justify-content-between my-3">
@@ -151,7 +151,7 @@
             </form>
 
             <h5 class="fw-bold my-3">Mailing & Billing Information</h5>
-            <form id="accountinginfo" asp-action="AccountingInfo" asp-controller="  ">
+            <form id="accountinginfo" asp-action="ProviderAccountingInfo" asp-controller="" asp-route-physicianid="@Model.physicianid">
                 <div class="row row-cols-1 row-cols-md-2 g-3">
                     <div class="col">
                         <div class="form-floating">
@@ -264,7 +264,7 @@
                                 <span class="material-symbols-outlined me-2">cloud_upload</span>
                                 <span class="d-none d-md-inline">Upload Sign</span>
                             </label>
-                            <button class="btn btn-outline-info mx-2" type="button" id="createBtn">Create</button>
+                            <button class="btn btn-outline-info mx-2" type="button" id="createBtn" disabled>Create</button>
                         </div>
                     </div>
 
@@ -366,7 +366,7 @@
                     }
                 </div>
            <div class="d-flex align-items-center gap-3 mb-3">
-                    <input type="checkbox" class="form-check-input" id="agreeToICA" name="agreeToICA" @(Model.NonDiscoluser[0] ? "checked" : "")>
+                    <input type="checkbox" class="form-check-input" id="agreeToICA" name="agreeToICA" @(Model.License[0] ? "checked" : "")>
                     <span>License-Documents</span>
 
                     <input type="file" class="form-control" id="License" hidden />
@@ -412,6 +412,7 @@
         var inputFields = document.querySelectorAll('#providerprofile input, #providerprofile select,#providerprofile textarea');
         var fileInput = document.querySelectorAll('#providerprofile input[type="file"]');
         console.log(fileInput)
+        var create = document.querySelector('#createBtn');
         var canvas = document.querySelector('#signatureCanvas');
 
         inputFields.forEach(function (input) {
@@ -429,7 +430,11 @@
         if (canvas) {
             canvas.disabled = !canvas.disabled;
         }
-
+        if (create) {
+            create.disabled=!create.disabled
+        }
+        $('#signatureImage').toggle(); // Hide the image
+        $('#canvasContainer').toggle();
         $("#SubProviderBtn").toggle();
     }
 
@@ -503,14 +508,12 @@
         function clearSignature() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             signatureData = null;
-            $('#canvasContainer').hide();
-
-            $('#signatureImage').show();
+           
 
         }
         function saveSignature() {
             if (!signatureData) {
-                alert('Please draw a signature before saving.');
+                toastr.error('Please draw a signature before saving.');
                 return;
             }
 
@@ -533,12 +536,12 @@
                         contentType: false,
                         success: function (response) {
                             // Handle succes response
-                            alert('Signature saved successfully.');
-                            window.location.href = '/Admin/PhysicanProfile/' + @Model.physicianid // Clear signature after saving
-                                },
+                            toastr.success('Signature saved successfully.');
+                            window.location.reload(true);
+                        },
                         error: function (xhr, status, error) {
                             // Handle error response
-                            alert('Error occurred while saving signature.');
+                            toastr.error('Error occurred while saving signature.');
                             console.error(xhr.responseText);
                         }
                     });
@@ -612,6 +615,7 @@
     })
     const handleFileUpload = function (fileInput) {
         if (!fileInput.files.length) {
+            toastr.error('Please Select File');
             return; // No file selected, do nothing
         }
 
@@ -628,11 +632,11 @@
             contentType: false,
             success: function (data) {
                 console.log('Success:', data);
-                location.reload()
+                location.reload();
             },
             error: function (error) {
                 console.error('Error:', error);
-                alert('An error occurred while saving the agreement. Please try again.');
+                toastr.error('An error occurred while saving the agreement. Please try again.');
             }
         })
     };

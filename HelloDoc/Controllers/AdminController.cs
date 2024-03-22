@@ -264,10 +264,13 @@ namespace HelloDoc.Controllers
                     physician.Signature = fileName;
                     _context.Physicians.Update(physician);
                     _context.SaveChanges();
+                    TempData["SuccessMessage"] = "Signature saved successfully.";
+
                     return Ok();
                 }
                 else
                 {
+                    TempData["Error"] = "Signature saved Unsuccessfully.";
                     return BadRequest("No signature image received.");
                 }
             }
@@ -280,6 +283,9 @@ namespace HelloDoc.Controllers
         public IActionResult UploadDoc(string fileName, IFormFile File, int physicianid)
         {
             Physician? physician = _context.Physicians.FirstOrDefault(item => item.Physicianid == physicianid);
+            if (physician != null)
+            {
+
             if (fileName == "ICA")
             {
                 var docfile=_uploadProvider.UploadDocFile(File,physicianid, fileName);
@@ -307,7 +313,13 @@ namespace HelloDoc.Controllers
             }
             _context.Physicians.Update(physician);
             _context.SaveChanges();
+            TempData["SuccessMessage"] = "Upload Doc successfully.";
             return Ok();
+            }
+            else
+            {
+                return BadRequest("No Doc File received.");
+            }
         }
 
         [HttpPost]
@@ -368,6 +380,29 @@ namespace HelloDoc.Controllers
             return RedirectToAction("PhysicanProfile", "Admin", new { id = id });
             }
         
+        [HttpPost]
+        public IActionResult ProviderAccountingInfo(int physicianid,string Address1, string Address2, string City, int State, string Zipcode, string MobileNo)
+        {
+            Physician? physician = _context.Physicians.FirstOrDefault(item => item.Physicianid == physicianid);
+            if (physician != null)
+            {
+                physician.Address1=Address1;
+                physician.Address2 = Address2;
+                physician.City= City;
+                physician.Regionid = State;
+                physician.Zip= Zipcode; 
+                physician.Mobile=MobileNo;
+                _context.Physicians.Update(physician);
+                _context.SaveChanges();
+                TempData["SuccessMessage"] = "Provider AccountingInfo Saved.";
+            }
+            else
+            {
+                TempData["Error"] = "Provider AccountingInfo UnSaved.";
+
+            }
+            return RedirectToAction("PhysicanProfile", "Admin", new { id = physicianid });
+        }
 
         //main View
         public IActionResult Parteners()
@@ -378,6 +413,19 @@ namespace HelloDoc.Controllers
         public IActionResult Records()
         {
             return View();
+        }
+        public IActionResult Access()
+        {
+            return View();
+        }
+        public IActionResult CreateProvider()
+        {
+            List<Region> regions = _context.Regions.ToList();
+            List<Role> roles= _context.Roles.ToList();  
+            CreateProviderVM createProvider = new CreateProviderVM();
+            createProvider.Regions= regions;
+            createProvider.Roles = roles;
+            return View(createProvider);
         }
         //main View
         public IActionResult SendLink()
@@ -425,18 +473,7 @@ namespace HelloDoc.Controllers
                     return File(result, "text/csv", "filtered_data.csv"); // Change content type and file name as needed
                 }
             }
-            if (exportAllData)
-            {
-                using (var memoryStream = new MemoryStream())
-                using (var writer = new StreamWriter(memoryStream))
-                using (var csvWriter = new CsvWriter(writer, CultureInfo.InvariantCulture))
-                {
-                    csvWriter.WriteRecords(filteredPatients);
-                    writer.Flush();
-                    var result = memoryStream.ToArray();
-                    return File(result, "text/csv", "filtered_data.csv"); // Change content type and file name as needed
-                }
-            }
+            
             return PartialView(partialName, paginatedData);
         }
         public IActionResult ExportAll(string currentStatus)

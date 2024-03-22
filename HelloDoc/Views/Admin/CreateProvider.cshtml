@@ -1,0 +1,345 @@
+﻿@model DataAccessLayer.CustomModel.CreateProviderVM;
+@{
+    ViewData["Title"] = "CreateProvider";
+    Layout = "~/Views/Shared/_Layout4.cshtml";
+}
+<div class="container bg-light">
+
+    <div class="d-flex justify-content-between my-3">
+        <div class="d-flex">
+            <span class="fs-2 text-muted fw-bold">My Profile</span>
+        </div>
+        <div class="d-flex justify-content-end">
+            <a asp-controller="Admin" asp-action="Index" asp-area=""
+               class="btn btn-outline-info d-flex align-items-center">
+                <span class="material-symbols-outlined"> chevron_left </span> Back
+            </a>
+        </div>
+    </div>
+    <div class="bg-white mx-2 border rounded-3 p-3 p-md-5 mb-3 d-flex flex-column gap-4 bg-white">
+        <form>
+            <div class="row row-cols-1 row-cols-md-2 g-3">
+                <div class="col-12 col-md-12">
+                    <h5 class="fw-semibold">Prvoider Information</h5>
+                </div>
+
+                    <div class="col">
+                        <div class="form-floating">
+                            <input type="text"
+                                   class="form-control"
+                                   id="floatingInput"
+                                   placeholder="name@example.com" asp-for="Firstname" />
+                            <label for="floatingInput">User Name</label>
+                            <span class="text-danger" asp-validation-for="Firstname"></span>
+                        </div>
+                    </div>
+                    <div class="col">
+
+                        <div class="form-floating">
+                            <input type="password"
+                                   asp-for="Passwordhash"
+                                   class="form-control"
+                                   id="Password"
+                                   placeholder="*****" required />
+                            <label for="floatingInput" asp-for="Passwordhash">Password</label>
+                            <span asp-validation-for="Passwordhash" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="form-floating">
+                            <select class="form-select " aria-label="Default select example" name="state" id="cancelReason" asp-for="State">
+
+                                <option selected disabled>Select The State</option>
+                                @if (Model.Roles != null)
+                                {
+
+                                    @foreach (var region in Model.Roles)
+                                    {
+                                        <option value="@region.Roleid">@region.Name</option>
+                                    }
+                                }
+
+                            </select>
+                            <span class="error-state text-danger"></span>
+
+                    </div>
+                </div>
+                <div class="col-12 col-md-12">
+                    <h5 class="fw-semibold">Prvoider Information</h5>
+                </div>
+                <div class="col">
+                    <div class="form-floating">
+                        <input type="text"
+                               class="form-control"
+                               id="floatingInput"
+                               placeholder="name@example.com" asp-for="Firstname" />
+                        <label for="floatingInput">First Name</label>
+                        <span class="text-danger" asp-validation-for="Firstname"></span>
+                    </div>
+
+                </div>
+                <div class="col">
+                    <div class="form-floating">
+                        <input type="text"
+                               class="form-control"
+                               id="floatingInput"
+                               placeholder="name@example.com" />
+                        <label for="floatingInput" asp-for="Lastname">Last Name</label>
+                        <span class="text-danger" asp-validation-for="Lastname"></span>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="form-floating">
+                        <input type="email"
+                               class="form-control"
+                               id="Email"
+                               placeholder="name@example.com"
+                               asp-for="Email" />
+                        <label for="floatingInput" asp-for="Email">Email</label>
+                        <span asp-validation-for="Email" class="text-danger"></span>
+
+                    </div>
+                </div>
+
+                <div class="col">
+                    <div class="border rounded-2 tel-container">
+                        <input id="phone1"
+                               type="tel"
+                               class="form-control border-0 tel-input"
+                               asp-for="PhoneNo" />
+
+                    </div>
+                    <span asp-validation-for="PhoneNo" class="text-danger"></span>
+                </div>
+                <div class="col">
+                    <div class="form-floating">
+                        <input type="text"
+                               class="form-control"
+                               id="floatingInput"
+                               placeholder="name@example.com"
+                               asp-for="MedicalLicense" />
+                        <label for="floatingInput" asp-for="Lastname">Medical Licenese</label>
+                        <span asp-validation-for="MedicalLicense" class="text-danger"></span>
+
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="form-floating">
+                        <input type="text"
+                               class="form-control"
+                               id="floatingInput"
+                               placeholder="name@example.com"
+                               asp-for="NPINumber" />
+                        <label for="floatingInput" asp-for="NPINumber">Npi Number</label>
+                        <span asp-validation-for="NPINumber" class="text-danger"></span>
+
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="form-floating">
+                        <input type="text"
+                               class="form-control"
+                               id="floatingInput"
+                               placeholder="name@example.com"
+                               asp-for="NPINumber" />
+                        <label for="floatingInput" asp-for="NPINumber">Synchonization Email</label>
+                        <span asp-validation-for="NPINumber" class="text-danger"></span>
+
+                    </div>
+                </div>
+                <div class="col-12 col-md-12">
+                    <h5 class="fw-semibold">Mailing And Billing Information</h5>
+                </div>
+                <div class="col">
+                    <div class="form-floating">
+                        <input asp-for="@Model.Address1" type="text" class="form-control" id="address1" placeholder="Address 1" name="Address1">
+                        <label for="address1">Address 1</label>
+                        <span class="error-Address1 text-danger"></span>
+
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="form-floating">
+                        <input asp-for=@Model.Address2 type="text" class="form-control" id="address2" placeholder="Address 2" name="Address2">
+                        <label for="address2">Address 2</label>
+                        <span class="error-Address2 text-danger"></span>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="form-floating">
+                        <input asp-for=@Model.City type="text" class="form-control" id="city" placeholder="City" name="City">
+                        <label for="city">City</label>
+                        <span class="error-City text-danger"></span>
+
+                    </div>
+                </div>
+
+                <div class="col">
+                    <div class="form-floating">
+                        <select class="form-select " aria-label="Default select example" name="state" id="cancelReason" asp-for="State">
+
+                            <option selected disabled>Select The State</option>
+                            @if (Model.Regions != null)
+                            {
+
+                                @foreach (var region in Model.Regions)
+                                {
+                                    <option value="@region.Regionid">@region.Name</option>
+                                }
+                            }
+
+                        </select>
+                        <span class="error-state text-danger"></span>
+
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="form-floating">
+                        <input asp-for=@Model.ZipCode type="text" class="form-control" id="city" placeholder="City" name="Zipcode">
+                        <label for="zip">ZipCode</label>
+                        <span class="error-Zipcode text-danger"></span>
+
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class=" border rounded-2 tel-container">
+                        <input name="PhoneNumber" type="tel" id='phone2' name="MobileNo" class="form-control border-0 tel-input" placeholder="(201)555-0123" asp-for="@Model.PhoneNo">
+                        <span class="error-MobileNo text-danger"></span>
+
+                    </div>
+                </div>
+                <div class="col-12 col-md-12">
+                    <h5 class="fw-semibold">Select Provider Information</h5>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-check form-check-inline">
+                        @if (@Model.Regions != null)
+                        {
+
+                            @foreach (var region in Model.Regions)
+                            {
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input"
+                                           type="checkbox"
+                                           id="region-@region.Regionid"
+                                           name="adminRegion"
+                                           value="@region.Regionid" />
+                                    <label class="form-check-label" for="region-@region.Regionid">@region.Name</label>
+                                </div>
+                            }
+                        }
+                        <span class="error-adminRegion text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-12 col-md-12">
+                    <h5 class="fw-semibold">Provider Profile Information</h5>
+                </div>
+                <div class="col">
+                    <div class="form-floating">
+                        <input asp-for=@Model.BusinessName type="text" class="form-control" id="email" placeholder="Email" name="Businessname">
+                        <label for="email">BusinessName</label>
+                        <span class="error-email text-dange"></span>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="form-floating">
+                        <input asp-for=@Model.BusinessWebsite type="text" class="form-control" id="email" placeholder="Email" name="Businesswebsite">
+                        <label for="email">BusinessWebsite</label>
+                        <span class="error-email text-dange"></span>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="input-group input-group-lg">
+                        <div id="fileName" asp-for="FileName" class="form-control fs-6 align-middle">
+                            Select Photo
+                        </div>
+                        <input type="file" asp-for="File" class="form-control" id="fileInput" hidden disabled accept="jpg,png" />
+                        <label class="input-group-text btn btn-info text-light" for="fileInput">
+                            <span class="material-symbols-outlined me-2">cloud_upload</span>
+                            <span class="d-none d-md-inline">Upload</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+                    <h5 class="fw-semibold">On Board</h5>
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    <input type="checkbox" class="form-check-input" id="agreeToICA" name="agreeToICA">
+                    <span>Independent Contractor Agreement</span>
+
+                    <input type="file" class="form-control" id="ICA" hidden />
+                    <label class="input-group-text btn btn-info text-light" for="ICA">
+                        <span class="d-none d-md-inline">Upload</span>
+                    </label>
+                    
+                </div>
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    <input type="checkbox" class="form-check-input" id="agreeToICA" name="agreeToICA">
+                    <span>Background Check</span>
+
+                    <input type="file" class="form-control" id="Background" hidden />
+                    <label class="input-group-text btn btn-info text-light" for="Background">
+                        <span class="d-none d-md-inline">Upload</span>
+                    </label>
+                    
+                </div>
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    <input type="checkbox" class="form-check-input" id="agreeToICA" name="agreeToICA">
+                    <span>Hippa Compalience</span>
+
+                    <input type="file" class="form-control" id="Hippa" hidden />
+                    <label class="input-group-text btn btn-info text-light" for="Hippa">
+                        <span class="d-none d-md-inline">Upload</span>
+                    </label>
+                    
+                </div>
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    <input type="checkbox" class="form-check-input" id="agreeToICA" name="agreeToICA">
+                    <span>Non-disclosure-Agreement</span>
+
+                    <input type="file" class="form-control" id="NonDiscoluser" hidden />
+                    <label class="input-group-text btn btn-info text-light" for="NonDiscoluser">
+                        <span class="d-none d-md-inline">Upload</span>
+                    </label>
+                    
+                </div>
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    <input type="checkbox" class="form-check-input" id="agreeToICA" name="agreeToICA">
+                    <span>License-Documents</span>
+
+                    <input type="file" class="form-control" id="License" hidden />
+                    <label class="input-group-text btn btn-info text-light" for="License">
+                        <span class="d-none d-md-inline">Upload</span>
+                    </label>
+                    
+                </div>
+
+
+                <div>
+                </div>
+            <div class="d-flex justify-content-end">
+                <button class="btn btn-success">Create</button>
+            </div>
+        </form>
+    </div>
+</div>
+<script>
+    const phone1 = document.querySelector("#phone1");
+    const phoneInput1 = window.intlTelInput(phone1, {
+        utilsScript:
+            "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",
+        nationalMode: false,
+        showSelectedDialCode: true,
+        autoInsertDialCode: true,
+        formatOnDisplay: false,
+    });
+    const phone2 = document.querySelector("#phone2");
+    const phoneInput2 = window.intlTelInput(phone2, {
+        utilsScript:
+            "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",
+        nationalMode: false,
+        showSelectedDialCode: true,
+        autoInsertDialCode: true,
+        formatOnDisplay: false,
+    });
+
+</script>
