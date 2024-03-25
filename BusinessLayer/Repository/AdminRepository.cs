@@ -8,7 +8,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using MimeKit;
+using BC = BCrypt.Net.BCrypt;
 using System.Net;
+using System.Collections;
 
 namespace BusinessLayer.Repository
 {
@@ -18,15 +20,43 @@ namespace BusinessLayer.Repository
         [Obsolete]
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IConfiguration _configuration;
+        private readonly IUploadProvider _uploadprovider;
 
-        [Obsolete]
-        public AdminRepository(ApplicationDbContext context, IConfiguration configuration, IHostingEnvironment hostingEnvironment)
+            
+        public AdminRepository(ApplicationDbContext context,IUploadProvider uploadProvider, IConfiguration configuration, IHostingEnvironment hostingEnvironment)
         {
             _context = context;
 
             _configuration = configuration;
             _hostingEnvironment = hostingEnvironment;
+            _uploadprovider = uploadProvider;
         }
+
+        public Physician GetPhysicianByEmail(string email)
+        {
+            return _context.Physicians.FirstOrDefault(item => item.Email == email);
+        }
+        public Admin GetAdminByEmail(string email)
+        {
+            return _context.Admins.FirstOrDefault(item => item.Email == email);
+        }
+
+        public AspnetUser GetAspNetUserByEmail(string email)
+        {
+            return _context.AspnetUsers.FirstOrDefault(item => item.Email == email);
+        }
+        public List<int> GetUserPermissions(string roleid)
+        {
+            var menulist = _context.Rolemenus.Where(item => item.Roleid == int.Parse(roleid)).Select(item => item.Menuid).ToList();
+            ;
+            return menulist;
+        }
+        public Menu GetMenufromMenuid(string menuid)
+        {
+            var menu = _context.Menus.Where(item => item.Menuid == int.Parse(menuid)).FirstOrDefault();
+            return menu;
+        }
+
         #region SearchPatients
         public List<NewRequestTableVM> SearchPatients(string searchValue, string selectValue, string selectedFilter, int[] currentStatus)
         {
@@ -618,6 +648,262 @@ namespace BusinessLayer.Repository
             _context.SaveChanges();
         }
         #endregion
+        
+        #region GetAdminProfile
+        public AdminProfileVm GetAdminProfile(string email)
+        {
+            var admin = _context.Admins.FirstOrDefault(item => item.Email == email);
+            var adminProfile = new AdminProfileVm();
 
+            if (admin != null)
+            {
+                adminProfile.FirstName = admin.Firstname;
+                adminProfile.LastName = admin.Lastname ?? "";
+                adminProfile.Email = admin.Email;
+                adminProfile.Address1 = admin.Address1 ?? "";
+                adminProfile.Address2 = admin.Address2 ?? "";
+                adminProfile.City = admin.City ?? "";
+                adminProfile.ZipCode = admin.Zip ?? "";
+                adminProfile.MobileNo = admin.Mobile ?? "";
+                adminProfile.Regions = _context.Regions.ToList();
+                adminProfile.WorkingRegions = _context.AdminRegions.Where(item => item.Adminid == admin.Adminid).ToList();
+                adminProfile.State = admin.Regionid;
+            }
+
+            return adminProfile;
+        }
+        #endregion
+
+        #region ResetAdminPassword
+        public void ResetAdminPassword(string email, string newPassword)
+        {
+            var account = _context.AspnetUsers.FirstOrDefault(item => item.Email == email);
+
+            if (account != null)
+            {
+                string passwordhash = BC.HashPassword(newPassword);
+                account.Passwordhash = passwordhash;
+                _context.AspnetUsers.Update(account);
+                _context.SaveChanges();
+            }
+            else
+            {
+                throw new InvalidOperationException("Account not found");
+            }
+        }
+        #endregion
+
+        #region UpdateAdministrationInfo
+        public void UpdateAdministrationInfo(string sessionEmail, string email, string mobileNo, string[] adminRegionIds)
+        {
+            var admin = GetAdminByEmail(sessionEmail);
+            var aspnetUser = GetAspNetUserByEmail(sessionEmail);
+
+            if (admin != null && aspnetUser != null)
+            {
+                admin.Email = email;
+                admin.Mobile = mobileNo;
+                _context.Admins.Update(admin);
+
+                aspnetUser.Email = email;
+                _context.AspnetUsers.Update(aspnetUser);
+
+                var existingRegions = _context.AdminRegions.Where(item => item.Adminid == admin.Adminid).ToList();
+                _context.AdminRegions.RemoveRange(existingRegions);
+
+                foreach (string regionId in adminRegionIds)
+                {
+                    if (int.TryParse(regionId, out int regionIdInt))
+                    {
+                        _context.AdminRegions.Add(new AdminRegion { Adminid = admin.Adminid, Regionid = regionIdInt });
+                    }
+                }
+
+                _context.SaveChanges();
+            }
+            else
+            {
+                throw new InvalidOperationException("Account not found");
+            }
+        }
+        #endregion
+
+        #region UpdateAccountingInfo
+        public void UpdateAccountingInfo(string sessionEmail, string address1, string address2, string city, string zipcode, int state, string mobileNo)
+        {
+            var admin = GetAdminByEmail(sessionEmail);
+
+            if (admin != null)
+            {
+                admin.Address1 = address1;
+                admin.Address2 = address2;
+                admin.City = city;
+                admin.Zip = zipcode;
+                admin.Regionid = state;
+                admin.Mobile = mobileNo;
+
+                _context.Admins.Update(admin);
+                _context.SaveChanges();
+            }
+            else
+            {
+                throw new InvalidOperationException("Account not found");
+            }
+        }
+        #endregion
+
+        #region GetProvider
+        public List<ProviderVM> GetProviders(string region)
+        {
+            var providers = (from phy in _context.Physicians
+                             join role in _context.Roles on phy.Roleid equals role.Roleid
+                             join notify in _context.PhysicianNotifications on phy.Physicianid equals notify.Physicianid
+                             where (string.IsNullOrEmpty(region) || phy.Regionid == int.Parse(region))
+                             select new ProviderVM
+                             {
+                                 Name = phy.Firstname,
+                                 status = phy.Status,
+                                 Role = role.Name,
+                                 OnCallStaus = new BitArray(new[] { notify.Isnotificationstopped[0] }),
+                                 regions = _context.Regions.ToList(),
+                                 physicianid = phy.Physicianid
+                             }).ToList();
+            return providers;
+        }
+        #endregion
+
+        #region GetPhysicianProfile
+        public ProviderProfileVm GetPhysicianProfile(int id)
+        {
+            var physician = _context.Physicians.FirstOrDefault(item => item.Physicianid == id);
+
+            if (physician == null)
+            {
+                throw new InvalidOperationException("Physician not found");
+            }
+
+            var providerProfile = new ProviderProfileVm
+            {
+                FirstName = physician.Firstname,
+                LastName = physician.Lastname ?? "",
+                Email = physician.Email,
+                Address1 = physician.Address1 ?? "",
+                Address2 = physician.Address2 ?? "",
+                City = physician.City ?? "",
+                ZipCode = physician.Zip ?? "",
+                MobileNo = physician.Mobile ?? "",
+                Regions = _context.Regions.ToList(),
+                MedicalLicense = physician.Medicallicense,
+                NPINumber = physician.Npinumber,
+                SynchronizationEmail = physician.Syncemailaddress,
+                physicianid = physician.Physicianid,
+                WorkingRegions = _context.PhysicianRegions.Where(item => item.Physicianid == physician.Physicianid).ToList(),
+                State = physician.Regionid,
+                SignatureFilename = physician.Signature,
+                BusinessWebsite = physician.Businesswebsite,
+                BusinessName = physician.Businessname,
+                PhotoFileName = physician.Photo,
+                IsAgreement = physician.Isagreementdoc,
+                IsBackground = physician.Isbackgrounddoc,
+                IsHippa = physician.Istrainingdoc,
+                NonDiscoluser = physician.Isnondisclosuredoc,
+                License = physician.Islicensedoc
+            };
+
+            return providerProfile;
+        }
+        #endregion
+
+        #region ResetPhysicianPassword
+        public bool ResetPhysicianPassword(int physicianId, string newPassword)
+        {
+            var physician = _context.Physicians.FirstOrDefault(item => item.Physicianid == physicianId);
+            var account = GetAspNetUserByEmail(physician.Email);
+
+            if (account != null && BC.Verify(newPassword, account.Passwordhash))
+            {
+                return false; // Password remains the same
+            }
+            else if (account != null)
+            {
+                string passwordHash = BC.HashPassword(newPassword);
+                account.Passwordhash = passwordHash;
+                _context.AspnetUsers.Update(account);
+                _context.SaveChanges();
+                return true; // Password updated successfully
+            }
+            else
+            {
+                return false; // Account not found
+            }
+        }
+        #endregion
+
+        #region UpdatePhysicianInformation
+        public void UpdatePhysicianInformation(int id, string email, string mobileNo, string[] adminRegion, string synchronizationEmail, string npinumber, string medicalLicense)
+        {
+            var physician = _context.Physicians.FirstOrDefault(item => item.Physicianid == id);
+
+            if (physician != null)
+            {
+                physician.Email = email;
+                physician.Mobile = mobileNo;
+                physician.Npinumber = npinumber;
+                physician.Syncemailaddress = synchronizationEmail;
+                physician.Medicallicense = medicalLicense;
+
+                _context.Physicians.Update(physician);
+                _context.SaveChanges();
+
+                // Remove existing regions
+                var existingRegions = _context.PhysicianRegions.Where(item => item.Physicianid == physician.Physicianid).ToList();
+                _context.PhysicianRegions.RemoveRange(existingRegions);
+
+                // Add new regions
+                foreach (string regionValue in adminRegion)
+                {
+                    int regionId = int.Parse(regionValue); // Assuming region values are integer IDs
+                    _context.PhysicianRegions.Add(new PhysicianRegion { Physicianid = physician.Physicianid, Regionid = regionId });
+                }
+                _context.SaveChanges(); // Save changes to add new associations
+            }
+            else
+            {
+                throw new InvalidOperationException("Physician not found");
+            }
+        }
+        #endregion
+
+        #region UpdateProviderProfile
+        public void UpdateProviderProfile(int id, string businessName, string businessWebsite, IFormFile signatureFile, IFormFile photoFile)
+        {
+            var physician = _context.Physicians.FirstOrDefault(item => item.Physicianid == id);
+
+            if (physician != null)
+            {
+                physician.Businessname = businessName;
+                physician.Businesswebsite = businessWebsite;
+
+                if (signatureFile != null && signatureFile.FileName != null)
+                {
+                    string signatureFileName = _uploadprovider.UploadSignature(signatureFile, id);
+                    physician.Signature = signatureFileName;
+                }
+
+                if (photoFile != null && photoFile.FileName != null)
+                {
+                    string photoFileName = _uploadprovider.UploadPhoto(photoFile, id);
+                    physician.Photo = photoFileName;
+                }
+
+                _context.Physicians.Update(physician);
+                _context.SaveChanges();
+            }
+            else
+            {
+                throw new InvalidOperationException("Physician not found");
+            }
+        }
+        #endregion
     }
 }

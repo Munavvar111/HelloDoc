@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using DataAccessLayer.CustomModel;
+using DataAccessLayer.DataModels;
+using Microsoft.AspNetCore.Http;
 
 namespace BusinessLayer.InterFace
 {
@@ -25,6 +27,25 @@ namespace BusinessLayer.InterFace
 
         ViewEncounterForm GetEncounterForm(int requestid);
         void SaveOrUpdateEncounterForm(ViewEncounterForm viewEncounterForm, string requestid);
+        public List<int> GetUserPermissions(string roleid);
+        public Menu GetMenufromMenuid(string menuid);
+
+        AdminProfileVm GetAdminProfile(string email);
+        void ResetAdminPassword(string email, string newPassword);
+        Physician GetPhysicianByEmail(string email);
+        Admin GetAdminByEmail(string email);
+        AspnetUser GetAspNetUserByEmail(string email);
+        void UpdateAdministrationInfo(string sessionEmail, string email, string mobileNo, string[] adminRegionIds);
+        void UpdateAccountingInfo(string sessionEmail, string address1, string address2, string city, string zipcode, int state, string mobileNo);
+
+        List<ProviderVM> GetProviders(string region);   
+
+        ProviderProfileVm GetPhysicianProfile(int id);
+        bool ResetPhysicianPassword(int physicianId, string newPassword);
+        void UpdatePhysicianInformation(int id, string email, string mobileNo, string[] adminRegion, string synchronizationEmail, string npinumber, string medicalLicense);
+        void UpdateProviderProfile(int id, string businessName, string businessWebsite, IFormFile signatureFile, IFormFile photoFile);
+
+
 
     }
 }

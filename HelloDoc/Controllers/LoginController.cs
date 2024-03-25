@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using BC = BCrypt.Net.BCrypt;
 using Microsoft.AspNetCore.DataProtection;
 using DataAccessLayer.DataModels;
+using Newtonsoft.Json;
 
 namespace HalloDocPatient.Controllers
 {
@@ -41,6 +42,7 @@ namespace HalloDocPatient.Controllers
                 if (_login.isLoginValid(a))
                 {
                     var user = await _context.Users.FirstOrDefaultAsync(x => x.Email == a.Email);
+                    var admin=_context.Admins.FirstOrDefault(x=>x.Email==a.Email);
                     AspnetUser? aspnetuser = _context.AspnetUsers.FirstOrDefault(x => x.Email == a.Email);
                     if (aspnetuser != null)
                     {
@@ -48,20 +50,22 @@ namespace HalloDocPatient.Controllers
                         if (role != null)
                         {
 
-                            AspnetRole? rolefromroleid = _context.AspnetRoles.FirstOrDefault(x => x.Id == role.Roleid);
-
-                            var token = _jwtAuth.GenerateToken(user?.Email ?? "", rolefromroleid.Name.Trim());
-                            HttpContext.Session.SetString("Role", rolefromroleid.Name.Trim());
+                            Role? rolefromroleid = _context.Roles.FirstOrDefault(x => x.Roleid == role.Roleid);
+                            var rolemenu = _context.Rolemenus.Where(item => item.Roleid == rolefromroleid.Roleid).Select(item => item.Menuid).ToList();
+                            var token = _jwtAuth.GenerateToken(user?.Email ?? "", rolefromroleid.Roleid.ToString());
+                            HttpContext.Session.SetString("Role", rolefromroleid.Roleid.ToString());
                             HttpContext.Session.SetString("token", token);
-                            HttpContext.Session.SetString("Email", user?.Email ?? "");
+                            HttpContext.Session.SetString("aspnetid", aspnetuser.Aspnetuserid);
+                            HttpContext.Session.SetString("UserPermissions", JsonConvert.SerializeObject(rolemenu));
+                            HttpContext.Session.SetString("Email", a?.Email ?? "");
                             HttpContext.Session.SetInt32("id", user?.Userid ?? 1);
                             HttpContext.Session.SetString("Username", user?.Firstname ?? "");
-                            if (rolefromroleid?.Name.Trim() == "admin")
+                            if (admin!=null)
                             {
                                 TempData["SuccessMessage"] = "Login  successful!";
                                 return RedirectToAction("Index", "Admin");
                             }
-                            else if (rolefromroleid?.Name.Trim() == "user")
+                            else if (user!=null)
                             {
                                 TempData["SuccessMessage"] = "Login  successful!";
 

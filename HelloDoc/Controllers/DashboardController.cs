@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace HalloDocPatient.Controllers
 {
-    [CustomAuthorize("user")]
+    [CustomAuthorize("Dashboard","24")]
     public class DashboardController : Controller
     {
         private readonly ApplicationDbContext _context;

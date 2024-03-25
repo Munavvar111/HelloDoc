@@ -17,7 +17,7 @@
         </div>
     </div>
     <div class="bg-white mx-2 border rounded-3 p-3 p-md-5 mb-3 d-flex flex-column gap-4 bg-white">
-        <form>
+        <form asp-action="CreateProvider" method="post" enctype="multipart/form-data">
             <div class="row row-cols-1 row-cols-md-2 g-3">
                 <div class="col-12 col-md-12">
                     <h5 class="fw-semibold">Prvoider Information</h5>
@@ -28,9 +28,9 @@
                             <input type="text"
                                    class="form-control"
                                    id="floatingInput"
-                                   placeholder="name@example.com" asp-for="Firstname" />
+                                   placeholder="name@example.com" asp-for="UserName" />
                             <label for="floatingInput">User Name</label>
-                            <span class="text-danger" asp-validation-for="Firstname"></span>
+                            <span class="text-danger" asp-validation-for="UserName"></span>
                         </div>
                     </div>
                     <div class="col">
@@ -47,9 +47,9 @@
                     </div>
                     <div class="col">
                         <div class="form-floating">
-                            <select class="form-select " aria-label="Default select example" name="state" id="cancelReason" asp-for="State">
+                            <select class="form-select " aria-label="Default select example"  id="cancelReason" asp-for="RoleId">
 
-                                <option selected disabled>Select The State</option>
+                                <option selected disabled>Select The Role   </option>
                                 @if (Model.Roles != null)
                                 {
 
@@ -83,7 +83,8 @@
                         <input type="text"
                                class="form-control"
                                id="floatingInput"
-                               placeholder="name@example.com" />
+                               placeholder="name@example.com"
+                               asp-for="Lastname"/>
                         <label for="floatingInput" asp-for="Lastname">Last Name</label>
                         <span class="text-danger" asp-validation-for="Lastname"></span>
                     </div>
@@ -118,7 +119,7 @@
                                id="floatingInput"
                                placeholder="name@example.com"
                                asp-for="MedicalLicense" />
-                        <label for="floatingInput" asp-for="Lastname">Medical Licenese</label>
+                        <label for="floatingInput" asp-for="MedicalLicense">Medical Licenese</label>
                         <span asp-validation-for="MedicalLicense" class="text-danger"></span>
 
                     </div>
@@ -236,16 +237,16 @@
                 </div>
                 <div class="col">
                     <div class="form-floating">
-                        <input asp-for=@Model.BusinessName type="text" class="form-control" id="email" placeholder="Email" name="Businessname">
-                        <label for="email">BusinessName</label>
-                        <span class="error-email text-dange"></span>
+                        <input asp-for=BusinessName type="text" class="form-control" id="business" placeholder="Business">
+                        <label asp-for="BusinessName">BusinessName</label>
+                        <span asp-validation-for="BusinessWebsite" class="text-danger"></span>
                     </div>
                 </div>
                 <div class="col">
                     <div class="form-floating">
-                        <input asp-for=@Model.BusinessWebsite type="text" class="form-control" id="email" placeholder="Email" name="Businesswebsite">
-                        <label for="email">BusinessWebsite</label>
-                        <span class="error-email text-dange"></span>
+                        <input asp-for=BusinessWebsite type="text" class="form-control" id="businesswebsite" placeholder="BusinessWebsite" >
+                        <label asp-for="BusinessWebsite">BusinessWebsite</label>
+                        <span asp-validation-for="BusinessName" class="text-danger"></span>
                     </div>
                 </div>
                 <div class="col">
@@ -253,11 +254,13 @@
                         <div id="fileName" asp-for="FileName" class="form-control fs-6 align-middle">
                             Select Photo
                         </div>
-                        <input type="file" asp-for="File" class="form-control" id="fileInput" hidden disabled accept="jpg,png" />
-                        <label class="input-group-text btn btn-info text-light" for="fileInput">
+                        <input type="file" asp-for="File" class="form-control" id="fileInput" hidden accept="jpg,png" />
+                        <label class="input-group-text btn btn-info text-light" for="fileInput" asp-for="File">
                             <span class="material-symbols-outlined me-2">cloud_upload</span>
                             <span class="d-none d-md-inline">Upload</span>
                         </label>
+
+                        <span asp-validation-for="File" class="text-danger"></span>
                     </div>
                 </div>
             </div>
@@ -266,7 +269,7 @@
                     <input type="checkbox" class="form-check-input" id="agreeToICA" name="agreeToICA">
                     <span>Independent Contractor Agreement</span>
 
-                    <input type="file" class="form-control" id="ICA" hidden />
+                    <input type="file" asp-for="IsAgreement" class="form-control" id="ICA" hidden />
                     <label class="input-group-text btn btn-info text-light" for="ICA">
                         <span class="d-none d-md-inline">Upload</span>
                     </label>
@@ -276,7 +279,7 @@
                     <input type="checkbox" class="form-check-input" id="agreeToICA" name="agreeToICA">
                     <span>Background Check</span>
 
-                    <input type="file" class="form-control" id="Background" hidden />
+                    <input type="file" asp-for="IsBackground" class="form-control" id="Background" hidden />
                     <label class="input-group-text btn btn-info text-light" for="Background">
                         <span class="d-none d-md-inline">Upload</span>
                     </label>
@@ -286,7 +289,7 @@
                     <input type="checkbox" class="form-check-input" id="agreeToICA" name="agreeToICA">
                     <span>Hippa Compalience</span>
 
-                    <input type="file" class="form-control" id="Hippa" hidden />
+                    <input type="file" asp-for="IsHippa" class="form-control" id="Hippa" hidden />
                     <label class="input-group-text btn btn-info text-light" for="Hippa">
                         <span class="d-none d-md-inline">Upload</span>
                     </label>
@@ -296,7 +299,7 @@
                     <input type="checkbox" class="form-check-input" id="agreeToICA" name="agreeToICA">
                     <span>Non-disclosure-Agreement</span>
 
-                    <input type="file" class="form-control" id="NonDiscoluser" hidden />
+                    <input type="file" asp-for="NonDiscoluser" class="form-control" id="NonDiscoluser" hidden />
                     <label class="input-group-text btn btn-info text-light" for="NonDiscoluser">
                         <span class="d-none d-md-inline">Upload</span>
                     </label>
@@ -306,7 +309,7 @@
                     <input type="checkbox" class="form-check-input" id="agreeToICA" name="agreeToICA">
                     <span>License-Documents</span>
 
-                    <input type="file" class="form-control" id="License" hidden />
+                    <input type="file" asp-for="License" class="form-control" id="License" hidden />
                     <label class="input-group-text btn btn-info text-light" for="License">
                         <span class="d-none d-md-inline">Upload</span>
                     </label>
@@ -342,4 +345,19 @@
         formatOnDisplay: false,
     });
 
+</script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const fileInputs = document.querySelectorAll('input[type="file"]');
+        fileInputs.forEach(function (input) {
+            input.addEventListener('change', function () {
+                const checkbox = this.parentElement.querySelector('input[type="checkbox"]');
+                if (this.files.length > 0) {
+                    checkbox.checked = true;
+                } else {
+                    checkbox.checked = false;
+                }
+            });
+        });
+    });
 </script>

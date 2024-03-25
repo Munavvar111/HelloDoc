@@ -25,6 +25,12 @@ namespace DataAccessLayer.CustomModel
         [StringLength(50, ErrorMessage = "Last Name should be between {2} and {1} characters.", MinimumLength = 2)]
         public string Lastname { get; set; } = null!;
 
+        [Column("username")]
+        [Required(ErrorMessage = "Please Enter UserName")]
+        [RegularExpression(@"^[^\s]+$", ErrorMessage = "Invalid UserName")]
+        [StringLength(50, ErrorMessage = "Last Name should be between {2} and {1} characters.", MinimumLength = 2)]
+        public string UserName { get; set; } = null!;
+
 
         [Column("email")]
         [Required(ErrorMessage = "Please Enter Email")]
@@ -49,19 +55,29 @@ namespace DataAccessLayer.CustomModel
         public string? City { get; set; }
         public string? Street { get; set; }
         public int? State { get; set; }
+
+        [Required(ErrorMessage ="Please Enter A Role")]
+        public int RoleId { get; set; }
         public IFormFile? Photo { get; set; }
         public string? ZipCode { get; set; }
         public List<Region>? Regions { get; set; }
         public List<Role>? Roles { get; set; }
-        public string? BusinessName { get; set; }
-        public string? BusinessWebsite { get; set; }
+
+        [Required(ErrorMessage = "Please Enter A BusinessName")]
+        public string BusinessName { get; set; } = null!;
+
+        [Required(ErrorMessage = "Please Enter A BusinessWebsite")]
+        public string BusinessWebsite { get; set; } = null!;
         public string? AdminNotes { get; set; }
-        public IFormFile? File { get; set; }
+
+
+        [Required(ErrorMessage = "Plese Enter A Photo")]
+        public IFormFile File { get; set; } = null!;
         public IFormFile? signature { get; set; }
-        public BitArray? IsAgreement { get; set; }
-        public BitArray? IsBackground { get; set; }
-        public BitArray? IsHippa { get; set; }
-        public BitArray? NonDiscoluser { get; set; }
-        public BitArray? License { get; set; }
+        public IFormFile? IsAgreement { get; set; }
+        public IFormFile? IsBackground { get; set; }
+        public IFormFile? IsHippa { get; set; }
+        public IFormFile? NonDiscoluser { get; set; }
+        public IFormFile? License { get; set; }
     }
 }

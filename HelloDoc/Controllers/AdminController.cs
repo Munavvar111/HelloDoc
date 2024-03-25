@@ -1,5 +1,4 @@
 ﻿using BusinessLayer.InterFace;
-using BusinessLayer.InterFace;
 using DataAccessLayer.CustomModel;
 using DataAccessLayer.DataContext;
 using DataAccessLayer.DataModels;
@@ -11,12 +10,12 @@ using System.Collections;
 using BC = BCrypt.Net.BCrypt;
 using CsvHelper;
 using System.Globalization;
-using System.Collections.Generic;
+using ServiceStack;
 using BusinessLayer.Repository;
+
 
 namespace HelloDoc.Controllers
 {
-    [CustomAuthorize("admin")]
     public class AdminController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -28,11 +27,11 @@ namespace HelloDoc.Controllers
         private readonly IUploadProvider _uploadProvider;
         private readonly IDataProtectionProvider _dataProtectionProvider;
 
-        public AdminController(ApplicationDbContext context,IUploadProvider uploadProvider, IAdmin admin, IPatientRequest patient, IDataProtectionProvider dataProtectionProvider, IWebHostEnvironment hostingEnvironment, IJwtAuth jwtAuth, ILogin login)
+        public AdminController(ApplicationDbContext context, IUploadProvider uploadProvider, IAdmin admin, IPatientRequest patient, IDataProtectionProvider dataProtectionProvider, IWebHostEnvironment hostingEnvironment, IJwtAuth jwtAuth, ILogin login)
         {
             _context = context;
             _admin = admin;
-            _uploadProvider=uploadProvider;
+            _uploadProvider = uploadProvider;
             _patient = patient;
             _jwtAuth = jwtAuth;
             _hostingEnvironment = hostingEnvironment;
@@ -40,232 +39,192 @@ namespace HelloDoc.Controllers
             _dataProtectionProvider = dataProtectionProvider;
         }
         //main View
+        [CustomAuthorize("ProviderLocation", "17")]
         public IActionResult ProviderLocation()
         {
             return View();
         }
-
+        [CustomAuthorize("ProviderLocation", "17")]
         public List<PhysicianLocation> GetProviders()
         {
             return _context.PhysicianLocations.ToList();
         }
 
-        //main View
+        #region Profile
+        [CustomAuthorize("MyProfile", "5")]
         public IActionResult Profile()
         {
             string? email = HttpContext.Session.GetString("Email");
-            int? id = HttpContext.Session.GetInt32("id");
 
-            Admin? admin = _context.Admins.FirstOrDefault(item => item.Email == email);
-            AdminProfileVm adminProfile = new AdminProfileVm();
-
-            if (admin != null)
+            if (string.IsNullOrEmpty(email))
             {
-                adminProfile.FirstName = admin.Firstname;
-                adminProfile.LastName = admin.Lastname ?? "";
-                adminProfile.Email = admin.Email;
-                adminProfile.Address1 = admin.Address1 ?? "";
-                adminProfile.Address2 = admin.Address2 ?? "";
-                adminProfile.City = admin.City ?? "";
-                adminProfile.ZipCode = admin.Zip ?? "";
-                adminProfile.MobileNo = admin.Mobile ?? "";
-                adminProfile.Regions = _context.Regions.ToList();
-                adminProfile.WorkingRegions = _context.AdminRegions.Where(item => item.Adminid == admin.Adminid).ToList();
-                adminProfile.State = admin.Regionid;
+                TempData["Error"] = "Invalid session data. Please log in again.";
+                return RedirectToAction("Index", "Admin");
             }
-            else
+
+            var adminProfile = _admin.GetAdminProfile(email);
+
+            if (adminProfile == null)
             {
-                TempData["Error"] = "Something Went Wrong Please Try Again";
+                TempData["Error"] = "Something went wrong while fetching admin profile.";
                 return RedirectToAction("Index", "Admin");
             }
 
             return View(adminProfile);
         }
+        #endregion
 
+        #region ResetAdminPassword
+        [CustomAuthorize("MyProfile", "5")]
         [HttpPost]
-        public IActionResult ResetAdminPassword(string Password)
+        public IActionResult ResetAdminPassword(string password)
         {
             string? email = HttpContext.Session.GetString("Email");
-            Admin? admin = _context.Admins.FirstOrDefault(item => item.Email == email);
-            AspnetUser? account = _context.AspnetUsers.FirstOrDefault(item => item.Email == email);
-
-            if (account != null && BC.Verify(Password, account.Passwordhash))
+            if (string.IsNullOrEmpty(email))
             {
-                TempData["Error"] = "Your Previous Password Is Same As Current";
+                TempData["Error"] = "Invalid session data. Please log in again.";
+                return RedirectToAction("Index", "Admin");
             }
-            else if (account != null)
+            try
             {
-                string passwordhash = BC.HashPassword(Password);
-                account.Passwordhash = passwordhash;
-                _context.AspnetUsers.Update(account);
-                _context.SaveChanges();
-                TempData["SuccessMessage"] = "Your Password Update SuccessFull";
+                _admin.ResetAdminPassword(email, password);
+                TempData["SuccessMessage"] = "Your password has been updated successfully.";
             }
-            else
+            catch (InvalidOperationException ex)
             {
-                TempData["Error"] = "Account not found";
+                TempData["Error"] = ex.Message;
             }
 
             return RedirectToAction("Profile", "Admin");
         }
+        #endregion
+
+        #region AdministrationInfo
+        [CustomAuthorize("MyProfile", "5")]
         [HttpPost]
-        public IActionResult AdministrationInfo(string email, string MobileNo, string[] adminRegion)
+        public IActionResult AdministrationInfo(string email, string mobileNo, string[] adminRegion)
         {
-            string? sessionemail = HttpContext.Session.GetString("Email");
-            AspnetUser? aspnetUser = _context.AspnetUsers.FirstOrDefault(item => item.Email == sessionemail);
-            Admin? admin = _context.Admins.Where(item => item.Email == sessionemail).FirstOrDefault();
-            if (admin != null && aspnetUser != null)
+            string? sessionEmail = HttpContext.Session.GetString("Email");
+            
+            if (string.IsNullOrEmpty(sessionEmail))
             {
-                admin.Email = email;
-                admin.Mobile = MobileNo;
-                _context.Admins.Update(admin);
-                _context.SaveChanges();
-                aspnetUser.Email = email;
-                _context.AspnetUsers.Update(aspnetUser);
-                _context.SaveChanges();
-                List<AdminRegion> existingregion = _context.AdminRegions.Where(item => item.Adminid == admin.Adminid).ToList();
-                _context.AdminRegions.RemoveRange(existingregion);
-                foreach (string regionValue in adminRegion)
-                {
-                    int regionId = int.Parse(regionValue); // Assuming region values are integer IDs
-                    _context.AdminRegions.Add(new AdminRegion { Adminid = admin.Adminid, Regionid = regionId });
-                }
-                _context.SaveChanges(); // Save changes to add new associations
-                TempData["SuccessMessage"] = "Your Administration Details Update SuccessFull";
+                TempData["Error"] = "Invalid session data. Please log in again.";
+                return RedirectToAction("Index", "Admin");
             }
-            else
+            try
             {
-                TempData["Error"] = "Account not found";
+                _admin.UpdateAdministrationInfo(sessionEmail, email, mobileNo, adminRegion);
+                TempData["SuccessMessage"] = "Your administration details have been updated successfully.";
             }
-            return RedirectToAction("Profile", "Admin");
-
-        }
-
-        public IActionResult AccountingInfo(string Address1, string Address2, string City, int State, string Zipcode, string MobileNo)
-        {
-            string? sessionemail = HttpContext.Session.GetString("Email");
-            Admin? admin = _context.Admins.Where(item => item.Email == sessionemail).FirstOrDefault();
-            if (admin != null)
+            catch (InvalidOperationException ex)
             {
-                admin.Address1 = Address1;
-                admin.Address2 = Address2;
-                admin.City = City;
-                admin.Zip = Zipcode;
-                admin.Regionid = State;
-                admin.Mobile = MobileNo;
-                _context.Admins.Update(admin);
-                _context.SaveChanges();
-                TempData["SuccessMessage"] = "Your Accounting Details Update SuccessFull";
-            }
-            else
-            {
-                TempData["Error"] = "Account not found";
+                TempData["Error"] = ex.Message;
             }
 
             return RedirectToAction("Profile", "Admin");
-
         }
+        #endregion
+
+        #region AccountingInfo
+        [CustomAuthorize("MyProfile", "5")]
+        public IActionResult AccountingInfo(string address1, string address2, string city, int state, string zipcode, string mobileNo)
+        {
+            string? sessionEmail = HttpContext.Session.GetString("Email");
+
+            if (string.IsNullOrEmpty(sessionEmail))
+            {
+                TempData["Error"] = "Invalid session data. Please log in again.";
+                return RedirectToAction("Index", "Admin");
+            }
+            try
+            {
+                _admin.UpdateAccountingInfo(sessionEmail, address1, address2, city, zipcode, state, mobileNo);
+                TempData["SuccessMessage"] = "Your accounting details have been updated successfully.";
+            }
+            catch (InvalidOperationException ex)
+            {
+                TempData["Error"] = ex.Message;
+            }
+
+            return RedirectToAction("Profile", "Admin");
+        }
+        #endregion
+
+        #region Provider
+        [CustomAuthorize("Provider", "8")]
         public IActionResult Provider()
         {
             List<Region> region = _context.Regions.ToList();
             return View(region);
         }
-        //main View
+        #endregion
+
+        #region ProviderData
+        [CustomAuthorize("Provider", "8")]
         public IActionResult ProviderData(string region)
         {
-            List<ProviderVM> providers = (from phy in _context.Physicians
-                                          join role in _context.Roles
-                                          on phy.Roleid equals role.Roleid
-                                          join notify in _context.PhysicianNotifications
-                                          on phy.Physicianid equals notify.Physicianid
-                                          where (string.IsNullOrEmpty(region) || phy.Regionid == int.Parse(region))
-                                          select new ProviderVM
-                                          {
-                                              Name = phy.Firstname,
-                                              status = phy.Status,
-                                              Role = role.Name,
-                                              OnCallStaus = new BitArray(new[] { notify.Isnotificationstopped[0] }),
-                                              regions = _context.Regions.ToList(),
-                                              physicianid = phy.Physicianid
-                                          }).ToList();
+            var providers = _admin.GetProviders(region);
             return PartialView("ProviderProfileTablePartial", providers);
         }
+        #endregion
 
+        #region PhysicanProfile
+        [CustomAuthorize("Provider", "8")]
         public IActionResult PhysicanProfile(int id)
         {
-            Physician? physician = _context.Physicians.FirstOrDefault(item => item.Physicianid == id);
-
-            ProviderProfileVm providerProfile = new ProviderProfileVm();
-            providerProfile.FirstName = physician.Firstname;
-            providerProfile.LastName = physician.Lastname ?? "";
-            providerProfile.Email = physician.Email;
-            providerProfile.Address1 = physician.Address1 ?? "";
-            providerProfile.Address2 = physician.Address2 ?? "";
-            providerProfile.City = physician.City ?? "";
-            providerProfile.ZipCode = physician.Zip ?? "";
-            providerProfile.MobileNo = physician.Mobile ?? "";
-            providerProfile.Regions = _context.Regions.ToList();
-            providerProfile.MedicalLicense = physician.Medicallicense;
-            providerProfile.NPINumber = physician.Npinumber;
-            providerProfile.SynchronizationEmail = physician.Syncemailaddress;
-            providerProfile.physicianid = physician.Physicianid;
-            providerProfile.WorkingRegions = _context.PhysicianRegions.Where(item => item.Physicianid == physician.Physicianid).ToList();
-            providerProfile.State = physician.Regionid;
-            providerProfile.SignatureFilename = physician.Signature;
-            providerProfile.BusinessWebsite = physician.Businesswebsite;
-            providerProfile.BusinessName = physician.Businessname;
-            providerProfile.PhotoFileName = physician.Photo;
-            providerProfile.IsAgreement = physician.Isagreementdoc;
-            providerProfile.IsBackground = physician.Isbackgrounddoc;
-            providerProfile.IsHippa = physician.Istrainingdoc;
-            providerProfile.NonDiscoluser = physician.Isnondisclosuredoc;
-            providerProfile.License = physician.Islicensedoc;
-            return View(providerProfile);
-
+            try
+            {
+                var providerProfile = _admin.GetPhysicianProfile(id);
+                return View(providerProfile);
+            }
+            catch (InvalidOperationException ex)
+            {
+                TempData["Error"] = ex.Message;
+                return RedirectToAction("Index", "Error");
+            }
         }
-        public IActionResult ResetPhysicianPassword(string Password, int physicianid)
+        #endregion
+
+        #region ResetPhysicianPassword
+        [CustomAuthorize("Provider", "8")]
+        public IActionResult ResetPhysicianPassword(string password, int physicianId)
         {
-
-            Physician? physician = _context.Physicians.FirstOrDefault(item => item.Physicianid == physicianid);
-
-            AspnetUser? account = _context.AspnetUsers.FirstOrDefault(item => item.Email == physician.Email);
-
-            if (account != null && BC.Verify(Password, account.Passwordhash))
+            try
             {
-                TempData["Error"] = "Your Previous Password Is Same As Current";
+                bool passwordChanged = _admin.ResetPhysicianPassword(physicianId, password);
+                if (passwordChanged)
+                {
+                    TempData["SuccessMessage"] = "Your password has been updated successfully.";
+                }
+                else
+                {
+                    TempData["ErrorMessage"] = "Your previous password is the same as the current one.";
+                }
             }
-            else if (account != null)
+            catch (InvalidOperationException ex)
             {
-                string passwordhash = BC.HashPassword(Password);
-                account.Passwordhash = passwordhash;
-                _context.AspnetUsers.Update(account);
-                _context.SaveChanges();
-                TempData["SuccessMessage"] = "Your Password Update SuccessFull";
-            }
-            else
-            {
-                TempData["Error"] = "Account not found";
+                TempData["ErrorMessage"] = ex.Message;
             }
 
-            return RedirectToAction("PhysicanProfile", "Admin", new { id = physicianid });
+            return RedirectToAction("PhysicanProfile", "Admin", new { id = physicianId });
         }
+        #endregion
 
+        #region SaveSignatureImage
+        [CustomAuthorize("Provider", "8")]
         [HttpPost]
         public IActionResult SaveSignatureImage(IFormFile signatureImage, int id)
         {
             try
             {
-                
                 if (signatureImage != null && signatureImage.Length > 0)
                 {
                     string fileName = _uploadProvider.UploadSignature(signatureImage, id);
-
                     var physician = _context.Physicians.FirstOrDefault(item => item.Physicianid == id);
                     physician.Signature = fileName;
                     _context.Physicians.Update(physician);
                     _context.SaveChanges();
                     TempData["SuccessMessage"] = "Signature saved successfully.";
-
                     return Ok();
                 }
                 else
@@ -279,6 +238,10 @@ namespace HelloDoc.Controllers
                 return StatusCode(500, $"Error saving signature: {ex.Message}");
             }
         }
+        #endregion
+
+        #region UploadDoc
+        [CustomAuthorize("Provider", "8")]
         [HttpPost]
         public IActionResult UploadDoc(string fileName, IFormFile File, int physicianid)
         {
@@ -286,112 +249,94 @@ namespace HelloDoc.Controllers
             if (physician != null)
             {
 
-            if (fileName == "ICA")
-            {
-                var docfile=_uploadProvider.UploadDocFile(File,physicianid, fileName);
-                physician.Isagreementdoc = new BitArray(new[] { true });
-            }
-            if (fileName == "Background")
-            {
-                var docfile=_uploadProvider.UploadDocFile(File,physicianid, fileName);
-                physician.Isbackgrounddoc = new BitArray(new[] { true });
-            }
-            if (fileName == "Hippa")
-            {
-                var docfile=_uploadProvider.UploadDocFile(File,physicianid, fileName);
-                physician.Istrainingdoc = new BitArray(new[] { true });
-            }
-            if (fileName == "NonDiscoluser")
-            {
-                var docfile=_uploadProvider.UploadDocFile(File,physicianid, fileName);
-                physician.Isnondisclosuredoc = new BitArray(new[] { true });
-            }
-            if (fileName == "License")
-            {
-                var docfile=_uploadProvider.UploadDocFile(File,physicianid, fileName);
-                physician.Islicensedoc = new BitArray(new[] { true });
-            }
-            _context.Physicians.Update(physician);
-            _context.SaveChanges();
-            TempData["SuccessMessage"] = "Upload Doc successfully.";
-            return Ok();
+                if (fileName == "ICA")
+                {
+                    var docfile = _uploadProvider.UploadDocFile(File, physicianid, fileName);
+                    physician.Isagreementdoc = new BitArray(new[] { true });
+                }
+                if (fileName == "Background")
+                {
+                    var docfile = _uploadProvider.UploadDocFile(File, physicianid, fileName);
+                    physician.Isbackgrounddoc = new BitArray(new[] { true });
+                }
+                if (fileName == "Hippa")
+                {
+                    var docfile = _uploadProvider.UploadDocFile(File, physicianid, fileName);
+                    physician.Istrainingdoc = new BitArray(new[] { true });
+                }
+                if (fileName == "NonDiscoluser")
+                {
+                    var docfile = _uploadProvider.UploadDocFile(File, physicianid, fileName);
+                    physician.Isnondisclosuredoc = new BitArray(new[] { true });
+                }
+                if (fileName == "License")
+                {
+                    var docfile = _uploadProvider.UploadDocFile(File, physicianid, fileName);
+                    physician.Islicensedoc = new BitArray(new[] { true });
+                }
+                _context.Physicians.Update(physician);
+                _context.SaveChanges();
+                TempData["SuccessMessage"] = "Upload Doc successfully.";
+                return Ok();
             }
             else
             {
                 return BadRequest("No Doc File received.");
             }
         }
+        #endregion
 
+        #region PhysicianInformation
+        [CustomAuthorize("Provider", "8")]
         [HttpPost]
-        public IActionResult PhysicianInformation(string email, int id, string MobileNo, string[] adminRegion, string SynchronizationEmail, string NPINumber, string MedicalLicense)
+        public IActionResult PhysicianInformation(string email, int id, string mobileNo, string[] adminRegion, string synchronizationEmail, string npinumber, string medicalLicense)
         {
-            Physician? physician = _context.Physicians.FirstOrDefault(item => item.Physicianid == id);
-
-            AspnetUser? account = _context.AspnetUsers.FirstOrDefault(item => item.Email == physician.Email);
-            if (physician != null)
+            try
             {
-                physician.Email = email;
-                physician.Mobile = MobileNo;
-                physician.Npinumber = NPINumber;
-                physician.Syncemailaddress = SynchronizationEmail;
-                physician.Medicallicense = MedicalLicense;
-                _context.Physicians.Update(physician);
-                _context.SaveChanges();
-                List<PhysicianRegion> existingregion = _context.PhysicianRegions.Where(item => item.Physicianid == physician.Physicianid).ToList();
-                _context.PhysicianRegions.RemoveRange(existingregion);
-                _context.SaveChanges(); // Save changes to add new associations
-
-                foreach (string regionValue in adminRegion)
-                {
-                    int regionId = int.Parse(regionValue); // Assuming region values are integer IDs
-                    _context.PhysicianRegions.Add(new PhysicianRegion { Physicianid = physician.Physicianid, Regionid = regionId });
-                }
-                _context.SaveChanges(); // Save changes to add new associations
-                TempData["SuccessMessage"] = "Your Administration Details Update SuccessFull";
+                _admin.UpdatePhysicianInformation(id, email, mobileNo, adminRegion, synchronizationEmail, npinumber, medicalLicense);
+                TempData["SuccessMessage"] = "Physician information has been updated successfully.";
             }
-            else
+            catch (InvalidOperationException ex)
             {
-                TempData["Error"] = "Account not found";
+                TempData["ErrorMessage"] = ex.Message;
             }
+
             return RedirectToAction("PhysicanProfile", "Admin", new { id = id });
-
         }
-        [HttpPost]
-        public IActionResult Providerprofile(int id, string Businessname, string businesswebsite, IFormFile File, IFormFile signature)
-        {
-           
-                Physician? physician = _context.Physicians.FirstOrDefault(item => item.Physicianid == id);
-                physician.Businessname = Businessname;
-                physician.Businesswebsite = businesswebsite;
-                if (signature.FileName != null)
-                 {
-                string signnature = _uploadProvider.UploadSignature(signature, id);
-                physician.Signature=signnature;
-                }
-                if(File.FileName!= null)
-            {
-                string photo = _uploadProvider.UploadPhoto(File, id);
-                physician.Photo = photo;
+        #endregion
 
+        #region Providerprofile
+        [CustomAuthorize("Provider", "8")]
+        [HttpPost]
+        public IActionResult Providerprofile(int id, string businessName, string businessWebsite, IFormFile signatureFile, IFormFile photoFile)
+        {
+            try
+            {
+                _admin.UpdateProviderProfile(id, businessName, businessWebsite, signatureFile, photoFile);
+                TempData["SuccessMessage"] = "Provider profile has been updated successfully.";
             }
-                _context.Physicians.Update(physician);
-                _context.SaveChanges();
+            catch (InvalidOperationException ex)
+            {
+                TempData["ErrorMessage"] = ex.Message;
+            }
 
             return RedirectToAction("PhysicanProfile", "Admin", new { id = id });
-            }
-        
+        }
+        #endregion
+
+        [CustomAuthorize("Provider", "8")]
         [HttpPost]
-        public IActionResult ProviderAccountingInfo(int physicianid,string Address1, string Address2, string City, int State, string Zipcode, string MobileNo)
+        public IActionResult ProviderAccountingInfo(int physicianid, string Address1, string Address2, string City, int State, string Zipcode, string MobileNo)
         {
             Physician? physician = _context.Physicians.FirstOrDefault(item => item.Physicianid == physicianid);
             if (physician != null)
             {
-                physician.Address1=Address1;
+                physician.Address1 = Address1;
                 physician.Address2 = Address2;
-                physician.City= City;
+                physician.City = City;
                 physician.Regionid = State;
-                physician.Zip= Zipcode; 
-                physician.Mobile=MobileNo;
+                physician.Zip = Zipcode;
+                physician.Mobile = MobileNo;
                 _context.Physicians.Update(physician);
                 _context.SaveChanges();
                 TempData["SuccessMessage"] = "Provider AccountingInfo Saved.";
@@ -404,6 +349,137 @@ namespace HelloDoc.Controllers
             return RedirectToAction("PhysicanProfile", "Admin", new { id = physicianid });
         }
 
+        public IActionResult CreateProvider()
+        {
+            List<Region> regions = _context.Regions.ToList();
+            List<Role> roles = _context.Roles.Where(item => item.Accounttype == 2).ToList();
+            CreateProviderVM createProvider = new CreateProviderVM();
+            createProvider.Regions = regions;
+            createProvider.Roles = roles;
+            return View(createProvider);
+        }
+
+        [HttpPost]
+        public IActionResult CreateProvider(CreateProviderVM createProvider, string[] adminRegion)
+        {
+            string? email = HttpContext.Session.GetString("Email");
+            string? id = HttpContext.Session.GetString("aspnetid");
+            Admin? admin = _context.Admins.FirstOrDefault(item => item.Email == email);
+
+            AspnetUser aspnetUser = new AspnetUser();
+            aspnetUser.Username = createProvider.UserName;
+            aspnetUser.Aspnetuserid = Guid.NewGuid().ToString();
+            aspnetUser.Email = createProvider.Email;
+            aspnetUser.Passwordhash = BC.HashPassword(createProvider.Passwordhash);
+            aspnetUser.Phonenumber = createProvider.PhoneNo;
+            _context.AspnetUsers.Add(aspnetUser);
+            _context.SaveChanges();
+            Physician physician = new Physician();
+            physician.Roleid = createProvider.RoleId;
+            physician.Firstname = createProvider.Firstname;
+            physician.Lastname = createProvider.Lastname;
+            physician.Aspnetuserid = aspnetUser.Aspnetuserid;
+            physician.Email = createProvider.Email;
+            physician.Mobile = createProvider.PhoneNo;
+            physician.Medicallicense = createProvider.MedicalLicense;
+            physician.Address1 = createProvider.Address1;
+            physician.Address2 = createProvider.Address2;
+            physician.Regionid = createProvider.State;
+            physician.City = createProvider.City;
+            physician.Zip = createProvider.ZipCode;
+            physician.Createdby = id;
+            physician.Createddate = DateTime.Now;
+            physician.Status = 1;
+            physician.Businessname = createProvider.BusinessName;
+            physician.Businesswebsite = createProvider.BusinessWebsite;
+            physician.Npinumber = createProvider.NPINumber;
+            physician.Syncemailaddress = createProvider.SynchronizationEmail;
+            if (createProvider.File != null)
+            {
+                physician.Photo = "photo" + createProvider.File.FileName.GetExtension();
+            }
+            if (createProvider.IsAgreement != null)
+            {
+                physician.Isagreementdoc = new BitArray(new[] { true });
+            }
+            else
+            {
+                physician.Isagreementdoc = new BitArray(new[] { false });
+            }
+            if (createProvider.IsBackground != null)
+            {
+                physician.Isbackgrounddoc = new BitArray(new[] { true });
+            }
+            else
+            {
+                physician.Isbackgrounddoc = new BitArray(new[] { false });
+            }
+            if (createProvider.License != null)
+            {
+                physician.Islicensedoc = new BitArray(new[] { false });
+            }
+            else
+            {
+                physician.Islicensedoc = new BitArray(new[] { false });
+            }
+            if (createProvider.NonDiscoluser != null)
+            {
+                physician.Isnondisclosuredoc = new BitArray(new[] { true });
+            }
+            else
+            {
+                physician.Isnondisclosuredoc = new BitArray(new[] { false });
+            }
+            if (createProvider.IsHippa != null)
+            {
+                physician.Istrainingdoc = new BitArray(new[] { true });
+            }
+            else
+            {
+                physician.Istrainingdoc = new BitArray(new[] { false });
+            }
+            _context.Physicians.Add(physician);
+            _context.SaveChanges();
+            if (createProvider.File != null)
+            {
+                var photo = _uploadProvider.UploadPhoto(createProvider.File, physician.Physicianid);
+            }
+            if (createProvider.IsAgreement != null)
+            {
+                var ICA = _uploadProvider.UploadDocFile(createProvider.IsAgreement, physician.Physicianid, "ICA");
+            }
+            if (createProvider.IsBackground != null)
+            {
+                var ICA = _uploadProvider.UploadDocFile(createProvider.IsBackground, physician.Physicianid, "Background");
+            }
+            if (createProvider.IsHippa != null)
+            {
+                var ICA = _uploadProvider.UploadDocFile(createProvider.IsHippa, physician.Physicianid, "Hippa");
+            }
+            if (createProvider.License != null)
+            {
+                var ICA = _uploadProvider.UploadDocFile(createProvider.License, physician.Physicianid, "License");
+            }
+            if (createProvider.NonDiscoluser != null)
+            {
+                var ICA = _uploadProvider.UploadDocFile(createProvider.License, physician.Physicianid, "NonDiscoluser");
+            }
+            PhysicianNotification physicianNotification = new PhysicianNotification();
+            physicianNotification.Physicianid = physician.Physicianid;
+            physicianNotification.Isnotificationstopped = new BitArray(new[] { true });
+            _context.PhysicianNotifications.Add(physicianNotification);
+            _context.SaveChanges();
+            foreach (var item in adminRegion)
+            {
+
+                PhysicianRegion physicianRegion = new PhysicianRegion();
+                physicianRegion.Physicianid = physician.Physicianid;
+                physicianRegion.Regionid = int.Parse(item);
+                _context.PhysicianRegions.Add(physicianRegion);
+            }
+            _context.SaveChanges();
+            return RedirectToAction("Provider");
+        }
         //main View
         public IActionResult Parteners()
         {
@@ -414,20 +490,103 @@ namespace HelloDoc.Controllers
         {
             return View();
         }
+
+        [CustomAuthorize("Role", "7")]
         public IActionResult Access()
+        {
+            var role = _context.Roles.ToList();
+            return View(role);
+        }
+
+        [CustomAuthorize("Role", "7")]
+        public IActionResult CreateAccess()
         {
             return View();
         }
-        public IActionResult CreateProvider()
+
+        [CustomAuthorize("Role", "7")]
+        [HttpPost]
+        public IActionResult CreateAccess(int[] rolemenu, string rolename, int accounttype)
         {
-            List<Region> regions = _context.Regions.ToList();
-            List<Role> roles= _context.Roles.ToList();  
-            CreateProviderVM createProvider = new CreateProviderVM();
-            createProvider.Regions= regions;
-            createProvider.Roles = roles;
-            return View(createProvider);
+            Role role = new Role();
+            role.Name = rolename;
+            role.Accounttype = (short)accounttype;
+            role.Createdby = "admin";
+            role.Isdeleted = new BitArray(new[] { false });
+            _context.Roles.Add(role);
+            _context.SaveChanges();
+
+            foreach (var menu in rolemenu)
+            {
+                Rolemenu rolemenu1 = new Rolemenu();
+                rolemenu1.Menuid = menu;
+                rolemenu1.Roleid = role.Roleid;
+                _context.Rolemenus.Add(rolemenu1);
+                _context.SaveChanges();
+            }
+            return RedirectToAction("Access");
+        }
+
+        [CustomAuthorize("Role", "7")]
+        public IActionResult RoleData(int region)
+        {
+            var menuList = _context.Menus.Where(item => region == 0 || item.Accounttype == region).ToList();
+            return PartialView("accesspartial", menuList);
+        }
+
+        [CustomAuthorize("Role", "7")]
+        public IActionResult EditRoleData(int region, int roleid)
+        {
+            var menuList = _context.Menus.Where(item => region == 0 || item.Accounttype == region).ToList();
+            var rolemenu = _context.Rolemenus.Where(item => item.Roleid == roleid).Select(item => item.Menuid).ToList();
+
+            var viewModel = new RoleMenuViewModel
+            {
+                MenuList = menuList,
+                RoleMenuIds = rolemenu
+            };
+
+            return PartialView("EditAccessPartial", viewModel);
+        }
+
+        [CustomAuthorize("Role", "7")]
+        public IActionResult EditAccess(int roleid)
+        {
+            var rolemenu = _context.Rolemenus.Where(item => item.Roleid == roleid).Select(item => item.Menuid).ToList();
+            var role = _context.Roles.Where(item => item.Roleid == roleid).FirstOrDefault();
+            AccessVM accessVM = new AccessVM();
+            accessVM.Menu = rolemenu;
+            accessVM.Name = role.Name;
+            accessVM.roleid = roleid;
+            accessVM.Accounttype = role.Accounttype;
+
+            return View(accessVM);
+        }
+
+        [CustomAuthorize("Role", "7")]
+        [HttpPost]
+        public IActionResult EditAccess(int roleid, int[] rolemenu, string rolename, int accounttype)
+        {
+            var role = _context.Roles.FirstOrDefault(item => item.Roleid == roleid);
+            var menulist = _context.Rolemenus.Where(item => item.Roleid == roleid).ToList();
+            role.Name = rolename;
+            role.Accounttype = (short)accounttype;
+            _context.Roles.Update(role);
+            _context.SaveChanges();
+            _context.Rolemenus.RemoveRange(menulist);
+            _context.SaveChanges();
+            foreach (var item in rolemenu)
+            {
+                Rolemenu rolemenu1 = new Rolemenu();
+                rolemenu1.Menuid = item;
+                rolemenu1.Roleid = roleid;
+                _context.Rolemenus.Add(rolemenu1);
+            }
+            _context.SaveChanges();
+            return RedirectToAction("EditAccess", new { roleid = roleid });
         }
         //main View
+        [CustomAuthorize("Dashboard", "6")]
         public IActionResult SendLink()
         {
             string? resetLink = Url.ActionLink("PatientRequest", "Request", protocol: HttpContext.Request.Scheme);
@@ -443,6 +602,8 @@ namespace HelloDoc.Controllers
                 return RedirectToAction("Index", "Admin");
             }
         }
+
+        [CustomAuthorize("Dashboard", "6")]
         public IActionResult Index()
         {
             List<NewRequestTableVM> request = _admin.GetAllData();
@@ -450,7 +611,7 @@ namespace HelloDoc.Controllers
             return View(request.ToList());
         }
 
-
+        [CustomAuthorize("Dashboard", "6")]
         public IActionResult SearchPatient(string searchValue, string selectValue, string partialName, string selectedFilter, int[] currentStatus, bool exportdata, bool exportAllData, int page, int pageSize = 5)
         {
             List<NewRequestTableVM> filteredPatients = _admin.SearchPatients(searchValue, selectValue, selectedFilter, currentStatus);
@@ -473,9 +634,11 @@ namespace HelloDoc.Controllers
                     return File(result, "text/csv", "filtered_data.csv"); // Change content type and file name as needed
                 }
             }
-            
+
             return PartialView(partialName, paginatedData);
         }
+
+        [CustomAuthorize("Dashboard", "6")]
         public IActionResult ExportAll(string currentStatus)
         {
             var statusArray = currentStatus?.Split(',')?.Select(int.Parse).ToArray();
@@ -495,6 +658,8 @@ namespace HelloDoc.Controllers
 
             // Or return appropriate response format for export
         }
+
+        [CustomAuthorize("Dashboard", "6")]
         public IActionResult Learning()
         {
             return View();
@@ -503,12 +668,15 @@ namespace HelloDoc.Controllers
         {
             return PartialView("PendingTablePartial");
         }
+
+        [CustomAuthorize("Dashboard", "6")]
         public IActionResult ViewCase(int id)
         {
             ViewCaseVM ViewCase = _admin.GetCaseById(id);
             return View(ViewCase);
         }
 
+        [CustomAuthorize("Dashboard", "6")]
         [HttpPost]
         public async Task<IActionResult> ViewCase(ViewCaseVM viewCaseVM, int id)
         {
@@ -520,6 +688,8 @@ namespace HelloDoc.Controllers
             }
             return View();
         }
+
+        [CustomAuthorize("Dashboard", "6")]
         public IActionResult Viewnotes(int requestid)
         {
             ViewData["ViewName"] = "Dashboard";
@@ -527,6 +697,8 @@ namespace HelloDoc.Controllers
             List<ViewNotesVM> result = _admin.GetNotesForRequest(requestid);
             return View(result);
         }
+
+        [CustomAuthorize("Dashboard", "6")]
         [HttpPost]
         public async Task<IActionResult> AssignRequest(int regionid, int physician, string description, int requestid, int status)
         {
@@ -547,6 +719,7 @@ namespace HelloDoc.Controllers
             }
         }
 
+        [CustomAuthorize("Dashboard", "6")]
         public async Task<IActionResult> TransferRequest(int regionid, int physician, string description, int requestid, int status)
         {
             string? email = HttpContext.Session.GetString("Email");
@@ -565,6 +738,7 @@ namespace HelloDoc.Controllers
         }
 
         [HttpPost]
+        [CustomAuthorize("Dashboard", "6")]
         public async Task<IActionResult> ViewNotesPost(string adminNotes, int id)
         {
 
@@ -576,6 +750,7 @@ namespace HelloDoc.Controllers
         }
 
         [HttpPost]
+        [CustomAuthorize("Dashboard", "6")]
         public async Task<IActionResult> CancelCase(string notes, string cancelReason, int requestid)
         {
             bool result = await _admin.CancelCase(requestid, notes, cancelReason);
@@ -584,6 +759,7 @@ namespace HelloDoc.Controllers
 
         }
 
+        [CustomAuthorize("Dashboard", "6")]
         public IActionResult CreateRequest()
         {
             List<Region> region = _context.Regions.ToList();
@@ -592,6 +768,7 @@ namespace HelloDoc.Controllers
             return View(requestmoel);
         }
 
+        [CustomAuthorize("Dashboard", "6")]
         [HttpPost]
         public IActionResult CreateRequest(RequestModel requestModel)
         {
@@ -687,7 +864,9 @@ namespace HelloDoc.Controllers
             }
             return RedirectToAction("Index");
         }
+
         #region ViewUploads
+        [CustomAuthorize("Dashboard", "6")]
         public async Task<IActionResult> ViewUploads(int id)
         {
             List<Requestwisefile> reqfile = await _patient.GetRequestwisefileByIdAsync(id);
@@ -703,7 +882,7 @@ namespace HelloDoc.Controllers
         }
         #endregion
 
-
+        #region DeleteFile
         [HttpPost]
         public IActionResult DeleteFile(string filename)
         {
@@ -734,6 +913,9 @@ namespace HelloDoc.Controllers
                 return StatusCode(500, new { message = $"Error deleting file: {ex.Message}" });
             }
         }
+        #endregion
+
+        #region DeleteSelectedFiles
         [HttpPost]
         public IActionResult DeleteSelectedFiles(List<string> filenames)
         {
@@ -760,6 +942,10 @@ namespace HelloDoc.Controllers
                 return StatusCode(500, new { message = $"Error deleting files: {ex.Message}" });
             }
         }
+        #endregion
+
+        #region UploadFile
+        [CustomAuthorize("Dashboard", "6")]
         [HttpPost]
         public async Task<IActionResult> UploadFile(RequestFileViewModel rm, int id)
         {
@@ -774,6 +960,8 @@ namespace HelloDoc.Controllers
                 return RedirectToAction("ViewUploads", "Admin", new { id = id });
             }
         }
+        #endregion
+
 
         [HttpPost]
         public IActionResult SendEmailWithSelectedFiles(List<string> filenames)
@@ -805,25 +993,15 @@ namespace HelloDoc.Controllers
             }
         }
 
-
+        [CustomAuthorize("SendOrder", "12")]
         public IActionResult SendOrder(int requestid)
         {
             SendOrderModel sendOrderModel = _admin.GetSendOrder(requestid);
 
             return View(sendOrderModel);
         }
-        public IActionResult VendorNameByHelthProfession(int helthprofessionaltype)
-        {
-            List<Healthprofessional> vendorname = _context.Healthprofessionals.Where(item => item.Healthprofessionalid == helthprofessionaltype).ToList();
-            return Ok(vendorname);
-        }
 
-        public IActionResult BusinessDetails(int vendorname)
-        {
-            Healthprofessional? businessdetails = _context.Healthprofessionals.Where(item => item.Healthprofessionalid == vendorname).FirstOrDefault();
-            return Ok(businessdetails);
-        }
-
+        [CustomAuthorize("SendOrder", "12")]
         [HttpPost]
         public IActionResult SendOrder(SendOrderModel order)
         {
@@ -842,6 +1020,19 @@ namespace HelloDoc.Controllers
 
 
         }
+
+        public IActionResult VendorNameByHelthProfession(int helthprofessionaltype)
+        {
+            List<Healthprofessional> vendorname = _context.Healthprofessionals.Where(item => item.Healthprofessionalid == helthprofessionaltype).ToList();
+            return Ok(vendorname);
+        }
+
+        public IActionResult BusinessDetails(int vendorname)
+        {
+            Healthprofessional? businessdetails = _context.Healthprofessionals.Where(item => item.Healthprofessionalid == vendorname).FirstOrDefault();
+            return Ok(businessdetails);
+        }
+
         [HttpPost]
         public IActionResult SendAgreement(int requestid, string agreementemail, string agreementphoneno)
         {

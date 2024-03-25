@@ -1,0 +1,13 @@
+﻿
+
+@foreach (var menu in Model.MenuList)
+{
+    <div class="form-check form-check-inline">
+        <input class="form-check-input"
+               type="checkbox"
+               id="role-@menu.Menuid"
+               name="rolemenu"
+               value="@menu.Menuid" @(Model.RoleMenuIds.Contains(menu.Menuid) ? "checked" : "") />
+        <label class="form-check-label" for="region-@menu.Menuid">@menu.Name</label>
+    </div>
+}

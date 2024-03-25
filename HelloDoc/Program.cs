@@ -4,8 +4,10 @@ using DataAccessLayer.DataContext;
 using Humanizer;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using Rotativa.AspNetCore;
 using ServiceStack.Text;
+using Geocoding;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,6 +19,7 @@ builder.Services.AddScoped<IOtherRequest,OtherRequest>();
 builder.Services.AddScoped<IAdmin,AdminRepository>();
 builder.Services.AddScoped<IJwtAuth, JwtAuthRepo>();
 builder.Services.AddScoped<IUploadProvider, UploadProvider>();
+
 RotativaConfiguration.Setup(builder.Environment.WebRootPath, "Rotativa");
 
 
@@ -35,6 +38,11 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;
 });
 
+builder.Services.AddControllersWithViews()
+    .AddNewtonsoftJson(options =>
+    {
+        options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+    });
 var app = builder.Build();
 var hostingEnvironment = app.Services.GetRequiredService<IHostEnvironment>();
 

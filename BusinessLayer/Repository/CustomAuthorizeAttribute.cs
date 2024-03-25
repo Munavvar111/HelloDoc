@@ -5,13 +5,18 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.Extensions.DependencyInjection;
+using DataAccessLayer.DataModels;
+using System.Linq;
 
 public class CustomAuthorizeAttribute : Attribute, IAuthorizationFilter
 {
     private readonly string _role;
-    public CustomAuthorizeAttribute(string role = "")
+    private readonly string _menuid;
+    public CustomAuthorizeAttribute(string role = "", string menuid = "")
     {
         this._role = role;
+        this._menuid = menuid;
+        
     }
 
 
@@ -19,6 +24,7 @@ public class CustomAuthorizeAttribute : Attribute, IAuthorizationFilter
     public void OnAuthorization(AuthorizationFilterContext context)
     {
         var jwtServices = context.HttpContext.RequestServices.GetService<IJwtAuth>();
+        var admin = context.HttpContext.RequestServices.GetService<IAdmin>();
 
         if (jwtServices == null)
         {
@@ -56,8 +62,9 @@ public class CustomAuthorizeAttribute : Attribute, IAuthorizationFilter
 
             return;
         }
-
-        if (string.IsNullOrWhiteSpace(_role) || roleType != _role)
+        var userPermissions = admin.GetUserPermissions(roleType);
+      
+        if (string.IsNullOrWhiteSpace(_role) || !userPermissions.Contains(int.Parse(_menuid)))
         {
             context.Result = new RedirectToRouteResult(new RouteValueDictionary(new { controller = "Login", action = "Index" }));
             return;
