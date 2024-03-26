@@ -187,12 +187,12 @@
                           >Access</a>
                         <ul class="dropdown-menu bg-light mt-3 bg-opacity-0">
                             <li class="border-bottom">
-                                <a class="dropdown-item" asp-action="Access" asp-controller="Admin">
+                                <a class="dropdown-item @(ViewContext.ActionDescriptor.RouteValues["action"] == "Access" ? "active" : "")" asp-action="Access" asp-controller="Admin">
                                     Access
                                 </a>
                             </li>
                             <li>
-                                <a class="dropdown-item" asp-action="UserAccess" asp-controller="Admin">
+                                <a class="dropdown-item @(ViewContext.ActionDescriptor.RouteValues["action"] == "UserAccess" ? "active" : "")" asp-action="UserAccess" asp-controller="Admin">
                                     User Access
                                 </a>
                             </li>

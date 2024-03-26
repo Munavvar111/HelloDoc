@@ -12,6 +12,7 @@ using CsvHelper;
 using System.Globalization;
 using ServiceStack;
 using BusinessLayer.Repository;
+using System.Data;
 
 
 namespace HelloDoc.Controllers
@@ -73,6 +74,35 @@ namespace HelloDoc.Controllers
             return View(adminProfile);
         }
         #endregion
+        #region ProfileByID
+        [CustomAuthorize("MyProfile", "5")]
+        public IActionResult EditProfile(int adminid)
+        {
+            if (adminid==0)
+            {
+                TempData["Error"] = "Admin Value is Not Match";
+                return RedirectToAction("Index", "Admin");
+
+            }
+            string? email=_context.Admins.Where(item=>item.Adminid==adminid).Select(item=>item.Email).FirstOrDefault();
+            if (string.IsNullOrEmpty(email))
+            {
+                TempData["Error"] = "Something Went Wrong.";
+                return RedirectToAction("Index", "Admin");
+
+            }
+
+            var adminProfile = _admin.GetAdminProfile(email);
+
+            if (adminProfile == null)
+            {
+                TempData["Error"] = "Something went wrong while fetching admin profile.";
+            return RedirectToAction("Index", "Admin");
+            }
+            return View("Profile",adminProfile);
+
+        }
+        #endregion
 
         #region ResetAdminPassword
         [CustomAuthorize("MyProfile", "5")]
@@ -105,7 +135,7 @@ namespace HelloDoc.Controllers
         public IActionResult AdministrationInfo(string email, string mobileNo, string[] adminRegion)
         {
             string? sessionEmail = HttpContext.Session.GetString("Email");
-            
+
             if (string.IsNullOrEmpty(sessionEmail))
             {
                 TempData["Error"] = "Invalid session data. Please log in again.";
@@ -585,13 +615,14 @@ namespace HelloDoc.Controllers
             _context.SaveChanges();
             return RedirectToAction("Access", new { roleid = roleid });
         }
-        [CustomAuthorize("Role","7")]
+
+        [CustomAuthorize("Role", "7")]
         public IActionResult DeleteRole(int roleId)
         {
             List<Rolemenu> rolemenu = _context.Rolemenus.Where(item => item.Roleid == roleId).ToList();
             _context.Rolemenus.RemoveRange(rolemenu);
             _context.SaveChanges();
-            Role? role=_context.Roles.Where(item=>item.Roleid == roleId).FirstOrDefault();
+            Role? role = _context.Roles.Where(item => item.Roleid == roleId).FirstOrDefault();
             if (role != null)
             {
                 _context.Roles.Remove(role);
@@ -605,6 +636,47 @@ namespace HelloDoc.Controllers
             return RedirectToAction("access");
         }
 
+        public IActionResult UserAccess()
+        {
+            return View();
+        }
+
+        public IActionResult UserData(int role)
+        {
+            var list = (from aspuser in _context.AspnetUsers
+                        join user in _context.Users
+                        on aspuser.Aspnetuserid equals user.Aspnetuserid into users
+                        from totaluser in users.DefaultIfEmpty()
+                        join physician in _context.Physicians
+                        on aspuser.Aspnetuserid equals physician.Aspnetuserid into physicians
+                        from totalphy in physicians.DefaultIfEmpty()
+                        join admin in _context.Admins
+                        on aspuser.Aspnetuserid equals admin.Aspnetuserid into admins
+                        from totaladmin in admins.DefaultIfEmpty()
+                        join aspnetuserrole in _context.AspnetUserroles
+                        on aspuser.Aspnetuserid equals aspnetuserrole.Userid into aspnetusersroles
+                        from totalasprole in aspnetusersroles.DefaultIfEmpty()
+                        join roletab in _context.Roles
+                        on totalasprole.Roleid equals roletab.Roleid into rolesdata
+                        from roles in rolesdata.DefaultIfEmpty()
+                        select new UserAccess
+                        {
+                            AccountType = roles.Name,
+                            AccountPOCAdmin = totaladmin.Firstname,
+                            AccountPOCPhy = totalphy.Firstname,
+                            AccountPOCUser = totaluser.Firstname,
+                            phone = totaluser.Mobile,
+                            phonePhy = totalphy.Mobile,
+                            phoneAdmin = totaladmin.Mobile,
+                            statusUser = (short)totaluser.Status,
+                            statusPhy = (short)totalphy.Status,
+                            statusAdmin = totaladmin.Adminid,
+                            roleid = roles.Roleid,
+                            physicianid=totalphy.Physicianid,
+                            adminid=totaladmin.Adminid,
+                        }).Where(item=>role==0 ||item.roleid==role).ToList();
+            return PartialView("UserAccessPartial", list);
+        }
         //main View
         [CustomAuthorize("Dashboard", "6")]
         public IActionResult SendLink()
@@ -622,7 +694,6 @@ namespace HelloDoc.Controllers
                 return RedirectToAction("Index", "Admin");
             }
         }
-
         [CustomAuthorize("Dashboard", "6")]
         public IActionResult Index()
         {
@@ -630,7 +701,6 @@ namespace HelloDoc.Controllers
             int newcount = request.Count(item => item.Status == 1);
             return View(request.ToList());
         }
-
         [CustomAuthorize("Dashboard", "6")]
         public IActionResult SearchPatient(string searchValue, string selectValue, string partialName, string selectedFilter, int[] currentStatus, bool exportdata, bool exportAllData, int page, int pageSize = 5)
         {

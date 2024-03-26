@@ -1,0 +1,63 @@
+﻿@{
+    ViewData["Title"] = "UserAccess";
+    Layout = "~/Views/Shared/_Layout4.cshtml";
+}
+
+<div class="container bg-light mt-4">
+    <div class="d-flex justify-content-between my-3">
+        <div class="d-flex">
+            <span class="fs-2 text-muted fw-bold">User Access</span>
+        </div>
+        <div class="d-flex justify-content-end">
+            <a asp-controller="Admin" asp-action="Index" asp-area=""
+               class="btn btn-outline-info d-flex align-items-center">
+                <span class="material-symbols-outlined"> chevron_left </span> Back
+            </a>
+        </div>
+    </div>
+</div>
+<div class="container bg-white">
+    <div class="form-floating mb-4 mt-4 w-25">
+
+        <select class="form-select" aria-label="Default select example" id="accounttypeuser" name="accounttypeuser">
+            <option value="0">All</option>
+            <option value="1">Admin</option>
+            <option value="3">Patient</option>
+            <option value="2">Physician</option>
+        </select>
+    </div>
+    <div id="UserAccessPartial"></div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        FetchUsers();
+    });
+    $("#accounttypeuser").on("change", function () {
+        console.log("fii")
+        FetchUsers();
+    });
+    function FetchUsers() {
+        var role = $("#accounttypeuser").val();
+        $.ajax({
+            method: "GET",
+            url: "/Admin/UserData",
+            data: { role: role },
+            success: function (response) {
+                if (response.code == 401) {
+
+                    location.reload();
+                }
+                else {
+                    console.log("Function Success")
+                    $('#UserAccessPartial').html(response)
+
+                }
+
+            },
+            error: function () {
+                console.log("Function Fail")
+            }
+        })
+    }
+</script>
