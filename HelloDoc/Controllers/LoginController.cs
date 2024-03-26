@@ -38,7 +38,7 @@ namespace HalloDocPatient.Controllers
         public async Task<IActionResult> Index(LoginModel a)
         {
             if (ModelState.IsValid)
-            {
+                {
                 if (_login.isLoginValid(a))
                 {
                     var user = await _context.Users.FirstOrDefaultAsync(x => x.Email == a.Email);

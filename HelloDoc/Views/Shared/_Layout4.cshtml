@@ -2,7 +2,7 @@
 @using Newtonsoft.Json;
 @{
     // Retrieve session data
-    
+
     string? username = Context.Session.GetString("Username");
     int userId = Context.Session.GetInt32("UserId") ?? 0; // Use a default value if session data is not available
     var userPermissionsJson = Context.Session.GetString("UserPermissions");
@@ -41,7 +41,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css" integrity="sha512-dPXYcDub/aeb08c63jRq/k6GaKccl256JQy/AnOq7CAnEZ9FzSL9wSbcZkMp4R26vBsMLFYH4kQ67/bbV8XaCQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
 
-   
+
     <link href="https://cdn.datatables.net/v/bs5/dt-2.0.0/datatables.min.css" rel="stylesheet">
 
     <script src="https://cdn.datatables.net/v/bs5/dt-2.0.0/datatables.min.js"></script>
@@ -94,20 +94,20 @@
             <!-- Responsive Navigation -->
             <div class="collapse d-sm-none" id="responsiveNav">
                 <ul class="nav nav-tabs-info text-info flex-column">
-                    
+
                     <li class="nav-item-info">
                         <a class="nav-link @(ViewContext.ActionDescriptor.RouteValues["action"] == "Index" ? "active" : "")"
                            asp-action="Index" asp-controller="Admin">Home</a>
                     </li>
                     @if (userPermissions.Contains("5"))
                     {
-                        
-                    <li class="nav-item">
-                        <a class="nav-link @(ViewContext.ActionDescriptor.RouteValues["action"] == "Profile" ? "active" : "")"
-                           asp-action="Profile" asp-controller="Admin">Profile</a>
-                    </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link @(ViewContext.ActionDescriptor.RouteValues["action"] == "Profile" ? "active" : "")"
+                               asp-action="Profile" asp-controller="Admin">Profile</a>
+                        </li>
                     }
-                    
+
                     <li class="nav-item">
                         <a class="nav-link @(ViewContext.ActionDescriptor.RouteValues["action"] == "Profile" ? "active" : "")"
                            asp-action="Profile" asp-controller="Admin">My Profile</a>
@@ -135,50 +135,76 @@
             <ul class="nav nav-tabs-info text-info mb-3" id="pills-tab" role="tablist">
                 @if (userPermissions.Contains("6"))
                 {
-                <li class="nav-item text-info">
-                    <a class="nav-link @(ViewContext.ActionDescriptor.RouteValues["action"] == "Index" ? "active" : "")"
-                       asp-action="Index" asp-controller="Admin">Dashboard</a>
-                </li>
+                    <li class="nav-item text-info">
+                        <a class="nav-link @(ViewContext.ActionDescriptor.RouteValues["action"] == "Index" ? "active" : "")"
+                           asp-action="Index" asp-controller="Admin">Dashboard</a>
+                    </li>
                 }
                 @if (userPermissions.Contains("17"))
                 {
-                <li class="nav-item">
-                    <a class="nav-link @(ViewContext.ActionDescriptor.RouteValues["action"] == "ProviderLocation" ? "active" : "")"
-                       asp-action="ProviderLocation" asp-controller="Admin">Provider Location</a>
-                </li>
+                    <li class="nav-item">
+                        <a class="nav-link @(ViewContext.ActionDescriptor.RouteValues["action"] == "ProviderLocation" ? "active" : "")"
+                           asp-action="ProviderLocation" asp-controller="Admin">Provider Location</a>
+                    </li>
                 }
-                @if (userPermissions.Contains("5")){
-                <li class="nav-item">
-                    <a class="nav-link @(ViewContext.ActionDescriptor.RouteValues["action"] == "Profile" ? "active" : "")"
-                       asp-action="Profile" asp-controller="Admin">My Profile</a>
-                </li>
+                @if (userPermissions.Contains("5"))
+                {
+                    <li class="nav-item ">
+                        <a class="nav-link @(ViewContext.ActionDescriptor.RouteValues["action"] == "Profile" ? "active" : "")"
+                           asp-action="Profile" asp-controller="Admin">My Profile</a>
+
+                    </li>
                 }
-               @if (userPermissions.Contains("8")){
-                <li class="nav-item">
-                    <a class="nav-link @(ViewContext.ActionDescriptor.RouteValues["action"] == "Provider" ? "active" : "")"
-                       asp-action="Provider" asp-controller="Admin">Provider</a>
-                </li>
-               }
+                @if (userPermissions.Contains("8"))
+                {
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle @(ViewContext.ActionDescriptor.RouteValues["action"] == "Provider" ? "active" : "")" role="button" data-bs-toggle="dropdown" aria-expanded="false">Providers</a>
+                        <ul class="dropdown-menu bg-light mt-3 bg-opacity-0">
+                            <li class="border-bottom">
+                                <a class="dropdown-item" asp-action="Provider" asp-controller="Admin">
+                                    Provider
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" asp-action="Provider" asp-controller="Admin">
+                                    Scheduling
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                }
                 @if (userPermissions.Contains("11"))
                 {
-                <li class="nav-item">
-                    <a class="nav-link @(ViewContext.ActionDescriptor.RouteValues["action"] == "Parteners" ? "active" : "")"
-                       asp-action="Parteners" asp-controller="Admin">Parteners</a>
-                </li>
+                    <li class="nav-item ">
+                        <a class="nav-link @(ViewContext.ActionDescriptor.RouteValues["action"] == "Parteners" ? "active" : "")"
+                           asp-action="Parteners" asp-controller="Admin">Parteners</a>
+                    </li>
                 }
                 @if (userPermissions.Contains("7"))
                 {
-                <li class="nav-item">
-                    <a class="nav-link @(ViewContext.ActionDescriptor.RouteValues["action"] == "Access" ? "active" : "")"
-                       asp-action="Access" asp-controller="Admin">Access</a>
-                </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link  dropdown-toggle @(ViewContext.ActionDescriptor.RouteValues["action"] == "Access" ? "active" : "")" role="button" data-bs-toggle="dropdown" aria-expanded="false"
+                          >Access</a>
+                        <ul class="dropdown-menu bg-light mt-3 bg-opacity-0">
+                            <li class="border-bottom">
+                                <a class="dropdown-item" asp-action="Access" asp-controller="Admin">
+                                    Access
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" asp-action="UserAccess" asp-controller="Admin">
+                                    User Access
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
                 }
                 @if (userPermissions.Contains("3"))
                 {
-                <li class="nav-item">
-                    <a class="nav-link @(ViewContext.ActionDescriptor.RouteValues["action"] == "Records" ? "active" : "")"
-                       asp-action="Records" asp-controller="Admin">Records</a>
-                </li>
+                    <li class="nav-item">
+                        <a class="nav-link  @(ViewContext.ActionDescriptor.RouteValues["action"] == "Records" ? "active" : "")"
+                           asp-action="Records" asp-controller="Admin">Records</a>
+                    </li>
                 }
 
             </ul>
@@ -199,15 +225,15 @@
 
 
 
-   
+
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script src="~/js/custom.js" asp-append-version="true"></script>
     <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
-   
 
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js" ></script>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/jquery.validate.min.js"></script>
     <script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/additional-methods.min.js"></script>

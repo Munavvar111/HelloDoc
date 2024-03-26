@@ -9,7 +9,7 @@
             <span class="fs-2 text-muted fw-bold">Create Access</span>
         </div>
         <div class="d-flex justify-content-end">
-            <a asp-controller="Admin" asp-action="Index" asp-area=""
+            <a asp-controller="Admin" asp-action="Access" asp-area=""
                class="btn btn-outline-info d-flex align-items-center">
                 <span class="material-symbols-outlined"> chevron_left </span> Back
             </a>
@@ -17,40 +17,38 @@
     </div>
     <div class="container bg-white border-0">
         <div class="">
-            <span class="fs-2 text-muted">Details</span>
+            <span class="fs-2 text-muted fw-bold">Details</span>
         </div>
         <form asp-action="CreateAccess" method="post">
+            <div class="row row-cols-1 row-cols-md-2">
+                <div class="col">
+                    <div class="form-floating mb-4 mt-4">
+                        <input type="text"
+                               class="form-control"
+                               id="floatingInput"
+                               name="rolename"
+                               placeholder="name@example.com" />
+                        <label for="floatingInput">Role Name</label>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="form-floating mb-4 mt-4">
 
-        <div class="row row-cols-1 row-cols-md-2">
-            <div class="col">
-                <div class="form-floating mb-4 mt-4">
-                    <input type="text"
-                           class="form-control"
-                           id="floatingInput"
-                           name="rolename"
-                           placeholder="name@example.com"
-                            />
-                    <label for="floatingInput">Role Name</label>
+                        <select class="form-select" aria-label="Default select example" id="accounttype" name="accounttype">
+                            <option value="0" disabled selected>All</option>
+                            <option value="1">Admin</option>
+                            <option value="3">Patient</option>
+                            <option value="2">Physician</option>
+                        </select>
+                    </div>
                 </div>
             </div>
-            <div class="col">
-                <div class="form-floating mb-4 mt-4">
-
-                <select class="form-select" aria-label="Default select example" id="accounttype" name="accounttype">
-                    <option value="0" disabled selected>All</option>
-                    <option value="1">Admin</option>
-                    <option value="3">Patient</option>
-                    <option value="2">Physician</option>
-                </select>
-                </div>
+            <div id="accesspartial">
             </div>
-        </div>
-    <div id="accesspartial">
-    </div>
-        <div class="d-flex justify-content-end gap-2">
-            <button class="btn btn-outline-info">Save</button>
-            <button class="btn btn-outline-info">Cancel</button>
-        </div>
+            <div class="d-flex justify-content-end gap-2">
+                <button class="btn btn-outline-info">Save</button>
+                <button class="btn btn-outline-info">Cancel</button>
+            </div>
         </form>
     </div>
 </div>

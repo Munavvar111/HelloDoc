@@ -583,8 +583,28 @@ namespace HelloDoc.Controllers
                 _context.Rolemenus.Add(rolemenu1);
             }
             _context.SaveChanges();
-            return RedirectToAction("EditAccess", new { roleid = roleid });
+            return RedirectToAction("Access", new { roleid = roleid });
         }
+        [CustomAuthorize("Role","7")]
+        public IActionResult DeleteRole(int roleId)
+        {
+            List<Rolemenu> rolemenu = _context.Rolemenus.Where(item => item.Roleid == roleId).ToList();
+            _context.Rolemenus.RemoveRange(rolemenu);
+            _context.SaveChanges();
+            Role? role=_context.Roles.Where(item=>item.Roleid == roleId).FirstOrDefault();
+            if (role != null)
+            {
+                _context.Roles.Remove(role);
+                _context.SaveChanges();
+                TempData["SuccessMessage"] = "Your Role Has Been Deleted";
+            }
+            else
+            {
+                TempData["Error"] = "Your Role Has Been Not Deleted";
+            }
+            return RedirectToAction("access");
+        }
+
         //main View
         [CustomAuthorize("Dashboard", "6")]
         public IActionResult SendLink()
