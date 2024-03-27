@@ -1,7 +1,7 @@
 ﻿@model List<DataAccessLayer.CustomModel.UserAccess>
 <div class="bg-white border justify-content-center">
     <table class="table">
-        
+
         <thead class="table-secondary">
             <tr>
                 <th scope="col">AccountType</th>
@@ -14,63 +14,34 @@
         </thead>
         @foreach (var item in Model)
         {
+            @if (item.AccountTypeid != 3)
+            {
 
-            <tbody>
-                <tr>
-                    <td>@item.AccountType</td>
-                    @if (item.AccountPOCUser!=null)
-                    {
-                        <td>@item.AccountPOCUser</td>
-                    }
-                    @if (item.AccountPOCPhy!=null)
-                    {
-                        <td>@item.AccountPOCPhy</td>
-                    }
-                    @if (item.AccountPOCAdmin!=null)
-                    {
-                        <td>@item.AccountPOCAdmin</td>
-                    }
-                    @if (item.phone != null)
-                    {
-                        <td>@item.phone</td>
-                    }
-                    @if (item.phonePhy != null)
-                    {
-                        <td>@item.phonePhy</td>
-                    }
-                    @if (item.phoneAdmin != null)
-                    {
-                        <td>@item.phoneAdmin</td>
-                    }
-                    @if(item.phonePhy==null && item.phoneAdmin==null && item.phone == null)
-                    {
-                        <td>(Non)NNN-NNNNNN</td>
-                    }
-                    @if (item.statusUser != null)
-                    {
-                        <td>@item.statusUser</td>
-                    }
-                    @if (item.statusPhy != null)
-                    {
-                        <td>@item.statusPhy</td>
-                    }   
-                    @if (item.statusAdmin != null)
-                    {
-                        <td>@item.statusAdmin</td>
-                    }
-                    <td>0</td>
-                    @if (item.physicianid != null)
-                    {
-                        <td><a class="btn btn-outline-info" asp-action="PhysicanProfile" asp-controller="Admin" asp-route-id="@item.physicianid">Edit</a></td>
-                    }
-                    @if (item.adminid != null)
-                    {
-                        <td><a class="btn btn-outline-info" asp-action="EditProfile" asp-controller="Admin" asp-route-adminid="@item.adminid">Edit</a></td>
-                        
-                    }
-                    <td><button class="btn btn-outline-info">Edit</button></td>
-                </tr>
-            </tbody>
+                <tbody>
+                    <tr>
+                        <td>@item.AccountType</td>
+                        <td>@item.AccountType</td>
+                        @if (item.phone != null)
+                        {
+                            <td>@item.phone</td>
+                        }
+                        else
+                        {
+                            <td>(NON)NNN-NNNNNN</td>
+                        }
+                        <td>@item.status</td>
+                        <td>0</td>
+                        @if (item.AccountTypeid == 2)
+                        {
+                            <td><a class="btn btn-outline-info" asp-action="PhysicanProfile" asp-controller="Admin" asp-route-id="@item.useraccessid">Edit</a></td>
+                        }
+                        else
+                        {
+                            <td><a class="btn btn-outline-info" asp-action="EditProfile" asp-controller="Admin" asp-route-adminid="@item.useraccessid">Edit</a></td>
+                        }
+                    </tr>
+                </tbody>
+            }
         }
     </table>
 </div>

@@ -13,6 +13,12 @@ namespace DataAccessLayer.CustomModel
         [Required(ErrorMessage ="Please Enter The First Name")]
         public string FirstName { get; set; } = null!;
 
+        public string? Username { get; set; }
+        public string? Password { get; set; }
+
+        public List<Role>? Roles { get; set; }
+        public int RoleId { get; set; }
+
         [Required(ErrorMessage ="Plese Enter The Last Name")]
         public string LastName { get; set; } = null!;
 
@@ -35,5 +41,7 @@ namespace DataAccessLayer.CustomModel
         public List<Region>? Regions { get; set; }
         public int regionid { get; set; }
         public string? PhoneNO { get; set; }    
+        public string? Address1 { get; set; }    
+        public string? Address2 { get; set; }    
     }
 }

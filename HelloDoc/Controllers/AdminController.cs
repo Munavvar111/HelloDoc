@@ -74,17 +74,19 @@ namespace HelloDoc.Controllers
             return View(adminProfile);
         }
         #endregion
+
+
         #region ProfileByID
         [CustomAuthorize("MyProfile", "5")]
         public IActionResult EditProfile(int adminid)
         {
-            if (adminid==0)
+            if (adminid == 0)
             {
                 TempData["Error"] = "Admin Value is Not Match";
                 return RedirectToAction("Index", "Admin");
 
             }
-            string? email=_context.Admins.Where(item=>item.Adminid==adminid).Select(item=>item.Email).FirstOrDefault();
+            string? email = _context.Admins.Where(item => item.Adminid == adminid).Select(item => item.Email).FirstOrDefault();
             if (string.IsNullOrEmpty(email))
             {
                 TempData["Error"] = "Something Went Wrong.";
@@ -97,9 +99,9 @@ namespace HelloDoc.Controllers
             if (adminProfile == null)
             {
                 TempData["Error"] = "Something went wrong while fetching admin profile.";
-            return RedirectToAction("Index", "Admin");
+                return RedirectToAction("Index", "Admin");
             }
-            return View("Profile",adminProfile);
+            return View("Profile", adminProfile);
 
         }
         #endregion
@@ -354,6 +356,8 @@ namespace HelloDoc.Controllers
         }
         #endregion
 
+
+
         [CustomAuthorize("Provider", "8")]
         [HttpPost]
         public IActionResult ProviderAccountingInfo(int physicianid, string Address1, string Address2, string City, int State, string Zipcode, string MobileNo)
@@ -388,6 +392,8 @@ namespace HelloDoc.Controllers
             createProvider.Roles = roles;
             return View(createProvider);
         }
+
+       
 
         [HttpPost]
         public IActionResult CreateProvider(CreateProviderVM createProvider, string[] adminRegion)
@@ -508,8 +514,21 @@ namespace HelloDoc.Controllers
                 _context.PhysicianRegions.Add(physicianRegion);
             }
             _context.SaveChanges();
+
+            AspnetUserrole aspnetUserrole = new AspnetUserrole();
+            aspnetUserrole.Userid=aspnetUser.Aspnetuserid;
+            aspnetUserrole.Roleid = createProvider.RoleId;
+            _context.AspnetUserroles.Add(aspnetUserrole);
+            _context.SaveChanges();
+
             return RedirectToAction("Provider");
         }
+        public IActionResult Scheduling()
+        {
+            return View();
+        }
+        
+
         //main View
         public IActionResult Parteners()
         {
@@ -524,9 +543,14 @@ namespace HelloDoc.Controllers
         [CustomAuthorize("Role", "7")]
         public IActionResult Access()
         {
-            var role = _context.Roles.ToList();
-            return View(role);
+            // Filter roles based on IsDeleted being false (not deleted)
+            var roles = _context.Roles
+                                 .ToList();
+            // Switch to client-side evaluation
+            var list = roles.Where(item =>item.Isdeleted!=null &&(item.Isdeleted.Length==0||!item.Isdeleted[0]));
+            return View(list.ToList());
         }
+
 
         [CustomAuthorize("Role", "7")]
         public IActionResult CreateAccess()
@@ -542,6 +566,7 @@ namespace HelloDoc.Controllers
             role.Name = rolename;
             role.Accounttype = (short)accounttype;
             role.Createdby = "admin";
+            role.Createddate = DateTime.Now;
             role.Isdeleted = new BitArray(new[] { false });
             _context.Roles.Add(role);
             _context.SaveChanges();
@@ -619,13 +644,12 @@ namespace HelloDoc.Controllers
         [CustomAuthorize("Role", "7")]
         public IActionResult DeleteRole(int roleId)
         {
-            List<Rolemenu> rolemenu = _context.Rolemenus.Where(item => item.Roleid == roleId).ToList();
-            _context.Rolemenus.RemoveRange(rolemenu);
-            _context.SaveChanges();
+
             Role? role = _context.Roles.Where(item => item.Roleid == roleId).FirstOrDefault();
             if (role != null)
             {
-                _context.Roles.Remove(role);
+                role.Isdeleted = new BitArray(new[] { true });
+                _context.Roles.Update(role);
                 _context.SaveChanges();
                 TempData["SuccessMessage"] = "Your Role Has Been Deleted";
             }
@@ -644,9 +668,6 @@ namespace HelloDoc.Controllers
         public IActionResult UserData(int role)
         {
             var list = (from aspuser in _context.AspnetUsers
-                        join user in _context.Users
-                        on aspuser.Aspnetuserid equals user.Aspnetuserid into users
-                        from totaluser in users.DefaultIfEmpty()
                         join physician in _context.Physicians
                         on aspuser.Aspnetuserid equals physician.Aspnetuserid into physicians
                         from totalphy in physicians.DefaultIfEmpty()
@@ -659,23 +680,92 @@ namespace HelloDoc.Controllers
                         join roletab in _context.Roles
                         on totalasprole.Roleid equals roletab.Roleid into rolesdata
                         from roles in rolesdata.DefaultIfEmpty()
-                        select new UserAccess
-                        {
-                            AccountType = roles.Name,
-                            AccountPOCAdmin = totaladmin.Firstname,
-                            AccountPOCPhy = totalphy.Firstname,
-                            AccountPOCUser = totaluser.Firstname,
-                            phone = totaluser.Mobile,
-                            phonePhy = totalphy.Mobile,
-                            phoneAdmin = totaladmin.Mobile,
-                            statusUser = (short)totaluser.Status,
-                            statusPhy = (short)totalphy.Status,
-                            statusAdmin = totaladmin.Adminid,
-                            roleid = roles.Roleid,
-                            physicianid=totalphy.Physicianid,
-                            adminid=totaladmin.Adminid,
-                        }).Where(item=>role==0 ||item.roleid==role).ToList();
+                        where (role == 0 || roles.Roleid == role)
+                        select (roles.Accounttype == 1 ?
+                         new UserAccess
+                         {
+                             AccountType = roles.Name,
+                             AccountPOC = totaladmin.Firstname,
+                             phone = totaladmin.Mobile,
+                             status = totaladmin.Adminid,
+                             roleid = roles.Roleid,
+                             AccountTypeid = roles.Accounttype,
+                             useraccessid = totaladmin.Adminid,
+                         } : new UserAccess
+                         {
+                             AccountType = roles.Name,
+                             AccountPOC = totalphy.Firstname,
+                             phone = totalphy.Mobile,
+                             status = totalphy.Status,
+                             roleid = roles.Roleid,
+                             AccountTypeid = roles.Accounttype,
+                             useraccessid = totalphy.Physicianid,
+                         })).ToList();
             return PartialView("UserAccessPartial", list);
+        }
+
+        public IActionResult CreateAdmin()
+        {
+            List<Role> roles=_context.Roles.Where(item=>item.Accounttype== 1).ToList();
+            List<Region> region = _context.Regions.ToList();
+            AdminProfileVm profile=new AdminProfileVm();
+            profile.Regions=region;
+            profile.Roles = roles;
+            return View(profile);
+        }
+        [HttpPost]
+        public IActionResult CreateAdmin(AdminProfileVm profileVm, int[] adminRegion)
+        {
+            AspnetUser? aspnetUser=_context.AspnetUsers.FirstOrDefault(item=>item.Email==profileVm.Email);
+            if (aspnetUser != null)
+            {
+                TempData["Error"] = "Send Request Unsuccessful!";
+                return RedirectToAction("CreateAdmin", "Admin");
+            }
+            AspnetUser aspnet = new AspnetUser();
+            aspnet.Email=profileVm.Email;
+            aspnet.Aspnetuserid = Guid.NewGuid().ToString();
+            aspnet.Username = profileVm.Username;
+            aspnet.Createddat = DateTime.Now;
+            aspnet.Passwordhash = BC.HashPassword(profileVm.Password);
+            aspnet.Phonenumber = profileVm.MobileNo;
+            _context.AspnetUsers.Add(aspnet);
+            _context.SaveChanges();
+
+            Admin admin= new Admin();
+            admin.Email = profileVm.Email;
+            admin.Aspnetuserid = aspnet.Aspnetuserid;
+            admin.Firstname = profileVm.FirstName;
+            admin.Lastname = profileVm.LastName;
+            admin.Mobile = profileVm.MobileNo;
+            admin.Address2=profileVm.Address2;  
+            admin.Address1 = profileVm.Address1;
+            admin.City = profileVm.City;
+            admin.Regionid = profileVm.State;
+            admin.Zip = profileVm.ZipCode;
+            admin.Createdby = aspnet.Aspnetuserid;
+            admin.Status = 1;
+
+            _context.Admins.Add(admin);
+            _context.SaveChanges();
+
+            foreach(var region in adminRegion)
+            {
+
+            AdminRegion adminregions= new AdminRegion();
+                adminregions.Adminid = admin.Adminid;
+                adminregions.Regionid = region;
+                _context.AdminRegions.Add(adminregions);
+                _context.SaveChanges();
+            }
+
+            AspnetUserrole aspnetUserrole=new AspnetUserrole();
+            aspnetUserrole.Userid = aspnet.Aspnetuserid;
+            aspnetUserrole.Roleid = profileVm.RoleId;
+            _context.AspnetUserroles.Add(aspnetUserrole);
+            _context.SaveChanges();
+            return RedirectToAction("UserAccess", "Admin");
+            return RedirectToAction("UserAccess", "Admin");
         }
         //main View
         [CustomAuthorize("Dashboard", "6")]
@@ -694,7 +784,8 @@ namespace HelloDoc.Controllers
                 return RedirectToAction("Index", "Admin");
             }
         }
-        [CustomAuthorize("Dashboard", "6")]
+        [RouteAuthFilter]
+        [HttpGet("Admin/Dashboard", Name = "AdminDashboard")]
         public IActionResult Index()
         {
             List<NewRequestTableVM> request = _admin.GetAllData();

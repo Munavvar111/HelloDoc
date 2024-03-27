@@ -359,6 +359,9 @@ $(document).ready(function () {
         }
 
     });
+
+    
+
     $("#blockCaseForm").validate({
         rules: {
             blockreason: {
@@ -861,6 +864,78 @@ $(document).ready(function () {
         var complexityRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/; // Regular expression for password complexity
         return this.optional(element) || complexityRegex.test(value);
     }, "Password must contain a mix of uppercase, lowercase letters, numbers, and special characters");
+
+    $('#createAdmin').validate({
+        rules: {
+            Username: {
+                required: true
+            },
+            Password: {
+                required:true
+            },
+            FirstName: {
+                required: true
+            },
+            LastName: {
+                required: true
+            },
+            Email: {
+                required: true,
+                email: true
+            },
+            confirmmail: {
+                required: false,
+                equalTo: "#email"
+            },
+           
+            adminRegion: {
+                required: true,
+                minlength: 1
+            },
+            State: {
+                required: true,
+            },
+            RoleId: {
+                required: true
+            }
+        },
+        messages: {
+
+            FirstName: "Please enter your First Name.",
+            LastName: "Please enter your Last Name.",
+            Password: "Please Enter Password",
+            RoleId:"Please Enter Role",
+            Email: {
+                required: "Please enter an email address.",
+                email: "Please enter a valid email address."
+            },
+            confirmmail: {
+                required: "Please confirm your email address.",
+                equalTo: "Please enter the same email as above."
+            },
+            
+            adminRegion: "Please select at least one region.",
+            State:"please Enter State"
+
+        },
+        errorPlacement: function (error, element) {
+            var errorSpan = $("span.error-" + element.attr("name"));
+
+            if (errorSpan.length > 0) {
+                // If the specific span is found, append the error message to it
+                error.appendTo(errorSpan);
+            } else {
+                // If not found, use the default placement (after the input field)
+                error.insertAfter(element);
+            }
+        },
+        submitHandler: function (form) {
+            // If the form is valid, submit it
+            console.log(form)
+            form.submit();
+        }
+
+    })
 
 
     $('#business').on('change', function () {

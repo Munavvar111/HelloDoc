@@ -29,8 +29,10 @@ namespace DataAccessLayer.CustomModel
         public string? ZipCode { get; set; }
         public List<Region>? Regions { get; set; }
         public List<AdminRegion>? WorkingRegions { get; set; }
+        public List<Role>? Roles { get; set; }
+        public int RoleId { get; set; }
 
-    }
+}
 
 
 }

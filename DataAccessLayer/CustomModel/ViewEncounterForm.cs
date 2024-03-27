@@ -25,7 +25,7 @@ namespace DataAccessLayer.CustomModel
         public string HR { get; set; } // Likely Heart Rate
         public string RR { get; set; } // Likely Respiratory Rate
         public string BPSystolic { get; set; } // Likely Blood Pressure Systolic
-        public string BPDiastolic { get; set; } // Likely Blood Pressure Diastolic
+        public string   BPDiastolic { get; set; } // Likely Blood Pressure Diastolic
         public string O2 { get; set; } // Likely Oxygen level
         public string Pain { get; set; }
 

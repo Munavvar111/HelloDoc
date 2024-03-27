@@ -7,7 +7,6 @@
     int userId = Context.Session.GetInt32("UserId") ?? 0; // Use a default value if session data is not available
     var userPermissionsJson = Context.Session.GetString("UserPermissions");
     var userPermissions = JsonConvert.DeserializeObject<List<string>>(userPermissionsJson);
-
 }
 <!DOCTYPE html>
 <html lang="en" data-bs-theme="light">
@@ -166,7 +165,7 @@
                                 </a>
                             </li>
                             <li>
-                                <a class="dropdown-item" asp-action="Provider" asp-controller="Admin">
+                                <a class="dropdown-item" asp-action="Scheduling" asp-controller="Admin">
                                     Scheduling
                                 </a>
                             </li>
@@ -195,6 +194,11 @@
                                 <a class="dropdown-item @(ViewContext.ActionDescriptor.RouteValues["action"] == "UserAccess" ? "active" : "")" asp-action="UserAccess" asp-controller="Admin">
                                     User Access
                                 </a>
+                            </li> 
+                            <li>
+                                <a class="dropdown-item @(ViewContext.ActionDescriptor.RouteValues["action"] == "UserAccess" ? "active" : "")" asp-action="CreateAdmin" asp-controller="Admin">
+                                    Admin Account
+                                </a>
                             </li>
                         </ul>
                     </li>
@@ -206,16 +210,10 @@
                            asp-action="Records" asp-controller="Admin">Records</a>
                     </li>
                 }
-
             </ul>
-
         </div>
-
         <main class="container-fluid d-flex flex-column  p-0 bg-light flex-grow-1  ">
-
-
             @RenderBody()
-
         </main>
         <partial name="~/Views/Shared/_Footer.cshtml" />
     </div>

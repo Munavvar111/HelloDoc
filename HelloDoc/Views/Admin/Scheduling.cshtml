@@ -1,0 +1,47 @@
+﻿@{
+    ViewData["Title"] = "Scheduling";
+    Layout = "~/Views/Shared/_Layout4.cshtml";
+}
+
+
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/main.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/interaction.min.css" rel="stylesheet" />
+
+
+    <div id='calendar'></div>
+
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js'></script>
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/timegrid.min.js"></script>  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/list.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var calendarEl = document.getElementById('calendar');
+
+        // Replace with your actual event data (array of objects)
+        var events = [
+            { title: 'Meeting', start: '2024-03-28T10:00:00' }, // Example event
+            // Add more events as needed
+        ];
+
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth', // Set the initial view
+            views: {
+                dayGridMonth: { type: 'dayGridMonth' },  // Standard month grid view
+                timeGridWeek: { type: 'timeGridWeek' },  // Week grid view with time axis (optional)
+                // Remove the listWeek view as you don't need it
+            },
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek' // Buttons for day grid month and week view
+            },
+            buttonText: {
+                today: 'Today',
+                month: 'Month',
+                week: 'Week'
+            },
+            events: events // Provide your event data here
+        });
+
+        calendar.render();
+    });
+</script>
