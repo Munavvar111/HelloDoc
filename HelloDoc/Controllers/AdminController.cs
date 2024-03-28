@@ -710,7 +710,7 @@ namespace HelloDoc.Controllers
                         join roletab in _context.Roles
                         on totalasprole.Roleid equals roletab.Roleid into rolesdata
                         from roles in rolesdata.DefaultIfEmpty()
-                        where (role == 0 || roles.Roleid == role)
+                        where (role == 0 || roles.Accounttype == role)
                         select (roles.Accounttype == 1 ?
                          new UserAccess
                          {

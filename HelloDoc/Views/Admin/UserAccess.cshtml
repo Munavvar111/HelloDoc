@@ -17,6 +17,8 @@
     </div>
 </div>
 <div class="container bg-white">
+    <div class="d-flex justify-content-between">
+
     <div class="form-floating mb-4 mt-4 w-25">
 
         <select class="form-select" aria-label="Default select example" id="accounttypeuser" name="accounttypeuser">
@@ -24,13 +26,47 @@
             <option value="1">Admin</option>
             <option value="2">Physician</option>
         </select>
+
+    </div>
+    <div id="additionalButtons" class="mb-4 mt-4"></div>
+
     </div>
     <div id="UserAccessPartial"></div>
 </div>
-
+<script>
+    $(document).ready(function () {
+        // Function to handle change in account type
+        
+    });
+</script>
 <script>
     $(document).ready(function () {
         FetchUsers();
+
+        function handleAccountTypeChange() {
+            var accountType = $("#accounttypeuser").val();
+            var buttonContainer = $("#additionalButtons");
+            
+            // Clear previous content
+            buttonContainer.empty();
+
+            // Create and append appropriate button based on selected account type
+            if (accountType === "1") {
+                var createAdminAnchor = $("<a>").text("Create Admin").addClass("btn btn-outline-info");
+                createAdminAnchor.attr("href", "/Admin/CreateAdmin"); // Add your ASP.NET route here
+                buttonContainer.append(createAdminAnchor);
+            } else if (accountType === "2") {
+                var createProviderAnchor = $("<a>").text("Create Provider").addClass("btn btn-outline-info");
+                createProviderAnchor.attr("href", "/Admin/CreateProvider"); // Add your ASP.NET route here
+                buttonContainer.append(createProviderAnchor);
+            }
+        }
+
+        // Attach event listener to account type select element
+        $("#accounttypeuser").on("change", handleAccountTypeChange);
+
+        // Trigger initial handling to show appropriate button on page load
+        handleAccountTypeChange();
     });
     $("#accounttypeuser").on("change", function () {
         console.log("fii")
