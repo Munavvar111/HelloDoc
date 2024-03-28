@@ -15,11 +15,18 @@
             {
                 <tr>
                     <td scope="row">
-                        <input type="checkbox" class="form-check-input" name="fileIds" @(item.OnCallStaus[0] ? "checked" : "")>
+                        <input type="checkbox" class="form-check-input" name="fileIds" @(item.OnCallStaus[0] ? "checked" : "") data-physician-id="@item.physicianid">
                     </td>
                     <td scope="row">@item.Name</td>
                     <td scope="row">@item.Role</td>
-                    <td scope="row">Unavailable</td>
+                    @if (item.OnCallStaus[0])
+                    {
+                    <td scope="row">Available</td>
+                    }
+                    else{
+                    
+                    <td scope="row">UnAvailable</td>
+                    }
                     <td scope="row">
                         @if (item.status == 1)
                         {
@@ -48,4 +55,77 @@
             }
         </tbody>
     </table>
+    <button id="saveButton" class="btn btn-primary mt-3" style="display: none;" >Save</button>
+
 </div>
+<script>
+    var initialCheckboxState = Array.from(document.querySelectorAll('input[type="checkbox"]')).map(function (checkbox) {
+        return checkbox.checked;
+    });
+    var checkboxStates = [];
+    var physicianIds = [];
+
+    // Function to handle checkbox change event
+    function handleCheckboxChange() {
+        var currentCheckboxState = Array.from(document.querySelectorAll('input[type="checkbox"]')).map(function (checkbox) {
+            return checkbox.checked;
+        });
+
+        var checkedCheckboxes = document.querySelectorAll('input[type="checkbox"]:checked');
+        checkboxStates = Array.from(checkedCheckboxes).map(function (checkbox) {
+            return checkbox.checked;
+        });
+
+        physicianIds = Array.from(checkedCheckboxes).map(function (checkbox) {
+            return checkbox.getAttribute('data-physician-id');
+        });
+
+        var saveButton = document.getElementById('saveButton');
+
+        if (JSON.stringify(currentCheckboxState) !== JSON.stringify(initialCheckboxState)) {
+            saveButton.style.display = 'inline-block';
+        } else {
+            saveButton.style.display = 'none';
+        }
+    }
+
+    // Add event listeners to checkboxes
+    var checkboxes = document.querySelectorAll('input[type="checkbox"]');
+    checkboxes.forEach(function (checkbox) {
+        checkbox.addEventListener('change', handleCheckboxChange);
+    });
+
+    // Check if all checkboxes are initially unchecked
+    if (initialCheckboxState.every(function (state) { return !state; })) {
+        var saveButton = document.getElementById('saveButton');
+        saveButton.style.display = 'none';
+    }
+
+    // Function to handle the 'Save' button click
+    function saveChanges() {
+        console.log('Saving changes...', { checkboxStates, physicianIds });
+        // Add the logic for saving the checkbox states and physician IDs here
+        $.ajax({
+            type: 'POST',
+            url: '/Admin/SaveNotification',
+            data: {
+                physicianIds: physicianIds,
+                checkboxStates: checkboxStates
+            },
+            success: function (response) {
+                console.log('Save successful, response:', response);
+
+                window.location.reload();
+            },
+            error: function (error) {
+                console.error('Save failed:', error);
+            }
+        });
+        // After saving the changes, reset the state and dismiss the save button
+
+    }
+
+    // Add event listener to the 'Save' button
+    var saveButton = document.getElementById('saveButton');
+    saveButton.addEventListener('click', saveChanges);
+</script>

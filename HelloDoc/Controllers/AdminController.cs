@@ -387,13 +387,43 @@ namespace HelloDoc.Controllers
         {
             List<Region> regions = _context.Regions.ToList();
             List<Role> roles = _context.Roles.Where(item => item.Accounttype == 2).ToList();
+            List<Role> providerrole = roles.Where(item => item.Isdeleted[0]).ToList();
             CreateProviderVM createProvider = new CreateProviderVM();
             createProvider.Regions = regions;
-            createProvider.Roles = roles;
+            createProvider.Roles = providerrole;
             return View(createProvider);
         }
 
-       
+        [HttpPost]
+        public IActionResult SaveNotification(List<int> physicianIds, List<bool> checkboxStates)
+        {
+            for (int i = 0; i < physicianIds.Count; i++)
+            {
+                int physicianId = physicianIds[i];
+                bool isNotificationStopped = checkboxStates[i];
+
+                PhysicianNotification physicianNotification = _context.PhysicianNotifications
+                    .FirstOrDefault(pn => pn.Physicianid == physicianId);
+
+                if (physicianNotification != null)
+                {
+                    physicianNotification.Isnotificationstopped = new BitArray(new[] { isNotificationStopped });
+                    _context.SaveChanges();
+                }
+            }
+
+            // After updating the ones in the request, update the rest to false
+            var allPhysicians = _context.PhysicianNotifications
+                .Where(pn => !physicianIds.Contains(pn.Physicianid));
+
+            foreach (var physician in allPhysicians)
+            {
+                physician.Isnotificationstopped = new BitArray(new[] { false });
+            }
+            _context.SaveChanges();
+
+            return Ok();
+        }
 
         [HttpPost]
         public IActionResult CreateProvider(CreateProviderVM createProvider, string[] adminRegion)
@@ -1013,6 +1043,13 @@ namespace HelloDoc.Controllers
             }
             return View(requestModel);
         }
+        [HttpGet]
+        public IActionResult GetPhysician()
+        {
+            List<Physician> physicians = _context.Physicians.ToList();
+            return Json(physicians);
+        }
+
         public IActionResult GetStatusCounts(int id)
         {
             var counts = new
