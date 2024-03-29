@@ -638,22 +638,37 @@ namespace HelloDoc.Controllers
             return RedirectToAction("Scheduling");
         }
 		[HttpGet]
-		public IActionResult GetPhysicianShift()
+		public IActionResult GetPhysicianShift(int region)
 		{
-			List<Physician> physicians = _context.Physicians.ToList();
+			List<Physician> physicians = _context.Physicians.Where(item=>region==0|| item.Regionid==region).ToList();
 			return Json(physicians);
 		}
 
 		public IActionResult GetEvents()
 		{
-			var events = _context.Shiftdetails.ToList();
-			return Ok(events.Select(e => new
+            List<ScheduleModel> events = (from s in _context.Shifts
+                                      join pd in _context.Physicians
+                                      on s.Physicianid equals pd.Physicianid
+                                      join sd in _context.Shiftdetails
+                                      on s.Shiftid equals sd.Shiftid into shiftGroup
+                                      from sd in shiftGroup.DefaultIfEmpty()
+                                      select new ScheduleModel
+                                      {
+                                          Shiftid = sd.Shiftdetailid,
+                                          Status = sd.Status,
+                                          Starttime = sd.Starttime,
+                                          Endtime = sd.Endtime,
+                                          Physicianid=pd.Physicianid,
+                                          PhysicianName = pd.Firstname + ' ' + pd.Lastname,
+                                          Shiftdate=sd.Shiftdate,
+                                      }).ToList();
+            return Ok(events.Select(e => new
 			{
 				id = e.Shiftid,
-				resourceId = 4,
-				title = "Minavvar",
-				start = new DateTime(e.Shiftdate.Year, e.Shiftdate.Month, e.Shiftdate.Day, e.Starttime.Hour, e.Starttime.Minute, e.Starttime.Second),
-				end = new DateTime(e.Shiftdate.Year, e.Shiftdate.Month, e.Shiftdate.Day, e.Endtime.Hour, e.Endtime.Minute, e.Endtime.Second),
+				resourceId = e.Physicianid,
+				title = e.PhysicianName,
+				start = new DateTime(e.Shiftdate.Value.Year, e.Shiftdate.Value.Month, e.Shiftdate.Value.Day, e.Starttime.Hour, e.Starttime.Minute, e.Starttime.Second),
+				end = new DateTime(e.Shiftdate.Value.Year, e.Shiftdate.Value.Month, e.Shiftdate.Value.Day, e.Endtime.Hour, e.Endtime.Minute, e.Endtime.Second),
 			}).ToList());
 		}
 

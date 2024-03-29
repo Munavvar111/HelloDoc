@@ -1,4 +1,5 @@
-﻿@{
+﻿
+@{
     ViewData["Title"] = "Scheduling";
     Layout = "~/Views/Shared/_Layout4.cshtml";
 }
@@ -7,6 +8,20 @@
         cursor: pointer;
     }
 
+    .fc-header-toolbar.fc-header-resources-only {
+        background-color: #ff9999;
+        border: none;
+    }
+
+    .fc-header-toolbar,
+    .fc-daygrid-event {
+        background-color: #CCCCCC !important; /* or any other color code */
+    }
+
+    
+    .fc-timeline-header-row {
+        background-color:gray!important;
+    }
     .btn22 {
         padding: 0.25rem 0.5rem !important;
     }
@@ -23,110 +38,125 @@
         margin-top: 2rem;
     }
 </style>
-<div class="container ">
-    <div class="  d-flex p-4  ">
-        <h4 class="mx-2 mb-4">Scheduling</h4>
-        <div class="ms-auto mt-0 ">
-            <a href="javascript: history.go(-1)" type="button" class="btn btn-info mx-2  ">
-                < Back
-            </a>
-        </div>
-
-    </div>
-
-    <div class="d-flex justify-content-between">
-        <div class="w-25">
-            <div class="input-group border  rounded-0 mb-2 form-control col-md-4 col-12">
-                <div class="input-group-append">
-                    <button class="btn text-secondary border border-0 bg-white" type="button">
-                        <i class="bi bi-search"></i>
-                    </button>
+<div class="container-fluid">
+    <div class="row justify-content-center  w-100 ">
+        <div class="col-lg-7 col-md-10 col-sm-10 col-xs-12">
+            <div class="pt-2 d-flex justify-content-between align-items-center">
+                <h4 class="m-0">Scheduling</h4>
+                <a class="btn btn-outline-info rounded-2 px-3" onclick="Provider()">
+                    <i class="bi bi-chevron-left"></i> Back
+                </a>
+            </div>
+            <div class="container d-flex flex-column  shadow">
+                <div class="row mb-0 py-2 pe-2 rounded-3">
+                    <div class="d-lg-flex  justify-content-between pe-1 pt-3">
+                        <div class="col-xl-3  col-lg-3 col-md-12 col-sm-12 col-xs-12 col-12">
+                            <select class="form-select" aria-label="Default select example" id="regionselect">
+                                <option selected value="0">All Regions</option>
+                                <option value="1">One</option>
+                                <option value="2">Two</option>
+                                <option value="3">Three</option>
+                            </select>
+                        </div>
+                        <div class="mt-3">
+                            <button type="button" class="btn btn-info rounded-2 p-2 ">Provider On Call</button>
+                            <button type="button" class="btn btn-info rounded-2 p-2 ">Shift For Review</button>
+                            <button data-bs-toggle="modal" data-bs-target="#createShiftModal" type="button" class="btn btn-info mx-1 btn-sm btn22  ">
+                                Add New Shift
+                            </button>
+                        
+                    </div>
+                    </div>
                 </div>
-                <input type="search" class="form-control border-0  shadow-none" placeholder="Search Regions"
-                       list="data" id="myInput2" onkeyup="searchRegion()">
-                <datalist class=" border-0  shadow-none" aria-label="Default select example" id="data">
-                    <option value="mumbai"></option>
-                    <option value="kolkata"></option>
-                    <option value="banglore"></option>
-                </datalist>
+
+                <div class="row my-2">
+                    <div class="col-md-7 mt-2">
+                        <div id="calendarTitle" class="calendar-current-date fs-4 fw-bolder"></div>
+                        <div class="text-start my-3 calendar-navigation">
+                            <span id="calendar-prev" class="btn btn-info text-white rounded-circle" onclick="calendar.prev()">❮</span>
+                            <span class="mx-1"><i class="bi bi-calendar-day-fill fs-3"></i></span>
+                            <span id="calendar-next" class="btn btn-info text-white rounded-circle" onclick="calendar.next()">❯</span>
+                        </div>
+                    </div>
+                    <div class="col-md-5 mt-3">
+                        <div class="d-flex justify-content-end">
+                            <div class="alert   mx-1 px-4" role="alert" style="background-color:#F4CAED">
+                            </div>
+                            <span class="mx-1">Panding Shifts</span>
+                            <!-- Button trigger modal -->
+                            <div class="alert alert-success mx-1 px-4" role="alert">
+                            </div>
+                            <span class="mx-1">Appoved Shifts</span>
+
+                        </div>
+                        <div class="d-flex justify-content-end">
+                            <div id="day" class="btn btn-outline-info  mx-2" onclick="calendar.changeView('resourceTimeline')">
+                                Day
+                            </div>
+                            <!-- Button trigger modal -->
+                            <div id="week" class="btn btn-outline-info mx-2" onclick="calendar.changeView('resourceTimelineWeek')">
+                                Week
+                            </div>
+                            <div id="month" class="btn btn-outline-info mx-2" onclick="calendar.changeView('dayGridMonth')">
+                                Month
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="calendar" style="min-height:38vh">
+                </div>
             </div>
         </div>
-        <div class="d-flex justify-content-end">
-            <div class=" ms-auto d-flex">
-                <div class="col-auto">
-                    <button data-bs-toggle="modal" data-bs-target="#createShiftModal" type="button"
-                            class="btn btn-info ">
-                        Add New Shift
-                    </button>
-                </div>
-                <div class="col-auto">
-                    <a href="Req_shift.html" type="button" class="btn btn-info mx-2 flex-wrap btn22  ">
-                        Shifts For Review
-                    </a>
-                </div>
-                <div class="col-auto">
-                    <a href="providers_oncall.html" type="button"
-                       class="btn btn-info mx-2 flex-wrap btn22 ">
-                        Providers On call
-                    </a>
-                </div>
-            </div>
-        </div>
     </div>
 
-    <div id="datepicker" class="datepicker"></div>
 </div>
-<div class="container d-flex justify-content-between">
-    <div class="d-flex">
-
-    <button class="btn btn-primary m-1" id="prev-button"><</button>
-    <h2 id="calendarTitle">Calendar</h2>
-    <button class="btn btn-primary m-1" id="next-button">></button>
-    </div>
-    <div>
-
-    <button class="btn btn-primary m-1" id="day-button">Day</button>
-    <button class="btn btn-primary m-1" id="week-button">Week</button>
-    <button class="btn btn-primary m-1" id="month-button">Month</button>
-    </div>
+<div id="case2">
 </div>
-<div id="calendar" class="container"></div>
-
-
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar-scheduler@6.1.11/index.global.min.js"></script>
 <script>
     var calendar;
     document.addEventListener('DOMContentLoaded', function () {
         var calendarEl = document.getElementById('calendar');
+        var selectedRegion = $('#regionselect').val();
+        console.log(selectedRegion)
+        getPhysicianShift(selectedRegion);
 
-        fetch('/Admin/GetPhysicianShift')
-            .then(response => response.json())
-            .then(data => {
-                const resources = data.map(physician => ({
-                    id: physician.physicianid,
-                    title: physician.firstname,
-                    avatar: `<img src="/physician/${physician.physicianid}/photo.png" class="avatar" />`
-                }));
+        function getPhysicianShift(region) {
+            fetch('/Admin/GetPhysicianShift?region=' + region)
+                .then(response => response.json())
+                .then(data => {
+                    const resources = data.map(physician => ({
+                        id: physician.physicianid,
+                        title: physician.firstname,
+                        avatar: `<img src="/physician/${physician.physicianid}/photo.png" class="avatar" />`
+                    }));
+                    
+                    // Fetch events from the server
+                    fetch('/Admin/GetEvents')
+                        .then(response => response.json())
+                        .then(data => {
+                            const events = data.map(event => ({
+                                id: event.id,
+                                resourceId: event.resourceId,
+                                title: event.title,
+                                start: event.start,
+                                end: event.end,
+                                eventBackgroundColor: '#e39de8',
+                                color: '#e39de8'
 
-                // Fetch events from the server
-                fetch('/Admin/GetEvents')
-                    .then(response => response.json())
-                    .then(data => {
-                        const events = data.map(event => ({
-                            id: event.id,
-                            resourceId: event.resourceId,
-                            title: event.title,
-                            start: event.start,
-                            end: event.end
-                        }));
+                            }));
 
-                        initializeCalendar(resources, events);
-                    })
-                    .catch(error => console.error(error));
-            })
-            .catch(error => console.error(error));
-
+                            initializeCalendar(resources, events);
+                        })
+                        .catch(error => console.error(error));
+                })
+                .catch(error => console.error(error));
+        }
         function initializeCalendar(resources, events) {
+            $('#regionselect').on('change', function () {
+                const newRegion = $(this).val();
+                getPhysicianShift(newRegion);
+            });
             console.log(resources)
             calendar = new FullCalendar.Calendar(calendarEl, {
                 height: 'auto',
@@ -154,6 +184,17 @@
                 eventClick: function (info) {
                     console.log('Event clicked:', info.event);
                 },
+                eventBackgroundColor: function (event) {
+                    return event.eventBackgroundColor;
+                },
+                resourceLabelDidMount: function (resourceObj) {
+                    const img = document.createElement('img');
+                    const imgUrl = resourceObj.resource.extendedProps.imageUrl || `/Physician/${resourceObj.el.dataset.resourceId}/photo.png`;
+                    img.src = imgUrl;
+                    console.log(imgUrl);
+                    img.style.maxHeight = '40px';
+                    resourceObj.el.querySelector('.fc-datagrid-cell-main').appendChild(img);
+                },
                 dateClick: function (info) {
                     var resourceid = info.resource.id;
                     console.log(resourceid)
@@ -178,7 +219,7 @@
             });
 
             $("#month-button").click(function () {
-                calendar.changeView('resourceTimelineMonth');
+                calendar.changeView('dayGridMonth');
             });
 
             calendar.render();

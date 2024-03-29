@@ -1,0 +1,335 @@
+﻿
+tr, th, td {
+    color: black !important;
+    text-align: start;
+    padding: 12px !important;
+}
+
+label {
+    left: 12px !important;
+    top: -4px !important;
+}
+
+.ph-img {
+    width: 55px;
+    height: 55px;
+    border: 1px solid #0dcaf0;
+    border-radius: 65px;
+    padding: 2px;
+    margin: 2px 5px;
+}
+
+.alert-panding {
+    background: lightcoral !important;
+}
+
+
+.calendar-container {
+    border-radius: 10px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
+}
+
+    .calendar-container header {
+        display: flex;
+        align-items: center;
+        padding: 25px 30px 10px;
+        justify-content: space-between;
+    }
+
+header .calendar-navigation {
+    display: flex;
+}
+
+    header .calendar-navigation span {
+        height: 38px;
+        width: 38px;
+        margin: 0 1px;
+        cursor: pointer;
+        text-align: center;
+        line-height: 38px;
+        border-radius: 50%;
+        user-select: none;
+        color: #aeabab;
+        font-size: 1.9rem;
+    }
+
+.calendar-navigation span:last-child {
+    margin-right: -10px;
+}
+
+header .calendar-navigation span:hover {
+    background: #f2f2f2;
+}
+
+header .calendar-current-date {
+    font-weight: 500;
+    font-size: 1.45rem;
+}
+
+.calendar-body {
+    padding: 20px;
+}
+
+    .calendar-body tr {
+        list-style: none;
+        flex-wrap: wrap;
+        text-align: center;
+    }
+
+        .calendar-body tr th {
+            background-color: #565656 !important;
+            color: white !important;
+            padding: 0.4rem;
+            border: 1px solid #f3f3f3;
+        }
+
+    .calendar-body .calendar-dates {
+        margin-bottom: 20px;
+    }
+
+    .calendar-body td {
+        width: calc(100% / 7);
+        font-size: 1.07rem;
+        color: #414141;
+    }
+
+    .calendar-body .calendar-weekdays td {
+        cursor: default;
+        font-weight: 500;
+    }
+
+    .calendar-body .calendar-dates td {
+        border: 0px solid #414141;
+        position: relative;
+        z-index: 1;
+        /*cursor: pointer;*/
+    }
+
+.calendar-dates div.inactive {
+    color: #aaa;
+}
+
+
+
+.calendar-dates td::before {
+    position: absolute;
+    content: "";
+    z-index: -1;
+    top: 50%;
+    left: 50%;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.calendar-dates td.active {
+    background: #0dcaf047;
+}
+
+
+.first {
+    background-color: #ffabd5;
+    text-align: center;
+}
+
+    .first:hover {
+        background-color: #ffabd5 !important;
+    }
+
+
+.heading {
+    background-color: #565656;
+    color: white !important;
+    border: 1px solid #f3f3f3;
+}
+
+.weekhead {
+    background-color: #565656;
+    color: white !important;
+    border: 1px solid #f3f3f3;
+}
+
+.Converage {
+    background-color: #ffabd5;
+    color: black !important;
+}
+
+    .Converage td {
+        border: 1px solid #f3f3f3;
+    }
+
+.weekhead td {
+    color: white !important;
+    padding: 0.4rem;
+    border: 1px solid #f3f3f3;
+}
+
+.main tr > td {
+    border: 1px solid #c9c9c9;
+    padding: 0.2rem;
+}
+
+.calendar-dates tr > td {
+    border: 1px solid #c9c9c9;
+    padding: 0.2rem;
+}
+
+.table-text div a {
+    color: black !important;
+}
+
+.table-text div {
+    height: 40px;
+    overflow: hidden;
+    border: 1px solid #c9c9c9;
+    /*border-right: 1px solid #c9c9c9;*/
+    padding: 1px;
+    color: black !important;
+}
+
+    .table-text div:hover {
+        background-color: #0dcaf047;
+    }
+
+.Status-1 {
+    font-size: 12px;
+    background-color: #c2f7c2;
+    font-weight: 500;
+}
+
+    .Status-1:hover {
+        cursor: pointer !important;
+        background-color: #99f799 !important;
+    }
+
+.Status-0 {
+    font-size: 12px;
+    background-color: lightcoral;
+    font-weight: 500;
+}
+
+    .Status-0:hover {
+        cursor: pointer !important;
+        background-color: #f15858 !important;
+    }
+
+a {
+    text-decoration: none;
+}
+
+.model-Status-1 {
+    background-color: #c2f7c2;
+    border: 1px solid white;
+}
+
+.model-Status-0 {
+    background-color: lightcoral;
+    border: 1px solid white;
+}
+
+.w-Status-1 {
+    font-size: 0.9rem;
+    color: black !important;
+    display: block;
+    padding: 0.3rem;
+    background-color: #c2f7c2;
+}
+
+.w-Status-0 {
+    font-size: 0.9rem;
+    color: black !important;
+    padding: 0.3rem;
+    display: block;
+    background-color: lightcoral;
+}
+
+.employee-schedules thead tr td {
+    width: auto;
+}
+
+.employee-schedules-table tr > td {
+    border: 1px solid #c9c9c9;
+    padding: 0.2rem;
+}
+
+.employee-schedules-thead {
+    background-color: #565656;
+    color: white !important;
+    border: 1px solid #f3f3f3;
+}
+
+    .employee-schedules-thead td {
+        color: white !important;
+        padding: 0.4rem;
+        border: 1px solid #f3f3f3;
+    }
+
+
+.view-all-btn {
+    color: white !important;
+}
+
+
+/**Switch CSS*/
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 25px;
+    top: 0px !important;
+}
+
+    .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    -webkit-transition: .4s;
+    transition: .4s;
+}
+
+    .slider:before {
+        position: absolute;
+        content: "";
+        height: 20px;
+        width: 20px;
+        left: 3px;
+        top: 2px;
+        background-color: white;
+        -webkit-transition: .4s;
+        transition: .4s;
+    }
+
+input:checked + .slider {
+    background-color: #0dcaf0;
+}
+
+input:focus + .slider {
+    box-shadow: 0 0 1px #0dcaf0;
+}
+
+input:checked + .slider:before {
+    -webkit-transform: translateX(26px);
+    -ms-transform: translateX(26px);
+    transform: translateX(26px);
+}
+
+/* Rounded sliders */
+.slider.round {
+    border-radius: 34px;
+}
+
+    .slider.round:before {
+        border-radius: 50%;
+    }
