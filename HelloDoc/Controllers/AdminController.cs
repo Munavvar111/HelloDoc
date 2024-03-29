@@ -13,7 +13,7 @@ using System.Globalization;
 using ServiceStack;
 using BusinessLayer.Repository;
 using System.Data;
-
+using System.Transactions;
 
 namespace HelloDoc.Controllers
 {
@@ -555,12 +555,111 @@ namespace HelloDoc.Controllers
         }
         public IActionResult Scheduling()
         {
+            var region = _context.Regions.ToList();
+            ViewBag.regions = region;
             return View();
         }
-        
 
-        //main View
-        public IActionResult Parteners()
+        public IActionResult CreateShift(ScheduleModel data)
+        {
+            string? email = HttpContext.Session.GetString("Email");
+            string? id = HttpContext.Session.GetString("aspnetid");
+            Admin? admin = _context.Admins.FirstOrDefault(item => item.Email == email);
+
+            using (var transaction = new TransactionScope())
+                {
+                Shift shift = new Shift();
+                shift.Physicianid = data.Physicianid;
+                shift.Repeatupto = data.Repeatupto;
+                shift.Startdate = data.Startdate;
+                shift.Createdby = admin.Aspnetuserid;
+                shift.Createddate = DateTime.Now;
+                shift.Isrepeat = new BitArray(new[] { data.Isrepeat });
+                shift.Repeatupto = data.Repeatupto;
+                _context.Shifts.Add(shift);
+                _context.SaveChanges();
+
+                Shiftdetail sd = new Shiftdetail();
+                sd.Shiftid = shift.Shiftid;
+                sd.Shiftdate = new DateTime(data.Startdate.Year, data.Startdate.Month, data.Startdate.Day);
+                sd.Starttime = data.Starttime;
+                sd.Endtime = data.Endtime;
+                sd.Regionid = data.Regionid;
+                sd.Status = data.Status;
+                sd.Isdeleted = new BitArray(new[] { false }); 
+                _context.Shiftdetails.Add(sd);
+                _context.SaveChanges();
+
+                Shiftdetailregion sr = new Shiftdetailregion();
+                sr.Shiftdetailid = sd.Shiftdetailid;
+                sr.Regionid = data.Regionid;
+                sr.Isdeleted = new BitArray(new[] { false }); 
+                _context.Shiftdetailregions.Add(sr);
+                _context.SaveChanges();
+
+                List<int> day = data.checkWeekday.Split(',').Select(int.Parse).ToList();
+
+                foreach (int d in day)
+                {
+                    DayOfWeek desiredDayOfWeek = (DayOfWeek)d;
+                    DateTime today = DateTime.Today;
+                    DateTime nextOccurrence = new DateTime(data.Startdate.Year, data.Startdate.Month, data.Startdate.Day);
+                    int occurrencesFound = 0;
+                    while (occurrencesFound < data.Repeatupto)
+                    {
+                        if (nextOccurrence.DayOfWeek == desiredDayOfWeek)
+                        {
+
+                            Shiftdetail sdd = new Shiftdetail();
+                            sdd.Shiftid = shift.Shiftid;
+                            sdd.Shiftdate = nextOccurrence;
+                            sdd.Starttime = data.Starttime;
+                            sdd.Endtime = data.Endtime;
+                            sdd.Regionid = data.Regionid;
+                            sdd.Status = data.Status;
+                            sdd.Isdeleted = new BitArray(new[] { false }); 
+                            _context.Shiftdetails.Add(sdd);
+                            _context.SaveChanges();
+
+                            Shiftdetailregion srr = new Shiftdetailregion();
+                            srr.Shiftdetailid = sdd.Shiftdetailid;
+                            srr.Regionid = data.Regionid;
+                            srr.Isdeleted = new BitArray(new[] { false });
+                            _context.Shiftdetailregions.Add(srr);
+                            _context.SaveChanges();
+                            occurrencesFound++;
+                        }
+                        nextOccurrence = nextOccurrence.AddDays(1);
+                    }
+                }
+
+                transaction.Complete();
+            }
+            return RedirectToAction("Scheduling");
+        }
+		[HttpGet]
+		public IActionResult GetPhysicianShift()
+		{
+			List<Physician> physicians = _context.Physicians.ToList();
+			return Json(physicians);
+		}
+
+		public IActionResult GetEvents()
+		{
+			var events = _context.Shiftdetails.ToList();
+			return Ok(events.Select(e => new
+			{
+				id = e.Shiftid,
+				resourceId = 4,
+				title = "Minavvar",
+				start = new DateTime(e.Shiftdate.Year, e.Shiftdate.Month, e.Shiftdate.Day, e.Starttime.Hour, e.Starttime.Minute, e.Starttime.Second),
+				end = new DateTime(e.Shiftdate.Year, e.Shiftdate.Month, e.Shiftdate.Day, e.Endtime.Hour, e.Endtime.Minute, e.Endtime.Second),
+			}).ToList());
+		}
+
+
+		//main View
+		public IActionResult Parteners()
         {
             return View();
         }
@@ -1043,14 +1142,9 @@ namespace HelloDoc.Controllers
             }
             return View(requestModel);
         }
-        [HttpGet]
-        public IActionResult GetPhysician()
-        {
-            List<Physician> physicians = _context.Physicians.ToList();
-            return Json(physicians);
-        }
+        
 
-        public IActionResult GetStatusCounts(int id)
+		public IActionResult GetStatusCounts(int id)
         {
             var counts = new
             {

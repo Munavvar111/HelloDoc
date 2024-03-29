@@ -1,267 +1,190 @@
 ﻿@{
-	ViewData["Title"] = "Scheduling";
-	Layout = "~/Views/Shared/_Layout4.cshtml";
+    ViewData["Title"] = "Scheduling";
+    Layout = "~/Views/Shared/_Layout4.cshtml";
 }
+<style>
+    .fc-daygrid-event {
+        cursor: pointer;
+    }
+
+    .btn22 {
+        padding: 0.25rem 0.5rem !important;
+    }
+
+    .fc-header-toolbar .fc-button {
+        padding: 0.25rem 0.5rem !important;
+    }
+
+    .input-group {
+        width: 300px;
+    }
+
+    #calendar {
+        margin-top: 2rem;
+    }
+</style>
 <div class="container ">
-	<div class="  d-flex p-4  ">
-		<h4 class="mx-2 mb-4">Scheduling</h4>
-		<div class="ms-auto mt-0 ">
-			<a href="javascript: history.go(-1)" type="button" class="btn btn-info mx-2  ">
-				< Back
-			</a>
-		</div>
+    <div class="  d-flex p-4  ">
+        <h4 class="mx-2 mb-4">Scheduling</h4>
+        <div class="ms-auto mt-0 ">
+            <a href="javascript: history.go(-1)" type="button" class="btn btn-info mx-2  ">
+                < Back
+            </a>
+        </div>
 
-	</div>
+    </div>
 
+    <div class="d-flex justify-content-between">
+        <div class="w-25">
+            <div class="input-group border  rounded-0 mb-2 form-control col-md-4 col-12">
+                <div class="input-group-append">
+                    <button class="btn text-secondary border border-0 bg-white" type="button">
+                        <i class="bi bi-search"></i>
+                    </button>
+                </div>
+                <input type="search" class="form-control border-0  shadow-none" placeholder="Search Regions"
+                       list="data" id="myInput2" onkeyup="searchRegion()">
+                <datalist class=" border-0  shadow-none" aria-label="Default select example" id="data">
+                    <option value="mumbai"></option>
+                    <option value="kolkata"></option>
+                    <option value="banglore"></option>
+                </datalist>
+            </div>
+        </div>
+        <div class="d-flex justify-content-end">
+            <div class=" ms-auto d-flex">
+                <div class="col-auto">
+                    <button data-bs-toggle="modal" data-bs-target="#createShiftModal" type="button"
+                            class="btn btn-info ">
+                        Add New Shift
+                    </button>
+                </div>
+                <div class="col-auto">
+                    <a href="Req_shift.html" type="button" class="btn btn-info mx-2 flex-wrap btn22  ">
+                        Shifts For Review
+                    </a>
+                </div>
+                <div class="col-auto">
+                    <a href="providers_oncall.html" type="button"
+                       class="btn btn-info mx-2 flex-wrap btn22 ">
+                        Providers On call
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
 
-	<div class="d-flex justify-content-between">
-		<div class="w-25">
+    <div id="datepicker" class="datepicker"></div>
+</div>
+<div class="container d-flex justify-content-between">
+    <div class="d-flex">
 
-			<div class="input-group border  rounded-0 mb-2 form-control col-md-4 col-12">
-				<div class="input-group-append">
-					<button class="btn text-secondary border border-0 bg-white" type="button">
-						<i class="bi bi-search"></i>
-					</button>
-				</div>
-				<input type="search" class="form-control border-0  shadow-none" placeholder="Search Regions" list="data"
-					   id="myInput2" onkeyup="searchRegion()">
-				<datalist class=" border-0  shadow-none" aria-label="Default select example" id="data">
+    <button class="btn btn-primary m-1" id="prev-button"><</button>
+    <h2 id="calendarTitle">Calendar</h2>
+    <button class="btn btn-primary m-1" id="next-button">></button>
+    </div>
+    <div>
 
-					<option value="mumbai"></option>
-					<option value="kolkata"></option>
-					<option value="banglore"></option>
-				</datalist>
-			</div>
-		</div>
-		<div class="d-flex justify-content-end">
-
-			<div class=" ms-auto d-flex">
-				<div class="col-auto">
-					<button data-bs-toggle="modal" data-bs-target="#create" type="button"
-							class="btn btn-info ">
-						Add New Shift
-					</button>
-				</div>
-				<div class="col-auto">
-					<a href="Req_shift.html" type="button" class="btn btn-info mx-2 flex-wrap btn22  ">
-						Shifts For Review
-					</a>
-				</div>
-				<div class="col-auto">
-					<a href="providers_oncall.html" type="button"
-					   class="btn btn-info mx-2 flex-wrap btn22 ">
-						Providers On call
-					</a>
-				</div>
-			</div>
-		</div>
-	</div>
-	<div class="modal fade" id="create" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-		<div class="modal-dialog  modal-dialog-centered">
-			<div class="modal-content">
-				<div class="modal-header bg-info text-white">
-					<h1 class="modal-title fs-5 " id="exampleModalLabel">Create Shift</h1>
-					<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
-							aria-label="Close"></button>
-				</div>
-				<div class="modal-body">
-
-					<p mb-3>To assign this request search and select another Physician </p>
-
-					<div class="form-floating mb-3">
-						<select class="form-select" id="floatingSelect" aria-label="Floating label select example">
-							<option selected>Maryland</option>
-							<option value="1">One</option>
-							<option value="2">Two</option>
-							<option value="3">Three</option>
-						</select>
-						<label for="floatingSelect">Region</label>
-					</div>
-
-					<div class="form-floating mb-3">
-						<select class="form-select" id="floatingSelect" aria-label="Floating label select example">
-							<option selected></option>
-							<option value="1">One</option>
-							<option value="2">Two</option>
-							<option value="3">Three</option>
-						</select>
-						<label for="floatingSelect">Physician</label>
-					</div>
-
-					<div class="form-floating mb-3">
-						<!-- <input type="date" class="form-control" id="floatingInput"
-							mailto:placeholder="name@example.com">
-						<label for="floatingInput">Date of Birth</label> -->
-						<input type="text" id="uname" class="form-control" placeholder="Date Of Birth"
-							   onfocus="(this.type='date')"></input>
-						<label for="floatingInput" class="dm">Date of Birth</label>
-					</div>
-
-					<div class="row g-2">
-						<div class="col-md col-12">
-							<div class="form-floating mb-3">
-								<input type="time" class="form-control" id="floatingInput" placeholder="rttttttth">
-								<label for="floatingInput" class="dm">Start</label>
-							</div>
-						</div>
-						<div class="col-md col-12">
-							<div class="form-floating mb-3">
-								<input type="time" class="form-control" id="floatingInput" placeholder="trr">
-								<label for="floatingInput" class="dm">End</label>
-							</div>
-						</div>
-					</div>
-					<div class="form-check form-switch mb-2 ">
-
-						<label class="form-check-label" for="flexSwitchCheckChecked">
-							Repeat
-						</label>
-						<input class="form-check-input mx-3 check" type="checkbox" role="switch"
-							   id="flexSwitchCheckChecked" checked>
-					</div>
-
-
-					<div id="days" class="mt-2 mb-2">
-						<p class="mx-3">Repeat Days</p>
-						<div class="d-flex flex-row  ">
-							<div class="p-2 mx-1">
-								<div class="form-check">
-									<input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
-									<label class="form-check-label" for="flexCheckDefault">
-										Every Sunday
-									</label>
-
-								</div>
-							</div>
-							<div class="p-2 mx-1">
-								<div class="form-check">
-									<input class="form-check-input" type="checkbox" value="" id="flexCheckChecked">
-									<label class="form-check-label" for="flexCheckDefault">
-										Every Monday
-									</label>
-								</div>
-							</div>
-							<div class="p-2 mx-1">
-								<div class="form-check">
-									<input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
-									<label class="form-check-label" for="flexCheckDefault">
-										Every Tuesday
-									</label>
-								</div>
-							</div>
-
-
-						</div>
-						<div class="d-flex flex-row  ">
-							<div class="p-2 mx-1">
-								<div class="form-check">
-									<input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
-									<label class="form-check-label" for="flexCheckDefault">
-										Every Wednesday
-									</label>
-
-								</div>
-							</div>
-							<div class="p-2 mx-1">
-								<div class="form-check">
-									<input class="form-check-input" type="checkbox" value="" id="flexCheckChecked">
-									<label class="form-check-label" for="flexCheckDefault">
-										Every Thursday
-									</label>
-								</div>
-							</div>
-							<div class="p-2 mx-1">
-								<div class="form-check">
-									<input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
-									<label class="form-check-label" for="flexCheckDefault">
-										Every Friday
-									</label>
-								</div>
-							</div>
-						</div>
-						<div class="d-flex flex-row  ">
-							<div class="p-2 mx-1">
-								<div class="form-check">
-									<input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
-									<label class="form-check-label" for="flexCheckDefault">
-										Every Saturday
-									</label>
-
-								</div>
-							</div>
-						</div>
-					</div>
-					<div class="form-floating mb-3">
-						<select class="form-select" id="floatingSelect" aria-label="Floating label select example">
-							<option selected>2-times</option>
-							<option value="1">3-times</option>
-							<option value="2">3-times</option>
-							<option value="3">4-times</option>
-						</select>
-						<label for="floatingSelect">Repeat End</label>
-					</div>
-				</div>
-				<div class="modal-footer">
-
-					<button type="button" class="btn btn-info">Save</button>
-					<button type="button" class="btn btn-outline-info" data-bs-dismiss="modal">Cancel</button>
-				</div>
-			</div>
-		</div>
-	</div>
+    <button class="btn btn-primary m-1" id="day-button">Day</button>
+    <button class="btn btn-primary m-1" id="week-button">Week</button>
+    <button class="btn btn-primary m-1" id="month-button">Month</button>
+    </div>
 </div>
 <div id="calendar" class="container"></div>
 
+
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar-scheduler@6.1.11/index.global.min.js"></script>
 <script>
-	var calendar;
-	document.addEventListener('DOMContentLoaded', function () {
-		var calendarEl = document.getElementById('calendar');
+    var calendar;
+    document.addEventListener('DOMContentLoaded', function () {
+        var calendarEl = document.getElementById('calendar');
 
-		// **Server-Side Data Retrieval (recommended for large datasets):**
-		// Assuming you have an API endpoint to fetch physician data
-		fetch('/Admin/GetPhysician') // Replace with your endpoint URL
-			.then(response => response.json())
-			.then(data => {
-				console.log(data)
-				// 'data' should contain an array of physician objects
-				const resources = data.map(physician => ({
-					id: physician.physicianid, // Use physician ID as resource ID
-					title: physician.firstname
-					// Set physician name as resource title
-				}));
-				initializeCalendar(resources);
-			})
-			.catch(error => console.error(error));
+        fetch('/Admin/GetPhysicianShift')
+            .then(response => response.json())
+            .then(data => {
+                const resources = data.map(physician => ({
+                    id: physician.physicianid,
+                    title: physician.firstname,
+                    avatar: `<img src="/physician/${physician.physicianid}/photo.png" class="avatar" />`
+                }));
 
-		function initializeCalendar(resources) {
-			console.log(resources)
-			calendar = new FullCalendar.Calendar(calendarEl, {
+                // Fetch events from the server
+                fetch('/Admin/GetEvents')
+                    .then(response => response.json())
+                    .then(data => {
+                        const events = data.map(event => ({
+                            id: event.id,
+                            resourceId: event.resourceId,
+                            title: event.title,
+                            start: event.start,
+                            end: event.end
+                        }));
 
-				height: 'auto',
-				schedulerLicenseKey: 'GPL-My-Project-Is-Open-Source', // Replace with your license key
-				themeSystem: 'bootstrap5',
-				headerToolbar: false,
-				initialView: 'resourceTimeline',
-				datesSet: function (info) {
-					var title = info.view.title;
-					$("#calendarTitle").html(title);
-				},
-				resources: resources,
-				events: [ // Replace with your event data or API endpoint
-					{ id: '1', resourceId: resources[0].id, title: 'Meeting 1', start: '2024-03-28T08:00:00', end: '2024-03-28T10:00:00' },
-				],
-				eventClick: function (info) {
-					// Handle event click (optional)
-					console.log('Event clicked:', info.event);
-				},
-				dateClick: function (info) {
-					var resourceid = info.resource.id;
-					console.log(resourceid)
-				}
-			});
+                        initializeCalendar(resources, events);
+                    })
+                    .catch(error => console.error(error));
+            })
+            .catch(error => console.error(error));
 
-			calendar.render();
-		}
-	});
+        function initializeCalendar(resources, events) {
+            console.log(resources)
+            calendar = new FullCalendar.Calendar(calendarEl, {
+                height: 'auto',
+                schedulerLicenseKey: 'GPL-My-Project-Is-Open-Source',
+                themeSystem: 'bootstrap5',
+                headerToolbar: false,
+                initialView: 'resourceTimelineDay',
+                views: {
+                    resourceTimelineDay: {
+                        buttonText: 'Day',
+                    },
+                    resourceTimelineWeek: {
+                        buttonText: 'Week'
+                    },
+                    resourceTimelineMonth: {
+                        buttonText: 'Month'
+                    }
+                },
+                datesSet: function (info) {
+                    var title = info.view.title;
+                    $("#calendarTitle").html(title);
+                },
+                resources: resources,
+                events: events,
+                eventClick: function (info) {
+                    console.log('Event clicked:', info.event);
+                },
+                dateClick: function (info) {
+                    var resourceid = info.resource.id;
+                    console.log(resourceid)
+                },
+                
+            });
+
+            $("#next-button").click(function () {
+                calendar.next();
+            });
+
+            $("#prev-button").click(function () {
+                calendar.prev();
+            });
+
+            $("#day-button").click(function () {
+                calendar.changeView('resourceTimelineDay');
+            });
+
+            $("#week-button").click(function () {
+                calendar.changeView('resourceTimelineWeek');
+            });
+
+            $("#month-button").click(function () {
+                calendar.changeView('resourceTimelineMonth');
+            });
+
+            calendar.render();
+        }
+    });
 </script>
+
+
+<partial name="CreateShiftPartial"></partial>

@@ -9,12 +9,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HelloDoc", "HelloDoc\HelloD
 		{EDBD2EB0-CEB2-47B5-ABB0-00C4B7120B9B} = {EDBD2EB0-CEB2-47B5-ABB0-00C4B7120B9B}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BusinessLayer", "BusinessLayer\BusinessLayer.csproj", "{EDBD2EB0-CEB2-47B5-ABB0-00C4B7120B9B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BusinessLayer", "BusinessLayer\BusinessLayer.csproj", "{EDBD2EB0-CEB2-47B5-ABB0-00C4B7120B9B}"
 	ProjectSection(ProjectDependencies) = postProject
 		{47BE6E12-D780-40CF-8EF1-C181F9D20AD3} = {47BE6E12-D780-40CF-8EF1-C181F9D20AD3}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataAccessLayer", "DataAccessLayer\DataAccessLayer.csproj", "{47BE6E12-D780-40CF-8EF1-C181F9D20AD3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataAccessLayer", "DataAccessLayer\DataAccessLayer.csproj", "{47BE6E12-D780-40CF-8EF1-C181F9D20AD3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
