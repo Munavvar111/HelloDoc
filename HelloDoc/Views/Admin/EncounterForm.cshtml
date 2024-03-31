@@ -284,14 +284,6 @@
     </div>
 </div>
 
-<script>
-    $(document).ready(function () {
-        if (typeof @ViewData["modalMessage"] !== 'undefined') {
-            $('#finalizedModal').modal('show');
-        }
-    });
-</script>
-
 
 <script>
     const finalizeButton = document.getElementById('finalize');
@@ -305,7 +297,6 @@
 </script>
 <script>
     const savachanges = document.getElementById('savachanges');
-    const encounterForm = document.getElementById('encounterForm');
 
     finalizeButton.addEventListener('click', () => {
         const isFinalizedInput = document.getElementById('isfilnalized');

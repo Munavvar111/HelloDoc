@@ -14,6 +14,7 @@ using ServiceStack;
 using BusinessLayer.Repository;
 using System.Data;
 using System.Transactions;
+using Humanizer;
 
 namespace HelloDoc.Controllers
 {
@@ -356,32 +357,24 @@ namespace HelloDoc.Controllers
         }
         #endregion
 
-
-
+        #region ProviderAccountingInfo
         [CustomAuthorize("Provider", "8")]
         [HttpPost]
         public IActionResult ProviderAccountingInfo(int physicianid, string Address1, string Address2, string City, int State, string Zipcode, string MobileNo)
         {
-            Physician? physician = _context.Physicians.FirstOrDefault(item => item.Physicianid == physicianid);
-            if (physician != null)
+            bool success = _admin.UpdatePhysicianAccountingInfo(physicianid, Address1, Address2, City, State, Zipcode, MobileNo);
+            if (success)
             {
-                physician.Address1 = Address1;
-                physician.Address2 = Address2;
-                physician.City = City;
-                physician.Regionid = State;
-                physician.Zip = Zipcode;
-                physician.Mobile = MobileNo;
-                _context.Physicians.Update(physician);
-                _context.SaveChanges();
                 TempData["SuccessMessage"] = "Provider AccountingInfo Saved.";
             }
             else
             {
-                TempData["Error"] = "Provider AccountingInfo UnSaved.";
-
+                TempData["ErrorMessage"] = "Provider not found or invalid ID.";
             }
             return RedirectToAction("PhysicanProfile", "Admin", new { id = physicianid });
         }
+        #endregion
+
 
         public IActionResult CreateProvider()
         {
@@ -397,33 +390,10 @@ namespace HelloDoc.Controllers
         [HttpPost]
         public IActionResult SaveNotification(List<int> physicianIds, List<bool> checkboxStates)
         {
-            for (int i = 0; i < physicianIds.Count; i++)
-            {
-                int physicianId = physicianIds[i];
-                bool isNotificationStopped = checkboxStates[i];
-
-                PhysicianNotification physicianNotification = _context.PhysicianNotifications
-                    .FirstOrDefault(pn => pn.Physicianid == physicianId);
-
-                if (physicianNotification != null)
-                {
-                    physicianNotification.Isnotificationstopped = new BitArray(new[] { isNotificationStopped });
-                    _context.SaveChanges();
-                }
-            }
-
-            // After updating the ones in the request, update the rest to false
-            var allPhysicians = _context.PhysicianNotifications
-                .Where(pn => !physicianIds.Contains(pn.Physicianid));
-
-            foreach (var physician in allPhysicians)
-            {
-                physician.Isnotificationstopped = new BitArray(new[] { false });
-            }
-            _context.SaveChanges();
-
+            _admin.SaveNotification(physicianIds, checkboxStates);
             return Ok();
         }
+
 
         [HttpPost]
         public IActionResult CreateProvider(CreateProviderVM createProvider, string[] adminRegion)
@@ -546,7 +516,7 @@ namespace HelloDoc.Controllers
             _context.SaveChanges();
 
             AspnetUserrole aspnetUserrole = new AspnetUserrole();
-            aspnetUserrole.Userid=aspnetUser.Aspnetuserid;
+            aspnetUserrole.Userid = aspnetUser.Aspnetuserid;
             aspnetUserrole.Roleid = createProvider.RoleId;
             _context.AspnetUserroles.Add(aspnetUserrole);
             _context.SaveChanges();
@@ -567,7 +537,7 @@ namespace HelloDoc.Controllers
             Admin? admin = _context.Admins.FirstOrDefault(item => item.Email == email);
 
             using (var transaction = new TransactionScope())
-                {
+            {
                 Shift shift = new Shift();
                 shift.Physicianid = data.Physicianid;
                 shift.Repeatupto = data.Repeatupto;
@@ -586,50 +556,54 @@ namespace HelloDoc.Controllers
                 sd.Endtime = data.Endtime;
                 sd.Regionid = data.Regionid;
                 sd.Status = data.Status;
-                sd.Isdeleted = new BitArray(new[] { false }); 
+                sd.Isdeleted = new BitArray(new[] { false });
                 _context.Shiftdetails.Add(sd);
                 _context.SaveChanges();
 
                 Shiftdetailregion sr = new Shiftdetailregion();
                 sr.Shiftdetailid = sd.Shiftdetailid;
-                sr.Regionid = data.Regionid;
-                sr.Isdeleted = new BitArray(new[] { false }); 
+                sr.Regionid = (int)data.Regionid;
+                sr.Isdeleted = new BitArray(new[] { false });
                 _context.Shiftdetailregions.Add(sr);
                 _context.SaveChanges();
 
-                List<int> day = data.checkWeekday.Split(',').Select(int.Parse).ToList();
-
-                foreach (int d in day)
+                if (data.checkWeekday != null)
                 {
-                    DayOfWeek desiredDayOfWeek = (DayOfWeek)d;
-                    DateTime today = DateTime.Today;
-                    DateTime nextOccurrence = new DateTime(data.Startdate.Year, data.Startdate.Month, data.Startdate.Day);
-                    int occurrencesFound = 0;
-                    while (occurrencesFound < data.Repeatupto)
+
+                    List<int> day = data.checkWeekday.Split(',').Select(int.Parse).ToList();
+
+                    foreach (int d in day)
                     {
-                        if (nextOccurrence.DayOfWeek == desiredDayOfWeek)
+                        DayOfWeek desiredDayOfWeek = (DayOfWeek)d;
+                        DateTime today = DateTime.Today;
+                        DateTime nextOccurrence = new DateTime(data.Startdate.Year, data.Startdate.Month, data.Startdate.Day);
+                        int occurrencesFound = 0;
+                        while (occurrencesFound < data.Repeatupto)
                         {
+                            if (nextOccurrence.DayOfWeek == desiredDayOfWeek)
+                            {
 
-                            Shiftdetail sdd = new Shiftdetail();
-                            sdd.Shiftid = shift.Shiftid;
-                            sdd.Shiftdate = nextOccurrence;
-                            sdd.Starttime = data.Starttime;
-                            sdd.Endtime = data.Endtime;
-                            sdd.Regionid = data.Regionid;
-                            sdd.Status = data.Status;
-                            sdd.Isdeleted = new BitArray(new[] { false }); 
-                            _context.Shiftdetails.Add(sdd);
-                            _context.SaveChanges();
+                                Shiftdetail sdd = new Shiftdetail();
+                                sdd.Shiftid = shift.Shiftid;
+                                sdd.Shiftdate = nextOccurrence;
+                                sdd.Starttime = data.Starttime;
+                                sdd.Endtime = data.Endtime;
+                                sdd.Regionid = data.Regionid;
+                                sdd.Status = data.Status;
+                                sdd.Isdeleted = new BitArray(new[] { false });
+                                _context.Shiftdetails.Add(sdd);
+                                _context.SaveChanges();
 
-                            Shiftdetailregion srr = new Shiftdetailregion();
-                            srr.Shiftdetailid = sdd.Shiftdetailid;
-                            srr.Regionid = data.Regionid;
-                            srr.Isdeleted = new BitArray(new[] { false });
-                            _context.Shiftdetailregions.Add(srr);
-                            _context.SaveChanges();
-                            occurrencesFound++;
+                                Shiftdetailregion srr = new Shiftdetailregion();
+                                srr.Shiftdetailid = sdd.Shiftdetailid;
+                                srr.Regionid = (int)data.Regionid;
+                                srr.Isdeleted = new BitArray(new[] { false });
+                                _context.Shiftdetailregions.Add(srr);
+                                _context.SaveChanges();
+                                occurrencesFound++;
+                            }
+                            nextOccurrence = nextOccurrence.AddDays(1);
                         }
-                        nextOccurrence = nextOccurrence.AddDays(1);
                     }
                 }
 
@@ -637,44 +611,193 @@ namespace HelloDoc.Controllers
             }
             return RedirectToAction("Scheduling");
         }
-		[HttpGet]
-		public IActionResult GetPhysicianShift(int region)
-		{
-			List<Physician> physicians = _context.Physicians.Where(item=>region==0|| item.Regionid==region).ToList();
-			return Json(physicians);
-		}
+        [HttpGet]
+        public IActionResult GetPhysicianShift(int region)
+        {
 
-		public IActionResult GetEvents()
-		{
-            List<ScheduleModel> events = (from s in _context.Shifts
-                                      join pd in _context.Physicians
-                                      on s.Physicianid equals pd.Physicianid
-                                      join sd in _context.Shiftdetails
-                                      on s.Shiftid equals sd.Shiftid into shiftGroup
-                                      from sd in shiftGroup.DefaultIfEmpty()
-                                      select new ScheduleModel
-                                      {
-                                          Shiftid = sd.Shiftdetailid,
-                                          Status = sd.Status,
-                                          Starttime = sd.Starttime,
-                                          Endtime = sd.Endtime,
-                                          Physicianid=pd.Physicianid,
-                                          PhysicianName = pd.Firstname + ' ' + pd.Lastname,
-                                          Shiftdate=sd.Shiftdate,
-                                      }).ToList();
-            return Ok(events.Select(e => new
+
+            // Retrieve physicians associated with the specified region
+            var physicians = (from physicianRegion in _context.PhysicianRegions
+                              where region == 0 || physicianRegion.Regionid == region
+                              select physicianRegion.Physician)
+                             .ToList();
+
+            return Ok(physicians);
+        }
+
+        [HttpGet]
+        public IActionResult GetEvents()
+        {
+            var events = _admin.GetEvents();
+            var mappedEvents = events.Select(e => new
+            {
+                id = e.Shiftid,
+                resourceId = e.Physicianid,
+                title = e.PhysicianName,
+                start = new DateTime(e.Shiftdate.Value.Year, e.Shiftdate.Value.Month, e.Shiftdate.Value.Day, e.Starttime.Hour, e.Starttime.Minute, e.Starttime.Second),
+                end = new DateTime(e.Shiftdate.Value.Year, e.Shiftdate.Value.Month, e.Shiftdate.Value.Day, e.Endtime.Hour, e.Endtime.Minute, e.Endtime.Second),
+                ShiftDetailId = e.ShiftDetailId,
+                region = _context.Regions.Where(i => i.Regionid == e.Regionid),
+                status = e.Status
+            }).ToList();
+
+            return Ok(mappedEvents);
+        }
+        [HttpPost]
+        public IActionResult SaveShift(int shiftDetailId, DateTime startDate, TimeOnly startTime, TimeOnly endTime)
+        {
+            // Find the shift detail by its ID
+            Shiftdetail? shiftdetail = _context.Shiftdetails.Find(shiftDetailId);
+
+            // If shift detail is not found, return a 404 Not Found response
+            if (shiftdetail == null)
+            {
+                return NotFound("Shift detail not found.");
+            }
+
+            try
+            {
+                // Update the shift detail properties
+                shiftdetail.Shiftdate = startDate;
+                shiftdetail.Starttime = startTime;
+                shiftdetail.Endtime = endTime;
+
+                // Update the database
+                _context.Shiftdetails.Update(shiftdetail);
+                _context.SaveChanges();
+                var events = _admin.GetEvents();
+                var mappedEvents = events.Select(e => new
+                {
+                    id = e.Shiftid,
+                    resourceId = e.Physicianid,
+                    title = e.PhysicianName,
+                    start = new DateTime(e.Shiftdate.Value.Year, e.Shiftdate.Value.Month, e.Shiftdate.Value.Day, e.Starttime.Hour, e.Starttime.Minute, e.Starttime.Second),
+                    end = new DateTime(e.Shiftdate.Value.Year, e.Shiftdate.Value.Month, e.Shiftdate.Value.Day, e.Endtime.Hour, e.Endtime.Minute, e.Endtime.Second),
+                    ShiftDetailId = e.ShiftDetailId,
+                    region = _context.Regions.Where(i => i.Regionid == e.Regionid),
+                    status = e.Status
+                }).ToList();
+                // Return a 200 OK response
+                return Ok(new { message = "Shift detail updated successfully.", events = mappedEvents });
+            }
+            catch (Exception ex)
+            {
+                // Return a 400 Bad Request response with the error message
+                return BadRequest("Error updating shift detail: " + ex.Message);
+            }
+        }
+
+        public IActionResult DeleteShift(int shiftDetailId)
+        {
+			Shiftdetail? shiftdetail = _context.Shiftdetails.Find(shiftDetailId);
+			if (shiftdetail == null)
+			{
+				return NotFound("Shift detail not found.");
+			}
+            shiftdetail.Isdeleted = new BitArray(new[] { true });
+            _context.Shiftdetails.Update(shiftdetail);
+            _context.SaveChanges();
+			var events = _admin.GetEvents();
+			var mappedEvents = events.Select(e => new
 			{
 				id = e.Shiftid,
 				resourceId = e.Physicianid,
 				title = e.PhysicianName,
 				start = new DateTime(e.Shiftdate.Value.Year, e.Shiftdate.Value.Month, e.Shiftdate.Value.Day, e.Starttime.Hour, e.Starttime.Minute, e.Starttime.Second),
 				end = new DateTime(e.Shiftdate.Value.Year, e.Shiftdate.Value.Month, e.Shiftdate.Value.Day, e.Endtime.Hour, e.Endtime.Minute, e.Endtime.Second),
-			}).ToList());
+				ShiftDetailId = e.ShiftDetailId,
+				region = _context.Regions.Where(i => i.Regionid == e.Regionid),
+				status = e.Status
+			}).ToList();
+			return Ok(new { message = "Shift detail Deleted successfully.", events = mappedEvents });
+
 		}
 
 
-		//main View
-		public IActionResult Parteners()
+		public IActionResult ReturnShift(int shiftDetailId)
+        {
+            Shiftdetail? shiftdetail = _context.Shiftdetails.Find(shiftDetailId);
+
+            // If shift detail is not found, return a 404 Not Found response
+            if (shiftdetail == null)
+            {
+                return NotFound("Shift detail not found.");
+            }
+            shiftdetail.Status = (short)((shiftdetail.Status == 0) ? 1 : 0);
+
+            _context.Shiftdetails.Update(shiftdetail);
+            _context.SaveChanges();
+            var events = _admin.GetEvents();
+            var mappedEvents = events.Select(e => new
+            {
+                id = e.Shiftid,
+                resourceId = e.Physicianid,
+                title = e.PhysicianName,
+                start = new DateTime(e.Shiftdate.Value.Year, e.Shiftdate.Value.Month, e.Shiftdate.Value.Day, e.Starttime.Hour, e.Starttime.Minute, e.Starttime.Second),
+                end = new DateTime(e.Shiftdate.Value.Year, e.Shiftdate.Value.Month, e.Shiftdate.Value.Day, e.Endtime.Hour, e.Endtime.Minute, e.Endtime.Second),
+                ShiftDetailId = e.ShiftDetailId,
+                region = _context.Regions.Where(i => i.Regionid == e.Regionid),
+                status = e.Status
+            }).ToList();
+            return Ok(new { message = "Shift detail updated successfully.", events = mappedEvents });
+
+        }
+
+        public IActionResult ShiftReview()
+        {
+            return View();
+        }
+
+        public IActionResult GetReviewShift(int region)
+        {
+            var shifts = (from shiftis in _context.Shifts
+                          join shiftdetails in _context.Shiftdetails
+                          on shiftis.Shiftid equals shiftdetails.Shiftid
+                          join regionis in _context.Regions
+                          on shiftdetails.Regionid equals regionis.Regionid
+                          select new
+                          {
+                              shiftis.Shiftid,
+                              ShiftDetailId=shiftdetails.Shiftdetailid,
+                              shiftis.Physician.Firstname,
+                              shiftis.Physician.Lastname,
+                              shiftdetails.Shiftdate,
+                              shiftdetails.Starttime,
+                              shiftdetails.Endtime,
+                              shiftdetails.Regionid,
+                              RegionName = regionis.Name,
+                              shiftdetails.Status
+                          }).Where(item => (region == 0 || item.Regionid == region) && item.Status==1).ToList();
+            var regions = _context.Shiftdetails.Where(item => region == 0 || item.Regionid == region &&item.Status==1 ).ToList();
+            return PartialView("RequestedShiftPartial", shifts);
+        }
+
+        [HttpPost]
+        public IActionResult ApprovedShifts(List<int> selectedIds)
+        {
+            try
+            {
+                foreach (var id in selectedIds)
+                {
+                    var shiftDetail = _context.Shiftdetails.Find(id);
+                    if (shiftDetail != null)
+                    {
+                        shiftDetail.Status = 0; // Change the state to 0
+                        _context.Shiftdetails.Update(shiftDetail);
+                _context.SaveChanges();
+                    }
+                }
+
+                return Ok("Selected shifts have been successfully approved.");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "An error occurred while approving selected shifts: " + ex.Message);
+            }
+        }
+
+        //main View
+        public IActionResult Parteners()
         {
             return View();
         }
@@ -691,7 +814,7 @@ namespace HelloDoc.Controllers
             var roles = _context.Roles
                                  .ToList();
             // Switch to client-side evaluation
-            var list = roles.Where(item =>item.Isdeleted!=null &&(item.Isdeleted.Length==0||!item.Isdeleted[0]));
+            var list = roles.Where(item => item.Isdeleted != null && (item.Isdeleted.Length == 0 || !item.Isdeleted[0]));
             return View(list.ToList());
         }
 
@@ -850,24 +973,24 @@ namespace HelloDoc.Controllers
 
         public IActionResult CreateAdmin()
         {
-            List<Role> roles=_context.Roles.Where(item=>item.Accounttype== 1).ToList();
+            List<Role> roles = _context.Roles.Where(item => item.Accounttype == 1).ToList();
             List<Region> region = _context.Regions.ToList();
-            AdminProfileVm profile=new AdminProfileVm();
-            profile.Regions=region;
+            AdminProfileVm profile = new AdminProfileVm();
+            profile.Regions = region;
             profile.Roles = roles;
             return View(profile);
         }
         [HttpPost]
         public IActionResult CreateAdmin(AdminProfileVm profileVm, int[] adminRegion)
         {
-            AspnetUser? aspnetUser=_context.AspnetUsers.FirstOrDefault(item=>item.Email==profileVm.Email);
+            AspnetUser? aspnetUser = _context.AspnetUsers.FirstOrDefault(item => item.Email == profileVm.Email);
             if (aspnetUser != null)
             {
                 TempData["Error"] = "Send Request Unsuccessful!";
                 return RedirectToAction("CreateAdmin", "Admin");
             }
             AspnetUser aspnet = new AspnetUser();
-            aspnet.Email=profileVm.Email;
+            aspnet.Email = profileVm.Email;
             aspnet.Aspnetuserid = Guid.NewGuid().ToString();
             aspnet.Username = profileVm.Username;
             aspnet.Createddat = DateTime.Now;
@@ -876,13 +999,13 @@ namespace HelloDoc.Controllers
             _context.AspnetUsers.Add(aspnet);
             _context.SaveChanges();
 
-            Admin admin= new Admin();
+            Admin admin = new Admin();
             admin.Email = profileVm.Email;
             admin.Aspnetuserid = aspnet.Aspnetuserid;
             admin.Firstname = profileVm.FirstName;
             admin.Lastname = profileVm.LastName;
             admin.Mobile = profileVm.MobileNo;
-            admin.Address2=profileVm.Address2;  
+            admin.Address2 = profileVm.Address2;
             admin.Address1 = profileVm.Address1;
             admin.City = profileVm.City;
             admin.Regionid = profileVm.State;
@@ -893,22 +1016,21 @@ namespace HelloDoc.Controllers
             _context.Admins.Add(admin);
             _context.SaveChanges();
 
-            foreach(var region in adminRegion)
+            foreach (var region in adminRegion)
             {
 
-            AdminRegion adminregions= new AdminRegion();
+                AdminRegion adminregions = new AdminRegion();
                 adminregions.Adminid = admin.Adminid;
                 adminregions.Regionid = region;
                 _context.AdminRegions.Add(adminregions);
                 _context.SaveChanges();
             }
 
-            AspnetUserrole aspnetUserrole=new AspnetUserrole();
+            AspnetUserrole aspnetUserrole = new AspnetUserrole();
             aspnetUserrole.Userid = aspnet.Aspnetuserid;
             aspnetUserrole.Roleid = profileVm.RoleId;
             _context.AspnetUserroles.Add(aspnetUserrole);
             _context.SaveChanges();
-            return RedirectToAction("UserAccess", "Admin");
             return RedirectToAction("UserAccess", "Admin");
         }
         //main View
@@ -1062,6 +1184,7 @@ namespace HelloDoc.Controllers
             }
         }
 
+        #region ViewNotesPost
         [HttpPost]
         [CustomAuthorize("Dashboard", "6")]
         public async Task<IActionResult> ViewNotesPost(string adminNotes, int id)
@@ -1073,7 +1196,9 @@ namespace HelloDoc.Controllers
             }
             return RedirectToAction("ViewNotes", new { requestid = id });
         }
+        #endregion
 
+        #region CancelCasePost
         [HttpPost]
         [CustomAuthorize("Dashboard", "6")]
         public async Task<IActionResult> CancelCase(string notes, string cancelReason, int requestid)
@@ -1081,8 +1206,8 @@ namespace HelloDoc.Controllers
             bool result = await _admin.CancelCase(requestid, notes, cancelReason);
             TempData["SuccessMessage"] = "Cancel successfully";
             return Json(result);
-
         }
+        #endregion
 
         [CustomAuthorize("Dashboard", "6")]
         public IActionResult CreateRequest()
@@ -1157,9 +1282,9 @@ namespace HelloDoc.Controllers
             }
             return View(requestModel);
         }
-        
 
-		public IActionResult GetStatusCounts(int id)
+
+        public IActionResult GetStatusCounts(int id)
         {
             var counts = new
             {
@@ -1174,9 +1299,22 @@ namespace HelloDoc.Controllers
         }
         public IActionResult GetPhysician(string region)
         {
-            List<Physician> physician = _context.Physicians.Where(p => p.Regionid == int.Parse(region)).ToList();
-            return Ok(physician);
+            // Parse the region parameter to an integer
+            if (!int.TryParse(region, out int regionId))
+            {
+                return BadRequest("Invalid region ID format.");
+            }
+
+            // Retrieve physicians associated with the specified region
+            var physicians = (from physicianRegion in _context.PhysicianRegions
+                              where physicianRegion.Regionid == regionId
+                              select physicianRegion.Physician)
+                             .ToList();
+
+            return Ok(physicians);
         }
+
+        #region BlockRequest
         [HttpPost]
         public IActionResult BlockRequest(string blockreason, int requestid)
         {
@@ -1191,6 +1329,7 @@ namespace HelloDoc.Controllers
             }
             return RedirectToAction("Index");
         }
+        #endregion
 
         #region ViewUploads
         [CustomAuthorize("Dashboard", "6")]
@@ -1289,7 +1428,7 @@ namespace HelloDoc.Controllers
         }
         #endregion
 
-
+        #region SendEmailWithSelectedFiles
         [HttpPost]
         public IActionResult SendEmailWithSelectedFiles(List<string> filenames)
         {
@@ -1319,7 +1458,9 @@ namespace HelloDoc.Controllers
                 return StatusCode(500, new { message = $"Error sending email: {ex.Message}" });
             }
         }
+        #endregion
 
+        #region GetOrder
         [CustomAuthorize("SendOrder", "12")]
         public IActionResult SendOrder(int requestid)
         {
@@ -1327,7 +1468,9 @@ namespace HelloDoc.Controllers
 
             return View(sendOrderModel);
         }
+        #endregion
 
+        #region SendOrder
         [CustomAuthorize("SendOrder", "12")]
         [HttpPost]
         public IActionResult SendOrder(SendOrderModel order)
@@ -1342,11 +1485,8 @@ namespace HelloDoc.Controllers
                 TempData["Error"] = "Order Unsuccessfully";
             }
             return RedirectToAction("SendOrder", "Admin", new { requestid = order.requestid });
-
-
-
-
         }
+        #endregion
 
         public IActionResult VendorNameByHelthProfession(int helthprofessionaltype)
         {
@@ -1360,6 +1500,7 @@ namespace HelloDoc.Controllers
             return Ok(businessdetails);
         }
 
+        #region SendAgreement
         [HttpPost]
         public IActionResult SendAgreement(int requestid, string agreementemail, string agreementphoneno)
         {
@@ -1373,6 +1514,8 @@ namespace HelloDoc.Controllers
             }
             return Json(false);
         }
+        #endregion
+
         [HttpPost]
         public IActionResult ClearCase(int requestidclearcase)
         {
@@ -1412,7 +1555,7 @@ namespace HelloDoc.Controllers
                 return RedirectToAction("Index", "Admin");
             }
         }
-
+        #region GeneratePDF
         [HttpPost]
         public IActionResult GeneratePDF(int requestid)
         {
@@ -1423,6 +1566,8 @@ namespace HelloDoc.Controllers
             {
                 return NotFound();
             }
+            #endregion
+
 
             //return View("EncounterFormDetails", encounterFormView);
             return new ViewAsPdf("EncounterFormDetails", viewEncounterForm)
@@ -1472,74 +1617,11 @@ namespace HelloDoc.Controllers
             if (viewEncounterForm.IsFinalizied == "0")
             {
                 _admin.SaveOrUpdateEncounterForm(viewEncounterForm, requestid);
-                return RedirectToAction("EncounterForm", "Admin", new { requestid = requestid });
+                return RedirectToAction("EncounterForm", "Admin", new { requestId = requestid });
             }
             else
             {
-                Encounterform? encounter = _context.Encounterforms.Where(item => item.RequestId == int.Parse(requestid)).FirstOrDefault();
-                if (encounter != null)
-                {
-                    encounter.Abd = viewEncounterForm.ABD;
-                    encounter.Skin = viewEncounterForm.Skin;
-                    encounter.RequestId = int.Parse(requestid);
-                    encounter.Rr = viewEncounterForm.RR;
-                    encounter.Procedures = viewEncounterForm.Procedures;
-                    encounter.Cv = viewEncounterForm.CV;
-                    encounter.Chest = viewEncounterForm.Chest;
-                    encounter.Allergies = viewEncounterForm.Allergies;
-                    encounter.BloodPressureDiastolic = viewEncounterForm.BPDiastolic;
-                    encounter.BloodPressureSystolic = viewEncounterForm.BPSystolic;
-                    encounter.Diagnosis = viewEncounterForm.Diagnosis;
-                    encounter.FollowUp = viewEncounterForm.Followup;
-                    encounter.Heent = viewEncounterForm.Heent;
-                    encounter.HistoryOfPresentIllnessOrInjury = viewEncounterForm.HistoryOfPresentIllness;
-                    encounter.Hr = viewEncounterForm.HR;
-                    encounter.IsFinalize = true;
-                    encounter.MedicalHistory = viewEncounterForm.MedicalHistory;
-                    encounter.Medications = viewEncounterForm.Medications;
-                    encounter.MedicationsDispensed = viewEncounterForm.MedicationsDispensed;
-                    encounter.Neuro = viewEncounterForm.Neuro;
-                    encounter.O2 = viewEncounterForm.O2;
-                    encounter.Other = viewEncounterForm.Other;
-                    encounter.Pain = viewEncounterForm.Pain;
-                    encounter.Procedures = viewEncounterForm.Procedures;
-                    encounter.Temp = viewEncounterForm.Temperature;
-                    encounter.TreatmentPlan = viewEncounterForm.TreatmentPlan;
-                    _context.Encounterforms.Update(encounter);
-                    _context.SaveChanges();
-                }
-                else
-                {
-                    Encounterform encounterFirsttime = new Encounterform();
-                    encounterFirsttime.Abd = viewEncounterForm.ABD;
-                    encounterFirsttime.Skin = viewEncounterForm.Skin;
-                    encounterFirsttime.Rr = viewEncounterForm.RR;
-                    encounterFirsttime.Procedures = viewEncounterForm.Procedures;
-                    encounterFirsttime.Cv = viewEncounterForm.CV;
-                    encounterFirsttime.Chest = viewEncounterForm.Chest;
-                    encounterFirsttime.Allergies = viewEncounterForm.Allergies;
-                    encounterFirsttime.BloodPressureDiastolic = viewEncounterForm.BPDiastolic;
-                    encounterFirsttime.BloodPressureSystolic = viewEncounterForm.BPSystolic;
-                    encounterFirsttime.Diagnosis = viewEncounterForm.Diagnosis;
-                    encounterFirsttime.FollowUp = viewEncounterForm.Followup;
-                    encounterFirsttime.RequestId = int.Parse(requestid);
-                    encounterFirsttime.Heent = viewEncounterForm.Heent;
-                    encounterFirsttime.HistoryOfPresentIllnessOrInjury = viewEncounterForm.HistoryOfPresentIllness;
-                    encounterFirsttime.Hr = viewEncounterForm.HR;
-                    encounterFirsttime.IsFinalize = true;
-                    encounterFirsttime.MedicalHistory = viewEncounterForm.MedicalHistory;
-                    encounterFirsttime.Medications = viewEncounterForm.Medications;
-                    encounterFirsttime.MedicationsDispensed = viewEncounterForm.MedicationsDispensed;
-                    encounterFirsttime.Neuro = viewEncounterForm.Neuro;
-                    encounterFirsttime.O2 = viewEncounterForm.O2;
-                    encounterFirsttime.Other = viewEncounterForm.Other;
-                    encounterFirsttime.Pain = viewEncounterForm.Pain;
-                    encounterFirsttime.Procedures = viewEncounterForm.Procedures;
-                    encounterFirsttime.Temp = viewEncounterForm.Temperature;
-                    encounterFirsttime.TreatmentPlan = viewEncounterForm.TreatmentPlan;
-                    _context.Encounterforms.Add(encounterFirsttime);
-                    _context.SaveChanges();
-                }
+                // Handle finalization
                 return RedirectToAction("Index", "Admin");
             }
         }

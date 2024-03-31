@@ -905,5 +905,86 @@ namespace BusinessLayer.Repository
             }
         }
         #endregion
-    }
+
+        #region UpdatePhysicianAccountingInfo
+        public bool UpdatePhysicianAccountingInfo(int physicianId, string address1, string address2, string city, int state, string zipcode, string mobileNo)
+        {
+            Physician physician = _context.Physicians.FirstOrDefault(item => item.Physicianid == physicianId);
+            if (physician != null)
+            {
+                physician.Address1 = address1;
+                physician.Address2 = address2;
+                physician.City = city;
+                physician.Regionid = state;
+                physician.Zip = zipcode;
+                physician.Mobile = mobileNo;
+                _context.Physicians.Update(physician);
+                _context.SaveChanges();
+                return true; // Operation succeeded
+            }
+            else
+            {
+                return false; // Physician not found
+            }
+        }
+        #endregion
+
+        #region SaveNotification
+        public void SaveNotification(List<int> physicianIds, List<bool> checkboxStates)
+        {
+            for (int i = 0; i < physicianIds.Count; i++)
+            {
+                int physicianId = physicianIds[i];
+                bool isNotificationStopped = checkboxStates[i];
+
+                PhysicianNotification? physicianNotification = _context.PhysicianNotifications
+                    .FirstOrDefault(pn => pn.Physicianid == physicianId);
+
+                if (physicianNotification != null)
+                {
+                    physicianNotification.Isnotificationstopped = new BitArray(new[] { isNotificationStopped });
+                    _context.SaveChanges();
+                }
+            }
+
+            // After updating the ones in the request, update the rest to false
+            var allPhysicians = _context.PhysicianNotifications
+                .Where(pn => !physicianIds.Contains(pn.Physicianid));
+
+            foreach (var physician in allPhysicians)
+            {
+                physician.Isnotificationstopped = new BitArray(new[] { false });
+            }
+            _context.SaveChanges();
+        }
+		#endregion
+
+		#region GetEventes
+		public List<ScheduleModel> GetEvents()
+		{
+			var eventswithoutdelet = (from s in _context.Shifts
+						  join pd in _context.Physicians on s.Physicianid equals pd.Physicianid
+						  join sd in _context.Shiftdetails on s.Shiftid equals sd.Shiftid into shiftGroup
+						  from sd in shiftGroup.DefaultIfEmpty()
+						  
+						  select new ScheduleModel
+						  {
+							  Shiftid = sd.Shiftdetailid,
+							  Status = sd.Status,
+							  Starttime = sd.Starttime,
+							  Endtime = sd.Endtime,
+							  Physicianid = pd.Physicianid,
+							  PhysicianName = pd.Firstname + ' ' + pd.Lastname,
+							  Shiftdate = sd.Shiftdate,
+							  ShiftDetailId = sd.Shiftdetailid,
+							  Regionid = sd.Regionid,
+                              ShiftDeleted = sd.Isdeleted[0]
+						  }).ToList();
+            var events = eventswithoutdelet.Where(item => !item.ShiftDeleted).ToList();
+			return events;
+		}
+		#endregion
+	}
 }
+
+                                        

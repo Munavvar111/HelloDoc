@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,11 +10,12 @@ namespace DataAccessLayer.CustomModel
     public class ScheduleModel
     {
         public int? Shiftid { get; set; }
+        public int? ShiftDetailId { get; set; }
 
         public int Physicianid { get; set; }
         public string? PhysicianName { get; set; }
         public string? PhysicianPhoto { get; set; }
-        public int Regionid { get; set; }
+        public int? Regionid { get; set; }
         public string? RegionName { get; set; }
 
         public DateOnly Startdate { get; set; }
@@ -25,6 +27,7 @@ namespace DataAccessLayer.CustomModel
 
         public string? checkWeekday { get; set; }
 
+        public bool ShiftDeleted { get; set; }  
         public int? Repeatupto { get; set; }
         public short Status { get; set; }
         public List<ScheduleModel> DayList { get; set; }

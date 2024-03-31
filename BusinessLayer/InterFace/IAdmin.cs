@@ -44,8 +44,10 @@ namespace BusinessLayer.InterFace
         bool ResetPhysicianPassword(int physicianId, string newPassword);
         void UpdatePhysicianInformation(int id, string email, string mobileNo, string[] adminRegion, string synchronizationEmail, string npinumber, string medicalLicense);
         void UpdateProviderProfile(int id, string businessName, string businessWebsite, IFormFile signatureFile, IFormFile photoFile);
+        bool UpdatePhysicianAccountingInfo(int physicianId, string address1, string address2, string city, int state, string zipcode, string mobileNo);
+        void SaveNotification(List<int> physicianIds, List<bool> checkboxStates);
+		List<ScheduleModel> GetEvents();
 
 
-
-    }
+	}
 }
