@@ -46,7 +46,7 @@ namespace BusinessLayer.InterFace
         void UpdateProviderProfile(int id, string businessName, string businessWebsite, IFormFile signatureFile, IFormFile photoFile);
         bool UpdatePhysicianAccountingInfo(int physicianId, string address1, string address2, string city, int state, string zipcode, string mobileNo);
         void SaveNotification(List<int> physicianIds, List<bool> checkboxStates);
-		List<ScheduleModel> GetEvents();
+		List<ScheduleModel> GetEvents(int region);
 
 
 	}

@@ -37,6 +37,79 @@
 	#calendar {
 		margin-top: 2rem;
 	}
+
+	.fc .fc-toolbar-title {
+		font-size: 22px;
+		font-weight: 600;
+	}
+
+	.fc-scrollgrid-sync-inner:has(.fc-col-header-cell-cushion) {
+		background-color: #747474;
+	}
+
+	.fc .fc-col-header-cell-cushion {
+		color: white;
+	}
+
+	.fc a {
+		color: black;
+	}
+
+	.fc-daygrid-day-top {
+		background-color: #ec9aef;
+	}
+
+	.fc .fc-button-group {
+		display: block;
+	}
+
+	.fc-button {
+		margin: 10px;
+	}
+
+	.fc-direction-ltr .fc-button-group > .fc-button:not(:last-child) {
+		background: none;
+		border: 1px solid #02BCE6;
+		color: #02BCE6;
+		border-radius: 5px;
+		margin: 3px;
+	}
+
+	.fc-direction-ltr .fc-button-group > .fc-button:last-child {
+		background: none;
+		border: 1px solid #02BCE6;
+		color: #02BCE6;
+		border-radius: 5px;
+		margin: 3px;
+	}
+
+	.fc .fc-button-primary:not(:disabled).fc-button-active:focus, .fc .fc-button-primary:not(:disabled):active:focus {
+		box-shadow: none;
+	}
+
+	.fc .fc-button-group > .fc-button.fc-button-active {
+		background-color: #02BCE6;
+		color: white;
+	}
+
+	.fc-toolbar-title {
+		font-weight: 600;
+	}
+
+	.fc-next-button.fc-button.fc-button-primary {
+		padding: 4px 5px;
+		border-radius: 50px;
+	}
+
+	.fc-prev-button.fc-button.fc-button-primary {
+		padding: 4px 5px;
+		border-radius: 50px;
+	}
+
+	.fc-direction-ltr {
+		padding: 4px 5px;
+		border-radius: 50px;
+	}
 </style>
 <div class="container">
 	<div class="row justify-content-center ">
@@ -66,7 +139,7 @@
 						<div class="mt-3">
 							<a  class="btn btn-info rounded-2 p-2 ">Provider On Call</a>
 							<a asp-action="ShiftReview" class="btn btn-info rounded-2 p-2 ">Shift For Review</a>
-							<a data-bs-toggle="modal" data-bs-target="#createShiftModal"  class="btn btn-info mx-1 btn-sm btn22  ">
+							<a data-bs-toggle="modal" data-bs-target="#createShiftModal"  class="btn btn-info rounded-2 p-2">
 								Add New Shift
 							</a>
 
@@ -122,13 +195,10 @@
 	var calendar;
 
 	document.addEventListener('DOMContentLoaded', function () {
-
-
 		var calendarEl = document.getElementById('calendar');
 		var selectedRegion = $('#regionselect').val();
 		console.log(selectedRegion)
 		getPhysicianShift(selectedRegion);
-
 		function getPhysicianShift(region) {
 			fetch('/Admin/GetPhysicianShift?region=' + region)
 				.then(response => response.json())
@@ -136,11 +206,11 @@
 					const resources = data.map(physician => ({
 						id: physician.physicianid,
 						title: physician.firstname,
-						avatar: `<img src="/physician/${physician.physicianid}/photo.png" class="avatar" />`
 					}));
 
+
 					// Fetch events from the server
-					fetch('/Admin/GetEvents')
+					fetch('/Admin/GetEvents?region=' + region)
 						.then(response => response.json())
 						.then(data => {
 							console.log(data)
@@ -150,8 +220,8 @@
 								title: event.title,
 								start: event.start,
 								end: event.end,
-								eventBackgroundColor: event.status == 0 ? '#e39de8' : '#32d97d',
-								color: event.status==0 ? '#e39de8' : '#32d97d',
+								eventBackgroundColor: event.status === 1 ? '#32d97d' : '#e39de8',
+								color: event.status === 1 ? '#e39de8' : '#32d97d',
 								ShiftDetailId: event.shiftDetailId,
 								region: event.region,
 								status: event.status
@@ -175,15 +245,50 @@
 				themeSystem: 'bootstrap5',
 				headerToolbar: false,
 				initialView: 'resourceTimelineDay',
+				dayMaxEvents: 4,
 				views: {
 					resourceTimelineDay: {
 						buttonText: 'Day',
 					},
 					resourceTimelineWeek: {
-						buttonText: 'Week'
+						buttonText: 'Week',
+						slotDuration: { days: 1 },
+						slotLabelInterval: { days: 1 },
+						slotMinTime: '00:00:00',
+						slotMaxTime: '23:59:59',
+						slotLabelFormat: {
+							omitWeekday: false,
+							weekday: 'short',
+							day: '2-digit',
+							omitCommas: true,
+							meridiem: 'short'
+						}
 					},
 					resourceTimelineMonth: {
-						buttonText: 'Month'
+						buttonText: 'Month',
+						eventLimit: true, // Set the event limit to 3
+						eventLimitText: "More"
+					}
+				},
+
+				viewDidMount: function (view) {
+					if (view.name === 'resourceTimelineWeek') {
+						view.calendar.setOption('slotLabelFormat', {
+							hour: '2-digit',
+							minute: '2-digit',
+							omitWeekday: false,
+							weekday: 'short',
+							month: 'short',
+							omitCommas: true,
+							meridiem: 'short'
+						});
+					}
+				},
+				viewDidMount: function (view) {
+					if (view.name === 'resourceTimelineWeek') {
+						view.calendar.setOption('slotLabelInterval', { days: 1 });
+						view.calendar.setOption('slotMinTime', '00:00:00');
+						view.calendar.setOption('slotMaxTime', '23:59:59');
 					}
 				},
 				datesSet: function (info) {
@@ -192,6 +297,8 @@
 				},
 				resources: resources,
 				events: events,
+				eventLimit: 3,
+				eventLimitText: "More",
 				eventClick: function (info) {
 					// Open the modal when an event is clicked
 					$('#eventModal').modal('show');
@@ -212,7 +319,7 @@
 						$.ajax({
 							url: '/Admin/ReturnShift',
 							type: 'POST',
-							data: { shiftDetailId: shiftDetailId },
+							data: { shiftDetailId: shiftDetailId, region: selectedRegion },
 							success: function (response) {
 								// Handle success
 								$('#eventModal').modal('hide');
@@ -223,8 +330,8 @@
 									title: event.title,
 									start: event.start,
 									end: event.end,
-									eventBackgroundColor: event.status == 0 ? '#e39de8' : '#32d97d',
-									color: event.status == 0 ? '#e39de8' : '#32d97d',
+									eventBackgroundColor: event.status == 1 ? '#e39de8' : '#32d97d',
+									color: event.status === 0 ? '#32d97d' : '#e39de8',
 									ShiftDetailId: event.shiftDetailId,
 									region: event.region
 								}));
@@ -245,7 +352,7 @@
 						$.ajax({
 							url: '/Admin/DeleteShift',
 							type: 'POST',
-							data: { shiftDetailId: shiftDetailId },
+							data: { shiftDetailId: shiftDetailId, region: selectedRegion },
 							success: function (response) {
 								$('#eventModal').modal('hide');
 
@@ -255,8 +362,8 @@
 									title: event.title,
 									start: event.start,
 									end: event.end,
-									eventBackgroundColor: event.status == 0 ? '#e39de8' : '#32d97d',
-									color: event.status == 0 ? '#e39de8' : '#32d97d',
+									eventBackgroundColor: event.status == 1 ? '#e39de8' : '#32d97d',
+									color: event.status === 0 ? '#32d97d' : '#e39de8',
 									ShiftDetailId: event.shiftDetailId,
 									region: event.region
 								}));
@@ -285,7 +392,8 @@
 								shiftDetailId: shiftDetailId,
 								startDate: startDate,
 								startTime: startTime,
-								endTime: endTime
+								endTime: endTime,
+							    region: selectedRegion
 							},
 							success: function (response) {
 								$('#eventModal').modal('hide');
@@ -297,7 +405,7 @@
 									start: event.start,
 									end: event.end,
 									eventBackgroundColor: event.status == 0 ? '#e39de8' : '#32d97d',
-									color: event.status == 0 ? '#e39de8' : '#32d97d',
+									color: event.status === 0 ? '#32d97d' : '#e39de8',
 									ShiftDetailId: event.shiftDetailId,
 									region: event.region
 								}));

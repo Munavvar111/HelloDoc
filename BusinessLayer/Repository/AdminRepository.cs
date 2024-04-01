@@ -960,7 +960,7 @@ namespace BusinessLayer.Repository
 		#endregion
 
 		#region GetEventes
-		public List<ScheduleModel> GetEvents()
+		public List<ScheduleModel> GetEvents(int region)
 		{
 			var eventswithoutdelet = (from s in _context.Shifts
 						  join pd in _context.Physicians on s.Physicianid equals pd.Physicianid
@@ -979,7 +979,7 @@ namespace BusinessLayer.Repository
 							  ShiftDetailId = sd.Shiftdetailid,
 							  Regionid = sd.Regionid,
                               ShiftDeleted = sd.Isdeleted[0]
-						  }).ToList();
+						  }).Where(item=>region==0|| item.Regionid==region).ToList();
             var events = eventswithoutdelet.Where(item => !item.ShiftDeleted).ToList();
 			return events;
 		}

@@ -567,7 +567,8 @@ namespace HelloDoc.Controllers
                 _context.Shiftdetailregions.Add(sr);
                 _context.SaveChanges();
 
-                if (data.checkWeekday != null)
+
+				if (data.checkWeekday != null)
                 {
 
                     List<int> day = data.checkWeekday.Split(',').Select(int.Parse).ToList();
@@ -576,8 +577,9 @@ namespace HelloDoc.Controllers
                     {
                         DayOfWeek desiredDayOfWeek = (DayOfWeek)d;
                         DateTime today = DateTime.Today;
-                        DateTime nextOccurrence = new DateTime(data.Startdate.Year, data.Startdate.Month, data.Startdate.Day);
-                        int occurrencesFound = 0;
+						DateTime nextOccurrence = new DateTime(data.Startdate.Year, data.Startdate.Month, data.Startdate.Day + 1);
+
+						int occurrencesFound = 0;
                         while (occurrencesFound < data.Repeatupto)
                         {
                             if (nextOccurrence.DayOfWeek == desiredDayOfWeek)
@@ -626,9 +628,9 @@ namespace HelloDoc.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetEvents()
+        public IActionResult GetEvents(int region)
         {
-            var events = _admin.GetEvents();
+            var events = _admin.GetEvents(region);
             var mappedEvents = events.Select(e => new
             {
                 id = e.Shiftid,
@@ -644,7 +646,7 @@ namespace HelloDoc.Controllers
             return Ok(mappedEvents);
         }
         [HttpPost]
-        public IActionResult SaveShift(int shiftDetailId, DateTime startDate, TimeOnly startTime, TimeOnly endTime)
+        public IActionResult SaveShift(int shiftDetailId, DateTime startDate, TimeOnly startTime, TimeOnly endTime,int region)
         {
             // Find the shift detail by its ID
             Shiftdetail? shiftdetail = _context.Shiftdetails.Find(shiftDetailId);
@@ -665,7 +667,7 @@ namespace HelloDoc.Controllers
                 // Update the database
                 _context.Shiftdetails.Update(shiftdetail);
                 _context.SaveChanges();
-                var events = _admin.GetEvents();
+                var events = _admin.GetEvents(region);
                 var mappedEvents = events.Select(e => new
                 {
                     id = e.Shiftid,
@@ -687,7 +689,7 @@ namespace HelloDoc.Controllers
             }
         }
 
-        public IActionResult DeleteShift(int shiftDetailId)
+        public IActionResult DeleteShift(int shiftDetailId,int region)
         {
 			Shiftdetail? shiftdetail = _context.Shiftdetails.Find(shiftDetailId);
 			if (shiftdetail == null)
@@ -697,7 +699,7 @@ namespace HelloDoc.Controllers
             shiftdetail.Isdeleted = new BitArray(new[] { true });
             _context.Shiftdetails.Update(shiftdetail);
             _context.SaveChanges();
-			var events = _admin.GetEvents();
+			var events = _admin.GetEvents(region);
 			var mappedEvents = events.Select(e => new
 			{
 				id = e.Shiftid,
@@ -714,7 +716,7 @@ namespace HelloDoc.Controllers
 		}
 
 
-		public IActionResult ReturnShift(int shiftDetailId)
+        public IActionResult ReturnShift(int shiftDetailId, int region)
         {
             Shiftdetail? shiftdetail = _context.Shiftdetails.Find(shiftDetailId);
 
@@ -727,7 +729,7 @@ namespace HelloDoc.Controllers
 
             _context.Shiftdetails.Update(shiftdetail);
             _context.SaveChanges();
-            var events = _admin.GetEvents();
+            var events = _admin.GetEvents(region);
             var mappedEvents = events.Select(e => new
             {
                 id = e.Shiftid,
@@ -795,6 +797,30 @@ namespace HelloDoc.Controllers
                 return StatusCode(500, "An error occurred while approving selected shifts: " + ex.Message);
             }
         }
+        [HttpPost]
+        public IActionResult DeleteSelectedShiftDetails(List<int> selectedIds)
+        {
+            try
+            {
+                foreach (var id in selectedIds)
+                {
+                    var shiftDetail = _context.Shiftdetails.Find(id);
+                    if (shiftDetail != null)
+                    {
+                        shiftDetail.Isdeleted = new BitArray(new[] { true }); // Change the state to 0
+                        _context.Shiftdetails.Update(shiftDetail);
+                        _context.SaveChanges();
+                    }
+                }
+
+                return Ok("Selected shifts have been successfully Deleted.");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "An error occurred while Deleting selected shifts: " + ex.Message);
+            }
+        }
+
 
         //main View
         public IActionResult Parteners()
