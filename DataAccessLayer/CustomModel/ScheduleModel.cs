@@ -18,7 +18,7 @@ namespace DataAccessLayer.CustomModel
         public int? Regionid { get; set; }
         public string? RegionName { get; set; }
 
-        public DateOnly Startdate { get; set; }
+        public DateTime Startdate { get; set; }
         public DateTime? Shiftdate { get; set; }
         public TimeOnly Starttime { get; set; }
         public TimeOnly Endtime { get; set; }
