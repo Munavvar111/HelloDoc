@@ -201,9 +201,21 @@
                 }
                 @if (userPermissions.Contains("3"))
                 {
-                    <li class="nav-item">
-                        <a class="nav-link  @(ViewContext.ActionDescriptor.RouteValues["action"] == "Records" ? "active" : "")"
-                           asp-action="Records" asp-controller="Admin">Records</a>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle  @(ViewContext.ActionDescriptor.RouteValues["action"] == "Records" ? "active" : "")" role="button" data-bs-toggle="dropdown" aria-expanded="false">Records</a>
+                        <ul class="dropdown-menu bg-light mt-3 bg-opacity-0">
+                            <li class="border-bottom">
+                                <a class="dropdown-item @(ViewContext.ActionDescriptor.RouteValues["action"] == "Records" ? "active" : "")" asp-action="Records" asp-controller="Admin">
+                                    Access
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item @(ViewContext.ActionDescriptor.RouteValues["action"] == "UserAccess" ? "active" : "")" asp-action="Records" asp-controller="Admin">
+                                    User Access
+                                </a>
+                            </li>
+
+                        </ul>
                     </li>
                 }
             </ul>

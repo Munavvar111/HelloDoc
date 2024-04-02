@@ -2,6 +2,7 @@
 	ViewData["Title"] = "Scheduling";
 	Layout = "~/Views/Shared/_Layout4.cshtml";
 }
+<partial name="ToasterPartialView"></partial>
 <style>
 	.fc-daygrid-event {
 		cursor: pointer;
@@ -137,12 +138,11 @@
 							</select>
 						</div>
 						<div class="mt-3">
-							<a  class="btn btn-info rounded-2 p-2 ">Provider On Call</a>
+							<a asp-action="ProviderOnCall" class="btn btn-info rounded-2 p-2 ">Provider On Call</a>
 							<a asp-action="ShiftReview" class="btn btn-info rounded-2 p-2 ">Shift For Review</a>
 							<a data-bs-toggle="modal" data-bs-target="#createShiftModal"  class="btn btn-info rounded-2 p-2">
 								Add New Shift
 							</a>
-
 						</div>
 					</div>
 				</div>
@@ -190,11 +190,16 @@
 </div>
 <div id="case2">
 </div>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar-scheduler@6.1.11/index.global.min.js"></script>
 <script>
 	var calendar;
 
 	document.addEventListener('DOMContentLoaded', function () {
+		var calendarView = localStorage.getItem("calendarView");
+		if (calendarView) {
+			calendar.changeView(calendarView);
+		}
 		var calendarEl = document.getElementById('calendar');
 		var selectedRegion = $('#regionselect').val();
 		console.log(selectedRegion)
@@ -244,13 +249,16 @@
 				schedulerLicenseKey: 'GPL-My-Project-Is-Open-Source',
 				themeSystem: 'bootstrap5',
 				headerToolbar: false,
+				eventOverlap: false,
 				initialView: 'resourceTimelineDay',
+				eventMaxStack: 1,
 				dayMaxEvents: 4,
 				views: {
 					resourceTimelineDay: {
 						buttonText: 'Day',
 					},
 					resourceTimelineWeek: {
+						dayMaxEventRows:3,
 						buttonText: 'Week',
 						slotDuration: { days: 1 },
 						slotLabelInterval: { days: 1 },
@@ -262,33 +270,10 @@
 							day: '2-digit',
 							omitCommas: true,
 							meridiem: 'short'
-						}
+						},
 					},
 					resourceTimelineMonth: {
 						buttonText: 'Month',
-						eventLimit: true, // Set the event limit to 3
-						eventLimitText: "More"
-					}
-				},
-
-				viewDidMount: function (view) {
-					if (view.name === 'resourceTimelineWeek') {
-						view.calendar.setOption('slotLabelFormat', {
-							hour: '2-digit',
-							minute: '2-digit',
-							omitWeekday: false,
-							weekday: 'short',
-							month: 'short',
-							omitCommas: true,
-							meridiem: 'short'
-						});
-					}
-				},
-				viewDidMount: function (view) {
-					if (view.name === 'resourceTimelineWeek') {
-						view.calendar.setOption('slotLabelInterval', { days: 1 });
-						view.calendar.setOption('slotMinTime', '00:00:00');
-						view.calendar.setOption('slotMaxTime', '23:59:59');
 					}
 				},
 				datesSet: function (info) {
@@ -299,13 +284,49 @@
 				events: events,
 				eventLimit: 3,
 				eventLimitText: "More",
+				eventMouseEnter: function (info) {
+					new bootstrap.Tooltip(info.el, {
+						title: info.event.title + ' (' + formatDate(info.event.start) + ' - ' + formatDate(info.event.end) + ')',
+						placement: 'top',
+						trigger: 'hover',
+						html: true
+					});
+				},
+				eventMouseLeave:function(info){
+					$(info.el).tooltip('dispose');
+				},
+				eventDragStart: function (info) {
+					// Allow the event to be dragged and dropped
+					return true;
+				},
+				eventDrop: function (info) {
+					var shiftDetailId = info.event.extendedProps.ShiftDetailId;
+					var startDate = formatDate(info.event.start);
+					var endDate = formatDate(info.event.end);
+					var region = info.event.extendedProps.region;
+
+					// Call AJAX request to update the event's start and end dates
+					$.ajax({
+						url: '/Admin/UpdateShiftDates',
+						type: 'POST',
+						data: {
+							shiftDetailId: shiftDetailId,
+							startDate: startDate,
+							endDate: endDate,
+							region: region
+						},
+						success: function (response) {
+							// Handle success
+						},
+						error: function (xhr, status, error) {
+							// Handle error
+						}
+					});
+				},
 				eventClick: function (info) {
-					// Open the modal when an event is clicked
 					$('#eventModal').modal('show');
 					$('#eventModal').on('click', '#editbtn', function () {
-						// Hide the edit button
 						$('#editbtn').addClass('d-none');
-						// Show the save button
 						$('#savebtn').removeClass('d-none');
 						$('#StartDateView').prop('disabled', false);
 						$('#StartTimeView').prop('disabled', false);
@@ -313,9 +334,9 @@
 					});
 
 					$('#eventModal').on('click', '#returnshift', function () {
-						// Get the ShiftDetailId from the event
+						console.log("sdfs")
+
 						var shiftDetailId = $('#shiftDetailId').val(); // Assuming you have an input field with id 'shiftDetailId' in your modal
-						// Call AJAX to return
 						$.ajax({
 							url: '/Admin/ReturnShift',
 							type: 'POST',
@@ -323,7 +344,6 @@
 							success: function (response) {
 								// Handle success
 								$('#eventModal').modal('hide');
-
 								const events = response.events.map(event => ({
 									id: event.id,
 									resourceId: event.resourceId,
@@ -335,19 +355,17 @@
 									ShiftDetailId: event.shiftDetailId,
 									region: event.region
 								}));
-								calendar.removeAllEvents(); // Remove existing events
-								calendar.addEventSource(events); // Add updated events
-								calendar.refetchEvents(); // Refetch events from the event sources
+								calendar.removeAllEvents(); 
+								calendar.addEventSource(events); 
+								calendar.refetchEvents();
 							
 							},
 							error: function (xhr, status, error) {
-								// Handle error
 							}
 						});
 					});
 
 					$('#eventModal').on('click', '#deletebtn', function () {
-						// Get the ShiftId from the event
 						var shiftDetailId = $('#shiftDetailId').val();
 						$.ajax({
 							url: '/Admin/DeleteShift',
@@ -355,7 +373,6 @@
 							data: { shiftDetailId: shiftDetailId, region: selectedRegion },
 							success: function (response) {
 								$('#eventModal').modal('hide');
-
 								const events = response.events.map(event => ({
 									id: event.id,
 									resourceId: event.resourceId,
@@ -367,12 +384,11 @@
 									ShiftDetailId: event.shiftDetailId,
 									region: event.region
 								}));
-								calendar.removeAllEvents(); // Remove existing events
-								calendar.addEventSource(events); // Add updated events
-								calendar.refetchEvents(); // Refetch events from the event sources
+								calendar.removeAllEvents(); 
+								calendar.addEventSource(events); 
+								calendar.refetchEvents(); 
 							},
 							error: function (xhr, status, error) {
-								// Handle error
 							}
 						});
 					});
@@ -384,7 +400,6 @@
 						var startTime = $('#StartTimeView').val();
 						var endTime = $('#EndTimeView').val();
 						console.log(shiftDetailId);
-						// Call AJAX to save
 						$.ajax({
 							url: '/Admin/SaveShift',
 							type: 'POST',
@@ -475,6 +490,7 @@
 					img.src = imgUrl;
 					console.log(imgUrl);
 					img.style.maxHeight = '40px';
+					img.style.float = 'left';
 					resourceObj.el.querySelector('.fc-datagrid-cell-main').appendChild(img);
 				},
 				dateClick: function (info) {
@@ -501,17 +517,47 @@
 
 			$("#day-button").click(function () {
 				calendar.changeView('resourceTimelineDay');
+				localStorage.setItem("calendarView", "resourceTimelineDay");
+
 			});
 
 			$("#week-button").click(function () {
 				calendar.changeView('resourceTimelineWeek');
+				localStorage.setItem("calendarView", "resourceTimelineWeek");
+
 			});
 
 			$("#month-button").click(function () {
 				calendar.changeView('dayGridMonth');
+				localStorage.setItem("calendarView", "dayGridMonth");
+
 			});
 
 			calendar.render();
+			calendar.on('eventDrop', function (info) {
+				var shiftDetailId = info.event.extendedProps.ShiftDetailId;
+				var startDate = formatDate(info.event.start);
+				var endDate = formatDate(info.event.end);
+				var region = info.event.extendedProps.region;
+
+				// Call AJAX request to update the event's start and end dates
+				$.ajax({
+					url: '/Admin/UpdateShiftDates',
+					type: 'POST',
+					data: {
+						shiftDetailId: shiftDetailId,
+						startDate: startDate,
+						endDate: endDate,
+						region: region
+					},
+					success: function (response) {
+						// Handle success
+					},
+					error: function (xhr, status, error) {
+						// Handle error
+					}
+				});
+			});
 		}
 	});
 

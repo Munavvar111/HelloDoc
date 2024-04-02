@@ -978,8 +978,8 @@ namespace BusinessLayer.Repository
 							  Shiftdate = sd.Shiftdate,
 							  ShiftDetailId = sd.Shiftdetailid,
 							  Regionid = sd.Regionid,
-                              ShiftDeleted = sd.Isdeleted[0]
-						  }).Where(item=>region==0|| item.Regionid==region).ToList();
+                              ShiftDeleted = sd.Isdeleted
+						  }).Where(item=>region==0 || item.Regionid==region).ToList();
             var events = eventswithoutdelet.Where(item => !item.ShiftDeleted).ToList();
 			return events;
 		}

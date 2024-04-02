@@ -541,14 +541,16 @@ namespace HelloDoc.Controllers
 
 			using (var transaction = new TransactionScope())
 			{
+				
 				// Check if the same shift already exists
 				bool shiftExists = _context.Shiftdetails.Any(sd =>
-					sd.Shift.Physicianid == data.Physicianid &&
-					 sd.Shift.Startdate.Equals(new DateOnly(data.Startdate.Year, data.Startdate.Month, data.Startdate.Day)) &&
-					sd.Starttime.Hour == data.Starttime.Hour &&
-					sd.Regionid == data.Regionid);
-
-
+							sd.Shift.Physicianid == data.Physicianid &&
+							sd.Shiftdate.Equals(new DateTime(data.Startdate.Year, data.Startdate.Month, data.Startdate.Day)) &&
+							(
+			                 (sd.Starttime.Hour <= data.Starttime.Hour && data.Starttime.Hour <= sd.Endtime.Hour) ||
+			                 (sd.Starttime.Hour <= data.Endtime.Hour && data.Endtime.Hour <= sd.Endtime.Hour)
+		                    ) && !sd.Isdeleted
+							);
 				if (shiftExists)
 				{
 					// If a conflicting shift is found, add the conflicting date to the list
@@ -575,20 +577,20 @@ namespace HelloDoc.Controllers
 					sd.Endtime = data.Endtime;
 					sd.Regionid = data.Regionid;
 					sd.Status = data.Status;
-					sd.Isdeleted = new BitArray(new[] { false });
+					sd.Isdeleted = false;
 					_context.Shiftdetails.Add(sd);
 					_context.SaveChanges();
 
 					Shiftdetailregion sr = new Shiftdetailregion();
 					sr.Shiftdetailid = sd.Shiftdetailid;
 					sr.Regionid = (int)data.Regionid;
-					sr.Isdeleted = new BitArray(new[] { false });
+					sr.Isdeleted = false;
 					_context.Shiftdetailregions.Add(sr);
 					_context.SaveChanges();
 				}
 
 				// Handle repeating shifts
-				if (data.checkWeekday != null && shift != null) // Ensure shift is not null
+				if (data.checkWeekday != null ) // Ensure shift is not null
 				{
 					List<int> day = data.checkWeekday.Split(',').Select(int.Parse).ToList();
 
@@ -604,10 +606,12 @@ namespace HelloDoc.Controllers
 							{
 								// Check if the same shift already exists for this day of the week and start time
 								bool shiftExistsForDay = _context.Shiftdetails.Any(sd =>
-									sd.Shift.Physicianid == data.Physicianid &&
-									sd.Shift.Startdate.Equals(new DateOnly(nextOccurrence.Year, nextOccurrence.Month, nextOccurrence.Day)) &&
-									sd.Starttime.Hour == data.Starttime.Hour &&
-									sd.Regionid == data.Regionid);
+								sd.Shift.Physicianid == data.Physicianid &&
+								sd.Shiftdate.Equals(new DateTime(nextOccurrence.Year, nextOccurrence.Month, nextOccurrence.Day)) &&
+								(
+			           (sd.Starttime.Hour <= data.Starttime.Hour && data.Starttime.Hour <= sd.Endtime.Hour) ||
+			  (sd.Starttime.Hour <= data.Endtime.Hour && data.Endtime.Hour <= sd.Endtime.Hour) 
+		)&& !sd.Isdeleted);
 
 								if (!shiftExistsForDay)
 								{
@@ -619,14 +623,14 @@ namespace HelloDoc.Controllers
 									sdd.Endtime = data.Endtime;
 									sdd.Regionid = data.Regionid;
 									sdd.Status = data.Status;
-									sdd.Isdeleted = new BitArray(new[] { false });
+									sdd.Isdeleted = false;
 									_context.Shiftdetails.Add(sdd);
 									_context.SaveChanges();
 
 									Shiftdetailregion srr = new Shiftdetailregion();
 									srr.Shiftdetailid = sdd.Shiftdetailid;
 									srr.Regionid = (int)data.Regionid;
-									srr.Isdeleted = new BitArray(new[] { false });
+									srr.Isdeleted = false;
 									_context.Shiftdetailregions.Add(srr);
 									_context.SaveChanges();
 								}
@@ -651,6 +655,35 @@ namespace HelloDoc.Controllers
 			}
 
 			return RedirectToAction("Scheduling");
+		}
+		public IActionResult ProviderOnCall()
+		{
+			var currentTime = DateTime.Now.Hour;
+			var query = _context.Shiftdetails.Where(item => currentTime >= item.Starttime.Hour && currentTime <= item.Endtime.Hour).Select(item => item.Shift.Physician);
+						
+						
+			var onDuty = query.ToList();
+			var allPhysicians = _context.Physicians.ToList();
+			var offDuty = allPhysicians.Except(onDuty).ToList();
+			ProviderOnCallVM md = new ProviderOnCallVM
+			{
+				OnDuty = onDuty,
+				OffDuty = offDuty
+			};
+
+			return View(md);
+		}
+
+		private bool IsAnyBitSet(BitArray bitArray)
+		{
+			foreach (bool bit in bitArray)
+			{
+				if (!bit)
+				{
+					return true; // If any bit is false, return true
+				}
+			}
+			return false; // If all bits are true, return false
 		}
 
 		[HttpGet]
@@ -736,7 +769,7 @@ namespace HelloDoc.Controllers
 			{
 				return NotFound("Shift detail not found.");
 			}
-			shiftdetail.Isdeleted = new BitArray(new[] { true });
+			shiftdetail.Isdeleted = true;
 			_context.Shiftdetails.Update(shiftdetail);
 			_context.SaveChanges();
 			var events = _admin.GetEvents(region);
@@ -847,7 +880,7 @@ namespace HelloDoc.Controllers
 					var shiftDetail = _context.Shiftdetails.Find(id);
 					if (shiftDetail != null)
 					{
-						shiftDetail.Isdeleted = new BitArray(new[] { true }); // Change the state to 0
+						shiftDetail.Isdeleted = true; // Change the state to 0
 						_context.Shiftdetails.Update(shiftDetail);
 						_context.SaveChanges();
 					}

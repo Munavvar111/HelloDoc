@@ -32,9 +32,6 @@ public partial class Shiftdetail
     [Column("status")]
     public short Status { get; set; }
 
-    [Column("isdeleted", TypeName = "bit(1)")]
-    public BitArray Isdeleted { get; set; } = null!;
-
     [Column("modifiedby")]
     [StringLength(128)]
     public string? Modifiedby { get; set; }
@@ -51,6 +48,9 @@ public partial class Shiftdetail
 
     [Column("issync", TypeName = "bit(1)")]
     public BitArray? Issync { get; set; }
+
+    [Column("isdeleted")]
+    public bool Isdeleted { get; set; }
 
     [ForeignKey("Modifiedby")]
     [InverseProperty("Shiftdetails")]

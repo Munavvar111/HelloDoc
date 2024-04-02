@@ -1,3 +1,82 @@
 ﻿@{
     Layout = "~/Views/Shared/_Layout4.cshtml";
 }
+<div class="container">
+	<h3 class="mt-4 mb-3">Patient History</h3>
+	<div class="container bg-body rounded shadow">
+		<div class="row pt-3">
+			<div class="col-lg-3 col-md-3 col-sm-6">
+				<div class="form-floating mb-3">
+					<input class="form-control shadow-none firstName" id="floatingInput" placeholder="First name">
+					<label for="floatingInput" class="customlable">First Name</label>
+					<span class="text-danger"></span>
+				</div>
+			</div>
+			<div class="col-lg-3 col-md-3 col-sm-6">
+				<div class="form-floating mb-3">
+					<input class="form-control shadow-none lastName" id="floatingInput" placeholder="Last Name">
+					<label for="floatingInput" class="customlable">Last Name</label>
+					<span class="text-danger"></span>
+				</div>
+			</div>
+			<div class="col-lg-3 col-md-3 col-sm-6">
+				<div class="form-floating mb-3">
+					<input class="form-control shadow-none email" id="floatingInput" placeholder="Email">
+					<label for="floatingInput" class="customlable">Email Name</label>
+					<span class="text-danger"></span>
+				</div>
+			</div>
+			<div class="col-lg-3 col-md-3 col-sm-6">
+				<div class="form-floating mb-3">
+					<input class="form-control shadow-none phoneNumber" id="floatingInput" placeholder="Phone Number">
+					<label for="floatingInput" class="customlable">Phone Number</label>
+					<span class="text-danger"></span>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col text-end mb-3">
+				<button class="btn btn-outline-info me-2 rounded" id="clearBtn">Clear</button>
+				<button class="btn btn-info text-white rounded" id="searchBtn">Search</button>
+			</div>
+		</div>
+		<div id="searchResults"></div>
+	</div>
+</div>
+<script>
+	$(document).ready(function () {
+		function changeTable(firstname, lastname, email, phonenumber) {
+			$.ajax({
+				type: "GET",
+				url: "/Admin/GetPatientHistoryData",
+				data: { firstName: firstname, lastName: lastname, email: email, phoneNumber: phonenumber },
+				success: function (data) {
+					$("#searchResults").html(data);
+				},
+				error: function (error) {
+					console.error("Error:", error);
+				}
+			});
+		}
+
+		$("#searchBtn").click(function () {
+			var FirstName = $(".firstName").val();
+			var LastName = $(".lastName").val();
+			var Email = $(".email").val();
+			var PhoneNumber = $(".phoneNumber").val();
+			changeTable(FirstName, LastName, Email, PhoneNumber);
+		});
+
+		$("#clearBtn").click(function () {
+			$(".firstName").val("");
+			$(".lastName").val("");
+			$(".email").val("");
+			$(".phoneNumber").val("");
+			changeTable(null, null, null, null);
+		});
+
+		// Call changeTable with null values initially
+		changeTable(null, null, null, null);
+	});
+
+</script>

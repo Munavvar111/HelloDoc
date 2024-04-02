@@ -1,0 +1,11 @@
+﻿@model DataAccessLayer.CustomModel.ProviderOnCallVM
+@{
+    ViewData["Title"] = "ProviderOnCall";
+    Layout = "~/Views/Shared/_Layout4.cshtml";
+}
+
+@foreach(var item in @Model.OnDuty)
+{
+    <div>@item.Firstname</div>
+}
+
