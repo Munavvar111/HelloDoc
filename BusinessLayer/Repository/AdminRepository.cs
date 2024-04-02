@@ -11,6 +11,7 @@ using MimeKit;
 using BC = BCrypt.Net.BCrypt;
 using System.Net;
 using System.Collections;
+using System.Transactions;
 
 namespace BusinessLayer.Repository
 {
@@ -22,8 +23,8 @@ namespace BusinessLayer.Repository
         private readonly IConfiguration _configuration;
         private readonly IUploadProvider _uploadprovider;
 
-            
-        public AdminRepository(ApplicationDbContext context,IUploadProvider uploadProvider, IConfiguration configuration, IHostingEnvironment hostingEnvironment)
+
+        public AdminRepository(ApplicationDbContext context, IUploadProvider uploadProvider, IConfiguration configuration, IHostingEnvironment hostingEnvironment)
         {
             _context = context;
 
@@ -31,7 +32,10 @@ namespace BusinessLayer.Repository
             _hostingEnvironment = hostingEnvironment;
             _uploadprovider = uploadProvider;
         }
-
+        public List<Region> GetAllRegion()
+        {
+            return _context.Regions.ToList();
+        }
         public Physician GetPhysicianByEmail(string email)
         {
             return _context.Physicians.FirstOrDefault(item => item.Email == email);
@@ -77,8 +81,8 @@ namespace BusinessLayer.Repository
                                                                             ? new DateOnly((int)reqclient.Intyear, int.Parse(reqclient.Strmonth), (int)reqclient.Intdate)
                                                                             : new DateOnly(),
                                                             ReqDate = req.Createddate,
-                                                            FirstName=reqclient.Firstname,
-                                                            LastName=reqclient.Lastname,
+                                                            FirstName = reqclient.Firstname,
+                                                            LastName = reqclient.Lastname,
                                                             Phone = reqclient.Phonenumber ?? "",
                                                             PhoneOther = req.Phonenumber ?? "",
                                                             Address = reqclient.City + reqclient.Zipcode,
@@ -256,11 +260,11 @@ namespace BusinessLayer.Repository
         #endregion
 
         #region AssignRequest
-        public async Task<bool> AssignRequest(int regionId, int physician, string description, int requestId,int adminid)
+        public async Task<bool> AssignRequest(int regionId, int physician, string description, int requestId, int adminid)
         {
             try
             {
-               
+
                 Request? request = await _context.Requests.FindAsync(requestId);
 
                 if (request != null)
@@ -271,7 +275,7 @@ namespace BusinessLayer.Repository
 
                     Requeststatuslog requestStatusLog = new Requeststatuslog
                     {
-                        Adminid=adminid,
+                        Adminid = adminid,
                         Notes = description,
                         Requestid = requestId,
                         Status = 2,
@@ -648,7 +652,7 @@ namespace BusinessLayer.Repository
             _context.SaveChanges();
         }
         #endregion
-        
+
         #region GetAdminProfile
         public AdminProfileVm GetAdminProfile(string email)
         {
@@ -957,34 +961,188 @@ namespace BusinessLayer.Repository
             }
             _context.SaveChanges();
         }
-		#endregion
+        #endregion
 
-		#region GetEventes
-		public List<ScheduleModel> GetEvents(int region)
-		{
-			var eventswithoutdelet = (from s in _context.Shifts
-						  join pd in _context.Physicians on s.Physicianid equals pd.Physicianid
-						  join sd in _context.Shiftdetails on s.Shiftid equals sd.Shiftid into shiftGroup
-						  from sd in shiftGroup.DefaultIfEmpty()
-						  
-						  select new ScheduleModel
-						  {
-							  Shiftid = sd.Shiftdetailid,
-							  Status = sd.Status,
-							  Starttime = sd.Starttime,
-							  Endtime = sd.Endtime,
-							  Physicianid = pd.Physicianid,
-							  PhysicianName = pd.Firstname + ' ' + pd.Lastname,
-							  Shiftdate = sd.Shiftdate,
-							  ShiftDetailId = sd.Shiftdetailid,
-							  Regionid = sd.Regionid,
-                              ShiftDeleted = sd.Isdeleted
-						  }).Where(item=>region==0 || item.Regionid==region).ToList();
+        #region GetEventes
+        public List<ScheduleModel> GetEvents(int region)
+        {
+            var eventswithoutdelet = (from s in _context.Shifts
+                                      join pd in _context.Physicians on s.Physicianid equals pd.Physicianid
+                                      join sd in _context.Shiftdetails on s.Shiftid equals sd.Shiftid into shiftGroup
+                                      from sd in shiftGroup.DefaultIfEmpty()
+
+                                      select new ScheduleModel
+                                      {
+                                          Shiftid = sd.Shiftdetailid,
+                                          Status = sd.Status,
+                                          Starttime = sd.Starttime,
+                                          Endtime = sd.Endtime,
+                                          Physicianid = pd.Physicianid,
+                                          PhysicianName = pd.Firstname + ' ' + pd.Lastname,
+                                          Shiftdate = sd.Shiftdate,
+                                          ShiftDetailId = sd.Shiftdetailid,
+                                          Regionid = sd.Regionid,
+                                          ShiftDeleted = sd.Isdeleted
+                                      }).Where(item => region == 0 || item.Regionid == region).ToList();
             var events = eventswithoutdelet.Where(item => !item.ShiftDeleted).ToList();
-			return events;
-		}
-		#endregion
-	}
+            return events;
+        }
+        #endregion
+
+        #region CreateShift
+        public (bool success, List<DateTime> conflictingDates) CreateShift(ScheduleModel data, string email)
+        {
+            Admin? admin = _context.Admins.FirstOrDefault(item => item.Email == email);
+            List<DateTime> conflictingDates = new List<DateTime>(); // List to store conflicting dates
+            Shift shift = null;
+
+            using (var transaction = new TransactionScope())
+            {
+                // Check if the same shift already exists
+                bool shiftExists = _context.Shiftdetails.Any(sd =>
+                            sd.Shift.Physicianid == data.Physicianid &&
+                            sd.Shiftdate.Equals(new DateTime(data.Startdate.Year, data.Startdate.Month, data.Startdate.Day)) &&
+                            (
+                                (sd.Starttime.Hour <= data.Starttime.Hour && data.Starttime.Hour <= sd.Endtime.Hour) ||
+                                (sd.Starttime.Hour <= data.Endtime.Hour && data.Endtime.Hour <= sd.Endtime.Hour)
+                            ) && !sd.Isdeleted);
+
+                if (shiftExists)
+                {
+                    // If a conflicting shift is found, add the conflicting date to the list
+                    conflictingDates.Add(DateTime.Parse(data.Startdate.ToString()));
+                    return (false, conflictingDates);
+                }
+                else
+                {
+                    // If no conflicting shift is found, create a new shift
+                    shift = new Shift();
+                    shift.Physicianid = data.Physicianid;
+                    shift.Repeatupto = data.Repeatupto;
+                    shift.Startdate = new DateOnly(data.Startdate.Year, data.Startdate.Month, data.Startdate.Day);
+                    shift.Createdby = admin.Aspnetuserid;
+                    shift.Createddate = DateTime.Now;
+                    shift.Isrepeat = new BitArray(new[] { data.Isrepeat });
+                    shift.Repeatupto = data.Repeatupto;
+                    _context.Shifts.Add(shift);
+                    _context.SaveChanges();
+
+                    Shiftdetail sd = new Shiftdetail();
+                    sd.Shiftid = shift.Shiftid;
+                    sd.Shiftdate = new DateTime(data.Startdate.Year, data.Startdate.Month, data.Startdate.Day);
+                    sd.Starttime = data.Starttime;
+                    sd.Endtime = data.Endtime;
+                    sd.Regionid = data.Regionid;
+                    sd.Status = data.Status;
+                    sd.Isdeleted = false;
+                    _context.Shiftdetails.Add(sd);
+                    _context.SaveChanges();
+
+                    Shiftdetailregion sr = new Shiftdetailregion();
+                    sr.Shiftdetailid = sd.Shiftdetailid;
+                    sr.Regionid = (int)data.Regionid;
+                    sr.Isdeleted = false;
+                    _context.Shiftdetailregions.Add(sr);
+                    _context.SaveChanges();
+
+                    // Handle repeating shifts
+                    if (data.checkWeekday != null) // Ensure shift is not null
+                    {
+                        List<int> day = data.checkWeekday.Split(',').Select(int.Parse).ToList();
+
+                        foreach (int d in day)
+                        {
+                            DayOfWeek desiredDayOfWeek = (DayOfWeek)d;
+                            DateTime nextOccurrence = new DateTime(data.Startdate.Year, data.Startdate.Month, data.Startdate.Day + 1);
+
+                            int occurrencesFound = 0;
+                            while (occurrencesFound < data.Repeatupto)
+                            {
+                                if (nextOccurrence.DayOfWeek == desiredDayOfWeek)
+                                {
+                                    // Check if the same shift already exists for this day of the week and start time
+                                    bool shiftExistsForDay = _context.Shiftdetails.Any(sd =>
+                                        sd.Shift.Physicianid == data.Physicianid &&
+                                        sd.Shiftdate.Equals(new DateTime(nextOccurrence.Year, nextOccurrence.Month, nextOccurrence.Day)) &&
+                                        (
+                                            (sd.Starttime.Hour <= data.Starttime.Hour && data.Starttime.Hour <= sd.Endtime.Hour) ||
+                                            (sd.Starttime.Hour <= data.Endtime.Hour && data.Endtime.Hour <= sd.Endtime.Hour)
+                                        ) && !sd.Isdeleted);
+
+                                    if (!shiftExistsForDay)
+                                    {
+                                        // If no conflicting shift is found, create a new shift for this day
+                                        Shiftdetail sdd = new Shiftdetail();
+                                        sdd.Shiftid = shift.Shiftid;
+                                        sdd.Shiftdate = nextOccurrence;
+                                        sdd.Starttime = data.Starttime;
+                                        sdd.Endtime = data.Endtime;
+                                        sdd.Regionid = data.Regionid;
+                                        sdd.Status = data.Status;
+                                        sdd.Isdeleted = false;
+                                        _context.Shiftdetails.Add(sdd);
+                                        _context.SaveChanges();
+
+                                        Shiftdetailregion srr = new Shiftdetailregion();
+                                        srr.Shiftdetailid = sdd.Shiftdetailid;
+                                        srr.Regionid = (int)data.Regionid;
+                                        srr.Isdeleted = false;
+                                        _context.Shiftdetailregions.Add(srr);
+                                        _context.SaveChanges();
+                                    }
+                                    else
+                                    {
+                                        conflictingDates.Add(nextOccurrence); // Add conflicting date to the list
+                                    }
+                                }
+                                occurrencesFound++;
+                                nextOccurrence = nextOccurrence.AddDays(1);
+                            }
+                        }
+                    }
+
+                    transaction.Complete();
+                    return (true, conflictingDates);
+                }
+            }
+        }
+        #endregion
+
+        #region GetProvidersOnCall
+        public ProviderOnCallVM GetProvidersOnCall(int region)
+        {
+            var currentTime = DateTime.Now.Hour;
+
+            var onDutyQuery = from shiftDetail in _context.Shiftdetails
+                              join physician in _context.Physicians on shiftDetail.Shift.Physicianid equals physician.Physicianid
+                              join physicianRegion in _context.PhysicianRegions on physician.Physicianid equals physicianRegion.Physicianid
+                              where (region == 0 || physicianRegion.Regionid == region) &&
+                                    shiftDetail.Shiftdate.Date == DateTime.Now.Date &&
+                                    currentTime >= shiftDetail.Starttime.Hour &&
+                                    currentTime <= shiftDetail.Endtime.Hour &&
+                                    !shiftDetail.Isdeleted
+                              select physician;
+
+            var onDuty = onDutyQuery.Distinct().ToList();
+
+            var offDutyQuery = from physician in _context.Physicians
+                               join physicianRegion in _context.PhysicianRegions on physician.Physicianid equals physicianRegion.Physicianid
+                               where (region == 0 || physicianRegion.Regionid == region) &&
+                                     !_context.Shiftdetails.Any(item => item.Shift.Physicianid == physician.Physicianid &&
+                                                                       currentTime >= item.Starttime.Hour &&
+                                                                       currentTime <= item.Endtime.Hour &&
+                                                                       !item.Isdeleted)
+                               select physician;
+
+            var offDuty = offDutyQuery.Distinct().ToList();
+
+            return new ProviderOnCallVM
+            {
+                OnDuty = onDuty,
+                OffDuty = offDuty
+            };
+        }
+        #endregion
+    }
 }
 
-                                        

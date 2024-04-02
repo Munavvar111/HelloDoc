@@ -395,8 +395,8 @@ namespace HelloDoc.Controllers
 			return Ok();
 		}
 
-
-		[HttpPost]
+        #region CreateProvider
+        [HttpPost]
 		public IActionResult CreateProvider(CreateProviderVM createProvider, string[] adminRegion)
 		{
 			string? email = HttpContext.Session.GetString("Email");
@@ -524,157 +524,52 @@ namespace HelloDoc.Controllers
 
 			return RedirectToAction("Provider");
 		}
-		public IActionResult Scheduling()
+        #endregion
+
+        #region Scheduling
+        public IActionResult Scheduling()
 		{
-			var region = _context.Regions.ToList();
+			var region = _admin.GetAllRegion();
 			ViewBag.regions = region;
 			return View();
 		}
+        #endregion
 
-		public IActionResult CreateShift(ScheduleModel data)
+        #region CreateShift
+        public IActionResult CreateShift(ScheduleModel data)
 		{
-			string? email = HttpContext.Session.GetString("Email");
-			string? id = HttpContext.Session.GetString("aspnetid");
-			Admin? admin = _context.Admins.FirstOrDefault(item => item.Email == email);
-			List<DateTime> conflictingDates = new List<DateTime>(); // List to store conflicting dates
-			Shift shift = null;
+            string email = HttpContext.Session.GetString("Email");
+            string aspnetid = HttpContext.Session.GetString("aspnetid");
 
-			using (var transaction = new TransactionScope())
-			{
-				
-				// Check if the same shift already exists
-				bool shiftExists = _context.Shiftdetails.Any(sd =>
-							sd.Shift.Physicianid == data.Physicianid &&
-							sd.Shiftdate.Equals(new DateTime(data.Startdate.Year, data.Startdate.Month, data.Startdate.Day)) &&
-							(
-			                 (sd.Starttime.Hour <= data.Starttime.Hour && data.Starttime.Hour <= sd.Endtime.Hour) ||
-			                 (sd.Starttime.Hour <= data.Endtime.Hour && data.Endtime.Hour <= sd.Endtime.Hour)
-		                    ) && !sd.Isdeleted
-							);
-				if (shiftExists)
-				{
-					// If a conflicting shift is found, add the conflicting date to the list
-					conflictingDates.Add(DateTime.Parse(data.Startdate.ToString()));
-				}
-				else
-				{
-					// If no conflicting shift is found, create a new shift
-					shift = new Shift();
-					shift.Physicianid = data.Physicianid;
-					shift.Repeatupto = data.Repeatupto;
-					shift.Startdate = new DateOnly(data.Startdate.Year, data.Startdate.Month, data.Startdate.Day);
-					shift.Createdby = admin.Aspnetuserid;
-					shift.Createddate = DateTime.Now;
-					shift.Isrepeat = new BitArray(new[] { data.Isrepeat });
-					shift.Repeatupto = data.Repeatupto;
-					_context.Shifts.Add(shift);
-					_context.SaveChanges();
+            var (success, conflictingDates) = _admin.CreateShift(data, email);
+            if (!success)
+            {
+                TempData["Error"] = $"Conflicting shifts found on: {string.Join(", ", conflictingDates.Select(d => d.ToString("yyyy-MM-dd")))}";
+            }
 
-					Shiftdetail sd = new Shiftdetail();
-					sd.Shiftid = shift.Shiftid;
-					sd.Shiftdate = new DateTime(data.Startdate.Year, data.Startdate.Month, data.Startdate.Day);
-					sd.Starttime = data.Starttime;
-					sd.Endtime = data.Endtime;
-					sd.Regionid = data.Regionid;
-					sd.Status = data.Status;
-					sd.Isdeleted = false;
-					_context.Shiftdetails.Add(sd);
-					_context.SaveChanges();
+            return RedirectToAction("Scheduling");
+        }
+        #endregion
 
-					Shiftdetailregion sr = new Shiftdetailregion();
-					sr.Shiftdetailid = sd.Shiftdetailid;
-					sr.Regionid = (int)data.Regionid;
-					sr.Isdeleted = false;
-					_context.Shiftdetailregions.Add(sr);
-					_context.SaveChanges();
-				}
-
-				// Handle repeating shifts
-				if (data.checkWeekday != null ) // Ensure shift is not null
-				{
-					List<int> day = data.checkWeekday.Split(',').Select(int.Parse).ToList();
-
-					foreach (int d in day)
-					{
-						DayOfWeek desiredDayOfWeek = (DayOfWeek)d;
-						DateTime nextOccurrence = new DateTime(data.Startdate.Year, data.Startdate.Month, data.Startdate.Day + 1);
-
-						int occurrencesFound = 0;
-						while (occurrencesFound < data.Repeatupto)
-						{
-							if (nextOccurrence.DayOfWeek == desiredDayOfWeek)
-							{
-								// Check if the same shift already exists for this day of the week and start time
-								bool shiftExistsForDay = _context.Shiftdetails.Any(sd =>
-								sd.Shift.Physicianid == data.Physicianid &&
-								sd.Shiftdate.Equals(new DateTime(nextOccurrence.Year, nextOccurrence.Month, nextOccurrence.Day)) &&
-								(
-			           (sd.Starttime.Hour <= data.Starttime.Hour && data.Starttime.Hour <= sd.Endtime.Hour) ||
-			  (sd.Starttime.Hour <= data.Endtime.Hour && data.Endtime.Hour <= sd.Endtime.Hour) 
-		)&& !sd.Isdeleted);
-
-								if (!shiftExistsForDay)
-								{
-									// If no conflicting shift is found, create a new shift for this day
-									Shiftdetail sdd = new Shiftdetail();
-									sdd.Shiftid = shift.Shiftid;
-									sdd.Shiftdate = nextOccurrence;
-									sdd.Starttime = data.Starttime;
-									sdd.Endtime = data.Endtime;
-									sdd.Regionid = data.Regionid;
-									sdd.Status = data.Status;
-									sdd.Isdeleted = false;
-									_context.Shiftdetails.Add(sdd);
-									_context.SaveChanges();
-
-									Shiftdetailregion srr = new Shiftdetailregion();
-									srr.Shiftdetailid = sdd.Shiftdetailid;
-									srr.Regionid = (int)data.Regionid;
-									srr.Isdeleted = false;
-									_context.Shiftdetailregions.Add(srr);
-									_context.SaveChanges();
-								}
-								else
-								{
-									conflictingDates.Add(nextOccurrence); // Add conflicting date to the list
-								}
-							}
-							occurrencesFound++;
-							nextOccurrence = nextOccurrence.AddDays(1);
-						}
-					}
-				}
-
-				// If conflicting dates are found, show toaster message
-				if (conflictingDates.Count > 0)
-				{
-					TempData["Error"] = $"Conflicting shifts found on: {string.Join(", ", conflictingDates.Select(d => d.ToString("yyyy-MM-dd")))}";
-				}
-
-				transaction.Complete();
-			}
-
-			return RedirectToAction("Scheduling");
-		}
-		public IActionResult ProviderOnCall()
+        #region ProviderOnCall
+        public IActionResult ProviderOnCall()
 		{
-			var currentTime = DateTime.Now.Hour;
-			var query = _context.Shiftdetails.Where(item => currentTime >= item.Starttime.Hour && currentTime <= item.Endtime.Hour).Select(item => item.Shift.Physician);
-						
-						
-			var onDuty = query.ToList();
-			var allPhysicians = _context.Physicians.ToList();
-			var offDuty = allPhysicians.Except(onDuty).ToList();
-			ProviderOnCallVM md = new ProviderOnCallVM
-			{
-				OnDuty = onDuty,
-				OffDuty = offDuty
-			};
+			List<Region> Regions = _admin.GetAllRegion();
+			ViewBag.Regions=Regions;
 
-			return View(md);
+			return View();
 		}
+        #endregion
 
-		private bool IsAnyBitSet(BitArray bitArray)
+
+        public IActionResult ProviderOnCallFetch(int region)
+        {
+            var model = _admin.GetProvidersOnCall(region);
+            return PartialView("ProviderOnCallPartial", model);
+        }
+
+
+        private bool IsAnyBitSet(BitArray bitArray)
 		{
 			foreach (bool bit in bitArray)
 			{

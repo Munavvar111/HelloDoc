@@ -1,0 +1,20 @@
+﻿@model DataAccessLayer.CustomModel.ProviderOnCallVM
+<div class="container p-3">
+    <span class="fs-4 bold">MD's On Call</span>
+@foreach (var item in @Model.OnDuty)
+{
+    <div class="d-flex gap-2">
+    <img src="/Physician/@item.Physicianid/@item.Photo"/>
+    <div>@item.Firstname</div>
+    </div>
+}
+<span class="fs-4 bold">Off Duty</span>
+
+    @foreach (var item in @Model.OffDuty)
+    {
+        <div class="d-flex gap-2">
+            <img src="/Physician/@item.Physicianid/@item.Photo" />
+            <div>@item.Firstname</div>
+        </div>
+    }
+</div>

@@ -13,6 +13,7 @@ namespace BusinessLayer.InterFace
     {   
         List<NewRequestTableVM> SearchPatients(string searchValue, string selectValue, string selectedFilter,int[] currentStatus);
         List<NewRequestTableVM> GetAllData();
+        List<Region> GetAllRegion();
         ViewCaseVM GetCaseById(int id);
         Task UpdateRequestClient(ViewCaseVM viewCaseVM, int id);
         List<ViewNotesVM> GetNotesForRequest(int requestid);
@@ -47,7 +48,8 @@ namespace BusinessLayer.InterFace
         bool UpdatePhysicianAccountingInfo(int physicianId, string address1, string address2, string city, int state, string zipcode, string mobileNo);
         void SaveNotification(List<int> physicianIds, List<bool> checkboxStates);
 		List<ScheduleModel> GetEvents(int region);
+        public (bool success, List<DateTime> conflictingDates) CreateShift(ScheduleModel data, string email);
 
-
-	}
+        ProviderOnCallVM GetProvidersOnCall(int region);
+    }
 }

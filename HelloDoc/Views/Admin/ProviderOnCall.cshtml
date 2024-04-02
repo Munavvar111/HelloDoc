@@ -4,8 +4,71 @@
     Layout = "~/Views/Shared/_Layout4.cshtml";
 }
 
-@foreach(var item in @Model.OnDuty)
-{
-    <div>@item.Firstname</div>
-}
 
+<div class="container bg-light">
+    <div class="d-flex justify-content-between my-3">
+        <div class="d-flex">
+            <span class="fs-2 text-muted fw-bold">New Request</span>
+        </div>
+        <div class="d-flex justify-content-end">
+            <a asp-controller="Admin" asp-action="Index" asp-area=""
+               class="btn btn-outline-info d-flex align-items-center">
+                <span class="material-symbols-outlined"> chevron_left </span> Back
+            </a>
+        </div>
+    </div>
+    
+    <div class="d-flex justify-content-between flex-wrap p-3">
+        <div class="">
+            <div class="form-floating">
+                <select class="form-select " aria-label="Default select example" name="state" id="provideregion">
+
+                    <option selected value="0">All</option>
+                  
+
+                        @foreach (var region in ViewBag.Regions)
+                        {
+                            <option value="@region.Regionid">@region.Name</option>
+                        }
+                    
+
+                </select>
+                <span class="error-state text-danger"></span>
+
+            </div>
+
+        </div>
+        <div class="d-flex gap-2">
+            <button class="btn btn-info">Shifts For Review</button>
+            <button class="btn btn-info">Calander View</button>
+        </div>
+    </div>
+        <div id="ProviderOnCallStatus" class="bg-white">
+
+        </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        FetchProviderOnCall();
+        $("#provideregion").on("change", function () {
+            FetchProviderOnCall();
+        });
+        function FetchProviderOnCall() {
+            var region = $('#provideregion').val();
+            $.ajax({
+                method:'POST',
+                url:"/Admin/ProviderOnCallFetch",
+                data: {region:region},
+                success: function (response) {
+                    $('#ProviderOnCallStatus').html(response)
+                },
+                error: function () {
+                    console.log(error)
+                }
+
+            })
+        }
+
+    });
+</script>
