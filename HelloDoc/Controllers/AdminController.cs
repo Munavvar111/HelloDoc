@@ -879,12 +879,34 @@ namespace HelloDoc.Controllers
             ViewBag.helthprofessional = healthprofessionaltype;
             return View();
 		}
+
+
 		public IActionResult CreatePatner()
 		{
             List<Healthprofessionaltype> healthprofessionaltype = _context.Healthprofessionaltypes.ToList();
             ViewBag.helthprofessional = healthprofessionaltype;
             return View();
         }
+
+		[HttpPost]
+		public IActionResult CreatePatner(HealthProffesionalVM healthProffesionalVM)
+		{
+			Healthprofessional healthprofessional = new Healthprofessional();
+			healthprofessional.Vendorname = healthProffesionalVM.Vendorname;
+			healthprofessional.Healthprofessionalid = healthProffesionalVM.Profession;
+			healthprofessional.Faxnumber = healthProffesionalVM.Faxnumber;
+			healthprofessional.Address = healthProffesionalVM.Address;
+			healthprofessional.City = healthProffesionalVM.City;
+			healthprofessional.Zip = healthProffesionalVM.Zip;
+			healthprofessional.Createddate=DateTime.Now;
+			healthprofessional.Businesscontact = healthProffesionalVM.Businesscontact;
+			healthprofessional.Phonenumber = healthProffesionalVM.Phonenumber;
+			healthprofessional.Email = healthProffesionalVM.Email;
+			healthprofessional.Isdeleted = false;
+			_context.Healthprofessionals.Add(healthprofessional);
+			_context.SaveChanges();
+			return View();
+		}
 
         [CustomAuthorize("Role", "7")]
 		public IActionResult Access()
