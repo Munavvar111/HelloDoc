@@ -15,10 +15,10 @@ namespace DataAccessLayer.CustomModel
         public int Physicianid { get; set; }
         public string? PhysicianName { get; set; }
         public string? PhysicianPhoto { get; set; }
-        public int? Regionid { get; set; }
+        public int Regionid { get; set; }
         public string? RegionName { get; set; }
 
-        public DateTime Startdate { get; set; }
+        public DateOnly Startdate { get; set; }
         public DateTime? Shiftdate { get; set; }
         public TimeOnly Starttime { get; set; }
         public TimeOnly Endtime { get; set; }

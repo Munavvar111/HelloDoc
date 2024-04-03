@@ -537,17 +537,22 @@ namespace HelloDoc.Controllers
 
         #region CreateShift
         public IActionResult CreateShift(ScheduleModel data)
-		{
-            string email = HttpContext.Session.GetString("Email");
-            string aspnetid = HttpContext.Session.GetString("aspnetid");
-
-            var (success, conflictingDates) = _admin.CreateShift(data, email);
-            if (!success)
+        {
+            List<DateTime> ConflictingDates = _admin.IsShiftOverwritting(data);
+            if (ConflictingDates.Count > 0)
             {
-                TempData["Error"] = $"Conflicting shifts found on: {string.Join(", ", conflictingDates.Select(d => d.ToString("yyyy-MM-dd")))}";
+                TempData["Error"] = $"Conflicting shifts found on: {string.Join(", ", ConflictingDates.Select(d => d.ToString("dd-MM-yyyy")))}";
             }
+            else
+            {
+                string email = HttpContext.Session.GetString("Email");
+               Admin adminId = _admin.GetAdminByEmail(email);
+                data.Status = 1;
+                _admin.CreateShift(data, email);
+                TempData["Success"] = "Shift created successfully";
+            }
+            return Redirect("Scheduling");
 
-            return RedirectToAction("Scheduling");
         }
         #endregion
 
@@ -793,15 +798,95 @@ namespace HelloDoc.Controllers
 		//main View
 		public IActionResult Parteners()
 		{
-			return View();
+
+            List<Healthprofessionaltype> healthprofessionaltype = _context.Healthprofessionaltypes.ToList();
+            ViewBag.helthprofessional = healthprofessionaltype;	
+            return View();
 		}
-		//main View
-		public IActionResult Records()
+
+		public IActionResult PartnerFilter(int helthProType, string vendorname)
+		{
+			var orders = (from helthprofesion in _context.Healthprofessionals
+						 join helthprofessiontype in _context.Healthprofessionaltypes
+						 on helthprofesion.Healthprofessionalid equals helthprofessiontype.Healthprofessionalid
+						 where helthprofesion.Isdeleted==false
+						 select new SendOrderModel
+						 {
+							 Professionname = helthprofessiontype.Professionname,
+							 BusinessName=helthprofesion.Vendorname,
+							 Email=helthprofesion.Email,
+							 FaxNumber=helthprofesion.Faxnumber,
+							 PhoneNumber=helthprofesion.Phonenumber,
+							 BusinesContact=helthprofesion.Businesscontact,
+							 HelthProfessionId=helthprofesion.Vendorid
+						}).
+						Where(item =>
+			(string.IsNullOrEmpty(vendorname) || item.BusinessName.Contains(vendorname)) &&
+			(helthProType == 0 || item.HelthProfessionId == helthProType)).ToList();
+
+			
+			return PartialView("PatnerPartialView",orders);
+		}
+
+		public IActionResult DelteHealthProfession(int id)
+		{
+			Healthprofessional healthprofessional = _context.Healthprofessionals.Find(id);
+			if (healthprofessional != null)
+			{
+				healthprofessional.Isdeleted = true;
+
+                _context.Healthprofessionals.Update(healthprofessional);
+                _context.SaveChanges();
+                return Json(new { success = true, message = "The record has been deleted." });
+            }
+            else
+			{
+                return StatusCode(500, new { message = "HealthProffesion Is Not In Existes" });
+            }
+        }
+        //main View
+        public IActionResult Records()
 		{
 			return View();
 		}
+		public IActionResult UpdateShiftDates()
+		{
+			return Ok();
+		}
 
-		[CustomAuthorize("Role", "7")]
+        public IActionResult GetPatientHistoryData(string firstName,string lastName,string email,string phoneNumber)
+		{
+			List<User> users = _context.Users.Where(item =>
+			(string.IsNullOrEmpty(firstName) || item.Firstname.Contains(firstName)) &&
+			(string.IsNullOrEmpty(lastName) || item.Lastname.Contains(lastName)) &&
+			(string.IsNullOrEmpty(email) || item.Email.Contains(email)) &&
+			(string.IsNullOrEmpty(phoneNumber) || item.Mobile.Contains(phoneNumber))).ToList();
+			List<PatientHistoryVM> patientHistoryVms = users.Select(user => new PatientHistoryVM
+			{
+				FirstName = user.Firstname,
+				LastName = user.Lastname,
+				Email = user.Email,
+				PhoneNumber = user.Mobile,
+				Address = user.City,
+			}).ToList();
+		
+			return PartialView("PatientHistoryPartial",patientHistoryVms);
+		}
+		public IActionResult EditPartner()
+		{
+
+            List<Healthprofessionaltype> healthprofessionaltype = _context.Healthprofessionaltypes.ToList();
+            ViewBag.helthprofessional = healthprofessionaltype;
+            return View();
+		}
+		public IActionResult CreatePatner()
+		{
+            List<Healthprofessionaltype> healthprofessionaltype = _context.Healthprofessionaltypes.ToList();
+            ViewBag.helthprofessional = healthprofessionaltype;
+            return View();
+        }
+
+        [CustomAuthorize("Role", "7")]
 		public IActionResult Access()
 		{
 			// Filter roles based on IsDeleted being false (not deleted)

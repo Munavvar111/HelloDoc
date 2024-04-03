@@ -1,20 +1,38 @@
 ﻿@model DataAccessLayer.CustomModel.ProviderOnCallVM
 <div class="container p-3">
-    <span class="fs-4 bold">MD's On Call</span>
-@foreach (var item in @Model.OnDuty)
+    <p class="fs-5 fw-bold"> MDs On Call </p>
+    @foreach (var item in @Model.OnDuty)
 {
-    <div class="d-flex gap-2">
-    <img src="/Physician/@item.Physicianid/@item.Photo"/>
-    <div>@item.Firstname</div>
-    </div>
+    <div class="d-inline-flex mb-3">
+            <div class="d-inline me-2">
+                @if (item.Photo!=null)
+                {
+                    <img src="~/Physician/@item.Physicianid/@item.Photo" style="height: 50px; width: 50px;" />
+                }
+                else
+                {
+                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRKIBpBz460WeOh7ds5JGbd_QaEYpB_zb9LIRvWmcUccw&s" style="height: 50px; width: 50px;" />
+                }
+            </div>
+            <p>@item.Firstname</p>
+        </div>
 }
-<span class="fs-4 bold">Off Duty</span>
+    <p class="fs-5 fw-bold"> Physicians Off Duty </p>
 
     @foreach (var item in @Model.OffDuty)
     {
-        <div class="d-flex gap-2">
-            <img src="/Physician/@item.Physicianid/@item.Photo" />
-            <div>@item.Firstname</div>
+        <div class="d-inline-flex mb-3">
+            <div class="d-inline me-2">
+                @if (item.Photo!=null)
+                {
+                    <img src="~/Physician/@item.Physicianid/@item.Photo" style="height: 50px; width: 50px;" />
+                }
+                else
+                {
+                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRKIBpBz460WeOh7ds5JGbd_QaEYpB_zb9LIRvWmcUccw&s" style="height: 50px; width: 50px;" />
+                }
+            </div>
+            <p>@item.Firstname</p>
         </div>
     }
 </div>

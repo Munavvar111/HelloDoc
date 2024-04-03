@@ -19,15 +19,22 @@ namespace DataAccessLayer.CustomModel
             
         [Required(ErrorMessage = "BusinessId is required.")]
         public int BusinessId { get; set; }
+        public int HelthProfessionId { get; set; }
 
         [Required(ErrorMessage = "Contact is required.")]
         public string Contact { get; set; }
+
+        public string Professionname { get; set; }
+        public string BusinessName { get; set; }
+        public string? BusinesContact { get; set; }
+
 
         [Required(ErrorMessage = "Email is required.")]
         public string Email { get; set; }
 
         [Required(ErrorMessage = "FaxNumber is required.")]
         public string FaxNumber { get; set; }
+        public string? PhoneNumber { get; set; }
 
         [Required(ErrorMessage = "Prescription is required.")]
         public string Prescription { get; set; }

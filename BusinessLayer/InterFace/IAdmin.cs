@@ -48,8 +48,8 @@ namespace BusinessLayer.InterFace
         bool UpdatePhysicianAccountingInfo(int physicianId, string address1, string address2, string city, int state, string zipcode, string mobileNo);
         void SaveNotification(List<int> physicianIds, List<bool> checkboxStates);
 		List<ScheduleModel> GetEvents(int region);
-        public (bool success, List<DateTime> conflictingDates) CreateShift(ScheduleModel data, string email);
-
+        void CreateShift(ScheduleModel data, string email);
+        List<DateTime> IsShiftOverwritting(ScheduleModel data);
         ProviderOnCallVM GetProvidersOnCall(int region);
     }
 }

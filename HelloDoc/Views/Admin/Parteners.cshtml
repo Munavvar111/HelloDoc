@@ -1,3 +1,118 @@
 ﻿@{
     Layout = "~/Views/Shared/_Layout4.cshtml";
 }
+<div class="container mt-3">
+    <span class="fs-2 text-muted fw-bold">Vendor(s)</span>
+    <div class="container bg-white p-3 mt-3 border">
+        <div class="d-flex flex-md-row flex-column justify-content-between gap-2">
+            
+            <div class="d-flex flex-column flex-md-row gap-2">
+                <div class="form-floating ">
+                    <input class="form-control shadow-none firstName" id="vendorname" placeholder="First name">
+                    <label for="floatingInput" class="customlable">Search Vendor</label>
+                    <span class="text-danger"></span>
+                </div>
+            <div class="form-floating ">
+                <select class="form-select " aria-label="Default select example" name="business" id="helthtype">
+                    <option selected>Please Select The Business</option>
+                        @foreach (var healthprofessionaltype in ViewBag.helthprofessional)
+                        {
+                            <option value="@healthprofessionaltype.Healthprofessionalid">@healthprofessionaltype.Professionname</option>
+                        }
+                </select>
+            </div>
+            </div>
+            <a asp-action="CreatePatner" class="btn btn-outline-info text-center">
+                Create Business 
+            </a>
+        </div>
+        <div id="PatnerPartialView"></div>
+    </div>
+</div>
+
+
+<script>
+    $(document).ready(function () {
+        FetchPartners();
+    });
+
+        $('#vendorname').on("input", function () {
+            FetchPartners();
+        });
+        $("#helthtype").on("change", function () {
+            FetchPartners();
+        });
+        function FetchPartners() {
+            var helthProType = $('#helthtype').val();
+            var vendorname = $('#vendorname').val();
+            $.ajax({
+                method: 'POST',
+                url: "/Admin/PartnerFilter",
+                 data: { helthProType: helthProType, vendorname: vendorname },
+                success: function (response) {
+            $('#PatnerPartialView').html(response)
+                },
+                error: function () {
+                    console.log(error)
+                }
+
+            })
+        }
+
+
+        function deleteRecord(id) {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: 'You will not be able to recover this record!',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, delete it!',
+                cancelButtonText: 'No, cancel!',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    deleteRecordAjax(id);
+                }
+            });
+        }
+
+    function deleteRecordAjax(id) {
+        $.ajax({
+            type: "POST",
+            url: "/Admin/DelteHealthProfession",
+            data: { id: id },
+            success: function (response) {
+                console.log(response)
+                if (response.success) {
+                    Swal.fire({
+                        title: 'Deleted!',
+                        text: 'The record has been deleted.',
+                        icon: 'success',
+                        confirmButtonText: 'OK',
+                        allowOutsideClick: false
+                    }).then((result) => {
+                        FetchPartners();
+
+                    });
+                } else {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: response.message,
+                        icon: 'error',
+                        confirmButtonText: 'OK',
+                        allowOutsideClick: false
+                    });
+                }
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'An error occurred while deleting the record.',
+                    icon: 'error',
+                    confirmButtonText: 'OK',
+                    allowOutsideClick: false
+                });
+            }
+        });
+    }
+</script>

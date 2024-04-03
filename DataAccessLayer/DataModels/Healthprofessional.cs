@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -54,9 +53,6 @@ public partial class Healthprofessional
     [StringLength(100)]
     public string? Phonenumber { get; set; }
 
-    [Column("isdeleted", TypeName = "bit(1)")]
-    public BitArray? Isdeleted { get; set; }
-
     [Column("ip")]
     [StringLength(20)]
     public string? Ip { get; set; }
@@ -68,6 +64,9 @@ public partial class Healthprofessional
     [Column("businesscontact")]
     [StringLength(100)]
     public string? Businesscontact { get; set; }
+
+    [Column("isdeleted")]
+    public bool? Isdeleted { get; set; }
 
     [ForeignKey("Healthprofessionalid")]
     [InverseProperty("Healthprofessionals")]

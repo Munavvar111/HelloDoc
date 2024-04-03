@@ -981,7 +981,7 @@ namespace BusinessLayer.Repository
                                           PhysicianName = pd.Firstname + ' ' + pd.Lastname,
                                           Shiftdate = sd.Shiftdate,
                                           ShiftDetailId = sd.Shiftdetailid,
-                                          Regionid = sd.Regionid,
+                                          Regionid = (int)sd.Regionid,
                                           ShiftDeleted = sd.Isdeleted
                                       }).Where(item => region == 0 || item.Regionid == region).ToList();
             var events = eventswithoutdelet.Where(item => !item.ShiftDeleted).ToList();
@@ -990,88 +990,61 @@ namespace BusinessLayer.Repository
         #endregion
 
         #region CreateShift
-        public (bool success, List<DateTime> conflictingDates) CreateShift(ScheduleModel data, string email)
+        public void CreateShift(ScheduleModel data,string email)
         {
             Admin? admin = _context.Admins.FirstOrDefault(item => item.Email == email);
             List<DateTime> conflictingDates = new List<DateTime>(); // List to store conflicting dates
-            Shift shift = null;
 
-            using (var transaction = new TransactionScope())
-            {
-                // Check if the same shift already exists
-                bool shiftExists = _context.Shiftdetails.Any(sd =>
-                            sd.Shift.Physicianid == data.Physicianid &&
-                            sd.Shiftdate.Equals(new DateTime(data.Startdate.Year, data.Startdate.Month, data.Startdate.Day)) &&
-                            (
-                                (sd.Starttime.Hour <= data.Starttime.Hour && data.Starttime.Hour <= sd.Endtime.Hour) ||
-                                (sd.Starttime.Hour <= data.Endtime.Hour && data.Endtime.Hour <= sd.Endtime.Hour)
-                            ) && !sd.Isdeleted);
 
-                if (shiftExists)
+            
+                try
                 {
-                    // If a conflicting shift is found, add the conflicting date to the list
-                    conflictingDates.Add(DateTime.Parse(data.Startdate.ToString()));
-                    return (false, conflictingDates);
-                }
-                else
-                {
-                    // If no conflicting shift is found, create a new shift
-                    shift = new Shift();
-                    shift.Physicianid = data.Physicianid;
-                    shift.Repeatupto = data.Repeatupto;
-                    shift.Startdate = new DateOnly(data.Startdate.Year, data.Startdate.Month, data.Startdate.Day);
-                    shift.Createdby = admin.Aspnetuserid;
-                    shift.Createddate = DateTime.Now;
-                    shift.Isrepeat = new BitArray(new[] { data.Isrepeat });
-                    shift.Repeatupto = data.Repeatupto;
-                    _context.Shifts.Add(shift);
-                    _context.SaveChanges();
-
-                    Shiftdetail sd = new Shiftdetail();
-                    sd.Shiftid = shift.Shiftid;
-                    sd.Shiftdate = new DateTime(data.Startdate.Year, data.Startdate.Month, data.Startdate.Day);
-                    sd.Starttime = data.Starttime;
-                    sd.Endtime = data.Endtime;
-                    sd.Regionid = data.Regionid;
-                    sd.Status = data.Status;
-                    sd.Isdeleted = false;
-                    _context.Shiftdetails.Add(sd);
-                    _context.SaveChanges();
-
-                    Shiftdetailregion sr = new Shiftdetailregion();
-                    sr.Shiftdetailid = sd.Shiftdetailid;
-                    sr.Regionid = (int)data.Regionid;
-                    sr.Isdeleted = false;
-                    _context.Shiftdetailregions.Add(sr);
-                    _context.SaveChanges();
-
-                    // Handle repeating shifts
-                    if (data.checkWeekday != null) // Ensure shift is not null
+                    using (var transaction = new TransactionScope())
                     {
-                        List<int> day = data.checkWeekday.Split(',').Select(int.Parse).ToList();
+                        Shift shift = new Shift();
+                        shift.Physicianid = data.Physicianid;
+                        shift.Repeatupto = data.Repeatupto;
+                        shift.Startdate = data.Startdate;
+                    shift.Createdby = admin.Aspnetuserid;
+                        shift.Createddate = DateTime.Now;
+                        shift.Isrepeat = new BitArray(new[] { true });
+                        shift.Repeatupto = data.Repeatupto;
+                        _context.Shifts.Add(shift);
+                        _context.SaveChanges();
 
-                        foreach (int d in day)
+                        Shiftdetail sd = new Shiftdetail();
+                        sd.Shiftid = shift.Shiftid;
+                        sd.Shiftdate = new DateTime(data.Startdate.Year, data.Startdate.Month, data.Startdate.Day);
+                        sd.Starttime = data.Starttime;
+                        sd.Endtime = data.Endtime;
+                        sd.Regionid = data.Regionid;
+                        sd.Status = data.Status;
+                        sd.Isdeleted = false;
+                        _context.Shiftdetails.Add(sd);
+                        _context.SaveChanges();
+
+                        Shiftdetailregion sr = new Shiftdetailregion();
+                        sr.Shiftdetailid = sd.Shiftdetailid;
+                        sr.Regionid = data.Regionid;
+                        sr.Isdeleted = false;
+                        _context.Shiftdetailregions.Add(sr);
+                        _context.SaveChanges();
+
+                        if (data.checkWeekday != null)
                         {
-                            DayOfWeek desiredDayOfWeek = (DayOfWeek)d;
-                            DateTime nextOccurrence = new DateTime(data.Startdate.Year, data.Startdate.Month, data.Startdate.Day + 1);
+                            List<int> day = data.checkWeekday.Split(',').Select(int.Parse).ToList();
 
-                            int occurrencesFound = 0;
-                            while (occurrencesFound < data.Repeatupto)
+                            foreach (int d in day)
                             {
-                                if (nextOccurrence.DayOfWeek == desiredDayOfWeek)
+                                DayOfWeek desiredDayOfWeek = (DayOfWeek)d;
+                                DateTime today = DateTime.Today;
+                                DateTime nextOccurrence = new DateTime(data.Startdate.Year, data.Startdate.Month, data.Startdate.Day + 1);
+                                int occurrencesFound = 0;
+                                while (occurrencesFound < data.Repeatupto)
                                 {
-                                    // Check if the same shift already exists for this day of the week and start time
-                                    bool shiftExistsForDay = _context.Shiftdetails.Any(sd =>
-                                        sd.Shift.Physicianid == data.Physicianid &&
-                                        sd.Shiftdate.Equals(new DateTime(nextOccurrence.Year, nextOccurrence.Month, nextOccurrence.Day)) &&
-                                        (
-                                            (sd.Starttime.Hour <= data.Starttime.Hour && data.Starttime.Hour <= sd.Endtime.Hour) ||
-                                            (sd.Starttime.Hour <= data.Endtime.Hour && data.Endtime.Hour <= sd.Endtime.Hour)
-                                        ) && !sd.Isdeleted);
-
-                                    if (!shiftExistsForDay)
+                                    if (nextOccurrence.DayOfWeek == desiredDayOfWeek)
                                     {
-                                        // If no conflicting shift is found, create a new shift for this day
+
                                         Shiftdetail sdd = new Shiftdetail();
                                         sdd.Shiftid = shift.Shiftid;
                                         sdd.Shiftdate = nextOccurrence;
@@ -1085,34 +1058,33 @@ namespace BusinessLayer.Repository
 
                                         Shiftdetailregion srr = new Shiftdetailregion();
                                         srr.Shiftdetailid = sdd.Shiftdetailid;
-                                        srr.Regionid = (int)data.Regionid;
+                                        srr.Regionid = data.Regionid;
                                         srr.Isdeleted = false;
                                         _context.Shiftdetailregions.Add(srr);
                                         _context.SaveChanges();
+                                        occurrencesFound++;
                                     }
-                                    else
-                                    {
-                                        conflictingDates.Add(nextOccurrence); // Add conflicting date to the list
-                                    }
+                                    nextOccurrence = nextOccurrence.AddDays(1);
                                 }
-                                occurrencesFound++;
-                                nextOccurrence = nextOccurrence.AddDays(1);
                             }
                         }
+
+                        transaction.Complete();
                     }
 
-                    transaction.Complete();
-                    return (true, conflictingDates);
                 }
-            }
-        }
-        #endregion
+                catch (Exception ex)
+                {
+                    throw new ApplicationException("Failed to submit Form", ex);
+                }
 
-        #region GetProvidersOnCall
-        public ProviderOnCallVM GetProvidersOnCall(int region)
+            }
+            #endregion
+
+            #region GetProvidersOnCall
+            public ProviderOnCallVM GetProvidersOnCall(int region)
         {
             var currentTime = DateTime.Now.Hour;
-
             var onDutyQuery = from shiftDetail in _context.Shiftdetails
                               join physician in _context.Physicians on shiftDetail.Shift.Physicianid equals physician.Physicianid
                               join physicianRegion in _context.PhysicianRegions on physician.Physicianid equals physicianRegion.Physicianid
@@ -1120,21 +1092,21 @@ namespace BusinessLayer.Repository
                                     shiftDetail.Shiftdate.Date == DateTime.Now.Date &&
                                     currentTime >= shiftDetail.Starttime.Hour &&
                                     currentTime <= shiftDetail.Endtime.Hour &&
-                                    !shiftDetail.Isdeleted
+                                    !shiftDetail.Isdeleted && !physician.Isdeleted==false
                               select physician;
 
             var onDuty = onDutyQuery.Distinct().ToList();
 
-            var offDutyQuery = from physician in _context.Physicians
-                               join physicianRegion in _context.PhysicianRegions on physician.Physicianid equals physicianRegion.Physicianid
-                               where (region == 0 || physicianRegion.Regionid == region) &&
-                                     !_context.Shiftdetails.Any(item => item.Shift.Physicianid == physician.Physicianid &&
-                                                                       currentTime >= item.Starttime.Hour &&
-                                                                       currentTime <= item.Endtime.Hour &&
-                                                                       !item.Isdeleted)
-                               select physician;
-
-            var offDuty = offDutyQuery.Distinct().ToList();
+			var offDutyQuery = from physician in _context.Physicians
+							   join physicianRegion in _context.PhysicianRegions on physician.Physicianid equals physicianRegion.Physicianid
+							   where (region == 0 || physicianRegion.Regionid == region) &&
+									 !_context.Shiftdetails.Any(item => item.Shift.Physicianid == physician.Physicianid &&
+                                                                        item.Shiftdate.Date == DateTime.Now.Date &&
+																	   currentTime >= item.Starttime.Hour &&
+																	   currentTime <= item.Endtime.Hour &&
+																	   !item.Isdeleted)
+							   select physician;
+			var offDuty = offDutyQuery.Distinct().ToList();
 
             return new ProviderOnCallVM
             {
@@ -1143,6 +1115,59 @@ namespace BusinessLayer.Repository
             };
         }
         #endregion
+
+        public List<DateTime> IsShiftOverwritting(ScheduleModel data)
+        {
+            List<DateTime> OverlappingDates = new List<DateTime>();
+            bool shiftExists = _context.Shiftdetails.Any(sd =>
+                                    sd.Shift.Physicianid == data.Physicianid && sd.Isdeleted == false &&
+                                    sd.Shiftdate.Equals(new DateTime(data.Startdate.Year, data.Startdate.Month, data.Startdate.Day)) &&
+                                    (
+                                    (sd.Starttime.Hour <= data.Starttime.Hour && data.Starttime.Hour <= sd.Endtime.Hour) ||
+                                    (sd.Starttime.Hour <= data.Endtime.Hour && data.Endtime.Hour <= sd.Endtime.Hour)
+                                    )
+                                    );
+            if (shiftExists)
+            {
+                OverlappingDates.Add(DateTime.Parse(data.Startdate.ToString()));
+            }
+
+            if (data.checkWeekday != null)
+            {
+                List<int> day = data.checkWeekday.Split(',').Select(int.Parse).ToList();
+
+                foreach (int d in day)
+                {
+                    DayOfWeek desiredDayOfWeek = (DayOfWeek)d;
+                    DateTime today = DateTime.Today;
+                    DateTime nextOccurrence = new DateTime(data.Startdate.Year, data.Startdate.Month, data.Startdate.Day + 1);
+                    int occurrencesFound = 0;
+                    while (occurrencesFound < data.Repeatupto)
+                    {
+                        if (nextOccurrence.DayOfWeek == desiredDayOfWeek)
+                        {
+                            var shiftExistForRepeat = _context.Shiftdetails.Any(sd =>
+                                    sd.Shift.Physicianid == data.Physicianid && sd.Isdeleted == false &&
+                                    sd.Shiftdate.Equals(new DateTime(nextOccurrence.Year, nextOccurrence.Month, nextOccurrence.Day)) &&
+                                    (
+                                    (sd.Starttime.Hour <= data.Starttime.Hour && data.Starttime.Hour <= sd.Endtime.Hour) ||
+                                    (sd.Starttime.Hour <= data.Endtime.Hour && data.Endtime.Hour <= sd.Endtime.Hour)
+                                    )
+                                    );
+                            if (shiftExistForRepeat)
+                            {
+                                OverlappingDates.Add(DateTime.Parse(nextOccurrence.ToString()));
+                            }
+                            occurrencesFound++;
+                        }
+                        nextOccurrence = nextOccurrence.AddDays(1);
+                    }
+                }
+            }
+            return OverlappingDates;
+        }
+
+
     }
 }
 

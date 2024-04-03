@@ -48,27 +48,27 @@
         </div>
 </div>
 
-<script>
-    $(document).ready(function () {
-        FetchProviderOnCall();
-        $("#provideregion").on("change", function () {
+    <script>
+        $(document).ready(function () {
             FetchProviderOnCall();
+            $("#provideregion").on("change", function () {
+                FetchProviderOnCall();
+            });
+            function FetchProviderOnCall() {
+                var region = $('#provideregion').val();
+                $.ajax({
+                    method:'POST',
+                    url:"/Admin/ProviderOnCallFetch",
+                    data: {region:region},
+                    success: function (response) {
+                        $('#ProviderOnCallStatus').html(response)
+                    },
+                    error: function () {
+                        console.log(error)
+                    }
+
+                })
+            }
+
         });
-        function FetchProviderOnCall() {
-            var region = $('#provideregion').val();
-            $.ajax({
-                method:'POST',
-                url:"/Admin/ProviderOnCallFetch",
-                data: {region:region},
-                success: function (response) {
-                    $('#ProviderOnCallStatus').html(response)
-                },
-                error: function () {
-                    console.log(error)
-                }
-
-            })
-        }
-
-    });
-</script>
+    </script>

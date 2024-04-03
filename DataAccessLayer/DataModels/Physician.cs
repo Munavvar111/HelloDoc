@@ -106,9 +106,6 @@ public partial class Physician
     [StringLength(200)]
     public string Businesswebsite { get; set; } = null!;
 
-    [Column("isdeleted", TypeName = "bit(1)")]
-    public BitArray? Isdeleted { get; set; }
-
     [Column("roleid")]
     public int? Roleid { get; set; }
 
@@ -132,6 +129,9 @@ public partial class Physician
     [Column("syncemailaddress")]
     [StringLength(50)]
     public string? Syncemailaddress { get; set; }
+
+    [Column("isdeleted")]
+    public bool? Isdeleted { get; set; }
 
     [ForeignKey("Aspnetuserid")]
     [InverseProperty("PhysicianAspnetusers")]

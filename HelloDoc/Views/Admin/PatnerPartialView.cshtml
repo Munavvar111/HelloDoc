@@ -1,0 +1,36 @@
+﻿@model List<DataAccessLayer.CustomModel.SendOrderModel>
+<div class="bg-white border justify-content-center mt-3 table-responsive">
+    <table class="table">
+
+        <thead class="table-secondary">
+            <tr>
+                <th scope="col">Profeesion</th>
+                <th scope="col">Business Name</th>
+                <th scope="col">Email</th>
+                <th scope="col">Fax Number</th>
+                <th scope="col">Phone Number</th>
+                <th scope="col">Business Contact</th>
+                <th scope="col"></th>
+            </tr>
+        </thead>
+        @foreach (var item in Model)
+        {
+                <tbody>
+                    <tr class="deleted">
+                        <td>@item.Professionname</td>
+                        <td>@item.BusinessName</td>
+
+                            <td>@item.Email</td>
+                        <td>@item.FaxNumber</td>
+                       <td>@item.PhoneNumber</td>
+                       <td>@item.BusinesContact</td>
+                       <td class="d-flex gap-2">
+                           <a asp-action="EditPartner" class="btn btn-outline-info">Edit</a>
+                        <a class="btn btn-outline-info" onclick="deleteRecord(@item.HelthProfessionId)">Delete</a>
+                    </td>
+                    </tr>
+                </tbody>
+            }
+        
+    </table>
+</div>

@@ -3,7 +3,7 @@
 }
 <div class="container">
 	<h3 class="mt-4 mb-3">Patient History</h3>
-	<div class="container bg-body rounded shadow">
+	<div class="container bg-body rounded shadow border">
 		<div class="row pt-3">
 			<div class="col-lg-3 col-md-3 col-sm-6">
 				<div class="form-floating mb-3">
@@ -51,6 +51,7 @@
 				url: "/Admin/GetPatientHistoryData",
 				data: { firstName: firstname, lastName: lastname, email: email, phoneNumber: phonenumber },
 				success: function (data) {
+					console.log(data)
 					$("#searchResults").html(data);
 				},
 				error: function (error) {

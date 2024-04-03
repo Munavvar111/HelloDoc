@@ -1,0 +1,119 @@
+﻿@model DataAccessLayer.CustomModel.HealthProffesionalVM;
+@{
+    ViewData["Title"] = "EditPartner";
+    Layout = "~/Views/Shared/_Layout4.cshtml";
+}
+
+<div class="mt-5  m-auto mb-5 form_content container">
+    <div class="mt-4 m-auto d-flex justify-content-between">
+        <div class="d-flex align-items-center justify-content-center">
+            <h3 class="me-2 mt-1 fw-bolder">Add Business</h3>
+        </div>
+        <div>
+            <button class="btn btn-lg btn-outline-info hover_white ms-5" onclick="window.history.back()">
+                <i class="fa-solid fa-chevron-left"></i> Back
+            </button>
+        </div>
+    </div>
+
+    <form id="AddPartner" asp-action="AddPartner" class="mt-4 m-auto">
+
+        <div class="row p-4 shadow rounded-3">
+            <div class="form-floating col-md-6 my-3">
+                <input asp-for="Vendorname" type="text" class="form-control" id="BusinessContactInput" placeholder=" ">
+                <label asp-for="Vendorname" for="BusinessContactInput" class="control-label ms-3">Business Name</label>
+                <span asp-validation-for="Vendorname" class="text-danger"></span>
+            </div>
+
+            <div class="form-floating col-md-6 my-3">
+                <select asp-for="Profession" class="form-select pt-1" id="BusinessSelect" aria-label="Select Business">
+                    <option disabled selected>Select Business</option>
+                    @foreach (var profession in ViewBag.helthprofessional)
+                    {
+                        <option value="@profession.Healthprofessionalid "> @profession.Professionname</option>
+                    }
+                </select>
+                <span asp-validation-for="Profession" class="text-danger"></span>
+
+
+            </div>
+
+            <div class="form-floating col-md-6 my-3">
+                <input asp-for="Faxnumber" type="text" class="form-control" id="BusinessContactInput" placeholder="Fax Number">
+                <label asp-for="Faxnumber" for="BusinessContactInput" class="control-label ms-3">Fax Number </label>
+                <span asp-validation-for="Faxnumber" class="text-danger"></span>
+
+            </div>
+
+            <div class="form-floating col-md-6 my-3 bg-white">
+                <div class="border rounded-2 tel-container">
+
+                <input asp-for="Phonenumber" id="phone" type="tel" class="form-control border-0 tel-input">
+                <span asp-validation-for="Phonenumber" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="form-floating col-md-6 my-3">
+                <input asp-for="Email" type="email" class="form-control" placeholder=" " id="EmailInput">
+                <label asp-for="Email" for="EmailInput" class="control-label ms-3">Email</label>
+                <span asp-validation-for="Email" class="text-danger"></span>
+
+            </div>
+
+            <div class="form-floating col-md-6 my-3">
+                <input asp-for="Businesscontact" type="text" class="form-control" id="Businesscontact" placeholder=" ">
+                <label asp-for="Businesscontact" for="Businesscontact" class="control-label ms-3">Business Contact</label>
+                <span asp-validation-for="Businesscontact" class="text-danger"></span>
+
+            </div>
+
+            <div class="form-floating col-md-6 my-3">
+                <input asp-for="Address" type="text" class="form-control" id="Street" placeholder=" ">
+                <label asp-for="Address" for="Street" class="control-label ms-3">Street</label>
+                <span asp-validation-for="Address" class="text-danger"></span>
+
+            </div>
+
+            <div class="form-floating col-md-6 my-3">
+                <input asp-for="City" type="text" class="form-control" id="City" placeholder=" ">
+                <label asp-for="City" for="City" class="control-label ms-3">City</label>
+                <span asp-validation-for="City" class="text-danger"></span>
+
+            </div>
+
+            <div class="form-floating col-md-6 my-3">
+                <input asp-for="State" type="text" class="form-control" id="State" placeholder="">
+                <label asp-for="State" for="State" class="control-label ms-3">State</label>
+            </div>
+            <div class="form-floating col-md-6 my-3">
+                <input asp-for="Zip" type="text" class="form-control" id="Zip" placeholder=" ">
+                <label asp-for="Zip" for="Zip" class="control-label ms-3">Zip/Postal</label>
+                <span asp-validation-for="Zip" class="text-danger"></span>
+
+            </div>
+
+
+            <div class="form-floating col-md-6 my-3">
+            </div>
+
+            <div class="my-3 d-flex justify-content-end ">
+                <button class="btn btn-outline-info hover_white hover_primary mx-2 btn-lg" type="submit">Save</button>
+                <button class="btn btn-outline-info hover_white hover_primary btn-lg" type="reset">Cancel</button>
+            </div>
+        </div>
+    </form>
+
+
+</div>
+
+<script>
+    const phone = document.querySelector("#phone");
+    const phoneInput1 = window.intlTelInput(phone, {
+        utilsScript:
+            "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",
+        nationalMode: false,
+        showSelectedDialCode: true,
+        autoInsertDialCode: true,
+        formatOnDisplay: false,
+    });
+</script>
