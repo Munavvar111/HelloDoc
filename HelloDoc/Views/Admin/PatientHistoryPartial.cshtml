@@ -24,7 +24,7 @@
 					<td scope="row">@item.Address</td>
 					<td scope="row">
 						<div class="d-flex">
-							<a class="btn btn-outline-info rounded me-2">Explore</a>
+							<a class="btn btn-outline-info rounded me-2" asp-route-userid="@item.UserId" asp-action="PatientRecords">Explore</a>
 						</div>
 					</td>
 				</tr>

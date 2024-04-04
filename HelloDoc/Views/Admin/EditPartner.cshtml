@@ -16,8 +16,8 @@
         </div>
     </div>
 
-    <form id="AddPartner" asp-action="AddPartner" class="mt-4 m-auto">
-
+    <form id="EditPartner" asp-action="EditPartner" class="mt-4 m-auto">
+        <input type="input" asp-for="@Model.HealthProfessionId" class="d-none"/>
         <div class="row p-4 shadow rounded-3">
             <div class="form-floating col-md-6 my-3">
                 <input asp-for="Vendorname" type="text" class="form-control" id="BusinessContactInput" placeholder=" ">
@@ -26,11 +26,11 @@
             </div>
 
             <div class="form-floating col-md-6 my-3">
-                <select asp-for="Profession" class="form-select pt-1" id="BusinessSelect" aria-label="Select Business">
+                <select asp-for="Profession" class="form-select pt-1" id="BusinessSelect" aria-label="Select Business" value="@Model.Profession">
                     <option disabled selected>Select Business</option>
                     @foreach (var profession in ViewBag.helthprofessional)
                     {
-                        <option value="@profession.Healthprofessionalid "> @profession.Professionname</option>
+                        <option value="@profession.Healthprofessionalid"> @profession.Professionname</option>
                     }
                 </select>
                 <span asp-validation-for="Profession" class="text-danger"></span>
@@ -54,7 +54,7 @@
             </div>
 
             <div class="form-floating col-md-6 my-3">
-                <input asp-for="Email" type="email" class="form-control" placeholder=" " id="EmailInput">
+                <input asp-for="Email" type="email" class="form-control" placeholder=" " id="EmailInput" value="@Model.Email">
                 <label asp-for="Email" for="EmailInput" class="control-label ms-3">Email</label>
                 <span asp-validation-for="Email" class="text-danger"></span>
 
@@ -82,8 +82,19 @@
             </div>
 
             <div class="form-floating col-md-6 my-3">
-                <input asp-for="State" type="text" class="form-control" id="State" placeholder="">
-                <label asp-for="State" for="State" class="control-label ms-3">State</label>
+                <select class="form-select " aria-label="Default select example" name="state" id="cancelReason" asp-for="State">
+
+                    <option selected disabled>Select The State</option>
+                    @if (ViewBag.Regions != null)
+                    {
+                        @foreach (var region in ViewBag.Regions)
+                        {
+                            <option value="@region.Name">@region.Name</option>
+                        }
+                    }
+                </select>
+                <span asp-validation-for="State" class="text-danger"></span>
+
             </div>
             <div class="form-floating col-md-6 my-3">
                 <input asp-for="Zip" type="text" class="form-control" id="Zip" placeholder=" ">

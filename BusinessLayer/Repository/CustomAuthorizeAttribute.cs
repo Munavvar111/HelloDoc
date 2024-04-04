@@ -23,7 +23,7 @@ public class CustomAuthorizeAttribute : Attribute, IAuthorizationFilter
 
     public void OnAuthorization(AuthorizationFilterContext context)
     {
-        var jwtServices = context.HttpContext.RequestServices.GetService<IJwtAuth>();
+            var jwtServices = context.HttpContext.RequestServices.GetService<IJwtAuth>();
         var admin = context.HttpContext.RequestServices.GetService<IAdmin>();
 
         if (jwtServices == null)

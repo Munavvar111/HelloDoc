@@ -1,0 +1,165 @@
+﻿
+@{
+    ViewData["Title"] = "SearchRecords";
+    Layout = "~/Views/Shared/_Layout4.cshtml";
+}
+
+<div class="container bg-light">
+	<div class="row mb-3 mt-4">
+		<div class="col">
+			<h3>Search Record</h3>
+		</div>
+		<div class="col text-end">
+			<button class="btn btn-info text-white" id="excelExport"><i class="bi bi-share"></i> Export Data to Excel</button>
+		</div>
+	</div>
+	<div class="container bg-body rounded shadow">
+		<div class="row pt-3">
+			<div class="col-lg-3 col-md-3 col-sm-6">
+				<div class="mb-3">
+					<select class="form-select shadow-none statusSelect p-3" id="floatingSelect" aria-label="Floating label select example">
+						<option value="0">Select Request Status</option>
+						<option value="1">New</option>
+						<option value="2">Pending</option>
+						<option value="3">Active</option>
+						<option value="4">Conclude</option>
+						<option value="5">To-close</option>
+						<option value="6">Unpaid</option>
+					</select>
+				</div>
+			</div>
+			<div class="col-lg-3 col-md-3 col-sm-6">
+				<div class="form-floating mb-3">
+					<input class="form-control shadow-none patientName" id="floatingInput" placeholder="Patient Name">
+					<label for="floatingInput" class="customlable">Patient Name</label>
+					<span class="text-danger"></span>
+				</div>
+			</div>
+			<div class="col-lg-3 col-md-3 col-sm-6">
+				<div class="mb-3">
+					<select class="form-select shadow-none requestType p-3" id="floatingSelect" aria-label="Floating label select example">
+						<option value="0">Select Request Type</option>
+						<option value="2">Patient</option>
+						<option value="3">Family/Friend</option>
+						<option value="4">Concierge</option>
+						<option value="1">Business</option>
+
+					</select>
+				</div>
+			</div>
+			<div class="col-lg-3 col-md-3 col-sm-6">
+				<div class="form-floating mb-3">
+					<input type="date" class="form-control shadow-none startingDate" id="floatingInput">
+					<label for="floatingInput" class="customlable">From Date Of Service</label>
+					<span class="text-danger"></span>
+				</div>
+			</div>
+		</div>
+		<div class="row pt-3">
+			<div class="col-lg-3 col-md-3 col-sm-6">
+				<div class="form-floating mb-3">
+					<input type="date" class="form-control shadow-none endDate" id="floatingInput">
+					<label for="floatingInput" class="customlable">To Date Of Service</label>
+					<span class="text-danger"></span>
+				</div>
+			</div>
+			<div class="col-lg-3 col-md-3 col-sm-6">
+				<div class="form-floating mb-3">
+					<input class="form-control shadow-none providorName" id="floatingInput" placeholder="Providor Name">
+					<label for="floatingInput" class="customlable">Providor Name</label>
+					<span class="text-danger"></span>
+				</div>
+			</div>
+			<div class="col-lg-3 col-md-3 col-sm-6">
+				<div class="form-floating mb-3">
+					<input class="form-control shadow-none email" id="floatingInput" placeholder="Email">
+					<label for="floatingInput" class="customlable">Email</label>
+					<span class="text-danger"></span>
+				</div>
+			</div>
+			<div class="col-lg-3 col-md-3 col-sm-6">
+				<div class="form-floating mb-3">
+					<input class="form-control shadow-none phoneNumber" id="floatingInput" placeholder="Phone Number">
+					<label for="floatingInput" class="customlable">Phone Number</label>
+					<span class="text-danger"></span>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col text-end mb-3">
+				<button class="btn btn-outline-info me-2 rounded clearBtn" id="clearBtn">Clear</button>
+				<button class="btn btn-info text-white rounded searchBtn" id="searchBtn">Search</button>
+			</div>
+		</div>
+		<div id="searchResults"></div>
+	</div>
+</div>
+<script>
+	$(document).ready(function () {
+		function changeTable(status, patientname, requesttype, providorname, email, phonenumber, exportstatus) {
+			$.ajax({
+				type: "GET",
+				url: "/Admin/GetPatientSearchRecords",
+				data: {
+					status: status,
+					patientName: patientname,
+					requestType: requesttype,
+					providorName: providorname,
+					email: email,
+					phoneNumber: phonenumber,
+					exportStatus: exportstatus
+				},
+				success: function (data) {
+					if (exportstatus == true) {
+						var blob = new Blob([data], { type: 'text/csv' });
+						var link = document.createElement('a');
+						link.href = window.URL.createObjectURL(blob);
+						link.download = 'PatientSearchRecord.csv';
+						document.body.appendChild(link);
+						link.click();
+						document.body.removeChild(link);
+					}
+					else {
+						$("#searchResults").html(data);
+					}
+
+				},
+				error: function (error) {
+					console.error("Error:", error);
+				}
+			});
+		}
+
+		$("#searchBtn").click(function () {
+			var Status = $(".statusSelect").val();
+			var PatientName = $(".patientName").val();
+			var RequestType = $(".requestType").val();
+			var ProvidorName = $(".providorName").val();
+			var Email = $(".email").val();
+			var PhoneNumber = $(".phoneNumber").val();
+			changeTable(Status, PatientName, RequestType, ProvidorName, Email, PhoneNumber, false);
+		});
+
+		$("#clearBtn").click(function () {
+			$(".statusSelect").val("0");
+			$(".patientName").val("");
+			$(".requestType").val("0");
+			$(".providorName").val("");
+			$(".email").val("");
+			$(".phoneNumber").val("");
+			changeTable("0", "", "0", "", "", "", false);
+		});
+		$("#excelExport").click(function () {
+			var Status = $(".statusSelect").val();
+			var PatientName = $(".patientName").val();
+			var RequestType = $(".requestType").val();
+			var ProvidorName = $(".providorName").val();
+			var Email = $(".email").val();
+			var PhoneNumber = $(".phoneNumber").val();
+			changeTable(Status, PatientName, RequestType, ProvidorName, Email, PhoneNumber, true);
+		});
+		// Call changeTable with default values initially
+		changeTable("0", "", "0", "", "", "", false);
+	});
+</script>
+

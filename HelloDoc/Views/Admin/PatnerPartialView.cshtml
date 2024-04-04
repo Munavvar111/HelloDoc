@@ -25,7 +25,7 @@
                        <td>@item.PhoneNumber</td>
                        <td>@item.BusinesContact</td>
                        <td class="d-flex gap-2">
-                           <a asp-action="EditPartner" class="btn btn-outline-info">Edit</a>
+                           <a asp-action="EditPartner" class="btn btn-outline-info" asp-route-partnerId="@item.HelthProfessionId">Edit</a>
                         <a class="btn btn-outline-info" onclick="deleteRecord(@item.HelthProfessionId)">Delete</a>
                     </td>
                     </tr>

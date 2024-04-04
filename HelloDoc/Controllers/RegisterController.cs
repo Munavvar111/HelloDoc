@@ -18,7 +18,7 @@ namespace HalloDocPatient.Controllers
         {
             _context = context;
         }
-        public IActionResult Index()
+        public IActionResult Index(int RequestId, string token)
         {
             return View();
         }

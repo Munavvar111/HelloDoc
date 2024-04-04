@@ -53,5 +53,6 @@ namespace DataAccessLayer.CustomModel
             [RegularExpression(@"^\d{6}(-\d{4})?$", ErrorMessage = "Invalid Zip/Postal format.")]
             public string Zip { get; set; }
         
-    }
+              public int HealthProfessionId { get; set; }
+      }
 }
