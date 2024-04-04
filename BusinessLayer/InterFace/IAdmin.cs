@@ -51,5 +51,22 @@ namespace BusinessLayer.InterFace
         void CreateShift(ScheduleModel data, string email);
         List<DateTime> IsShiftOverwritting(ScheduleModel data);
         ProviderOnCallVM GetProvidersOnCall(int region);
+        IQueryable<Region> GetRegionsByRegionId(int regionId);
+        Shiftdetail GetShiftDetailById(int shiftDetailId);
+
+        void UpdateShiftDetail(Shiftdetail shiftdetail);
+        void UpdateHealthPrifessional(Healthprofessional healthprofessional);
+        void SaveChanges();
+        IEnumerable<object> GetReviewShift(int region);
+        List<Healthprofessionaltype> GetAllHealthprofessoionalType();
+
+        IEnumerable<SendOrderModel> PartnerFilter(int healthProType, string vendorname);
+        Healthprofessional GetHealthprofessionalById(int healthprofessionalId);
+        List<User> GetUsers(string firstName, string lastName, string email, string phoneNumber);
+        List<PatientHistoryVM> GetPatientRecords(int userId);
+        void CreatePartner(HealthProffesionalVM healthProffesionalVM);
+        Region GetRegionByName(string state);
+        IEnumerable<Physician> GetPhysiciansByRegion(int region);
+
     }
 }

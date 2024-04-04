@@ -32,6 +32,12 @@ namespace BusinessLayer.Repository
             _hostingEnvironment = hostingEnvironment;
             _uploadprovider = uploadProvider;
         }
+
+        public List<Healthprofessionaltype> GetAllHealthprofessoionalType()
+        {
+            return _context.Healthprofessionaltypes.ToList();
+        }
+
         public List<Region> GetAllRegion()
         {
             return _context.Regions.ToList();
@@ -45,6 +51,17 @@ namespace BusinessLayer.Repository
             return _context.Admins.FirstOrDefault(item => item.Email == email);
         }
 
+        public Shiftdetail GetShiftDetailById(int shiftDetailId)
+        {
+            return _context.Shiftdetails.Find(shiftDetailId);
+        }
+
+
+        public IQueryable<Region> GetRegionsByRegionId(int regionId)
+        {
+            return _context.Regions.Where(i => i.Regionid == regionId);
+        }
+
         public AspnetUser GetAspNetUserByEmail(string email)
         {
             return _context.AspnetUsers.FirstOrDefault(item => item.Email == email);
@@ -52,13 +69,30 @@ namespace BusinessLayer.Repository
         public List<int> GetUserPermissions(string roleid)
         {
             var menulist = _context.Rolemenus.Where(item => item.Roleid == int.Parse(roleid)).Select(item => item.Menuid).ToList();
-            ;
             return menulist;
+        }
+
+        public Healthprofessional GetHealthprofessionalById(int healthprofessionalId)
+        {
+            return _context.Healthprofessionals.Find(healthprofessionalId);
         }
         public Menu GetMenufromMenuid(string menuid)
         {
             var menu = _context.Menus.Where(item => item.Menuid == int.Parse(menuid)).FirstOrDefault();
             return menu;
+        }
+        public void UpdateShiftDetail(Shiftdetail shiftdetail)
+        {
+            _context.Shiftdetails.Update(shiftdetail);
+        }
+        public void UpdateHealthPrifessional(Healthprofessional healthprofessional)
+        {
+            _context.Healthprofessionals.Update(healthprofessional);
+        }
+
+        public void SaveChanges()
+        {
+            _context.SaveChanges();
         }
 
         #region SearchPatients
@@ -1081,7 +1115,7 @@ namespace BusinessLayer.Repository
             }
             #endregion
 
-            #region GetProvidersOnCall
+        #region GetProvidersOnCall
             public ProviderOnCallVM GetProvidersOnCall(int region)
         {
             var currentTime = DateTime.Now.Hour;
@@ -1116,6 +1150,7 @@ namespace BusinessLayer.Repository
         }
         #endregion
 
+        #region IsShiftOverwritting
         public List<DateTime> IsShiftOverwritting(ScheduleModel data)
         {
             List<DateTime> OverlappingDates = new List<DateTime>();
@@ -1166,8 +1201,134 @@ namespace BusinessLayer.Repository
             }
             return OverlappingDates;
         }
+        #endregion
 
+        #region GetReviewShift
+        public IEnumerable<object> GetReviewShift(int region)
+        {
+            var shifts = (from shiftis in _context.Shifts
+                          join shiftdetails in _context.Shiftdetails
+                          on shiftis.Shiftid equals shiftdetails.Shiftid
+                          join regionis in _context.Regions
+                          on shiftdetails.Regionid equals regionis.Regionid
+                          select new
+                          {
+                              shiftis.Shiftid,
+                              ShiftDetailId = shiftdetails.Shiftdetailid,
+                              shiftis.Physician.Firstname,
+                              shiftis.Physician.Lastname,
+                              shiftdetails.Shiftdate,
+                              shiftdetails.Starttime,
+                              shiftdetails.Endtime,
+                              shiftdetails.Regionid,
+                              RegionName = regionis.Name,
+                              shiftdetails.Status
+                          }).Where(item => (region == 0 || item.Regionid == region) && item.Status == 1).ToList();
+            return shifts;
+        }
+        #endregion
 
+        #region PartnerFilter
+        public IEnumerable<SendOrderModel> PartnerFilter(int healthProType, string vendorname)
+        {
+            var orders = (from helthprofesion in _context.Healthprofessionals
+                          join helthprofessiontype in _context.Healthprofessionaltypes
+                          on helthprofesion.Healthprofessionalid equals helthprofessiontype.Healthprofessionalid
+                          where helthprofesion.Isdeleted == false
+                          select new SendOrderModel
+                          {
+                              Professionname = helthprofessiontype.Professionname,
+                              BusinessName = helthprofesion.Vendorname,
+                              Email = helthprofesion.Email,
+                              FaxNumber = helthprofesion.Faxnumber,
+                              PhoneNumber = helthprofesion.Phonenumber,
+                              BusinesContact = helthprofesion.Businesscontact,
+                              HelthProfessionId = helthprofesion.Vendorid
+                          })
+                        .Where(item =>
+                            (string.IsNullOrEmpty(vendorname) || item.BusinessName.Contains(vendorname)) &&
+                            (healthProType == 0 || item.HelthProfessionId == healthProType))
+                        .ToList();
+            return orders;
+        }
+        #endregion
+
+        #region GetUsers
+        public List<User> GetUsers(string firstName, string lastName, string email, string phoneNumber)
+        {
+            return _context.Users.Where(item =>
+                (string.IsNullOrEmpty(firstName) || item.Firstname.Contains(firstName)) &&
+                (string.IsNullOrEmpty(lastName) || item.Lastname.Contains(lastName)) &&
+                (string.IsNullOrEmpty(email) || item.Email.Contains(email)) &&
+                (string.IsNullOrEmpty(phoneNumber) || item.Mobile.Contains(phoneNumber))).ToList();
+        }
+        #endregion
+
+        #region GetPatientRecords
+        public List<PatientHistoryVM> GetPatientRecords(int userId)
+        {
+            return (from requestclient in _context.Requestclients
+                    join encounterform in _context.Encounterforms
+                    on requestclient.Requestid equals encounterform.RequestId into patientRecords
+                    from totalPatient in patientRecords.DefaultIfEmpty()
+                    where requestclient.Request.Userid == userId
+                    select new PatientHistoryVM
+                    {
+                        ClientName = requestclient.Request.Firstname,
+                        CreatedDate = requestclient.Request.Createddate,
+                        ConfirmationNumber = requestclient.Request.Confirmationnumber,
+                        ProvideName = requestclient.Request.Physician.Firstname,
+                        Status = requestclient.Request.Status,
+                        IsFinalize = totalPatient.IsFinalize,
+                        RequestId = requestclient.Request.Requestid,
+                        RequestClientId = requestclient.Requestclientid
+                    }).ToList();
+        }
+        #endregion
+
+        #region CreatePartner
+        public void CreatePartner(HealthProffesionalVM healthProffesionalVM)
+        {
+            Healthprofessional healthprofessional = new Healthprofessional
+            {
+                Vendorname = healthProffesionalVM.Vendorname,
+                Healthprofessionalid = healthProffesionalVM.Profession,
+                Faxnumber = healthProffesionalVM.Faxnumber,
+                Address = healthProffesionalVM.Address,
+                City = healthProffesionalVM.City,
+                Zip = healthProffesionalVM.Zip,
+                Createddate = DateTime.Now,
+                State = healthProffesionalVM.State,
+                Businesscontact = healthProffesionalVM.Businesscontact,
+                Phonenumber = healthProffesionalVM.Phonenumber,
+                Email = healthProffesionalVM.Email,
+                Isdeleted = false
+            };
+
+            var region = GetRegionByName(healthProffesionalVM.State);
+            if (region != null)
+                healthprofessional.Regionid = region.Regionid;
+
+            _context.Healthprofessionals.Add(healthprofessional);
+            _context.SaveChanges();
+        }
+        #endregion
+
+        #region GetPhysiciansByRegion
+        public IEnumerable<Physician> GetPhysiciansByRegion(int region)
+        {
+            var physicians = (from physicianRegion in _context.PhysicianRegions
+                              where region == 0 || physicianRegion.Regionid == region
+                              select physicianRegion.Physician)
+                             .ToList();
+            return physicians;
+        }
+        #endregion
+
+        public Region GetRegionByName(string state)
+        {
+            return _context.Regions.Where(r => r.Name == state).FirstOrDefault();
+        }
     }
 }
 
