@@ -306,7 +306,6 @@ $(document).ready(function () {
 
                     }
                 }
-
             },
             error: function (xhr) {
                 if (xhr.status === 403) {

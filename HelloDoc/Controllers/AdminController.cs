@@ -1,21 +1,19 @@
 ﻿using BusinessLayer.InterFace;
+using CsvHelper;
 using DataAccessLayer.CustomModel;
 using DataAccessLayer.DataContext;
 using DataAccessLayer.DataModels;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using Rotativa.AspNetCore;
-using System.Collections;
-using BC = BCrypt.Net.BCrypt;
-using CsvHelper;
-using System.Globalization;
 using ServiceStack;
-using BusinessLayer.Repository;
+using System.Collections;
 using System.Data;
-using System.Transactions;
-using Humanizer;
-using Geocoding.Microsoft.Json;
+using System.Globalization;
+using System.Web.Helpers;
+using BC = BCrypt.Net.BCrypt;
 
 namespace HelloDoc.Controllers
 {
@@ -373,10 +371,10 @@ namespace HelloDoc.Controllers
 			}
 			return RedirectToAction("PhysicanProfile", "Admin", new { id = physicianid });
 		}
-        #endregion
+		#endregion
 
-        #region CreateProvider
-        public IActionResult CreateProvider()
+		#region CreateProvider
+		public IActionResult CreateProvider()
 		{
 			List<Region> regions = _admin.GetAllRegion();
 			List<Role> roles = _context.Roles.Where(item => item.Accounttype == 2).ToList();
@@ -386,19 +384,19 @@ namespace HelloDoc.Controllers
 			createProvider.Roles = providerrole;
 			return View(createProvider);
 		}
-        #endregion
+		#endregion
 
-        #region SaveNotification
-        [HttpPost]
+		#region SaveNotification
+		[HttpPost]
 		public IActionResult SaveNotification(List<int> physicianIds, List<bool> checkboxStates)
 		{
 			_admin.SaveNotification(physicianIds, checkboxStates);
 			return Ok();
 		}
-        #endregion
+		#endregion
 
-        #region CreateProvider
-        [HttpPost]
+		#region CreateProvider
+		[HttpPost]
 		public IActionResult CreateProvider(CreateProviderVM createProvider, string[] adminRegion)
 		{
 			string? email = HttpContext.Session.GetString("Email");
@@ -566,27 +564,27 @@ namespace HelloDoc.Controllers
 
 			return View();
 		}
-        #endregion
+		#endregion
 
-        #region ProviderOnCallFetch
-        public IActionResult ProviderOnCallFetch(int region)
+		#region ProviderOnCallFetch
+		public IActionResult ProviderOnCallFetch(int region)
 		{
 			var model = _admin.GetProvidersOnCall(region);
 			return PartialView("ProviderOnCallPartial", model);
 		}
-        #endregion
+		#endregion
 
-        #region GetPhysicianShift
-        [HttpGet]
-        public IActionResult GetPhysicianShift(int region)
-        {
-            var physicians = _admin.GetPhysiciansByRegion(region);
-            return Ok(physicians);
-        }
-        #endregion
+		#region GetPhysicianShift
+		[HttpGet]
+		public IActionResult GetPhysicianShift(int region)
+		{
+			var physicians = _admin.GetPhysiciansByRegion(region);
+			return Ok(physicians);
+		}
+		#endregion
 
-        #region GetEvents
-        [HttpGet]
+		#region GetEvents
+		[HttpGet]
 		public IActionResult GetEvents(int region)
 		{
 			var events = _admin.GetEvents(region);
@@ -604,10 +602,10 @@ namespace HelloDoc.Controllers
 
 			return Ok(mappedEvents);
 		}
-        #endregion
+		#endregion
 
-        #region SaveShift
-        [HttpPost]
+		#region SaveShift
+		[HttpPost]
 		public IActionResult SaveShift(int shiftDetailId, DateTime startDate, TimeOnly startTime, TimeOnly endTime, int region)
 		{
 			Shiftdetail? shiftdetail = _admin.GetShiftDetailById(shiftDetailId);
@@ -622,9 +620,9 @@ namespace HelloDoc.Controllers
 				shiftdetail.Starttime = startTime;
 				shiftdetail.Endtime = endTime;
 
-                _admin.UpdateShiftDetail(shiftdetail);
-                _admin.SaveChanges();
-                var events = _admin.GetEvents(region);
+				_admin.UpdateShiftDetail(shiftdetail);
+				_admin.SaveChanges();
+				var events = _admin.GetEvents(region);
 				var mappedEvents = events.Select(e => new
 				{
 					id = e.Shiftid,
@@ -633,7 +631,7 @@ namespace HelloDoc.Controllers
 					start = new DateTime(e.Shiftdate.Value.Year, e.Shiftdate.Value.Month, e.Shiftdate.Value.Day, e.Starttime.Hour, e.Starttime.Minute, e.Starttime.Second),
 					end = new DateTime(e.Shiftdate.Value.Year, e.Shiftdate.Value.Month, e.Shiftdate.Value.Day, e.Endtime.Hour, e.Endtime.Minute, e.Endtime.Second),
 					ShiftDetailId = e.ShiftDetailId,
-					region =_admin.GetRegionsByRegionId(e.Regionid),
+					region = _admin.GetRegionsByRegionId(e.Regionid),
 					status = e.Status
 				}).ToList();
 				return Ok(new { message = "Shift detail updated successfully.", events = mappedEvents });
@@ -643,10 +641,10 @@ namespace HelloDoc.Controllers
 				return BadRequest("Error updating shift detail: " + ex.Message);
 			}
 		}
-        #endregion
+		#endregion
 
-        #region DeleteShift
-        public IActionResult DeleteShift(int shiftDetailId, int region)
+		#region DeleteShift
+		public IActionResult DeleteShift(int shiftDetailId, int region)
 		{
 			Shiftdetail? shiftdetail = _admin.GetShiftDetailById(shiftDetailId);
 			if (shiftdetail == null)
@@ -654,9 +652,9 @@ namespace HelloDoc.Controllers
 				return NotFound("Shift detail not found.");
 			}
 			shiftdetail.Isdeleted = true;
-            _admin.UpdateShiftDetail(shiftdetail);
-            _admin.SaveChanges();
-            var events = _admin.GetEvents(region);
+			_admin.UpdateShiftDetail(shiftdetail);
+			_admin.SaveChanges();
+			var events = _admin.GetEvents(region);
 			var mappedEvents = events.Select(e => new
 			{
 				id = e.Shiftid,
@@ -670,10 +668,10 @@ namespace HelloDoc.Controllers
 			}).ToList();
 			return Ok(new { message = "Shift detail Deleted successfully.", events = mappedEvents });
 		}
-        #endregion
+		#endregion
 
-        #region ReturnShift
-        public IActionResult ReturnShift(int shiftDetailId, int region)
+		#region ReturnShift
+		public IActionResult ReturnShift(int shiftDetailId, int region)
 		{
 			Shiftdetail? shiftdetail = _admin.GetShiftDetailById(shiftDetailId);
 
@@ -700,25 +698,25 @@ namespace HelloDoc.Controllers
 			}).ToList();
 			return Ok(new { message = "Shift detail updated successfully.", events = mappedEvents });
 		}
-        #endregion
+		#endregion
 
-        #region ShiftReview
-        public IActionResult ShiftReview()
+		#region ShiftReview
+		public IActionResult ShiftReview()
 		{
 			return View();
 		}
-        #endregion
+		#endregion
 
-        #region GetReviewShift
-        public IActionResult GetReviewShift(int region)
+		#region GetReviewShift
+		public IActionResult GetReviewShift(int region)
 		{
-            var shifts = _admin.GetReviewShift(region);
-            return PartialView("RequestedShiftPartial", shifts);
-        }
-        #endregion
+			var shifts = _admin.GetReviewShift(region);
+			return PartialView("RequestedShiftPartial", shifts);
+		}
+		#endregion
 
-        #region ApprovedShifts
-        [HttpPost]
+		#region ApprovedShifts
+		[HttpPost]
 		public IActionResult ApprovedShifts(List<int> selectedIds)
 		{
 			try
@@ -741,10 +739,10 @@ namespace HelloDoc.Controllers
 				return StatusCode(500, "An error occurred while approving selected shifts: " + ex.Message);
 			}
 		}
-        #endregion
+		#endregion
 
-        #region DeleteSelectedShiftDetails
-        [HttpPost]
+		#region DeleteSelectedShiftDetails
+		[HttpPost]
 		public IActionResult DeleteSelectedShiftDetails(List<int> selectedIds)
 		{
 			try
@@ -766,29 +764,36 @@ namespace HelloDoc.Controllers
 				return StatusCode(500, "An error occurred while Deleting selected shifts: " + ex.Message);
 			}
 		}
-        #endregion
+		#endregion
 
-        #region Parteners
-        public IActionResult Parteners()
+		#region Parteners
+		public IActionResult Parteners()
 		{
 			List<Healthprofessionaltype> healthprofessionaltype = _admin.GetAllHealthprofessoionalType();
 			ViewBag.helthprofessional = healthprofessionaltype;
 			return View();
 		}
-        #endregion
+		#endregion
 
-        #region PartnerFilter
-        public IActionResult PartnerFilter(int helthProType, string vendorname)
-        {
-            var orders = _admin.PartnerFilter(helthProType, vendorname);
-            return PartialView("PatnerPartialView", orders);
-        }
-        #endregion
-
-        #region DelteHealthProfession
-        public IActionResult DelteHealthProfession(int id)
+		#region PartnerFilter
+		public IActionResult PartnerFilter(int helthProType, string vendorname, int page)
 		{
-			Healthprofessional? healthprofessional =_admin.GetHealthprofessionalById(id);
+			var orders = _admin.PartnerFilter(helthProType, vendorname);
+			int pageSize = 3;
+			int totalItems = orders.Count();
+			int totalPages = (int)Math.Ceiling((double)totalItems / pageSize);
+			List<SendOrderModel> paginatedData = orders.Skip((page - 1) * pageSize).Take(pageSize).ToList();
+			ViewBag.totalPages = totalPages;
+			ViewBag.CurrentPage = page;
+			ViewBag.PageSize = pageSize;
+			return PartialView("PatnerPartialView", paginatedData);
+		}
+		#endregion
+
+		#region DelteHealthProfession
+		public IActionResult DelteHealthProfession(int id)
+		{
+			Healthprofessional? healthprofessional = _admin.GetHealthprofessionalById(id);
 			if (healthprofessional != null)
 			{
 				healthprofessional.Isdeleted = true;
@@ -802,42 +807,48 @@ namespace HelloDoc.Controllers
 				return StatusCode(500, new { message = "HealthProffesion Is Not In Existes" });
 			}
 		}
-        #endregion
+		#endregion
 
-        #region Records
-        public IActionResult Records()
+		#region Records
+		public IActionResult Records()
 		{
 			return View();
 		}
-        #endregion
+		#endregion
 
-        #region UpdateShiftDates
-        public IActionResult UpdateShiftDates()
+		#region UpdateShiftDates
+		public IActionResult UpdateShiftDates()
 		{
 			return Ok();
 		}
-        #endregion
+		#endregion
 
-        #region GetPatientHistoryData
-        public IActionResult GetPatientHistoryData(string firstName, string lastName, string email, string phoneNumber)
-        {
-            List<User> users = _admin.GetUsers(firstName, lastName, email, phoneNumber);
-            List<PatientHistoryVM> patientHistoryVms = users.Select(user => new PatientHistoryVM
-            {
-                FirstName = user.Firstname,
-                LastName = user.Lastname,
-                Email = user.Email,
-                PhoneNumber = user.Mobile,
-                Address = user.City,
-                UserId = user.Userid
-            }).ToList();
+		#region GetPatientHistoryData
+		public IActionResult GetPatientHistoryData(string firstName, string lastName, string email, string phoneNumber, int page)
+		{
+			List<User> users = _admin.GetUsers(firstName, lastName, email, phoneNumber);
+			List<PatientHistoryVM> patientHistoryVms = users.Select(user => new PatientHistoryVM
+			{
+				FirstName = user.Firstname,
+				LastName = user.Lastname,
+				Email = user.Email,
+				PhoneNumber = user.Mobile,
+				Address = user.City,
+				UserId = user.Userid
+			}).ToList();
+			int pageSize = 3;
+			int totalItems = patientHistoryVms.Count();
+			int totalPages = (int)Math.Ceiling((double)totalItems / pageSize);
+			List<PatientHistoryVM> paginatedData = patientHistoryVms.Skip((page - 1) * pageSize).Take(pageSize).ToList();
+			ViewBag.totalPages = totalPages;
+			ViewBag.CurrentPage = page;
+			ViewBag.PageSize = pageSize;
+			return PartialView("PatientHistoryPartial", paginatedData);
+		}
+		#endregion
 
-            return PartialView("PatientHistoryPartial", patientHistoryVms);
-        }
-        #endregion
-
-        #region EditPartner
-        public IActionResult EditPartner(int partnerId)
+		#region EditPartner
+		public IActionResult EditPartner(int partnerId)
 		{
 			Healthprofessional? healthprofessional = _admin.GetHealthprofessionalById(partnerId);
 			List<Healthprofessionaltype> healthprofessionaltype = _admin.GetAllHealthprofessoionalType();
@@ -858,10 +869,10 @@ namespace HelloDoc.Controllers
 			healthProffesionalVM.HealthProfessionId = healthprofessional.Vendorid;
 			return View(healthProffesionalVM);
 		}
-        #endregion
+		#endregion
 
-        #region EditPartner
-        [HttpPost]
+		#region EditPartner
+		[HttpPost]
 		public IActionResult EditPartner(HealthProffesionalVM healthProffesionalVM)
 		{
 			Healthprofessional? healthprofessional = _admin.GetHealthprofessionalById(healthProffesionalVM.HealthProfessionId);
@@ -881,18 +892,18 @@ namespace HelloDoc.Controllers
 			_admin.SaveChanges();
 			return RedirectToAction("EditPartner", new { partnerId = healthprofessional.Vendorid });
 		}
-        #endregion
+		#endregion
 
-        #region PatientRecords
-        public IActionResult PatientRecords(int userId)
-        {
-            List<PatientHistoryVM> patientRecords = _admin.GetPatientRecords(userId);
-            return View(patientRecords);
-        }
-        #endregion
+		#region PatientRecords
+		public IActionResult PatientRecords(int userId)
+		{
+			List<PatientHistoryVM> patientRecords = _admin.GetPatientRecords(userId);
+			return View(patientRecords);
+		}
+		#endregion
 
-        #region CreatePatner
-        public IActionResult CreatePatner()
+		#region CreatePatner
+		public IActionResult CreatePatner()
 		{
 			List<Healthprofessionaltype> healthprofessionaltype = _admin.GetAllHealthprofessoionalType();
 			List<Region> Regions = _admin.GetAllRegion();
@@ -900,52 +911,116 @@ namespace HelloDoc.Controllers
 			ViewBag.helthprofessional = healthprofessionaltype;
 			return View();
 		}
-        #endregion
+		#endregion
 
-        #region CreatePatnerPost
-        public IActionResult CreatePatner(HealthProffesionalVM healthProffesionalVM)
-        {
-            _admin.CreatePartner(healthProffesionalVM);
-            return RedirectToAction("Parteners");
-        }
-        #endregion
-
-        #region GetPatientSearchRecords
-        public IActionResult GetPatientSearchRecords(int status, string patientName, int requestType, string providorName, string email, string phoneNumber, bool exportStatus)
+		#region CreatePatnerPost
+		[HttpPost]
+		public IActionResult CreatePatner(HealthProffesionalVM healthProffesionalVM)
 		{
-			List<SearchRecordVM> searchRecord = (from request in _context.Requests
-										   join requestclient in _context.Requestclients
-										   on request.Requestid equals requestclient.Requestid
-										   join reqestnotes in _context.Requestnotes
-										   on request.Requestid equals reqestnotes.Requestid into allrequestnotes
-										   from allnotes in allrequestnotes.DefaultIfEmpty()
-										   join requeststatuslog in _context.Requeststatuslogs
-										   on request.Requestid equals requeststatuslog.Requestid into allstatuslog
-										   from alllogs in allstatuslog.DefaultIfEmpty()
-										   select new SearchRecordVM
-										   {
-											   PatientName = requestclient.Firstname,
-											   Requestor = request.Firstname??"",
-											   DateOfService = request.Accepteddate,
-											   CloseDate = request.Createddate,
-											   Email = requestclient.Email ?? "",
-											   PhoneNumber = requestclient.Phonenumber??"",
-											   Address = requestclient.Address??"",
-											   Zip = requestclient.Zipcode ?? "",
-											   RequestStatus=request.Status,
-											   PhysicianName=request.Physician.Firstname,
-											   PhysicianNote = allnotes.Physiciannotes,
-											   CancelledByProvidor = request.Status==3?alllogs.Notes:"",
-											   AdminNotes=allnotes.Adminnotes,
-											   PatientNote=requestclient.Notes
-										   }).ToList();
-			return PartialView("SearchRecordsPartial",searchRecord);
+			_admin.CreatePartner(healthProffesionalVM);
+			return RedirectToAction("Parteners");
 		}
-        #endregion
+		#endregion
+
+		public DateTime? GetDateofService(int requestid)
+		{
+			Requeststatuslog? log = _context.Requeststatuslogs.OrderByDescending(x => x.Createddate).FirstOrDefault(x => x.Requestid == requestid && x.Status == 6 && x.Physicianid != null);
+			return log?.Createddate;
+		}
+
+		public DateTime? GetCloseDate(int requestid)
+		{
+			Requeststatuslog? log = _context.Requeststatuslogs.OrderByDescending(x => x.Createddate).FirstOrDefault(x => x.Requestid == requestid && x.Status == 9);
+			return log?.Createddate;
+		}
+		public string? GetPatientCancellationNotes(int requestid)
+		{
+			Requeststatuslog? log = _context.Requeststatuslogs.OrderByDescending(x => x.Createddate).FirstOrDefault(x => x.Requestid == requestid && x.Status == 3 && x.Physicianid != null);
+			return log?.Notes;
+		}
+
+		#region GetPatientSearchRecords
+		public IActionResult GetPatientSearchRecords(int[] status, string patientName, int requestType, string providorName, string email, string phoneNumber, bool exportStatus)
+		{
+			var data = (from r in _context.Requests
+						join rc in _context.Requestclients on r.Requestid equals rc.Requestid
+						join p in _context.Physicians on r.Physicianid equals p.Physicianid into prJoin
+						from p in prJoin.DefaultIfEmpty()
+						join rn in _context.Requestnotes on r.Requestid equals rn.Requestid into rrnJoin
+						from rn in rrnJoin.DefaultIfEmpty()
+						select new
+						{
+							Request = r,
+							RequestClient = rc,
+							Physician = p,
+							RequestNote = rn
+						}).ToList();
+
+			var searchRecords = data.Select(item => new SearchRecordVM
+			{
+				PatientName = $"{item.RequestClient.Firstname} {item.RequestClient.Lastname}",
+				Requestor = $"{item.Request.Firstname} {item.Request.Lastname}",
+				DateOfService = GetDateofService(item.Request.Requestid),
+				ServiceDate = GetDateofService(item.Request.Requestid)?.ToString("MMMM dd, yyyy") ?? "",
+				DateofClose = GetCloseDate(item.Request.Requestid)?.ToString("MMMM dd, yyyy") ?? "",
+				CloseDate = GetCloseDate(item.Request.Requestid),
+				Email = item.RequestClient.Email,
+				PhoneNumber = item.RequestClient.Phonenumber,
+				Address = item.RequestClient.Location,
+				Zip = item.RequestClient.Zipcode,
+				RequestStatus = item.Request.Status,
+				PhysicianName = item.Physician != null ? $"{item.Physician.Firstname} {item.Physician.Lastname}" : "", // Handle null Physician
+				PhysicianNote = item.RequestNote?.Physiciannotes,
+				CancelledByProvidor = GetPatientCancellationNotes(item.Request.Requestid),
+				PatientNote = item.RequestClient.Notes,
+				RequestTypeId = item.Request.Requesttypeid,
+				AdminNotes = item.RequestNote?.Adminnotes,
+				RequestId = item.Request.Requestid,
+				IsDelted=item.Request.Isdeleted,
+			}).ToList();
+			 var searchRecord = searchRecords.Where(item =>
+	   (string.IsNullOrEmpty(email) || item.Email.Contains(email)) &&
+	   (string.IsNullOrEmpty(phoneNumber) || item.PhoneNumber.Contains(phoneNumber)) &&
+	   (string.IsNullOrEmpty(patientName) || item.PatientName.ToLower().Contains(patientName)) &&
+	   (string.IsNullOrEmpty(providorName) || item.PhysicianName.ToLower().Contains(providorName)) &&
+	   (status.Length==0 || status.Contains(item.RequestStatus)) && item.IsDelted==false &&
+	   (requestType == 0 || item.RequestTypeId == requestType)
+	   //&&
+	   //(fromdos == null || item.dateofservice >= fromdos) &&
+	   //(todos == null || item.DateOfService <= ToDoS)
+   ).ToList();
+			if (exportStatus)
+			{
+				using (var memoryStream = new MemoryStream())
+				using (var writer = new StreamWriter(memoryStream))
+				using (var csvWriter = new CsvWriter(writer, CultureInfo.InvariantCulture))
+				{
+					csvWriter.WriteRecords(searchRecord);
+					writer.Flush();
+					var result = memoryStream.ToArray();
+					return File(result, "text/csv", "filtered_data.csv"); // Change content type and file name as needed
+				}
+			}
+
+			return PartialView("SearchRecordsPartial", searchRecord);
+		}
+		#endregion
 
 
+		public IActionResult DeletePatient(int id)
+		{
+			Request? request = _context.Requests.Find(id);
+				if (request != null)
+			{
+				request.Isdeleted = true;
+			_context.Requests.Update(request);
+			}
+			_context.SaveChanges();
+			return RedirectToAction("SearchRecords");
+		}
 
-        [CustomAuthorize("Role", "7")]
+
+		[CustomAuthorize("Role", "7")]
 		public IActionResult Access()
 		{
 			// Filter roles based on IsDeleted being false (not deleted)
@@ -1193,7 +1268,6 @@ namespace HelloDoc.Controllers
 				return RedirectToAction("Index", "Admin");
 			}
 		}
-		[RouteAuthFilter]
 		[HttpGet("Admin/Dashboard", Name = "AdminDashboard")]
 		public IActionResult Index()
 		{
@@ -1841,16 +1915,16 @@ namespace HelloDoc.Controllers
 			return RedirectToAction("Index", "Admin");
 		}
 
-        private bool IsAnyBitSet(BitArray bitArray)
-        {
-            foreach (bool bit in bitArray)
-            {
-                if (!bit)
-                {
-                    return true; // If any bit is false, return true
-                }
-            }
-            return false; // If all bits are true, return false
-        }
-    }
+		private bool IsAnyBitSet(BitArray bitArray)
+		{
+			foreach (bool bit in bitArray)
+			{
+				if (!bit)
+				{
+					return true; // If any bit is false, return true
+				}
+			}
+			return false; // If all bits are true, return false
+		}
+	}
 }

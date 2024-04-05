@@ -107,6 +107,7 @@ namespace BusinessLayer.Repository
                                                         join encounter in _context.Encounterforms
                                                         on req.Requestid equals encounter.RequestId into enco
                                                         from eno in enco.Where(e => e != null).DefaultIfEmpty()
+                                                        where req.Isdeleted==false
                                                         select new NewRequestTableVM
                                                         {
                                                             PatientName = reqclient.Firstname.ToLower(),
@@ -1243,7 +1244,7 @@ namespace BusinessLayer.Repository
                               FaxNumber = helthprofesion.Faxnumber,
                               PhoneNumber = helthprofesion.Phonenumber,
                               BusinesContact = helthprofesion.Businesscontact,
-                              HelthProfessionId = helthprofesion.Vendorid
+                              HelthProfessionId =(int)helthprofesion.Healthprofessionalid
                           })
                         .Where(item =>
                             (string.IsNullOrEmpty(vendorname) || item.BusinessName.Contains(vendorname)) &&

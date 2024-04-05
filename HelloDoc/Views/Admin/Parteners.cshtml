@@ -32,23 +32,38 @@
 
 
 <script>
-    $(document).ready(function () {
-        FetchPartners();
-    });
+   
+    
+    var currentPage = localStorage.getItem("currentPage");
+    if (currentPage) {
+        currentPage = currentPage
+    }
+    else {
 
+        currentPage = 1;
+    }
+        FetchPartners(currentPage);
+    $(document).on("click", "#pagination a.page-link", function () {
+        console.log("Pagination link clicked!");
+        var id = $(this).attr("id");
+        currentPage = $("#" + id).data("page");
+        localStorage.setItem("currentPage", currentPage);
+        console.log("Current Page: " + currentPage);
+        FetchPartners(currentPage);
+    });
         $('#vendorname').on("input", function () {
-            FetchPartners();
+        FetchPartners(1);
         });
         $("#helthtype").on("change", function () {
-            FetchPartners();
+        FetchPartners(1);
         });
-        function FetchPartners() {
+    function FetchPartners(page) {
             var helthProType = $('#helthtype').val();
             var vendorname = $('#vendorname').val();
             $.ajax({
                 method: 'POST',
                 url: "/Admin/PartnerFilter",
-                 data: { helthProType: helthProType, vendorname: vendorname },
+            data: { helthProType: helthProType, vendorname: vendorname, page: page },
                 success: function (response) {
             $('#PatnerPartialView').html(response)
                 },

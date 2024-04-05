@@ -45,7 +45,7 @@
                         <td>
                             <div class="d-flex gap-1">
                                 <a class="btn btn-outline-info" asp-action="EditAccess" asp-route-roleid="@item.Roleid">Edit</a>
-                                <button class="btn btn-outline-info" type="button" onclick="confirmDelete('@item.Roleid')">Delete</button>
+                                <a class="btn btn-outline-info" type="button" onclick="confirmDelete('@item.Roleid')">Delete</a>
                             </div>
                         </td>
                     </tr>

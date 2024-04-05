@@ -168,7 +168,7 @@
 
 						</div>
 						<div class="d-flex justify-content-end">
-							<div id="day" class="btn btn-outline-info  mx-2" onclick="calendar.changeView('resourceTimeline')">
+							<div id="day" class="btn btn-outline-info  mx-2" onclick="calendar.changeView('resourceTimelineDay')">
 								Day
 							</div>
 							<!-- Button trigger modal -->
@@ -239,6 +239,7 @@
 				.catch(error => console.error(error));
 		}
 		function initializeCalendar(resources, events) {
+
 			$('#regionselect').on('change', function () {
 				const newRegion = $(this).val();
 				getPhysicianShift(newRegion);
@@ -280,6 +281,12 @@
 				datesSet: function (info) {
 					var title = info.view.title;
 					$("#calendarTitle").html(title);
+					if (calendar.view.type === 'resourceTimelineWeek') {
+						calendar.setOption('slotDuration', { days: 1 });
+
+					} else {
+						calendar.setOption('slotDuration', '01:00:00');
+					}
 				},
 				resources: resources,
 				events: events,
@@ -325,6 +332,8 @@
 					});
 				},
 				eventClick: function (info) {
+					var shiftDetailId = info.event.extendedProps.ShiftDetailId;
+					var region = info.event.extendedProps.region;
 					$('#eventModal').modal('show');
 					$('#eventModal').on('click', '#editbtn', function () {
 						$('#editbtn').addClass('d-none');
@@ -334,113 +343,9 @@
 						$('#EndTimeView').prop('disabled', false);
 					});
 
-					$('#eventModal').on('click', '#returnshift', function () {
-						console.log("sdfs")
-
-						var shiftDetailId = $('#shiftDetailId').val(); // Assuming you have an input field with id 'shiftDetailId' in your modal
-						$.ajax({
-							url: '/Admin/ReturnShift',
-							type: 'POST',
-							data: { shiftDetailId: shiftDetailId, region: selectedRegion },
-							success: function (response) {
-								// Handle success
-								$('#eventModal').modal('hide');
-								const events = response.events.map(event => ({
-									id: event.id,
-									resourceId: event.resourceId,
-									title: event.title,
-									start: event.start,
-									end: event.end,
-									eventBackgroundColor: event.status == 1 ? '#e39de8' : '#32d97d',
-									color: event.status === 0 ? '#32d97d' : '#e39de8',
-									ShiftDetailId: event.shiftDetailId,
-									region: event.region
-								}));
-								calendar.removeAllEvents(); 
-								calendar.addEventSource(events); 
-								calendar.refetchEvents();
-							
-							},
-							error: function (xhr, status, error) {
-							}
-						});
-					});
-
-					$('#eventModal').on('click', '#deletebtn', function () {
-						var shiftDetailId = $('#shiftDetailId').val();
-						$.ajax({
-							url: '/Admin/DeleteShift',
-							type: 'POST',
-							data: { shiftDetailId: shiftDetailId, region: selectedRegion },
-							success: function (response) {
-								$('#eventModal').modal('hide');
-								const events = response.events.map(event => ({
-									id: event.id,
-									resourceId: event.resourceId,
-									title: event.title,
-									start: event.start,
-									end: event.end,
-									eventBackgroundColor: event.status == 1 ? '#e39de8' : '#32d97d',
-									color: event.status === 0 ? '#32d97d' : '#e39de8',
-									ShiftDetailId: event.shiftDetailId,
-									region: event.region
-								}));
-								calendar.removeAllEvents(); 
-								calendar.addEventSource(events); 
-								calendar.refetchEvents(); 
-							},
-							error: function (xhr, status, error) {
-							}
-						});
-					});
-
-					$('#eventModal').on('click', '#savebtn', function () {
-						// Get data to be saved
-						var shiftDetailId = $('#shiftDetailId').val(); // Assuming you have an input field with id 'shiftDetailId' in your modal
-						var startDate = $('#StartDateView').val();
-						var startTime = $('#StartTimeView').val();
-						var endTime = $('#EndTimeView').val();
-						console.log(shiftDetailId);
-						$.ajax({
-							url: '/Admin/SaveShift',
-							type: 'POST',
-							data: {
-								shiftDetailId: shiftDetailId,
-								startDate: startDate,
-								startTime: startTime,
-								endTime: endTime,
-							    region: selectedRegion
-							},
-							success: function (response) {
-								$('#eventModal').modal('hide');
-
-								const events = response.events.map(event => ({
-									id: event.id,
-									resourceId: event.resourceId,
-									title: event.title,
-									start: event.start,
-									end: event.end,
-									eventBackgroundColor: event.status == 0 ? '#e39de8' : '#32d97d',
-									color: event.status === 0 ? '#32d97d' : '#e39de8',
-									ShiftDetailId: event.shiftDetailId,
-									region: event.region
-								}));
-								calendar.removeAllEvents(); // Remove existing events
-								calendar.addEventSource(events); // Add updated events
-								calendar.refetchEvents(); // Refetch events from the event sources
-
-								// Hide the save button and show the edit button
-								$('#savebtn').addClass('d-none');
-								$('#editbtn').removeClass('d-none');
-							},
-							error: function (xhr, status, error) {
-								// Handle error
-							}
-						});
-					});
+					
 					// Get the ShiftDetailId from the event's extendedProps
-					var shiftDetailId = info.event.extendedProps.ShiftDetailId;
-					var region = info.event.extendedProps.region;
+					
 					console.log(region)
 					// Populate modal content with event details
 					var event = info.event;
@@ -450,7 +355,7 @@
 							<input class="d-none" id="shiftDetailId" value="${shiftDetailId}">
 							   <div class="form-floating mb-3 mt-3">
                         <select class="form-control" aria-label="Default select example" id="selectregion" disabled>
-                            <option value="">${region[0].name}</option>
+								<option value="${region[0].name}">${region[0].name}</option>
                             
                         </select>
                     </div>
@@ -508,33 +413,33 @@
 
 			});
 
-			$("#next-button").click(function () {
-				calendar.next();
-			});
+		
 
-			$("#prev-button").click(function () {
-				calendar.prev();
-			});
+			function switchView() {
+				console.log(calendar.view.type)
+				if (window.screen.width < 700) {
+					if (calendar.view.type === 'resourceTimelineWeek') {
+						calendar.changeView('dayGridWeek');
+					}
+					if (calendar.view.type === 'resourceTimelineDay') {
+						$('.fc-daygrid-day-events').text("0/24");
+						calendar.changeView('timeGridDay');
+					}
+				} else {
+					if (calendar.view.type === 'dayGridWeek') {
+						calendar.changeView('resourceTimelineWeek');
+					}
+					if (calendar.view.type === 'timeGridDay') {
+						calendar.changeView('resourceTimelineDay');
+					}
+				}
+			}
+			switchView();
+			window.addEventListener('resize', switchView);
 
-			$("#day-button").click(function () {
-				calendar.changeView('resourceTimelineDay');
-				localStorage.setItem("calendarView", "resourceTimelineDay");
-
-			});
-
-			$("#week-button").click(function () {
-				calendar.changeView('resourceTimelineWeek');
-				localStorage.setItem("calendarView", "resourceTimelineWeek");
-
-			});
-
-			$("#month-button").click(function () {
-				calendar.changeView('dayGridMonth');
-				localStorage.setItem("calendarView", "dayGridMonth");
-
-			});
 
 			calendar.render();
+
 			calendar.on('eventDrop', function (info) {
 				var shiftDetailId = info.event.extendedProps.ShiftDetailId;
 				var startDate = formatDate(info.event.start);
@@ -591,6 +496,121 @@
 	}
 </script>
 <script>
+	$('#eventModal').on('click', '#returnshift', function () {
+		console.log("sdfs")
+
+		var shiftDetailId = $('#shiftDetailId').val();
+		var selectedRegion = $('#selectregion').val();
+		
+		
+		// Assuming you have an input field with id 'shiftDetailId' in your modal
+		$.ajax({
+			url: '/Admin/ReturnShift',
+			type: 'POST',
+			data: { shiftDetailId: shiftDetailId, region: selectedRegion },
+			success: function (response) {
+				// Handle success
+				$('#eventModal').modal('hide');
+				const events = response.events.map(event => ({
+					id: event.id,
+					resourceId: event.resourceId,
+					title: event.title,
+					start: event.start,
+					end: event.end,
+					eventBackgroundColor: event.status == 1 ? '#e39de8' : '#32d97d',
+					color: event.status === 0 ? '#32d97d' : '#e39de8',
+					ShiftDetailId: event.shiftDetailId,
+					region: event.region
+				}));
+				calendar.removeAllEvents();
+				calendar.addEventSource(events);
+				calendar.refetchEvents();
+
+			},
+			error: function (xhr, status, error) {
+			}
+		});
+	});
+
+	$('#eventModal').on('click', '#deletebtn', function () {
+		var shiftDetailId = $('#shiftDetailId').val();
+		var selectedRegion = $('#selectregion').val();
+
+		$.ajax({
+			url: '/Admin/DeleteShift',
+			type: 'POST',
+			data: { shiftDetailId: shiftDetailId, region: selectedRegion },
+			success: function (response) {
+				$('#eventModal').modal('hide');
+				const events = response.events.map(event => ({
+					id: event.id,
+					resourceId: event.resourceId,
+					title: event.title,
+					start: event.start,
+					end: event.end,
+					eventBackgroundColor: event.status == 1 ? '#e39de8' : '#32d97d',
+					color: event.status === 0 ? '#32d97d' : '#e39de8',
+					ShiftDetailId: event.shiftDetailId,
+					region: event.region
+				}));
+				calendar.removeAllEvents();
+				calendar.addEventSource(events);
+				calendar.refetchEvents();
+			},
+			error: function (xhr, status, error) {
+			}
+		});
+	});
+
+	$('#eventModal').on('click', '#savebtn', function () {
+		// Get data to be saved
+		var shiftDetailId = $('#shiftDetailId').val(); // Assuming you have an input field with id 'shiftDetailId' in your modal
+		var startDate = $('#StartDateView').val();
+		var startTime = $('#StartTimeView').val();
+		var endTime = $('#EndTimeView').val();
+		var selectedRegion = $('#selectregion').val();
+
+		console.log(shiftDetailId);
+		$.ajax({
+			url: '/Admin/SaveShift',
+			type: 'POST',
+			data: {
+				shiftDetailId: shiftDetailId,
+				startDate: startDate,
+				startTime: startTime,
+				endTime: endTime,
+				region: selectedRegion
+			},
+			success: function (response) {
+				$('#eventModal').modal('hide');
+
+				const events = response.events.map(event => ({
+					id: event.id,
+					resourceId: event.resourceId,
+					title: event.title,
+					start: event.start,
+					end: event.end,
+					eventBackgroundColor: event.status == 0 ? '#e39de8' : '#32d97d',
+					color: event.status === 0 ? '#32d97d' : '#e39de8',
+					ShiftDetailId: event.shiftDetailId,
+					region: event.region
+				}));
+				calendar.removeAllEvents(); // Remove existing events
+				calendar.addEventSource(events); // Add updated events
+				calendar.refetchEvents(); // Refetch events from the event sources
+
+				// Hide the save button and show the edit button
+				$('#savebtn').addClass('d-none');
+				$('#editbtn').removeClass('d-none');
+			},
+			error: function (xhr, status, error) {
+				// Handle error
+			}
+		});
+	});
+
+
+
 	// Function to format time to HH:mm
 	function formatTime(dateString) {
 		const date = new Date(dateString);

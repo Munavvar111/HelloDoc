@@ -45,11 +45,29 @@
 </div>
 <script>
 	$(document).ready(function () {
-		function changeTable(firstname, lastname, email, phonenumber) {
+
+		var currentPage = localStorage.getItem("currentPage");
+		if (currentPage) {
+			currentPage = currentPage
+		}
+		else {
+
+			currentPage = 1;
+		}
+
+		$(document).on("click", "#pagination a.page-link", function () {
+			console.log("Pagination link clicked!");
+			var id = $(this).attr("id");
+			currentPage = $("#" + id).data("page");
+			localStorage.setItem("currentPage", currentPage);
+			console.log("Current Page: " + currentPage);
+			changeTable(null, null, null, null, currentPage);
+		});
+		function changeTable(firstname, lastname, email, phonenumber,page) {
 			$.ajax({
 				type: "GET",
 				url: "/Admin/GetPatientHistoryData",
-				data: { firstName: firstname, lastName: lastname, email: email, phoneNumber: phonenumber },
+				data: { firstName: firstname, lastName: lastname, email: email, phoneNumber: phonenumber,page:page },
 				success: function (data) {
 					console.log(data)
 					$("#searchResults").html(data);
@@ -65,7 +83,7 @@
 			var LastName = $(".lastName").val();
 			var Email = $(".email").val();
 			var PhoneNumber = $(".phoneNumber").val();
-			changeTable(FirstName, LastName, Email, PhoneNumber);
+			changeTable(FirstName, LastName, Email, PhoneNumber,1);
 		});
 
 		$("#clearBtn").click(function () {
@@ -73,11 +91,11 @@
 			$(".lastName").val("");
 			$(".email").val("");
 			$(".phoneNumber").val("");
-			changeTable(null, null, null, null);
+			changeTable(null, null, null, null,1);
 		});
 
 		// Call changeTable with null values initially
-		changeTable(null, null, null, null);
+		changeTable(null, null, null, null,currentPage);
 	});
 
 </script>

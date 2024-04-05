@@ -49,8 +49,8 @@ public partial class Request
     [Column("createddate", TypeName = "timestamp without time zone")]
     public DateTime Createddate { get; set; }
 
-    [Column("isdeleted", TypeName = "bit(1)")]
-    public BitArray? Isdeleted { get; set; }
+    [Column("isdeleted")]
+    public bool? Isdeleted { get; set; }
 
     [Column("modifieddate", TypeName = "timestamp without time zone")]
     public DateTime? Modifieddate { get; set; }

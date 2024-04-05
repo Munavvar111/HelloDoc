@@ -4,7 +4,7 @@
     Layout = "~/Views/Shared/_Layout4.cshtml";
 }
 
-<div class="container bg-light">
+<div class="container-fluid bg-light">
 	<div class="row mb-3 mt-4">
 		<div class="col">
 			<h3>Search Record</h3>
@@ -13,7 +13,7 @@
 			<button class="btn btn-info text-white" id="excelExport"><i class="bi bi-share"></i> Export Data to Excel</button>
 		</div>
 	</div>
-	<div class="container bg-body rounded shadow">
+	<div class="container-fluid bg-body rounded shadow">
 		<div class="row pt-3">
 			<div class="col-lg-3 col-md-3 col-sm-6">
 				<div class="mb-3">
@@ -39,10 +39,10 @@
 				<div class="mb-3">
 					<select class="form-select shadow-none requestType p-3" id="floatingSelect" aria-label="Floating label select example">
 						<option value="0">Select Request Type</option>
-						<option value="2">Patient</option>
-						<option value="3">Family/Friend</option>
-						<option value="4">Concierge</option>
-						<option value="1">Business</option>
+						<option value="1">Patient</option>
+						<option value="2">Family/Friend</option>
+						<option value="3">Concierge</option>
+						<option value="4">Business</option>
 
 					</select>
 				</div>
@@ -97,9 +97,26 @@
 <script>
 	$(document).ready(function () {
 		function changeTable(status, patientname, requesttype, providorname, email, phonenumber, exportstatus) {
+
+			if (status == "1") {
+				status = [1];
+			}else if (status == 2) {
+				status = [2];
+			}else if (status == 3) {
+				status = [4,5];
+			}else if (status == 4) {
+				status = [6];
+			}else if (status == 5) {
+				status = [3,7,8];
+			}else if (status == 6) {
+				status = [9];
+			}else{
+				status = [];
+			}
 			$.ajax({
-				type: "GET",
+				type: "POST",
 				url: "/Admin/GetPatientSearchRecords",
+				traditional: true,
 				data: {
 					status: status,
 					patientName: patientname,
