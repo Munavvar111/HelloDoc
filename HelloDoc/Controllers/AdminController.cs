@@ -6,6 +6,7 @@ using DataAccessLayer.DataModels;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Rotativa.AspNetCore;
 using ServiceStack;
@@ -1015,7 +1016,7 @@ namespace HelloDoc.Controllers
 				request.Isdeleted = true;
 			_context.Requests.Update(request);
 			}
-			_context.SaveChanges();
+			_admin.SaveChanges();
 			return RedirectToAction("SearchRecords");
 		}
 
@@ -1023,12 +1024,31 @@ namespace HelloDoc.Controllers
 		[CustomAuthorize("Role", "7")]
 		public IActionResult Access()
 		{
-			// Filter roles based on IsDeleted being false (not deleted)
-			var roles = _context.Roles
-								 .ToList();
-			// Switch to client-side evaluation
+			List<Role> roles = _admin.GetAllRoles();
 			var list = roles.Where(item => item.Isdeleted != null && (item.Isdeleted.Length == 0 || !item.Isdeleted[0]));
 			return View(list.ToList());
+		}
+
+		public IActionResult BlockHistory()
+		{
+			return View();
+		}
+
+		public IActionResult GetBLockHistory(string name,string email ,string phonenumber)
+		{
+			var blockdata = _context.Blockrequests.Include(b => b.Request).Where(item => string.IsNullOrEmpty(name) || item.Request.Firstname.Contains(name)).ToList();
+			return PartialView("BlockHistoryPartial", blockdata);
+		}
+		
+		public IActionResult UnBlockUser(int id)
+		{
+			Blockrequest? blockHistory = _context.Blockrequests.Find(id);
+			if (blockHistory != null)
+			{
+				_context.Remove(blockHistory);
+				_context.SaveChanges();
+			}
+			return RedirectToAction("BlockHistory");
 		}
 
 		public IActionResult SearchRecords()
@@ -1042,6 +1062,7 @@ namespace HelloDoc.Controllers
 			return View();
 		}
 
+		#region CreateAccess
 		[CustomAuthorize("Role", "7")]
 		[HttpPost]
 		public IActionResult CreateAccess(int[] rolemenu, string rolename, int accounttype)
@@ -1052,34 +1073,39 @@ namespace HelloDoc.Controllers
 			role.Createdby = "admin";
 			role.Createddate = DateTime.Now;
 			role.Isdeleted = new BitArray(new[] { false });
-			_context.Roles.Add(role);
-			_context.SaveChanges();
+			_admin.AddRoles(role);
+			_admin.SaveChanges();
 
 			foreach (var menu in rolemenu)
 			{
 				Rolemenu rolemenu1 = new Rolemenu();
 				rolemenu1.Menuid = menu;
 				rolemenu1.Roleid = role.Roleid;
-				_context.Rolemenus.Add(rolemenu1);
-				_context.SaveChanges();
+				_admin.AddRoleMenus(rolemenu1);
+				_admin.SaveChanges();
+
 			}
 			return RedirectToAction("Access");
 		}
+		#endregion
 
+		#region RoleData
 		[CustomAuthorize("Role", "7")]
 		public IActionResult RoleData(int region)
 		{
-			var menuList = _context.Menus.Where(item => region == 0 || item.Accounttype == region).ToList();
+			List<Menu> menuList = _admin.GetMenuByAccountType(region);
 			return PartialView("accesspartial", menuList);
 		}
+		#endregion
 
+		#region EditRoleData
 		[CustomAuthorize("Role", "7")]
 		public IActionResult EditRoleData(int region, int roleid)
 		{
-			var menuList = _context.Menus.Where(item => region == 0 || item.Accounttype == region).ToList();
-			var rolemenu = _context.Rolemenus.Where(item => item.Roleid == roleid).Select(item => item.Menuid).ToList();
+			List<Menu> menuList = _admin.GetMenuByAccountType(region);
+			List<int>? rolemenu = _admin.GetRoleMenuIdByRoleId(roleid);
 
-			var viewModel = new RoleMenuViewModel
+			RoleMenuViewModel viewModel = new RoleMenuViewModel
 			{
 				MenuList = menuList,
 				RoleMenuIds = rolemenu
@@ -1087,12 +1113,14 @@ namespace HelloDoc.Controllers
 
 			return PartialView("EditAccessPartial", viewModel);
 		}
+		#endregion
 
+		#region EditAccess
 		[CustomAuthorize("Role", "7")]
 		public IActionResult EditAccess(int roleid)
 		{
-			var rolemenu = _context.Rolemenus.Where(item => item.Roleid == roleid).Select(item => item.Menuid).ToList();
-			var role = _context.Roles.Where(item => item.Roleid == roleid).FirstOrDefault();
+			List<int> rolemenu = _admin.GetRoleMenuIdByRoleId(roleid);
+			Role role = _admin.GetAllRolesById(roleid);
 			AccessVM accessVM = new AccessVM();
 			accessVM.Menu = rolemenu;
 			accessVM.Name = role.Name;
@@ -1101,40 +1129,43 @@ namespace HelloDoc.Controllers
 
 			return View(accessVM);
 		}
+		#endregion
 
+		#region EditAccess
 		[CustomAuthorize("Role", "7")]
 		[HttpPost]
 		public IActionResult EditAccess(int roleid, int[] rolemenu, string rolename, int accounttype)
 		{
-			var role = _context.Roles.FirstOrDefault(item => item.Roleid == roleid);
-			var menulist = _context.Rolemenus.Where(item => item.Roleid == roleid).ToList();
+			Role role = _admin.GetAllRolesById(roleid);
+			List<Rolemenu> menulist = _admin.GetRoleMenuById(roleid);
 			role.Name = rolename;
 			role.Accounttype = (short)accounttype;
-			_context.Roles.Update(role);
-			_context.SaveChanges();
-			_context.Rolemenus.RemoveRange(menulist);
-			_context.SaveChanges();
+			_admin.UpdateRoles(role);
+			_admin.SaveChanges();
+			_admin.RemoveRangeRoleMenu(menulist);
+		     _admin.SaveChanges();
 			foreach (var item in rolemenu)
 			{
 				Rolemenu rolemenu1 = new Rolemenu();
 				rolemenu1.Menuid = item;
 				rolemenu1.Roleid = roleid;
-				_context.Rolemenus.Add(rolemenu1);
+				_admin.AddRoleMenus(rolemenu1);
 			}
-			_context.SaveChanges();
+			_admin.SaveChanges(); 
 			return RedirectToAction("Access", new { roleid = roleid });
 		}
+		#endregion
 
+		#region DeleteRole
 		[CustomAuthorize("Role", "7")]
 		public IActionResult DeleteRole(int roleId)
 		{
-
-			Role? role = _context.Roles.Where(item => item.Roleid == roleId).FirstOrDefault();
+			Role? role = _admin.GetAllRolesById(roleId);
 			if (role != null)
 			{
 				role.Isdeleted = new BitArray(new[] { true });
-				_context.Roles.Update(role);
-				_context.SaveChanges();
+				_admin.UpdateRoles(role);
+				_admin.SaveChanges();
 				TempData["SuccessMessage"] = "Your Role Has Been Deleted";
 			}
 			else
@@ -1143,61 +1174,35 @@ namespace HelloDoc.Controllers
 			}
 			return RedirectToAction("access");
 		}
+		#endregion
 
+		#region UserAccessView
 		public IActionResult UserAccess()
 		{
 			return View();
 		}
+		#endregion
 
+		#region UserData
 		public IActionResult UserData(int role)
 		{
-			var list = (from aspuser in _context.AspnetUsers
-						join physician in _context.Physicians
-						on aspuser.Aspnetuserid equals physician.Aspnetuserid into physicians
-						from totalphy in physicians.DefaultIfEmpty()
-						join admin in _context.Admins
-						on aspuser.Aspnetuserid equals admin.Aspnetuserid into admins
-						from totaladmin in admins.DefaultIfEmpty()
-						join aspnetuserrole in _context.AspnetUserroles
-						on aspuser.Aspnetuserid equals aspnetuserrole.Userid into aspnetusersroles
-						from totalasprole in aspnetusersroles.DefaultIfEmpty()
-						join roletab in _context.Roles
-						on totalasprole.Roleid equals roletab.Roleid into rolesdata
-						from roles in rolesdata.DefaultIfEmpty()
-						where (role == 0 || roles.Accounttype == role)
-						select (roles.Accounttype == 1 ?
-						 new UserAccess
-						 {
-							 AccountType = roles.Name,
-							 AccountPOC = totaladmin.Firstname,
-							 phone = totaladmin.Mobile,
-							 status = totaladmin.Adminid,
-							 roleid = roles.Roleid,
-							 AccountTypeid = roles.Accounttype,
-							 useraccessid = totaladmin.Adminid,
-						 } : new UserAccess
-						 {
-							 AccountType = roles.Name,
-							 AccountPOC = totalphy.Firstname,
-							 phone = totalphy.Mobile,
-							 status = totalphy.Status,
-							 roleid = roles.Roleid,
-							 AccountTypeid = roles.Accounttype,
-							 useraccessid = totalphy.Physicianid,
-						 })).ToList();
+			var list = _admin.GetUserData(role);
 			return PartialView("UserAccessPartial", list);
 		}
+		#endregion
 
-
+		#region CreateAdmin
 		public IActionResult CreateAdmin()
 		{
 			List<Role> roles = _context.Roles.Where(item => item.Accounttype == 1).ToList();
-			List<Region> region = _context.Regions.ToList();
+			List<Region> region = _admin.GetAllRegion();
 			AdminProfileVm profile = new AdminProfileVm();
 			profile.Regions = region;
 			profile.Roles = roles;
 			return View(profile);
 		}
+		#endregion
+
 		[HttpPost]
 		public IActionResult CreateAdmin(AdminProfileVm profileVm, int[] adminRegion)
 		{
@@ -1268,6 +1273,7 @@ namespace HelloDoc.Controllers
 				return RedirectToAction("Index", "Admin");
 			}
 		}
+		#region Index
 		[HttpGet("Admin/Dashboard", Name = "AdminDashboard")]
 		public IActionResult Index()
 		{
@@ -1275,6 +1281,9 @@ namespace HelloDoc.Controllers
 			int newcount = request.Count(item => item.Status == 1);
 			return View(request.ToList());
 		}
+		#endregion
+
+		#region SearchPatientDashboard
 		[CustomAuthorize("Dashboard", "6")]
 		public IActionResult SearchPatient(string searchValue, string selectValue, string partialName, string selectedFilter, int[] currentStatus, bool exportdata, bool exportAllData, int page, int pageSize = 5)
 		{
@@ -1301,7 +1310,9 @@ namespace HelloDoc.Controllers
 
 			return PartialView(partialName, paginatedData);
 		}
+		#endregion
 
+		#region ExportAll
 		[CustomAuthorize("Dashboard", "6")]
 		public IActionResult ExportAll(string currentStatus)
 		{
@@ -1319,32 +1330,30 @@ namespace HelloDoc.Controllers
 				var result = memoryStream.ToArray();
 				return File(result, "text/csv", "filtered_data.csv"); // Change content type and file name as needed
 			}
-
-			// Or return appropriate response format for export
 		}
+		#endregion
 
-		[CustomAuthorize("Dashboard", "6")]
-		public IActionResult Learning()
-		{
-			return View();
-		}
+		#region PendingTablePartial
 		public IActionResult PendingTablePartial()
 		{
 			return PartialView("PendingTablePartial");
 		}
+		#endregion
 
+		#region ViewCaseGet
 		[CustomAuthorize("Dashboard", "6")]
 		public IActionResult ViewCase(int id)
 		{
 			ViewCaseVM ViewCase = _admin.GetCaseById(id);
 			return View(ViewCase);
 		}
+		#endregion
 
+		#region ViewCase
 		[CustomAuthorize("Dashboard", "6")]
 		[HttpPost]
 		public async Task<IActionResult> ViewCase(ViewCaseVM viewCaseVM, int id)
 		{
-			Requestclient? requestclient = await _context.Requestclients.FindAsync(id);
 			if (ModelState.IsValid)
 			{
 				await _admin.UpdateRequestClient(viewCaseVM, id);
@@ -1352,7 +1361,9 @@ namespace HelloDoc.Controllers
 			}
 			return View();
 		}
+		#endregion
 
+		#region ViewNotes
 		[CustomAuthorize("Dashboard", "6")]
 		public IActionResult Viewnotes(int requestid)
 		{
@@ -1361,14 +1372,16 @@ namespace HelloDoc.Controllers
 			List<ViewNotesVM> result = _admin.GetNotesForRequest(requestid);
 			return View(result);
 		}
+		#endregion
 
+		#region AssignRequest
 		[CustomAuthorize("Dashboard", "6")]
 		[HttpPost]
 		public async Task<IActionResult> AssignRequest(int regionid, int physician, string description, int requestid, int status)
 		{
 			string? email = HttpContext.Session.GetString("Email");
 			int? id = HttpContext.Session.GetInt32("id");
-			Admin? admin = _context.Admins.FirstOrDefault(item => item.Email == email);
+			Admin? admin = _admin.GetAdminByEmail(email);
 			if (admin != null)
 			{
 
@@ -1382,13 +1395,15 @@ namespace HelloDoc.Controllers
 				return Json(false);
 			}
 		}
+		#endregion
 
+		#region TransferRequest
 		[CustomAuthorize("Dashboard", "6")]
 		public async Task<IActionResult> TransferRequest(int regionid, int physician, string description, int requestid, int status)
 		{
 			string? email = HttpContext.Session.GetString("Email");
 			int? id = HttpContext.Session.GetInt32("id");
-			Admin? admin = _context.Admins.FirstOrDefault(item => item.Email == email);
+			Admin? admin = _admin.GetAdminByEmail(email);
 			if (admin != null)
 			{
 
@@ -1400,6 +1415,7 @@ namespace HelloDoc.Controllers
 				return Json(false);
 			}
 		}
+		#endregion
 
 		#region ViewNotesPost
 		[HttpPost]
@@ -1426,15 +1442,18 @@ namespace HelloDoc.Controllers
 		}
 		#endregion
 
+		#region CreateRequest
 		[CustomAuthorize("Dashboard", "6")]
 		public IActionResult CreateRequest()
 		{
-			List<Region> region = _context.Regions.ToList();
+			List<Region> region = _admin.GetAllRegion();
 			RequestModel requestmoel = new RequestModel();
 			requestmoel.Regions = region;
 			return View(requestmoel);
 		}
+		#endregion
 
+		
 		[CustomAuthorize("Dashboard", "6")]
 		[HttpPost]
 		public IActionResult CreateRequest(RequestModel requestModel)
@@ -1443,7 +1462,7 @@ namespace HelloDoc.Controllers
 			{
 				string? email = HttpContext.Session.GetString("Email");
 				int? id = HttpContext.Session.GetInt32("id");
-				var statebyregionid = _context.Regions.Where(item => item.Name == requestModel.State).FirstOrDefault();
+				var statebyregionid = _admin.GetRegionByName(requestModel.State);
 
 				Admin? admin = _context.Admins.FirstOrDefault(item => item.Email == email);
 				if (admin != null)
@@ -1483,8 +1502,9 @@ namespace HelloDoc.Controllers
 						_context.SaveChanges();
 						string token = Guid.NewGuid().ToString();
 						string? resetLink = Url.Action("Index", "Register", new { userId = request1.Requestid, token }, protocol: HttpContext.Request.Scheme);
-						if (_login.IsSendEmail("munavvarpopatiya999@gmail.com", "Munavvar", $"Click <a href='{resetLink}'>here</a> to Create A new Account"))
+						if (_login.IsSendEmail(requestModel.Email, "Munavvar", $"Click <a href='{resetLink}'>here</a> to Create A new Account"))
 						{
+							
 							TempData["SuccessMessage"] = "Create Request successful!";
 							return RedirectToAction("Index", "Admin");
 						}
@@ -1514,22 +1534,21 @@ namespace HelloDoc.Controllers
 			};
 			return Json(counts);
 		}
+
+		#region GetPhysician
 		public IActionResult GetPhysician(string region)
 		{
-			// Parse the region parameter to an integer
-			if (!int.TryParse(region, out int regionId))
+			try
 			{
-				return BadRequest("Invalid region ID format.");
+				var physicians = _admin.GetPhysiciansByRegion(region);
+				return Ok(physicians);
 			}
-
-			// Retrieve physicians associated with the specified region
-			var physicians = (from physicianRegion in _context.PhysicianRegions
-							  where physicianRegion.Regionid == regionId
-							  select physicianRegion.Physician)
-							 .ToList();
-
-			return Ok(physicians);
+			catch (ArgumentException ex)
+			{
+				return BadRequest(ex.Message);
+			}
 		}
+		#endregion
 
 		#region BlockRequest
 		[HttpPost]
@@ -1754,8 +1773,8 @@ namespace HelloDoc.Controllers
 					requeststatuslog.Requestid = requestidclearcase;
 					requeststatuslog.Createddate = DateTime.Now;
 					requeststatuslog.Adminid = admin?.Adminid;
-					_context.Requeststatuslogs.Add(requeststatuslog);
-					_context.SaveChanges();
+					_admin.AddRequestStatusLog(requeststatuslog);
+					_admin.SaveChanges();
 					TempData["SuccessMessage"] = "Clear Case successfully";
 
 				}
@@ -1845,9 +1864,9 @@ namespace HelloDoc.Controllers
 		public IActionResult CloseCase(int requestid)
 		{
 
-			Requestclient? requestclient = _context.Requestclients.Where(item => item.Requestid == requestid).FirstOrDefault();
+			Requestclient? requestclient = _admin.GetRequestClientById(requestid);
 			List<Requestwisefile> requestwisedocument = _context.Requestwisefiles.Where(item => item.Requestid == requestid).ToList();
-			Request? request = _context.Requests.Where(item => item.Requestid == requestid).FirstOrDefault();
+			Request? request = _admin.GetRequestById(requestid);
 			if (request != null)
 			{
 
@@ -1881,7 +1900,7 @@ namespace HelloDoc.Controllers
 			}
 			else
 			{
-				Requestclient? requestclient = _context.Requestclients.Where(item => item.Requestid == requestid).FirstOrDefault();
+				Requestclient? requestclient = _admin.GetRequestClientById(requestid);
 				if (requestclient != null)
 				{
 
@@ -1889,17 +1908,18 @@ namespace HelloDoc.Controllers
 					requestclient.Email = closeCaseVM.Email;
 					_context.Requestclients.Update(requestclient);
 				}
-				_context.SaveChanges();
+				_admin.SaveChanges();
 				return RedirectToAction("CloseCase", new { requestid = requestid });
 			}
 		}
 
+		#region CloseCaseModal
 		public IActionResult CloseCaseModal(int requestid)
 		{
-			Request? request = _context.Requests.Where(item => item.Requestid == requestid).FirstOrDefault();
+			Request? request = _admin.GetRequestById(requestid);
 			string? email = HttpContext.Session.GetString("Email");
 			int? id = HttpContext.Session.GetInt32("id");
-			Admin? admin = _context.Admins.FirstOrDefault(item => item.Email == email);
+			Admin? admin = _admin.GetAdminByEmail(email);
 			if (request != null)
 			{
 				request.Status = 9;
@@ -1909,11 +1929,13 @@ namespace HelloDoc.Controllers
 			requeststatuslog.Createddate = DateTime.Now;
 			requeststatuslog.Requestid = requestid;
 			requeststatuslog.Adminid = admin?.Adminid;
-			_context.Requeststatuslogs.Add(requeststatuslog);
-			_context.SaveChanges();
+			_admin.AddRequestStatusLog(requeststatuslog);
+			_admin.SaveChanges();
 			TempData["SuccessMessage"] = "Close Case successfully";
 			return RedirectToAction("Index", "Admin");
 		}
+		#endregion
+
 
 		private bool IsAnyBitSet(BitArray bitArray)
 		{

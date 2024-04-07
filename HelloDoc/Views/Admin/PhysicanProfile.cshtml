@@ -1,643 +1,663 @@
 ﻿@model DataAccessLayer.CustomModel.ProviderProfileVm;
 
 @{
-    ViewData["Title"] = "PhysicanProfile";
-    Layout = "~/Views/Shared/_Layout4.cshtml";
+	ViewData["Title"] = "PhysicanProfile";
+	Layout = "~/Views/Shared/_Layout4.cshtml";
 }
+<style>
+
+</style>
 <partial name="ToasterPartialView"></partial>
 <section>
-    <div class="container bg-light mt-4">
-        <div class="d-flex justify-content-between my-3">
-            <div class="d-flex">
-                <span class="fs-2 text-muted fw-bold">My Profile</span>
-            </div>
-            <div class="d-flex justify-content-end">
-                <a asp-controller="Admin" asp-action="Index" asp-area=""
-                   class="btn btn-outline-info d-flex align-items-center">
-                    <span class="material-symbols-outlined"> chevron_left </span> Back
-                </a>
-            </div>
-        </div>
-        <div class="container border rounded-3 p-3 p-md-5 mb-3 d-flex flex-column gap-4 bg-white">
-            <h5 class="fw-bold my-3">Account Information</h5>
-            <form method="post" asp-controller="Admin" asp-action="ResetPhysicianPassword" id="resetpassword">
-                <input value="@Model.physicianid" class="d-none" asp-for="physicianid" />
-                <div class="row row-cols-1 row-cols-md-2 g-3">
-                    <div class="col">
-                        <div class="form-floating">
-                            <input asp-for=@Model.Username type="text" class="form-control" id="username" placeholder="User Name" disabled>
-                            <label for="username">User Name</label>
-                        </div>
-                    </div>
-                    <div class="col">
-                        <div class="form-floating">
-                            <input asp-for=@Model.Password type="text" class="form-control" id="Password" placeholder="Password" name="Password">
-                            <label for="Password">Password</label>
-                            <span class="error-Password text-danger"></span>
+	<div class="container bg-light mt-4">
+		<div class="d-flex justify-content-between my-3">
+			<div class="d-flex">
+				<span class="fs-2 text-muted fw-bold">My Profile</span>
+			</div>
+			<div class="d-flex justify-content-end">
+				<a asp-controller="Admin" asp-action="Index" asp-area=""
+				   class="btn btn-outline-info d-flex align-items-center">
+					<span class="material-symbols-outlined"> chevron_left </span> Back
+				</a>
+			</div>
+		</div>
+		<div class="container border rounded-3 p-3 p-md-5 mb-3 d-flex flex-column gap-4 bg-white">
+			<h5 class="fw-bold my-3">Account Information</h5>
+			<form method="post" asp-controller="Admin" asp-action="ResetPhysicianPassword" id="resetpassword">
+				<input value="@Model.physicianid" class="d-none" asp-for="physicianid" />
+				<div class="row row-cols-1 row-cols-md-2 g-3">
+					<div class="col">
+						<div class="form-floating">
+							<input asp-for=@Model.Username type="text" class="form-control" id="username" placeholder="User Name" disabled>
+							<label for="username">User Name</label>
+						</div>
+					</div>
+					<div class="col">
+						<div class="form-floating">
+							<input asp-for=@Model.Password type="text" class="form-control" id="Password" placeholder="Password" name="Password">
+							<label for="Password">Password</label>
+							<span class="error-Password text-danger"></span>
 
-                        </div>
-                    </div>
-                    <div class="col">
-                        <div class="form-floating mb-3">
-                            <select name="" class="py-2 form-control mb-3 w-100 " id="" disabled>
-                                <option>Active</option>
-                                <option>Name</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="col">
-                        <div class="form-floating mb-3">
-                            <select name="" class="py-2 form-control mb-3 w-100 " id="" disabled>
-                                <option>Admin</option>
-                                <option>MasterAdmin</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-                <div class="d-flex justify-content-end">
-                    <button type="submit" class="btn btn-outline-info">Reset Password</button>
-                </div>
-            </form>
-            <h5 class="fw-bold my-3">Physician Information</h5>
-            <form id="administrationinfo" asp-action="PhysicianInformation" asp-controller="Admin" method="post" asp-route-id="@Model.physicianid">
-                <div class="row row-cols-1 row-cols-md-2 g-3">
-                    <div class="col">
-                        <input value="@Model.physicianid" class="d-none" asp-for="physicianid" />
-                        <div class="form-floating">
-                            <input asp-for=@Model.FirstName type="text" class="form-control" id="firstname" placeholder="First Name" disabled name="firstname">
-                            <label for="firstname">First Name</label>
-                        </div>
-                    </div>
-                    <div class="col">
-                        <div class="form-floating">
-                            <input asp-for=@Model.LastName type="text" class="form-control" id="lastname" placeholder="Last Name" disabled>
-                            <label for="lastname">Last Name</label>
-                        </div>
-                    </div>
-                    <div class="col">
-                        <div class="form-floating">
-                            <input asp-for=@Model.Email type="text" class="form-control" id="email" placeholder="Email" name="email" disabled>
-                            <label for="email">Email</label>
-                            <span class="error-email text-dange"></span>
-                        </div>
-                    </div>
+						</div>
+					</div>
+					<div class="col">
+						<div class="form-floating mb-3">
+							<select name="" class="py-2 form-control mb-3 w-100 " id="" disabled>
+								<option>Active</option>
+								<option>Name</option>
+							</select>
+						</div>
+					</div>
+					<div class="col">
+						<div class="form-floating mb-3">
+							<select name="" class="py-2 form-control mb-3 w-100 " id="" disabled>
+								<option>Admin</option>
+								<option>MasterAdmin</option>
+							</select>
+						</div>
+					</div>
+				</div>
+				<div class="d-flex justify-content-end">
+					<button type="submit" class="btn btn-outline-info">Reset Password</button>
+				</div>
+			</form>
+			<h5 class="fw-bold my-3">Physician Information</h5>
+			<form id="administrationinfo" asp-action="PhysicianInformation" asp-controller="Admin" method="post" asp-route-id="@Model.physicianid">
+				<div class="row row-cols-1 row-cols-md-2 g-3">
+					<div class="col">
+						<input value="@Model.physicianid" class="d-none" asp-for="physicianid" />
+						<div class="form-floating">
+							<input asp-for=@Model.FirstName type="text" class="form-control" id="firstname" placeholder="First Name" disabled name="firstname">
+							<label for="firstname">First Name</label>
+						</div>
+					</div>
+					<div class="col">
+						<div class="form-floating">
+							<input asp-for=@Model.LastName type="text" class="form-control" id="lastname" placeholder="Last Name" disabled>
+							<label for="lastname">Last Name</label>
+						</div>
+					</div>
+					<div class="col">
+						<div class="form-floating">
+							<input asp-for=@Model.Email type="text" class="form-control" id="email" placeholder="Email" name="email" disabled>
+							<label for="email">Email</label>
+							<span class="error-email text-dange"></span>
+						</div>
+					</div>
 
-                    <div class="col">
-                        <div class="border rounded-2 tel-container">
-                            <input id="phone1"
-                                   type="tel"
-                                   class="form-control border-0 tel-input"
-                                   asp-for="MobileNo"
-                                   disabled />
-                        </div>
-                    </div>
-                    <div class="col">
-                        <div class="form-floating">
-                            <input asp-for=@Model.MedicalLicense type="text" class="form-control" id="email" placeholder="Email" name="MedicalLicense" disabled>
-                            <label for="email">Medical License#</label>
-                            <span class="error-email text-dange"></span>
-                        </div>
-                    </div>
-                    <div class="col">
-                        <div class="form-floating">
-                            <input asp-for=@Model.NPINumber type="text" class="form-control" id="email" placeholder="Email" name="NPINumber" disabled>
-                            <label for="email">NPI Number</label>
-                            <span class="error-email text-dange"></span>
-                        </div>
-                    </div>
-                    <div class="col">
-                        <div class="form-floating">
-                            <input asp-for=@Model.SynchronizationEmail type="text" class="form-control" id="email" placeholder="Email" name="SynchronizationEmail" disabled>
-                            <label for="email">Synchronization Email</label>
-                            <span class="error-email text-dange"></span>
-                        </div>
-                    </div>
-
-
-                    <div class="col-md-6">
-                        <div class="form-check form-check-inline">
-                            @if (@Model.Regions != null && Model.WorkingRegions != null)
-                            {
-
-                                @foreach (var region in Model.Regions)
-                                {
-                                    <div class="form-check form-check-inline">
-                                        <input class="form-check-input"
-                                               type="checkbox"
-                                               id="region-@region.Regionid"
-                                               name="adminRegion"
-                                               value="@region.Regionid"
-                                        @(Model.WorkingRegions.Any(wr => wr.Regionid == region.Regionid) ? "checked" : "")
-                                               disabled />
-                                        <label class="form-check-label" for="region-@region.Regionid">@region.Name</label>
-                                    </div>
-                                }
-                            }
-                            <span class="error-adminRegion text-danger"></span>
-                        </div>
-                    </div>
-
-                </div>
-                <div class="row">
-                    <div class="d-flex flex-row-reverse">
-                        <button class="btn btn-outline-info" id="EditBtn" type="button" onclick="toggleEdit()">
-                            Edit
-                        </button>
-                        <button class="btn btn-outline-info mx-3" type="Submit" id="SubBtn">
-                            Submit
-                        </button>
-                    </div>
-                </div>
-            </form>
-
-            <h5 class="fw-bold my-3">Mailing & Billing Information</h5>
-            <form id="accountinginfo" asp-action="ProviderAccountingInfo" asp-controller="admin" asp-route-physicianid="@Model.physicianid">
-                <div class="row row-cols-1 row-cols-md-2 g-3">
-                    <div class="col">
-                        <div class="form-floating">
-                            <input asp-for="@Model.Address1" type="text" class="form-control" id="address1" placeholder="Address 1" name="Address1" disabled>
-                            <label for="address1">Address 1</label>
-                            <span class="error-Address1 text-danger"></span>
-
-                        </div>
-                    </div>
-                    <div class="col">
-                        <div class="form-floating">
-                            <input asp-for=@Model.Address2 type="text" class="form-control" id="address2" placeholder="Address 2" name="Address2" disabled>
-                            <label for="address2">Address 2</label>
-                            <span class="error-Address2 text-danger"></span>
-                        </div>
-                    </div>
-                    <div class="col">
-                        <div class="form-floating">
-                            <input asp-for=@Model.City type="text" class="form-control" id="city" placeholder="City" name="City" disabled>
-                            <label for="city">City</label>
-                            <span class="error-City text-danger"></span>
-
-                        </div>
-                    </div>
-
-                    <div class="col">
-                        <div class="form-floating">
-                            <select class="form-select " aria-label="Default select example" name="state" id="cancelReason" asp-for="State" disabled>
-
-                                <option selected disabled>Select The State</option>
-                                @if (Model.Regions != null)
-                                {
-
-                                    @foreach (var region in Model.Regions)
-                                    {
-                                        <option value="@region.Regionid">@region.Name</option>
-                                    }
-                                }
-
-                            </select>
-                            <span class="error-state text-danger"></span>
-
-                        </div>
-                    </div>
-                    <div class="col">
-                        <div class="form-floating">
-                            <input asp-for=@Model.ZipCode type="text" class="form-control" id="city" placeholder="City" name="Zipcode" disabled>
-                            <label for="zip">ZipCode</label>
-                            <span class="error-Zipcode text-danger"></span>
-
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="form-floating">
-                            <input name="PhoneNumber" type="tel" id='phone2' name="MobileNo" class="form-control" placeholder="(201)555-0123" disabled asp-for="@Model.MobileNo">
-                            <span class="error-MobileNo text-danger"></span>
-
-                        </div>
-                    </div>
-                </div>
-                <div class="row mt-3">
-                    <div class="d-flex flex-row-reverse">
-                        <button class="btn btn-outline-info" id="EditBtn" type="button" onclick="toggleAdminEdit()">
-                            Edit
-                        </button>
-                        <button class="btn btn-outline-info mx-3" type="Submit" id="SubAdminBtn">
-                            Submit
-                        </button>
-                    </div>
-                </div>
-            </form>
-            <h5 class="fw-bold my-3">Provider Profile</h5>
-
-            <form id="providerprofile" asp-action="Providerprofile" asp-controller="Admin" asp-route-id="@Model.physicianid" enctype="multipart/form-data">
-                <div class="row row-cols-1 row-cols-md-2 g-3">
-
-                    <div class="col">
-                        <div class="form-floating">
-                            <input asp-for=@Model.BusinessName type="text" class="form-control" id="email" placeholder="Email" name="Businessname" disabled>
-                            <label for="email">BusinessName</label>
-                            <span class="error-email text-dange"></span>
-                        </div>
-                    </div>
-                    <div class="col">
-                        <div class="form-floating">
-                            <input asp-for=@Model.BusinessWebsite type="text" class="form-control" id="email" placeholder="Email" name="Businesswebsite" disabled>
-                            <label for="email">BusinessWebsite</label>
-                            <span class="error-email text-dange"></span>
-                        </div>
-                    </div>
-                    <div class="col">
-                        <div class="input-group input-group-lg">
-                            <div id="fileName" asp-for="FileName" class="form-control fs-6 align-middle">
-                                Select Photo
-                            </div>
-                            <input type="file" asp-for="File" name="PhotoFile" class="form-control" id="fileInput" hidden disabled accept="jpg,png" />
-                            <label class="input-group-text btn btn-info text-light" for="fileInput">
-                                <span class="material-symbols-outlined me-2">cloud_upload</span>
-                                <span class="d-none d-md-inline">Upload</span>
-                            </label>
-                        </div>
-                    </div>
-                    <div class="col">
-                        <div class="input-group input-group-lg">
-                            <div id="signname" class="form-control fs-6 align-middle">
-                                Select Signature
-                            </div>
-                            <input type="file" id="sign" name="signature" class="form-control" hidden disabled />
-                            <label class="input-group-text btn btn-info text-light" for="sign">
-                                <span class="material-symbols-outlined me-2">cloud_upload</span>
-                                <span class="d-none d-md-inline">Upload Sign</span>
-                            </label>
-                            <button class="btn btn-outline-info mx-2" type="button" id="createBtn" disabled>Create</button>
-                        </div>
-                    </div>
-
-                    <div class="col-12">
-
-                        <div id="canvasContainer" style="display: block;">
-                            <div id="signatureArea">
-                                <canvas id="signatureCanvas" width="400" height="200"></canvas>
-                            </div>
-                            <div class="buttons">
-                                <button id="clearBtn" class="btn btn-outline-info" type="button">Clear</button>
-                                <button id="saveBtn" class="btn btn-outline-info" type="button">Save</button>
-                            </div>
-                        </div>
+					<div class="col">
+						<div class="border rounded-2 tel-container">
+							<input id="phone1"
+								   type="tel"
+								   class="form-control border-0 tel-input"
+								   asp-for="MobileNo"
+								   disabled />
+						</div>
+					</div>
+					<div class="col">
+						<div class="form-floating">
+							<input asp-for=@Model.MedicalLicense type="text" class="form-control" id="email" placeholder="Email" name="MedicalLicense" disabled>
+							<label for="email">Medical License#</label>
+							<span class="error-email text-dange"></span>
+						</div>
+					</div>
+					<div class="col">
+						<div class="form-floating">
+							<input asp-for=@Model.NPINumber type="text" class="form-control" id="email" placeholder="Email" name="NPINumber" disabled>
+							<label for="email">NPI Number</label>
+							<span class="error-email text-dange"></span>
+						</div>
+					</div>
+					<div class="col">
+						<div class="form-floating">
+							<input asp-for=@Model.SynchronizationEmail type="text" class="form-control" id="email" placeholder="Email" name="SynchronizationEmail" disabled>
+							<label for="email">Synchronization Email</label>
+							<span class="error-email text-dange"></span>
+						</div>
+					</div>
 
 
-                        <img src="~/Physician/@Model.physicianid/@Model.SignatureFilename" alt="Signature" id="signatureImage" style="max-width: 100%; max-height: 200px;" />
+					<div class="col-md-6">
+						<div class="form-check form-check-inline">
+							@if (@Model.Regions != null && Model.WorkingRegions != null)
+							{
 
-                    </div>
-                    <div class="col-12 col-md-12">
-                        <div class="form-floating">
-                            <textarea class="form-control"
-                                      placeholder="Leave a comment here"
-                                      id="floatingTextarea2"
-                                      style="height: 100px"
-                                      asp-for="AdminNotes" disabled></textarea>
-                            <label for="floatingTextarea2">
-                                Admin Notes
-                                <span class="d-none d-sm-inline">(Optional)</span>
-                            </label>
-                        </div>
-                    </div>
-                </div>
-                <div class="row mt-3">
-                    <div class="d-flex flex-row-reverse">
-                        <button class="btn btn-outline-info" id="EditBtn" type="button" onclick="toggleProviderEdit()">
-                            Edit
-                        </button>
-                        <button class="btn btn-outline-info mx-3" type="Submit" id="SubProviderBtn">
-                            Submit
-                        </button>
-                    </div>
-                </div>
-            </form>
-            <h5>Onboarding</h5>
-            <form>
+								@foreach (var region in Model.Regions)
+								{
+									<div class="form-check form-check-inline">
+										<input class="form-check-input"
+											   type="checkbox"
+											   id="region-@region.Regionid"
+											   name="adminRegion"
+											   value="@region.Regionid"
+										@(Model.WorkingRegions.Any(wr => wr.Regionid == region.Regionid) ? "checked" : "")
+											   disabled />
+										<label class="form-check-label" for="region-@region.Regionid">@region.Name</label>
+									</div>
+								}
+							}
+							<span class="error-adminRegion text-danger"></span>
+						</div>
+					</div>
+
+				</div>
+				<div class="row">
+					<div class="d-flex flex-row-reverse">
+						<button class="btn btn-outline-info" id="EditBtn" type="button" onclick="toggleEdit()">
+							Edit
+						</button>
+						<button class="btn btn-outline-info mx-3" type="Submit" id="SubBtn">
+							Submit
+						</button>
+					</div>
+				</div>
+			</form>
+
+			<h5 class="fw-bold my-3">Mailing & Billing Information</h5>
+			<form id="accountinginfo" asp-action="ProviderAccountingInfo" asp-controller="admin" asp-route-physicianid="@Model.physicianid">
+				<div class="row row-cols-1 row-cols-md-2 g-3">
+					<div class="col">
+						<div class="form-floating">
+							<input asp-for="@Model.Address1" type="text" class="form-control" id="address1" placeholder="Address 1" name="Address1" disabled>
+							<label for="address1">Address 1</label>
+							<span class="error-Address1 text-danger"></span>
+
+						</div>
+					</div>
+					<div class="col">
+						<div class="form-floating">
+							<input asp-for=@Model.Address2 type="text" class="form-control" id="address2" placeholder="Address 2" name="Address2" disabled>
+							<label for="address2">Address 2</label>
+							<span class="error-Address2 text-danger"></span>
+						</div>
+					</div>
+					<div class="col">
+						<div class="form-floating">
+							<input asp-for=@Model.City type="text" class="form-control" id="city" placeholder="City" name="City" disabled>
+							<label for="city">City</label>
+							<span class="error-City text-danger"></span>
+
+						</div>
+					</div>
+
+					<div class="col">
+						<div class="form-floating">
+							<select class="form-select " aria-label="Default select example" name="state" id="cancelReason" asp-for="State" disabled>
+
+								<option selected disabled>Select The State</option>
+								@if (Model.Regions != null)
+								{
+
+									@foreach (var region in Model.Regions)
+									{
+										<option value="@region.Regionid">@region.Name</option>
+									}
+								}
+
+							</select>
+							<span class="error-state text-danger"></span>
+
+						</div>
+					</div>
+					<div class="col">
+						<div class="form-floating">
+							<input asp-for=@Model.ZipCode type="text" class="form-control" id="city" placeholder="City" name="Zipcode" disabled>
+							<label for="zip">ZipCode</label>
+							<span class="error-Zipcode text-danger"></span>
+
+						</div>
+					</div>
+					<div class="col-md-6">
+						<div class="form-floating">
+							<input name="PhoneNumber" type="tel" id='phone2' name="MobileNo" class="form-control" placeholder="(201)555-0123" disabled asp-for="@Model.MobileNo">
+							<span class="error-MobileNo text-danger"></span>
+
+						</div>
+					</div>
+				</div>
+				<div class="row mt-3">
+					<div class="d-flex flex-row-reverse">
+						<button class="btn btn-outline-info" id="EditBtn" type="button" onclick="toggleAdminEdit()">
+							Edit
+						</button>
+						<button class="btn btn-outline-info mx-3" type="Submit" id="SubAdminBtn">
+							Submit
+						</button>
+					</div>
+				</div>
+			</form>
+			<h5 class="fw-bold my-3">Provider Profile</h5>
+
+			<form id="providerprofile" asp-action="Providerprofile" asp-controller="Admin" asp-route-id="@Model.physicianid" enctype="multipart/form-data">
+				<div class="row row-cols-1 row-cols-md-2 g-3">
+
+					<div class="col">
+						<div class="form-floating">
+							<input asp-for=@Model.BusinessName type="text" class="form-control" id="email" placeholder="Email" name="Businessname" disabled>
+							<label for="email">BusinessName</label>
+							<span class="error-email text-dange"></span>
+						</div>
+					</div>
+					<div class="col">
+						<div class="form-floating">
+							<input asp-for=@Model.BusinessWebsite type="text" class="form-control" id="email" placeholder="Email" name="Businesswebsite" disabled>
+							<label for="email">BusinessWebsite</label>
+							<span class="error-email text-dange"></span>
+						</div>
+					</div>
+					<div class="col">
+						<div class="input-group input-group-lg">
+							<div id="fileName" asp-for="FileName" class="form-control fs-6 align-middle">
+								Select Photo
+							</div>
+							<input type="file" asp-for="File" name="PhotoFile" class="form-control" id="fileInput" hidden disabled accept="jpg,png" />
+							<label class="input-group-text btn btn-info text-light" for="fileInput">
+								<span class="material-symbols-outlined me-2">cloud_upload</span>
+								<span class="d-none d-md-inline">Upload</span>
+							</label>
+						</div>
+					</div>
+					<div class="col">
+						<div class="input-group input-group-lg">
+							<div id="signname" class="form-control fs-6 align-middle">
+								Select Signature
+							</div>
+							<input type="file" id="sign" name="signature" class="form-control" hidden disabled />
+							<label class="input-group-text btn btn-info text-light" for="sign">
+								<span class="material-symbols-outlined me-2">cloud_upload</span>
+								<span class="d-none d-md-inline">Upload Sign</span>
+							</label>
+							<button class="btn btn-outline-info mx-2" type="button" id="createBtn" disabled>Create</button>
+						</div>
+					</div>
+
+					<div class="col-12">
+
+						<div id="canvasContainer" style="display: block;">
+							<div id="signatureArea">
+								<canvas id="signatureCanvas" width="400" height="200"></canvas>
+							</div>
+							<div class="buttons">
+								<button id="clearBtn" class="btn btn-outline-info" type="button">Clear</button>
+								<button id="saveBtn" class="btn btn-outline-info" type="button">Save</button>
+							</div>
+						</div>
 
 
-                <div class="d-flex align-items-center gap-3 mb-3">
-                    <input type="checkbox" class="form-check-input" id="agreeToICA" name="agreeToICA" @(Model.IsAgreement[0] ? "checked" : "")>
-                    <span>Independent Contractor Agreement</span>
+						<img src="~/Physician/@Model.physicianid/@Model.SignatureFilename" alt="Signature" id="signatureImage" style="max-width: 100%; max-height: 200px;" />
 
-                    <input type="file" class="form-control" id="ICA" accept=".pdf" hidden />
-                    <label class="input-group-text btn btn-info text-light" for="ICA">
-                        <span class="d-none d-md-inline">Upload</span>
-                    </label>
-                    @if (Model.IsAgreement[0])
-                    {
-                        <a class="btn btn-info" href="~/Physician/@Model.physicianid/ICA.pdf">View</a>
-                    }
-                </div>
-                <div class="d-flex align-items-center gap-3 mb-3">
-                    <input type="checkbox" class="form-check-input" id="agreeToICA" name="agreeToICA" @(Model.IsBackground[0] ? "checked" : "")>
-                    <span>Background Check</span>
-
-                    <input type="file" class="form-control" id="Background" hidden />
-                    <label class="input-group-text btn btn-info text-light" for="Background">
-                        <span class="d-none d-md-inline">Upload</span>
-                    </label>
-                    @if (Model.IsBackground[0])
-                    {
-                        <a class="btn btn-info" href="~/Physician/@Model.physicianid/Background.pdf">View</a>
-                    }
-                </div>
-                <div class="d-flex align-items-center gap-3 mb-3">
-                    <input type="checkbox" class="form-check-input" id="agreeToICA" name="agreeToICA" @(Model.IsHippa[0] ? "checked" : "")>
-                    <span>Hippa Compalience</span>
-
-                    <input type="file" class="form-control" id="Hippa" hidden />
-                    <label class="input-group-text btn btn-info text-light" for="Hippa">
-                        <span class="d-none d-md-inline">Upload</span>
-                    </label>
-                    @if (Model.IsHippa[0])
-                    {
-                        <a class="btn btn-info" href="~/Physician/@Model.physicianid/Hippa.pdf">View</a>
-                    }
-                </div>
-           <div class="d-flex align-items-center gap-3 mb-3">
-                    <input type="checkbox" class="form-check-input" id="agreeToICA" name="agreeToICA" @(Model.NonDiscoluser[0] ? "checked" : "")>
-                    <span>Non-disclosure-Agreement</span>
-
-                    <input type="file" class="form-control" id="NonDiscoluser" hidden />
-                    <label class="input-group-text btn btn-info text-light" for="NonDiscoluser">
-                        <span class="d-none d-md-inline">Upload</span>
-                    </label>
-                    @if (Model.NonDiscoluser[0])
-                    {
-                        <a class="btn btn-info" href="~/Physician/@Model.physicianid/Hippa.pdf">View</a>
-                    }
-                </div>
-           <div class="d-flex align-items-center gap-3 mb-3">
-                    <input type="checkbox" class="form-check-input" id="agreeToICA" name="agreeToICA" @(Model.License[0] ? "checked" : "")>
-                    <span>License-Documents</span>
-
-                    <input type="file" class="form-control" id="License" hidden />
-                    <label class="input-group-text btn btn-info text-light" for="License">
-                        <span class="d-none d-md-inline">Upload</span>
-                    </label>
-                    @if (Model.License[0])
-                    {
-                        <a class="btn btn-info" href="~/Physician/@Model.physicianid/License.pdf">View</a>
-                    }
-                </div>
-            </form>
+					</div>
+					<div class="col-12 col-md-12">
+						<div class="form-floating">
+							<textarea class="form-control"
+									  placeholder="Leave a comment here"
+									  id="floatingTextarea2"
+									  style="height: 100px"
+									  asp-for="AdminNotes" disabled></textarea>
+							<label for="floatingTextarea2">
+								Admin Notes
+								<span class="d-none d-sm-inline">(Optional)</span>
+							</label>
+						</div>
+					</div>
+				</div>
+				<div class="row mt-3">
+					<div class="d-flex flex-row-reverse">
+						<button class="btn btn-outline-info" id="EditBtn" type="button" onclick="toggleProviderEdit()">
+							Edit
+						</button>
+						<button class="btn btn-outline-info mx-3" type="Submit" id="SubProviderBtn">
+							Submit
+						</button>
+					</div>
+				</div>
+			</form>
+			<h5>Onboarding</h5>
+			<form>
 
 
+				<div class="d-flex align-items-center gap-3 mb-3">
+					<input type="checkbox" class="form-check-input" id="agreeToICA" name="agreeToICA" @(Model.IsAgreement[0] ? "checked" : "")>
+					<span>Independent Contractor Agreement</span>
 
-        </div>
-    </div>
+					<div class="file-input-container d-flex align-items-center">
+						<input type="file" class="form-control" id="ICA" accept=".pdf" hidden />
+						<label class="input-group-text btn btn-info text-light" for="ICA">
+							<span class="d-none d-md-inline">Upload</span>
+							<span class="d-md-none">Upload</span>
+						</label>
+					</div>
+					@if (Model.IsAgreement[0])
+					{
+						<a class="btn btn-info" href="~/Physician/@Model.physicianid/ICA.pdf">View</a>
+					}
+				</div>
+				<div class="d-flex align-items-center gap-3 mb-3">
+					<input type="checkbox" class="form-check-input" id="agreeToICA" name="agreeToICA" @(Model.IsBackground[0] ? "checked" : "")>
+					<span>Background Check</span>
+
+					<div class="file-input-container d-flex align-items-center">
+						<input type="file" class="form-control" id="Background" hidden />
+						<label class="input-group-text btn btn-info text-light" for="Background">
+							<span class="d-none d-md-inline">Upload</span>
+							<span class="d-md-none">Upload</span>
+						</label>
+					</div>
+					@if (Model.IsBackground[0])
+					{
+						<a class="btn btn-info" href="~/Physician/@Model.physicianid/Background.pdf">View</a>
+					}
+				</div>
+				<div class="d-flex align-items-center gap-3 mb-3">
+					<input type="checkbox" class="form-check-input" id="agreeToICA" name="agreeToICA" @(Model.IsHippa[0] ? "checked" : "")>
+					<span>Hippa Compalience</span>
+
+					<div class="file-input-container d-flex align-items-center">
+						<input type="file" class="form-control" id="Hippa" hidden />
+						<label class="input-group-text btn btn-info text-light" for="Hippa">
+							<span class="d-none d-md-inline">Upload</span>
+							<span class="d-md-none">Upload</span>
+
+						</label>
+					</div>
+					@if (Model.IsHippa[0])
+					{
+						<a class="btn btn-info" href="~/Physician/@Model.physicianid/Hippa.pdf">View</a>
+					}
+				</div>
+				<div class="d-flex align-items-center gap-3 mb-3">
+					<input type="checkbox" class="form-check-input" id="agreeToICA" name="agreeToICA" @(Model.NonDiscoluser[0] ? "checked" : "")>
+					<span>Non-disclosure-Agreement</span>
+
+					<div class="file-input-container d-flex align-items-center">
+						<input type="file" class="form-control" id="NonDiscoluser" hidden />
+						<label class="input-group-text btn btn-info text-light" for="NonDiscoluser">
+							<span class="d-none d-md-inline">Upload</span>
+							<span class="d-md-none">Upload</span>
+					</div>
+					</label>
+					@if (Model.NonDiscoluser[0])
+					{
+						<a class="btn btn-info" href="~/Physician/@Model.physicianid/Hippa.pdf">View</a>
+					}
+				</div>
+				<div class="d-flex align-items-center gap-3 mb-3">
+					<input type="checkbox" class="form-check-input" id="agreeToICA" name="agreeToICA" @(Model.License[0] ? "checked" : "")>
+					<span>License-Documents</span>
+
+					<div class="file-input-container d-flex align-items-center">
+						<input type="file" class="form-control" id="License" hidden />
+						<label class="input-group-text btn btn-info text-light" for="License">
+							<span class="d-none d-md-inline">Upload</span>
+							<span class="d-md-none">Upload</span>
+						</label>
+					</div>
+
+					@if (Model.License[0])
+					{
+						<a class="btn btn-info" href="~/Physician/@Model.physicianid/License.pdf">View</a>
+					}
+				</div>
+			</form>
+
+
+
+		</div>
+	</div>
 </section>
 <script>
 
-    $("#SubBtn").hide();
-    $("#SubAdminBtn").hide();
-    $('#SubProviderBtn').hide();
-    function toggleEdit() {
-        var inputFields = document.querySelectorAll('#administrationinfo input');
+	$("#SubBtn").hide();
+	$("#SubAdminBtn").hide();
+	$('#SubProviderBtn').hide();
+	function toggleEdit() {
+		var inputFields = document.querySelectorAll('#administrationinfo input');
 
-        inputFields.forEach(function (input) {
-            input.disabled = !input.disabled;
-        });
+		inputFields.forEach(function (input) {
+			input.disabled = !input.disabled;
+		});
 
-        $("#SubBtn").toggle();
-    }
-    function toggleAdminEdit() {
-        var inputFields = document.querySelectorAll('#accountinginfo input,#accountinginfo select');
+		$("#SubBtn").toggle();
+	}
+	function toggleAdminEdit() {
+		var inputFields = document.querySelectorAll('#accountinginfo input,#accountinginfo select');
 
-        inputFields.forEach(function (input) {
-            input.disabled = !input.disabled;
-        });
+		inputFields.forEach(function (input) {
+			input.disabled = !input.disabled;
+		});
 
-        $("#SubAdminBtn").toggle();
-    }
-    function toggleProviderEdit() {
-        var inputFields = document.querySelectorAll('#providerprofile input, #providerprofile select,#providerprofile textarea');
-        var fileInput = document.querySelectorAll('#providerprofile input[type="file"]');
-        console.log(fileInput)
-        var create = document.querySelector('#createBtn');
-        var canvas = document.querySelector('#signatureCanvas');
+		$("#SubAdminBtn").toggle();
+	}
+	function toggleProviderEdit() {
+		var inputFields = document.querySelectorAll('#providerprofile input, #providerprofile select,#providerprofile textarea');
+		var fileInput = document.querySelectorAll('#providerprofile input[type="file"]');
+		console.log(fileInput)
+		var create = document.querySelector('#createBtn');
+		var canvas = document.querySelector('#signatureCanvas');
 
-        inputFields.forEach(function (input) {
-            if (input.type !== "file" && input !== canvas) {
-                input.disabled = !input.disabled;
-            }
-        });
-        fileInput.forEach(function (fileinput) {
+		inputFields.forEach(function (input) {
+			if (input.type !== "file" && input !== canvas) {
+				input.disabled = !input.disabled;
+			}
+		});
+		fileInput.forEach(function (fileinput) {
 
-            if (fileinput) {
-                fileinput.disabled = !fileinput.disabled;
-            }
-        });
+			if (fileinput) {
+				fileinput.disabled = !fileinput.disabled;
+			}
+		});
 
-        if (canvas) {
-            canvas.disabled = !canvas.disabled;
-        }
-        if (create) {
-            create.disabled=!create.disabled
-        }
-        $('#signatureImage').toggle(); // Hide the image
-        $('#canvasContainer').toggle();
-        $("#SubProviderBtn").toggle();
-    }
+		if (canvas) {
+			canvas.disabled = !canvas.disabled;
+		}
+		if (create) {
+			create.disabled = !create.disabled
+		}
+		$('#signatureImage').toggle(); // Hide the image
+		$('#canvasContainer').toggle();
+		$("#SubProviderBtn").toggle();
+	}
 
 
 </script>
 
 <script>
-    const phone1 = document.querySelector("#phone1");
-    const phoneInput1 = window.intlTelInput(phone1, {
-        utilsScript:
-            "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",
-        nationalMode: false,
-        showSelectedDialCode: true,
-        autoInsertDialCode: true,
-        formatOnDisplay: false,
-    });
+	const phone1 = document.querySelector("#phone1");
+	const phoneInput1 = window.intlTelInput(phone1, {
+		utilsScript:
+			"https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",
+		nationalMode: false,
+		showSelectedDialCode: true,
+		autoInsertDialCode: true,
+		formatOnDisplay: false,
+	});
 </script>
 <script src="https://cdn.jsdelivr.net/npm/formdata-polyfill"></script>
 
 
 <script>
-    $('#canvasContainer').hide(); // Hide the image
+	$('#canvasContainer').hide(); // Hide the image
 
-    $("#createBtn").click(function () {
-        if ($("#signatureImage").is(":visible")) {
-            $('#signatureImage').hide(); // Hide the image
-            $('#canvasContainer').show(); // Show canvas container
-        } else {
-            $('#canvasContainer').show(); // Show canvas container
-        }
-    });
+	$("#createBtn").click(function () {
+		if ($("#signatureImage").is(":visible")) {
+			$('#signatureImage').hide(); // Hide the image
+			$('#canvasContainer').show(); // Show canvas container
+		} else {
+			$('#canvasContainer').show(); // Show canvas container
+		}
+	});
 
-    document.addEventListener("DOMContentLoaded", function () {
-        var canvas = document.getElementById('signatureCanvas');
-        var ctx = canvas.getContext("2d");
-        var isDrawing = false;
-        var lastX = 0;
-        var lastY = 0;
-        var signatureData;
-        canvas.addEventListener('mousedown', startDrawing);
-        canvas.addEventListener('mousemove', draw);
-        canvas.addEventListener('mouseup', stopDrawing);
-        canvas.addEventListener('mouseout', stopDrawing);
+	document.addEventListener("DOMContentLoaded", function () {
+		var canvas = document.getElementById('signatureCanvas');
+		var ctx = canvas.getContext("2d");
+		var isDrawing = false;
+		var lastX = 0;
+		var lastY = 0;
+		var signatureData;
+		canvas.addEventListener('mousedown', startDrawing);
+		canvas.addEventListener('mousemove', draw);
+		canvas.addEventListener('mouseup', stopDrawing);
+		canvas.addEventListener('mouseout', stopDrawing);
 
-        document.getElementById('clearBtn').addEventListener('click', clearSignature);
-        document.getElementById('saveBtn').addEventListener('click', saveSignature);
+		document.getElementById('clearBtn').addEventListener('click', clearSignature);
+		document.getElementById('saveBtn').addEventListener('click', saveSignature);
 
-        function startDrawing(e) {
-            isDrawing = true;
-            [lastX, lastY] = [e.offsetX, e.offsetY];
-        }
+		function startDrawing(e) {
+			isDrawing = true;
+			[lastX, lastY] = [e.offsetX, e.offsetY];
+		}
 
-        function draw(e) {
-            if (!isDrawing) return;
-            ctx.beginPath();
-            ctx.moveTo(lastX, lastY);
-            ctx.lineTo(e.offsetX, e.offsetY);
-            ctx.strokeStyle = '#000';
-            ctx.lineWidth = 2;
-            ctx.lineCap = 'round';
-            ctx.stroke();
-            [lastX, lastY] = [e.offsetX, e.offsetY];
-        }
+		function draw(e) {
+			if (!isDrawing) return;
+			ctx.beginPath();
+			ctx.moveTo(lastX, lastY);
+			ctx.lineTo(e.offsetX, e.offsetY);
+			ctx.strokeStyle = '#000';
+			ctx.lineWidth = 2;
+			ctx.lineCap = 'round';
+			ctx.stroke();
+			[lastX, lastY] = [e.offsetX, e.offsetY];
+		}
 
-        function stopDrawing() {
-            isDrawing = false;
-            signatureData = true;
+		function stopDrawing() {
+			isDrawing = false;
+			signatureData = true;
 
-        }
+		}
 
-        function clearSignature() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            signatureData = null;
-           
+		function clearSignature() {
+			ctx.clearRect(0, 0, canvas.width, canvas.height);
+			signatureData = null;
 
-        }
-        function saveSignature() {
-            if (!signatureData) {
-                toastr.error('Please draw a signature before saving.');
-                return;
-            }
 
-            var canvas = document.getElementById('signatureCanvas');
-            var dataUrl = canvas.toDataURL('image/png');
+		}
+		function saveSignature() {
+			if (!signatureData) {
+				toastr.error('Please draw a signature before saving.');
+				return;
+			}
 
-            // Convert data URL to blob
-            fetch(dataUrl)
-                .then(res => res.blob())
-                .then(blob => {
-                    var formData = new FormData();
-                    formData.append('signatureImage', blob);
-                    formData.append('id', @Model.physicianid);
+			var canvas = document.getElementById('signatureCanvas');
+			var dataUrl = canvas.toDataURL('image/png');
 
-                    $.ajax({
-                        url: '/Admin/SaveSignatureImage',
-                        type: 'POST',
-                        data: formData,
-                        processData: false,
-                        contentType: false,
-                        success: function (response) {
-                            // Handle succes response
-                            toastr.success('Signature saved successfully.');
-                            window.location.reload(true);
-                        },
-                        error: function (xhr, status, error) {
-                            // Handle error response
-                            toastr.error('Error occurred while saving signature.');
-                            console.error(xhr.responseText);
-                        }
-                    });
-                })
-                .catch(error => {
-                    console.error('Error converting data URL to blob:', error);
-                });
-        }
+			// Convert data URL to blob
+			fetch(dataUrl)
+				.then(res => res.blob())
+				.then(blob => {
+					var formData = new FormData();
+					formData.append('signatureImage', blob);
+					formData.append('id', @Model.physicianid);
 
-    });
+					$.ajax({
+						url: '/Admin/SaveSignatureImage',
+						type: 'POST',
+						data: formData,
+						processData: false,
+						contentType: false,
+						success: function (response) {
+							// Handle succes response
+							toastr.success('Signature saved successfully.');
+							window.location.reload(true);
+						},
+						error: function (xhr, status, error) {
+							// Handle error response
+							toastr.error('Error occurred while saving signature.');
+							console.error(xhr.responseText);
+						}
+					});
+				})
+				.catch(error => {
+					console.error('Error converting data URL to blob:', error);
+				});
+		}
+
+	});
 
 </script>
 <script>
-    document.getElementById("fileInput").onchange = function () {
-        let path = this.value.substr(this.value.lastIndexOf(`\\`) + 1);
-        const allowedExtensions = ['jpg', 'png'];
-        const fileExtension = this.files[0].name.split('.').pop().toLowerCase();
+	document.getElementById("fileInput").onchange = function () {
+		let path = this.value.substr(this.value.lastIndexOf(`\\`) + 1);
+		const allowedExtensions = ['jpg', 'png'];
+		const fileExtension = this.files[0].name.split('.').pop().toLowerCase();
 
-        if (allowedExtensions.includes(fileExtension)) {
-            document.getElementById("fileName").innerText = filename;
-        } else {
-            alert("Please select a JPG or PNG file only.");
-            document.getElementById("fileName").innerText = "Please Select File";
-            this.value = "";
-            this.disabled = false;
-        }
-    };
+		if (allowedExtensions.includes(fileExtension)) {
+			document.getElementById("fileName").innerText = filename;
+		} else {
+			alert("Please select a JPG or PNG file only.");
+			document.getElementById("fileName").innerText = "Please Select File";
+			this.value = "";
+			this.disabled = false;
+		}
+	};
 
 
 </script>
 
 <script>
-    document.getElementById("sign").onchange = function () {
-        const filename = this.value.split("\\").pop(); // For Windows systems
+	document.getElementById("sign").onchange = function () {
+		const filename = this.value.split("\\").pop(); // For Windows systems
 
-        const allowedExtensions = ['jpg', 'png'];
-        const fileExtension = this.files[0].name.split('.').pop().toLowerCase();
+		const allowedExtensions = ['jpg', 'png'];
+		const fileExtension = this.files[0].name.split('.').pop().toLowerCase();
 
-        if (allowedExtensions.includes(fileExtension)) {
-            document.getElementById("signname").innerText = filename;
-        } else {
-            alert("Please select a JPG or PNG file only.");
-            document.getElementById("signname").innerText = "";
-            this.value = "";
-            this.disabled = false;
-        }
+		if (allowedExtensions.includes(fileExtension)) {
+			document.getElementById("signname").innerText = filename;
+		} else {
+			alert("Please select a JPG or PNG file only.");
+			document.getElementById("signname").innerText = "";
+			this.value = "";
+			this.disabled = false;
+		}
 
-    };
+	};
 </script>
 <script>
-    const fileInput = $('#ICA');
-    const BackGroundCheck = $('#Background');
-    const Hippa = $('#Hippa');
-    const HippNonDiscolusera = $('#NonDiscoluser');
-    const License = $('#License');
+	const fileInput = $('#ICA');
+	const BackGroundCheck = $('#Background');
+	const Hippa = $('#Hippa');
+	const HippNonDiscolusera = $('#NonDiscoluser');
+	const License = $('#License');
 
-    BackGroundCheck.change(function () {
-        handleFileUpload(this);
-    });
-    License.change(function () {
-        handleFileUpload(this);
-    });
-    fileInput.change(function () {
-        handleFileUpload(this);
-    });
-    Hippa.change(function () {
-        handleFileUpload(this);
-    });
-    HippNonDiscolusera.change(function () {
-        handleFileUpload(this);
-    })
-    const handleFileUpload = function (fileInput) {
-        if (!fileInput.files.length) {
-            toastr.error('Please Select File');
-            return; // No file selected, do nothing
-        }
+	BackGroundCheck.change(function () {
+		handleFileUpload(this);
+	});
+	License.change(function () {
+		handleFileUpload(this);
+	});
+	fileInput.change(function () {
+		handleFileUpload(this);
+	});
+	Hippa.change(function () {
+		handleFileUpload(this);
+	});
+	HippNonDiscolusera.change(function () {
+		handleFileUpload(this);
+	})
+	const handleFileUpload = function (fileInput) {
+		if (!fileInput.files.length) {
+			toastr.error('Please Select File');
+			return; // No file selected, do nothing
+		}
 
-        const formData = new FormData();
-        formData.append('File', fileInput.files[0]);  // Append file to FormData
-        formData.append('fileName', fileInput.id); // Indicate file type in server-side processing (optional)
-        formData.append('physicianid', @Model.physicianid);
-        // Replace with your server-side URL and data handling logic
-        $.ajax({
-            url: '/Admin/UploadDoc',
-            type: 'POST',
-            data: formData,
-            processData: false,
-            contentType: false,
-            success: function (data) {
-                console.log('Success:', data);
-                location.reload();
-            },
-            error: function (error) {
-                console.error('Error:', error);
-                toastr.error('An error occurred while saving the agreement. Please try again.');
-            }
-        })
-    };
+		const formData = new FormData();
+		formData.append('File', fileInput.files[0]);  // Append file to FormData
+		formData.append('fileName', fileInput.id); // Indicate file type in server-side processing (optional)
+		formData.append('physicianid', @Model.physicianid);
+		// Replace with your server-side URL and data handling logic
+		$.ajax({
+			url: '/Admin/UploadDoc',
+			type: 'POST',
+			data: formData,
+			processData: false,
+			contentType: false,
+			success: function (data) {
+				console.log('Success:', data);
+				location.reload();
+			},
+			error: function (error) {
+				console.error('Error:', error);
+				toastr.error('An error occurred while saving the agreement. Please try again.');
+			}
+		})
+	};
 </script>

@@ -12,6 +12,7 @@ using BC = BCrypt.Net.BCrypt;
 using System.Net;
 using System.Collections;
 using System.Transactions;
+using Org.BouncyCastle.Asn1.Ocsp;
 
 namespace BusinessLayer.Repository
 {
@@ -37,9 +38,36 @@ namespace BusinessLayer.Repository
         {
             return _context.Healthprofessionaltypes.ToList();
         }
-
-        public List<Region> GetAllRegion()
+        public List<Role> GetAllRoles()
         {
+            return _context.Roles.ToList();
+        }
+        public void AddRoles(Role role)
+        {
+            _context.Roles.Add(role);   
+        }
+        public Role GetAllRolesById(int roleId)
+        {
+            
+           Role? role= _context.Roles.Where(item => item.Roleid == roleId).FirstOrDefault();
+			if (role == null)
+			{
+				throw new Exception("Role not found"); // or use a more specific exception type
+			}
+            return role;
+
+		}
+          public void AddRoleMenus(Rolemenu rolemenu)
+        {
+            _context.Rolemenus.Add(rolemenu);   
+        }
+        public List<Menu> GetMenuByAccountType(int accounttype)
+		{
+			List<Menu> menus= _context.Menus.Where(item => accounttype == 0 || item.Accounttype == accounttype).ToList();
+            return menus;
+		}
+		public List<Region> GetAllRegion()
+		{
             return _context.Regions.ToList();
         }
         public Physician GetPhysicianByEmail(string email)
@@ -55,9 +83,29 @@ namespace BusinessLayer.Repository
         {
             return _context.Shiftdetails.Find(shiftDetailId);
         }
+        public List<int> GetRoleMenuIdByRoleId(int roleId) {
+			List<int> Rolemenus=_context.Rolemenus.Where(item => item.Roleid == roleId).Select(item => item.Menuid).ToList();
+            return Rolemenus;
+		}
+        public List<Rolemenu> GetRoleMenuById(int roleId) {
+			List<Rolemenu> Rolemenus=_context.Rolemenus.Where(item => item.Roleid == roleId).ToList();
+            return Rolemenus;
+		}
+        public void UpdateRoleMenus(Rolemenu rolemenu)
+        {
+            _context.Rolemenus.Update(rolemenu);
+        }
 
+        public void UpdateRoles(Role role)
+        {
+            _context.Roles.Update(role);
+        }
+        public void RemoveRangeRoleMenu(List<Rolemenu> rolemenu)
+        {
+			_context.Rolemenus.RemoveRange(rolemenu);
+		}
 
-        public IQueryable<Region> GetRegionsByRegionId(int regionId)
+		public IQueryable<Region> GetRegionsByRegionId(int regionId)
         {
             return _context.Regions.Where(i => i.Regionid == regionId);
         }
@@ -85,12 +133,23 @@ namespace BusinessLayer.Repository
         {
             _context.Shiftdetails.Update(shiftdetail);
         }
-        public void UpdateHealthPrifessional(Healthprofessional healthprofessional)
+
+        public void UpdateRequestStatusLog(Requeststatuslog requeststatuslog)
+        {
+            _context.Requeststatuslogs.Update(requeststatuslog);
+        }
+
+		public void UpdateHealthPrifessional(Healthprofessional healthprofessional)
         {
             _context.Healthprofessionals.Update(healthprofessional);
         }
 
-        public void SaveChanges()
+        public void AddRequestStatusLog(Requeststatuslog requeststatuslog)
+        {
+            _context.Requeststatuslogs.Add(requeststatuslog);
+        }
+
+		public void SaveChanges()
         {
             _context.SaveChanges();
         }
@@ -472,7 +531,7 @@ namespace BusinessLayer.Repository
                     {
                         Email = request.Email,
                         Phonenumber = request.Phonenumber,
-                        Requestid = requestId.ToString(),
+                        Requestid = requestId,
                         Createddate = DateTime.Now,
                         Reason = blockReason
                     };
@@ -1324,12 +1383,80 @@ namespace BusinessLayer.Repository
                              .ToList();
             return physicians;
         }
-        #endregion
+		#endregion
 
-        public Region GetRegionByName(string state)
+		#region GetUserData
+		public List<UserAccess> GetUserData(int role)
+		{
+			var list = (from aspuser in _context.AspnetUsers
+						join physician in _context.Physicians
+						on aspuser.Aspnetuserid equals physician.Aspnetuserid into physicians
+						from totalphy in physicians.DefaultIfEmpty()
+						join admin in _context.Admins
+						on aspuser.Aspnetuserid equals admin.Aspnetuserid into admins
+						from totaladmin in admins.DefaultIfEmpty()
+						join aspnetuserrole in _context.AspnetUserroles
+						on aspuser.Aspnetuserid equals aspnetuserrole.Userid into aspnetusersroles
+						from totalasprole in aspnetusersroles.DefaultIfEmpty()
+						join roletab in _context.Roles
+						on totalasprole.Roleid equals roletab.Roleid into rolesdata
+						from roles in rolesdata.DefaultIfEmpty()
+						where (role == 0 || roles.Accounttype == role)
+						select (roles.Accounttype == 1 ?
+							new UserAccess
+							{
+								AccountType = roles.Name,
+								AccountPOC = totaladmin.Firstname,
+								phone = totaladmin.Mobile,
+								status = totaladmin.Adminid,
+								roleid = roles.Roleid,
+								AccountTypeid = roles.Accounttype,
+								useraccessid = totaladmin.Adminid,
+							} : new UserAccess
+							{
+								AccountType = roles.Name,
+								AccountPOC = totalphy.Firstname,
+								phone = totalphy.Mobile,
+								status = totalphy.Status,
+								roleid = roles.Roleid,
+								AccountTypeid = roles.Accounttype,
+								useraccessid = totalphy.Physicianid,
+							})).ToList();
+			return list;
+		}
+		#endregion
+
+		#region GetPhysician
+		public List<Physician> GetPhysiciansByRegion(string region)
+		{
+			if (!int.TryParse(region, out int regionId))
+			{
+				throw new ArgumentException("Invalid region ID format.");
+			}
+
+			var physicians = (from physicianRegion in _context.PhysicianRegions
+							  where physicianRegion.Regionid == regionId
+							  select physicianRegion.Physician)
+							 .ToList();
+
+			return physicians;
+		}
+		#endregion
+
+        public Request GetRequestById(int requestId)
+        {
+            return _context.Requests.Find(requestId);
+        }
+		public Region GetRegionByName(string state)
         {
             return _context.Regions.Where(r => r.Name == state).FirstOrDefault();
         }
-    }
+
+        public Requestclient GetRequestClientById(int requestid)
+        {
+			return _context.Requestclients.Where(item => item.Requestid == requestid).FirstOrDefault();
+		}
+
+	}
 }
 

@@ -1,11 +1,11 @@
 ﻿@model List<DataAccessLayer.CustomModel.PatientHistoryVM>
 @{
-    ViewData["Title"] = "PatientRecords";
-    Layout = "~/Views/Shared/_Layout4.cshtml";
+	ViewData["Title"] = "PatientRecords";
+	Layout = "~/Views/Shared/_Layout4.cshtml";
 }
 
 <div class="container mt-3">
-	
+
 	<div class="d-flex justify-content-between my-3">
 		<div class="d-flex">
 			<span class="fs-2 text-muted fw-bold">Patient Records</span>
@@ -16,81 +16,153 @@
 			</button>
 		</div>
 	</div>
-		<div class=" mt-4 mb-border-0">
-			<table class="table table-hover">
-				<thead class="table-light">
+	<div class="table-responsive mt-4 mb-border-0">
+		<table class="table table-hover d-md-table d-none">
+			<thead class="table-light">
+				<tr>
+					<th scope="col">Clint</th>
+					<th scope="col">Created Date</th>
+					<th scope="col">Conformation</th>
+					<th scope="col">Providor Name</th>
+					<th scope="col">Conclude Date</th>
+					<th scope="col">Status</th>
+					<th scope="col">Final Report</th>
+					<th scope="col">Actions</th>
+				</tr>
+			</thead>
+			<tbody>
+				@foreach (var item in Model)
+				{
 					<tr>
-						<th scope="col">Clint</th>
-						<th scope="col">Created Date</th>
-						<th scope="col">Conformation</th>
-						<th scope="col">Providor Name</th>
-						<th scope="col">Conclude Date</th>
-						<th scope="col">Status</th>
-						<th scope="col">Final Report</th>
-						<th scope="col">Actions</th>
-					</tr>
-				</thead>
-				<tbody>
-					@foreach (var item in Model)
-					{
-						<tr>
-							<td scope="row">
-								@item.ClientName
-							</td>
-							<td scope="row">@item.CreatedDate</td>
-							<td scope="row">@item.ConfirmationNumber</td>
-							<td scope="row">@item.ProvideName</td>
-							<td scope="row">@item.ConcludeDate</td>
-							<td scope="row">
-								@if (item.Status == 1)
-								{
-									<span>New</span>
-								}
-								@if (item.Status == 2)
-								{
-									<span>Pending</span>
-								}
-								@if (item.Status == 4 || item.Status == 5)
-								{
-									<span>Active</span>
-								}
-								@if (item.Status == 6)
-								{
-									<span>Conclude</span>
-								}
-								@if (item.Status == 3 || item.Status == 7 || item.Status == 8)
-								{
-									<span>To Close</span>
-								}
-								@if (item.Status == 9)
-								{
-									<span>Unpaid</span>
-								}
-							</td>
-							<td>
-								@if (item.IsFinalize == true)
-								{
+						<td scope="row">
+							@item.ClientName
+						</td>
+						<td scope="row">@item.CreatedDate</td>
+						<td scope="row">@item.ConfirmationNumber</td>
+						<td scope="row">@item.ProvideName</td>
+						<td scope="row">@item.ConcludeDate</td>
+						<td scope="row">
+							@if (item.Status == 1)
+							{
+								<span>New</span>
+							}
+							@if (item.Status == 2)
+							{
+								<span>Pending</span>
+							}
+							@if (item.Status == 4 || item.Status == 5)
+							{
+								<span>Active</span>
+							}
+							@if (item.Status == 6)
+							{
+								<span>Conclude</span>
+							}
+							@if (item.Status == 3 || item.Status == 7 || item.Status == 8)
+							{
+								<span>To Close</span>
+							}
+							@if (item.Status == 9)
+							{
+								<span>Unpaid</span>
+							}
+						</td>
+						<td>
+							@if (item.IsFinalize == true)
+							{
 								<a asp-action="GeneratePDF" asp-route-requestid="@item.RequestId" class="btn btn-outline-info rounded">View</a>
-								}
+							}
 
-							</td>
-							<td scope="col">
+						</td>
+						<td scope="col">
 
-								<div class="dropdown">
-									<a class="btn btn-outline-info text-decoration-none" dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-										Action
-									</a>
-									<div class="dropdown-menu dropdown-menu-right dropdown-menu-lg-left" aria-labelledby="dropdownMenuButton">
-											<a asp-action="ViewCase" asp-route-id="@item.RequestClientId" class="dropdown-item text-secondary">View Case</a>
-											<a asp-action="ViewCase" asp-route-id="@item.RequestClientId" class="dropdown-item text-secondary">Chat</a>
-											<a asp-action="ViewUploads" asp-route-id="@item.RequestId" class="dropdown-item text-secondary"> Documents</a>
-									</div>
+							<div class="dropdown">
+								<a class="btn btn-outline-info text-decoration-none" dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+									Action
+								</a>
+								<div class="dropdown-menu dropdown-menu-right dropdown-menu-lg-left" aria-labelledby="dropdownMenuButton">
+									<a asp-action="ViewCase" asp-route-id="@item.RequestClientId" class="dropdown-item text-secondary">View Case</a>
+									<a asp-action="ViewCase" asp-route-id="@item.RequestClientId" class="dropdown-item text-secondary">Chat</a>
+									<a asp-action="ViewUploads" asp-route-id="@item.RequestId" class="dropdown-item text-secondary"> Documents</a>
 								</div>
-							</td>
+							</div>
+						</td>
 
-						</tr>
-					}
-				</tbody>
-			</table>
-		</div>
+					</tr>
+				}
+			</tbody>
+		</table>
+
+		@{
+			var Count = 0;
+		}
+		@foreach (var items in Model)
+		{
+			<div class="bg-info-subtle border-4 border-top d-md-none" data-bs-toggle="collapse" data-bs-target="#collapseExample-@Count" aria-expanded="false"
+				 aria-controls="collapseExample">
+				<div class="d-flex flex-column gap-3">
+					<div class="mb-2 ms-3">
+						<span class="text-muted">@items.ClientName</span>
+					</div>
+					<div class="mb-2 ms-3">
+						<span class="text-muted ms-1">@items.ConfirmationNumber</span>
+					</div>
+				</div>
+			</div>
+			<div class="collapse border-2 border-top d-md-none rounded-3 bg-info-subtle " id="collapseExample-@Count">
+				<div class="d-flex flex-column">
+					<div class="ms-3">
+						<span class="text-muted">
+							<i class="bi bi-check-circle text-info me-2"></i>Created Date:<span class="fw-bolder">@items.CreatedDate</span>
+						</span>
+					</div>
+					<div class="ms-3 mt-2">
+						<span class="text-muted">
+							<i class="bi bi-person-circle text-info me-2"></i>Provider:<span class="fw-bolder"> @items.ProvideName</span>
+						</span>
+					</div>
+				<div class="ms-3 mt-2">
+						<span class="text-muted">
+							<i class="bi bi-person-circle text-info me-2"></i>Conculde Date:<span class="fw-bolder"> @items.ConcludeDate</span>
+						</span>
+					</div>
+				<div class="ms-3 mt-2">
+						<span class="text-muted">
+							<i class="bi bi-person-circle text-info me-2"></i>status:@if (items.Status == 1)
+							{
+								<span>New</span>
+							}
+							@if (items.Status == 2)
+							{
+								<span>Pending</span>
+							}
+							@if (items.Status == 4 || items.Status == 5)
+							{
+								<span>Active</span>
+							}
+							@if (items.Status == 6)
+							{
+								<span>Conclude</span>
+							}
+							@if (items.Status == 3 || items.Status == 7 || items.Status == 8)
+							{
+								<span>To Close</span>
+							}
+							@if (items.Status == 9)
+							{
+								<span>Unpaid</span>
+							}
+						</span>
+					</div>
+					<div class="d-flex flex-column mb-2 gap-2">
+						<a asp-action="ViewCase" asp-route-id="@items.RequestClientId" class="btn btn-outline-info rounded me-2 mx-4">View Case</a>
+						<a asp-action="ViewUploads" asp-route-id="@items.RequestId" class="btn btn-outline-info rounded me-2 mx-4"> Documents</a>
+
+					</div>
+				</div>
+			</div>
+			Count++;
+		}
+
 	</div>
+</div>

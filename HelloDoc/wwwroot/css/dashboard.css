@@ -2,11 +2,12 @@
   width: 150px;
 }
 
-nav ul li a {
+nav ul li a {   
   color: #6c757d;
 }
 .nav-link.active {
-  border-bottom: 3px solid #17a2b8 !important;
+    border-bottom: 3px solid #17a2b8 !important;
+    color: #17a2b8!important;
 }
 .active a {
   color: #17a2b8;
@@ -34,12 +35,31 @@ nav ul li a {
   .desktop-nav {
     display: none !important;
   }
-  ul li a {
-    color: black !important;
-  }
-  .active{
+  
+  /*.active{
     background-color: #b1e7f0;
     color:black ;
     border: none;
-  }
+  }*/
+}
+
+/* Ensure dropdown menu z-index */
+.custom-dropdown-menu {
+    z-index: 1000 !important;
+    position: relative;
+}
+
+/* Dark mode specific styles */
+@media (prefers-color-scheme: dark) {
+    .custom-dropdown-menu {
+        background-color: #343a40 !important;
+    }
+
+        .custom-dropdown-menu .dropdown-item {
+            color: #fff !important;
+        }
+
+            .custom-dropdown-menu .dropdown-item:hover {
+                background-color: #4e555b !important;
+            }
 }

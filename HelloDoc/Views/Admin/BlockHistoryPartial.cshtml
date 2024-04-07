@@ -1,0 +1,162 @@
+﻿@model List<DataAccessLayer.DataModels.Blockrequest>																								
+<div class="table-responsive mt-4 mb-4">
+	<table class="table table-hover d-md-table d-none">
+		<thead class="table-light">
+			<tr>
+				<th scope="col">FirstName</th>
+				<th scope="col">Phone</th>
+				<th scope="col">Email</th>
+				<th scope="col">CreatedDate</th>
+				<th scope="col">Reason</th>
+				<th scope="col">IsActive</th>
+				<th scope="col"></th>
+			</tr>
+		</thead>
+		<tbody>
+			@foreach (var item in Model)
+			{
+				<tr>
+					<td scope="row">
+						@item.Request.Firstname
+
+					</td>
+					<td scope="row">@item.Phonenumber</td>
+					<td scope="row">@item.Email</td>
+					<td scope="row">@item.Createddate</td>
+					<td scope="row">@item.Reason</td>
+					<td scope="row">
+						<input type="checkbox" class="form-check-input" id="isActive-@item.Blockrequestid" name="isActive-@item.Blockrequestid" @(item.Isactive == true ? "checked='checked'" : "") />
+						<label for="isActive-@item.Blockrequestid" class="form-check-label ms-2">Is Active</label>
+					</td>
+					<td scope="row">
+						<div class="d-flex">
+							<button class="btn btn-outline-info rounded me-2 unblock-btn" data-blockrequestid="@item.Blockrequestid">Unblock</button>
+						</div>
+					</td>
+				</tr>
+			}
+		</tbody>
+	</table>
+	@{
+		var Count = 0;
+	}
+	@foreach (var items in Model)
+	{
+		<div class="bg-info-subtle border-4 border-top d-md-none" data-bs-toggle="collapse" data-bs-target="#collapseExample-@Count" aria-expanded="false"
+			 aria-controls="collapseExample">
+			<div class="d-flex flex-column gap-3">
+				<div class="mb-2 ms-3">
+					<span class="text-muted">@items.Request.Firstname</span>
+				</div>
+				<div class="mb-2 ms-3">
+					<span class="text-muted ms-1">@items.Email</span>
+				</div>
+			</div>
+		</div>
+		<div class="collapse border-2 border-top d-md-none rounded-3 bg-info-subtle " id="collapseExample-@Count">
+			<div class="d-flex flex-column">
+				<div class="ms-3">
+					<span class="text-muted">
+						<i class="bi bi-check-circle text-info me-2"></i>Phone:<span class="fw-bolder">@items.Phonenumber</span>
+					</span>
+				</div>
+				<div class="ms-3 mt-2">
+					<span class="text-muted">
+						<i class="bi bi-person-circle text-info me-2"></i>Created Date:<span class="fw-bolder"> @items.Createddate</span>
+					</span>
+				</div>
+				<div class="ms-3 mt-2">
+					<span class="text-muted">
+						<i class="bi bi-person-circle text-info me-2"></i>Notes:<span class="fw-bolder"> @items.Reason</span>
+					</span>
+				</div>
+				<div class="ms-3 mt-2">
+					<span class="text-muted">
+						<i class="bi bi-person-circle text-info me-2"></i>IsActive:<span class="fw-bolder"> @if (items.Isactive==true)
+							{
+								<span>Yes</span>
+							}
+							else
+							{
+								<span>No</span>
+							}
+						</span>
+					</span>
+				</div>
+
+				<div class="d-flex justify-content-end mb-2 gap-2">
+					<button class="btn btn-outline-info rounded me-2 unblock-btn" data-blockrequestid="@items.Blockrequestid">Unblock</button>
+				</div>
+			</div>
+		</div>
+		Count++;
+	}
+
+
+</div>
+<div class="pb-3 mt-3">
+	<nav id="pagination" aria-label="Page navigation">
+		<ul class="pagination justify-content-center mb-0">
+			@if (ViewBag.CurrentPage >= 1 && ViewBag.CurrentPage <= ViewBag.TotalPages)
+			{
+				int prevpage = Convert.ToInt32(ViewBag.CurrentPage) - 1;
+				int currpage = Convert.ToInt32(ViewBag.CurrentPage);
+				int nextpage = Convert.ToInt32(ViewBag.CurrentPage) + 1;
+				if (ViewBag.CurrentPage > 1)
+				{
+					<li class="page-item ">
+						<a class="page-link" id="previous" data-page="@(prevpage)" aria-label="Previous">
+							<span aria-hidden="true">&laquo;</span>
+							<span class="visually-hidden">Previous</span>
+						</a>
+					</li>
+				}
+				for (int z = 0; z < 3; z++)
+				{
+					if (currpage + z <= ViewBag.TotalPages)
+					{
+						<li class="page-item @(currpage + z == ViewBag.CurrentPage ? "active" : "")">
+							<a class="page-link" id="current_@z" data-page="@(currpage + z)" aria-label="Current">
+								<span>@(ViewBag.CurrentPage + z)</span>
+							</a>
+						</li>
+					}
+				}
+				if (ViewBag.CurrentPage < ViewBag.TotalPages)
+				{
+					<li class="page-item ">
+						<a class="page-link" id="next" data-page="@(nextpage)" aria-label="Next">
+							<span aria-hidden="true">&raquo;</span>
+							<span class="visually-hidden">Next</span>
+						</a>
+					</li>
+				}
+
+			}
+		</ul>
+	</nav>
+</div>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.19/dist/sweetalert2.min.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.19/dist/sweetalert2.min.js"></script>
+<script>
+	$('.unblock-btn').click(function () {
+		var blockId = $(this).data('blockrequestid');
+		Unblock(blockId);
+	});
+
+	function Unblock(blockId) {
+		Swal.fire({
+			title: 'Are you sure?',
+			text: 'You will not be able to recover this patient!',
+			icon: 'warning',
+			showCancelButton: true,
+			confirmButtonText: 'Yes, delete it!',
+			cancelButtonText: 'No, cancel!',
+			reverseButtons: true
+		}).then((result) => {
+			if (result.isConfirmed) {
+				window.location.href = '@Url.Action("UnBlockUser", "Admin")/' + blockId;
+			}
+		});
+	}
+</script>

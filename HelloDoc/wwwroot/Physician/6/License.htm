@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login - HalloDocPatient</title>
+    <link rel="shortcut icon" href="/images/favicon.png" type="image/x-icon" />
+    <script src="/lib/jquery/dist/jquery.min.js"></script>
+    <script src="/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+
+    <link rel="stylesheet" href="/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="/css/site.css?v=FPkqPSAfdM1mpojaTpVTLlEY1OwnMAdRQOfZgv3_bGE" />
+    <link rel="stylesheet" href="/css/style.css?v=YPNDzDv9wxDQXtUn1WoRaTKsSdnQth-Jnt3FxKeDaEg" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+
+
+    <!-- Bootstrap JS and Popper.js CDN (for collapsible functionality) -->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+            integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+            crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+            integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+            crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+            integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+            crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+
+</head>
+<body>
+    <div class="container-fluid d-flex flex-column max-vw-100 vh-100 p-0">
+        <main class="d-flex flex-grow-1">
+            <div class="m-auto d-flex align-items-center  justify-content-center flex-grow-1 index-container">
+                <button class="btn btn-outline-info text-center align-middle position-absolute top-0 end-0 dark-mode-btn m-5"
+                        id="modeSwitch">
+                    <span class="material-symbols-outlined"> dark_mode </span>
+                </button>
+
+                <div class="h-100 mw-100  position-absolute top-0 z-1 d-flex justify-content-center align-items-center">
+                    <img src="/images/11116016_415.jpg" alt="Patient Site" class="mh-100 w-100 object-fit-contain opacity-25 blur-img" />
+                </div>
+
+                <div class="container d-flex flex-column gap-4 align-items-center z-2 position-relative">
+                    <div class="bg-logo text-center pb-3 rounded-3 bg-opacity-50">
+                        <img src="/images/logo.png" alt="logo" class="w-50" />
+                    </div>
+                    </partial>
+<a class="link-info d-flex w-100 justify-content-end" href="/">
+    <span class="material-symbols-outlined"> chevron_left </span>
+    Back
+</a>
+<h3 class="fw-semibold">Login To Your Account</h3>
+
+<form class="w-100" method="post" action="">
+    <div class="input-group mb-3">
+        <div class="form-floating flex-grow-1">
+            <input type="email" class="form-control" id="floatingInputGroup1" data-val="true" data-val-regex="Invalid email address" data-val-regex-pattern="^[a-zA-Z0-9._%&#x2B;-]&#x2B;@[a-zA-Z0-9.-]&#x2B;\.[a-zA-Z]{2,}$" data-val-required="Email is required" name="Email" value="" />
+            <label for="floatingInputGroup1 ">Email</label>
+            <span class="text-danger field-validation-valid" data-valmsg-for="Email" data-valmsg-replace="true"></span>
+
+        </div>
+        <span class="input-group-text ">
+            <span class="material-symbols-outlined text-secondary">
+                account_circle
+            </span>
+        </span>
+    </div>
+    <div class="input-group mb-3">
+        <div class="form-floating flex-grow-1 ">
+            <input type="password" class="form-control" id="password" data-val="true" data-val-length="The field Passwordhash must be a string with a maximum length of 256." data-val-length-max="256" data-val-required="The Passwordhash field is required." maxlength="256" name="Passwordhash" />
+            <label for="password">Password</label>
+            <span class="text-danger field-validation-valid" data-valmsg-for="Passwordhash" data-valmsg-replace="true"></span>
+
+        </div>
+        <span class="input-group-text" id="passwordBtn">
+            <span class="material-symbols-outlined text-secondary">
+                visibility
+            </span>
+        </span>
+    </div>
+
+    <button type="submit" class="btn btn-info w-100 text-white">
+        Log In
+    </button>
+<input name="__RequestVerificationToken" type="hidden" value="CfDJ8HXTy1-bCaJHrLGr7-HZUM6U-oOa-wczh8D2uarLKO13j3ruA039WaPE5gVnGKA-7Jkr4wBkesx--vyyz-U_AG2zW4A3kDmWqP-1qi93UCN4mbbOuiZbzL7_NqY9ePz09sTuJQWJL1YkuyPjeByM0DY" /></form>
+<a class="link-info" href="/Login/ForgotPassword">Forgot Password ?</a>
+<div class="text-danger validation-summary-valid" data-valmsg-summary="true"><ul><li style="display:none"></li>
+</ul></div>
+
+
+<script>
+
+    </script>
+<script src="/js/passwordInput.js?v=wB-rEZgKwrTcrliuygNNE2qLS7zox54soMHTzkd43tQ"></script> 
+                    <div class="d-flex gap-2 rounded-3 mt-5 p-3">
+                        <a href="#" class="link-secondary">Terms of condition</a> |
+                        <a href="#" class="link-secondary">Privacy Policy</a>
+                    </div>
+                </div>
+            </div>
+    </div>
+        </main>
+           
+    </div>
+
+
+
+    <script src="/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/custom.js?v=X95o5uSeIkgeuvm1gR7autHdy9fJZb02CkXfzo5cF0g"></script>
+
+</body>
+</html>
+        

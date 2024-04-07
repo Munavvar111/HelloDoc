@@ -1,0 +1,113 @@
+﻿
+@{
+    ViewData["Title"] = "BLockHistory";
+    Layout = "~/Views/Shared/_Layout4.cshtml";
+}
+
+<div class="container d-flex justify-content-between my-3">
+    <div class="d-flex">
+        <span class="fs-2 text-muted fw-bold">Provider Information</span>
+    </div>
+    <div class="d-flex justify-content-end">
+        <a asp-controller="Admin" asp-action="Index" asp-area=""
+           class="btn btn-outline-info d-flex align-items-center">
+            <span class="material-symbols-outlined"> chevron_left </span> Back
+        </a>
+    </div>
+</div>
+<div class="container bg-light mt-2">
+	<div class="container bg-light rounded shadow border">
+		<div class="row pt-3">
+			<div class="col-lg-3 col-md-3 col-sm-6">
+				<div class="form-floating mb-3">
+					<input class="form-control shadow-none name" id="floatingInput" placeholder="First name">
+					<label for="floatingInput" class="customlable">Name</label>
+					<span class="text-danger"></span>
+				</div>
+			</div>
+			<div class="col-lg-3 col-md-3 col-sm-6">
+				<div class="form-floating mb-3">
+					<input class="form-control shadow-none date" type="date"  id="floatingInput" placeholder="Last Name">
+					<label for="floatingInput" class="customlable">Date</label>
+					<span class="text-danger"></span>
+				</div>
+			</div>
+			<div class="col-lg-3 col-md-3 col-sm-6">
+				<div class="form-floating mb-3">
+					<input class="form-control shadow-none email" id="floatingInput" placeholder="Email">
+					<label for="floatingInput" class="customlable">Email Name</label>
+					<span class="text-danger"></span>
+				</div>
+			</div>
+			<div class="col-lg-3 col-md-3 col-sm-6">
+				<div class="form-floating mb-3">
+					<input class="form-control shadow-none phoneNumber" id="floatingInput" placeholder="Phone Number">
+					<label for="floatingInput" class="customlable">Phone Number</label>
+					<span class="text-danger"></span>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col text-end mb-3">
+				<button class="btn btn-outline-info me-2 rounded" id="clearBtn">Clear</button>
+				<button class="btn btn-info text-white rounded" id="searchBtn">Search</button>
+			</div>
+		</div>
+		<div id="BlockResults"></div>
+	</div>
+</div>
+
+<script>
+	$(document).ready(function () {
+
+		var currentPage = localStorage.getItem("currentPage");
+		if (currentPage) {
+			currentPage = currentPage
+		}
+		else {
+
+			currentPage = 1;
+		}
+
+		$(document).on("click", "#pagination a.page-link", function () {
+			console.log("Pagination link clicked!");
+			var id = $(this).attr("id");
+			currentPage = $("#" + id).data("page");
+			localStorage.setItem("currentPage", currentPage);
+			console.log("Current Page: " + currentPage);
+			changeTable( null, null, null, currentPage);
+		});
+		function changeTable(name, email, phonenumber, page) {
+			$.ajax({
+				type: "GET",
+				url: "/Admin/GetBLockHistory",
+				data: { name:name, email: email, phoneNumber: phonenumber, page: page },
+				success: function (data) {
+					console.log(data)
+					$("#BlockResults").html(data);
+				},
+				error: function (error) {
+					console.error("Error:", error);
+				}
+			});
+		}
+
+		$("#searchBtn").click(function () {
+			var Name=$(".name").val("");
+			var Email = $(".email").val();
+			var PhoneNumber = $(".phoneNumber").val();
+			changeTable(Name, Email, PhoneNumber, 1);
+		});
+
+		$("#clearBtn").click(function () {
+			$(".name").val("");
+			$(".email").val("");
+			$(".phoneNumber").val("");
+			changeTable(null, null, null, 1);
+		});
+
+		// Call changeTable with null values initially
+		changeTable(null, null, null, null, currentPage);
+	});
+
+</script>

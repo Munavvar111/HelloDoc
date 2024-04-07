@@ -18,6 +18,7 @@ builder.Services.AddScoped<IPatientRequest,PatientRequest>();
 builder.Services.AddScoped<IOtherRequest,OtherRequest>(); 
 builder.Services.AddScoped<IAdmin,AdminRepository>();
 builder.Services.AddScoped<IJwtAuth, JwtAuthRepo>();
+builder.Services.AddScoped<IEmailServices,EmailServiceRepository>();    
 builder.Services.AddScoped<IUploadProvider, UploadProvider>();
 
 RotativaConfiguration.Setup(builder.Environment.WebRootPath, "Rotativa");

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -22,15 +21,8 @@ public partial class Blockrequest
     [StringLength(50)]
     public string? Email { get; set; }
 
-    [Column("isactive", TypeName = "bit(1)")]
-    public BitArray? Isactive { get; set; }
-
     [Column("reason", TypeName = "character varying")]
     public string? Reason { get; set; }
-
-    [Column("requestid")]
-    [StringLength(50)]
-    public string Requestid { get; set; } = null!;
 
     [Column("ip")]
     [StringLength(20)]
@@ -41,4 +33,14 @@ public partial class Blockrequest
 
     [Column("modifieddate", TypeName = "timestamp without time zone")]
     public DateTime? Modifieddate { get; set; }
+
+    [Column("requestid")]
+    public int Requestid { get; set; }
+
+    [Column("isactive")]
+    public bool? Isactive { get; set; }
+
+    [ForeignKey("Requestid")]
+    [InverseProperty("Blockrequests")]
+    public virtual Request Request { get; set; } = null!;
 }

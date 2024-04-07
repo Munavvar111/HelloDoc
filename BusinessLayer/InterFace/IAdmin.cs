@@ -68,5 +68,26 @@ namespace BusinessLayer.InterFace
         Region GetRegionByName(string state);
         IEnumerable<Physician> GetPhysiciansByRegion(int region);
 
-    }
+        List<Role> GetAllRoles();
+        Role GetAllRolesById(int roleId);
+
+        void AddRoles(Role role);
+
+        void RemoveRangeRoleMenu(List<Rolemenu> rolemenu);
+        void UpdateRoles(Role role);    
+        void AddRoleMenus(Rolemenu rolemenu);
+        void UpdateRoleMenus(Rolemenu rolemenu);
+        List<Menu> GetMenuByAccountType(int accounttype);
+        List<int> GetRoleMenuIdByRoleId(int roleid);
+        List<Rolemenu> GetRoleMenuById(int roleid);
+
+        List<UserAccess> GetUserData(int role);
+        List<Physician> GetPhysiciansByRegion(string region);
+
+        void AddRequestStatusLog(Requeststatuslog requeststatuslog);
+        Request GetRequestById(int requestId);
+
+        void UpdateRequestStatusLog(Requeststatuslog updaterequeststatuslog);
+        Requestclient GetRequestClientById(int requestid);
+	}
 }

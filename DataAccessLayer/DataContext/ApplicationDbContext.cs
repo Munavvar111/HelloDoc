@@ -142,6 +142,10 @@ public partial class ApplicationDbContext : DbContext
         modelBuilder.Entity<Blockrequest>(entity =>
         {
             entity.HasKey(e => e.Blockrequestid).HasName("blockrequests_pkey");
+
+            entity.HasOne(d => d.Request).WithMany(p => p.Blockrequests)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("blockrequests_requestid_fkey");
         });
 
         modelBuilder.Entity<Business>(entity =>

@@ -1,47 +1,102 @@
 ﻿@model List<DataAccessLayer.CustomModel.UserAccess>
 <div class="bg-white border justify-content-center">
-    <table class="table">
+	<table class="table d-md-table d-none">
 
-        <thead class="table-secondary">
-            <tr>
-                <th scope="col">AccountType</th>
-                <th scope="col">Account POC</th>
-                <th scope="col">Phone</th>
-                <th scope="col">Status</th>
-                <th scope="col">Open Request</th>
-                <th scope="col">Action</th>
-            </tr>
-        </thead>
-        @foreach (var item in Model)
-        {
-            @if (item.AccountTypeid != 3)
-            {
+		<thead class="table-secondary">
+			<tr>
+				<th scope="col">AccountType</th>
+				<th scope="col">Account POC</th>
+				<th scope="col">Phone</th>
+				<th scope="col">Status</th>
+				<th scope="col">Open Request</th>
+				<th scope="col">Action</th>
+			</tr>
+		</thead>
+		@foreach (var item in Model)
+		{
+			@if (item.AccountTypeid != 3)
+			{
 
-                <tbody>
-                    <tr>
-                        <td>@item.AccountType</td>
-                        <td>@item.AccountType</td>
-                        @if (item.phone != null)
-                        {
-                            <td>@item.phone</td>
-                        }
-                        else
-                        {
-                            <td>(NON)NNN-NNNNNN</td>
-                        }
-                        <td>@item.status</td>
-                        <td>0</td>
-                        @if (item.AccountTypeid == 2)
-                        {
-                            <td><a class="btn btn-outline-info" asp-action="PhysicanProfile" asp-controller="Admin" asp-route-id="@item.useraccessid">Edit</a></td>
-                        }
-                        else
-                        {
-                            <td><a class="btn btn-outline-info" asp-action="EditProfile" asp-controller="Admin" asp-route-adminid="@item.useraccessid">Edit</a></td>
-                        }
-                    </tr>
-                </tbody>
-            }
-        }
-    </table>
+				<tbody>
+					<tr>
+						<td>@item.AccountType</td>
+						<td>@item.AccountType</td>
+						@if (item.phone != null)
+						{
+							<td>@item.phone</td>
+						}
+						else
+						{
+							<td>(NON)NNN-NNNNNN</td>
+						}
+						<td>@item.status</td>
+						<td>0</td>
+						@if (item.AccountTypeid == 2)
+						{
+							<td><a class="btn btn-outline-info" asp-action="PhysicanProfile" asp-controller="Admin" asp-route-id="@item.useraccessid">Edit</a></td>
+						}
+						else
+						{
+							<td><a class="btn btn-outline-info" asp-action="EditProfile" asp-controller="Admin" asp-route-adminid="@item.useraccessid">Edit</a></td>
+						}
+					</tr>
+				</tbody>
+			}
+		}
+	</table>
+
+	@{
+		var Count = 0;
+	}
+	@foreach (var items in Model)
+	{
+		@if (items.AccountTypeid != 3)
+		{
+			<div class="bg-info-subtle border-4 border-top d-md-none" data-bs-toggle="collapse" data-bs-target="#collapseExample-@Count" aria-expanded="false"
+				 aria-controls="collapseExample">
+				<div class="d-flex flex-column gap-3">
+					<div class="form-check mt-2 ms-3">
+						<span>@items.AccountType</span>
+					</div>
+					<div class="mb-2 ms-3">
+						<span class="text-muted">Account Type:</span><span class="ms-1">@items.AccountType</span>
+					</div>
+				</div>
+			</div>
+			<div class="collapse border-2 border-top d-md-none rounded-3 bg-info-subtle " id="collapseExample-@Count">
+				<div class="d-flex flex-column">
+					<div class="ms-3 mt-2">
+						<span class="text-muted"><i class="bi bi-person-circle text-info me-2"></i>Phone: @items.phone</span>
+					</div>
+					<div class="ms-3 mt-2">
+						<span class="text-muted"><i class="bi bi-check-circle text-info me-2"></i>Status: @items.status</span>
+					</div>
+					<div class="ms-3 mt-2">
+						<span class="text-muted"><i class="bi bi-person-circle text-info me-2"></i>Phone: @items.OpenRequest</span>
+					</div>
+
+					<div class="d-flex justify-content-end mb-2 gap-2">
+						@if (items.AccountTypeid == 2)
+						{
+							<a asp-action="PhysicanProfile" asp-route-id="@items.useraccessid" class="btn btn-outline-info rounded">
+								<small>
+									Edit
+								</small>
+							</a>
+						}
+						else
+						{
+							<a asp-action="EditProfile" asp-route-adminid="@items.useraccessid" class="btn btn-outline-info rounded">
+								<small>
+									Edit
+								</small>
+							</a>
+						}
+						
+					</div>
+				</div>
+			</div>
+			Count++;
+		}
+	}
 </div>

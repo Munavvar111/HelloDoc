@@ -3,6 +3,7 @@
 @{
     Layout = "~/Views/Shared/_Layout4.cshtml";
 }
+
 <partial name="ToasterPartialView"></partial>
 <div class="container p-3">
     <div class="d-flex justify-content-between my-3">
@@ -19,10 +20,13 @@
 </div>
 <div class="container  rounded-3">
     <div class="d-flex border bg-white p-3 justify-content-end">
-        <a class="btn btn-outline-info" asp-action="CreateAccess" asp-controller="Admin">Createe Access</a>
+        <a class="btn btn-outline-info" asp-action="CreateAccess" asp-controller="Admin">
+            <span class="d-none d-md-inline">Create</span>
+            <span class="d-md-none"><i class="bi bi-plus-lg"></i></span>
+        </a>
     </div>
     <div class="bg-white border justify-content-center">
-        <table class="table">
+        <table class="table d-none d-md-table">
             <colgroup>
                 <col span="1" style="width: 35%;">
                 <col span="1" style="width: 50%;">
@@ -45,13 +49,60 @@
                         <td>
                             <div class="d-flex gap-1">
                                 <a class="btn btn-outline-info" asp-action="EditAccess" asp-route-roleid="@item.Roleid">Edit</a>
-                                <a class="btn btn-outline-info" type="button" onclick="confirmDelete('@item.Roleid')">Delete</a>
+                                <a class="btn btn-outline-info"  onclick="confirmDelete('@item.Roleid')">Delete</a>
                             </div>
                         </td>
                     </tr>
                 </tbody>
             }
         </table>
+        <div class="d-md-none" style="max-width: 100%;">
+        @foreach (var roles in Model)
+        {
+                <div class="row" style="max-width: 100%;">
+                    <div class="d-flex flex-column mt-2 mb-2 border-bottom mx-3 pb-2">
+                    <div class="mb-2">
+                        <span class="text-muted">Name: @roles.Name</span>
+                    </div>
+                    <div class="mb-2">
+                        <span class="text-muted">
+                            Account Type:
+                            @if (roles.Accounttype == 1)
+                            {
+                                <span>Admin</span>
+                            }
+                            else if (roles.Accounttype == 2)
+                            {
+                                <span>Physician</span>
+                            }
+                            else if (roles.Accounttype == 3)
+                            {
+                                <span>Patient</span>
+                            }
+                            else
+                            {
+                                <span>Un-Known</span>
+                            }
+                        </span>
+                    </div>
+                    <div>
+                         <a class="btn btn-outline-info" asp-action="EditAccess" asp-route-roleid="@roles.Roleid">
+                            <span class="d-none d-md-inline">
+                                Edit
+                            </span>
+                            <small class="d-md-none p-1">Edit</small>
+                        </a>
+                            <a class="btn btn-outline-info"  onclick="confirmDelete('@roles.Roleid')">
+                                <span class="d-none d-md-inline">
+                                Delete
+                            </span>
+                            <small class="d-md-none">Delete</small>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
     </div>
 </div>
 <script>

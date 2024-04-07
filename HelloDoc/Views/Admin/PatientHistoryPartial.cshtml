@@ -1,6 +1,6 @@
 ﻿
 <div class="table-responsive mt-4 mb-4">
-	<table class="table table-hover">
+	<table class="table table-hover d-md-table d-none">
 		<thead class="table-light">
 			<tr>
 				<th scope="col">FirstName</th>
@@ -31,6 +31,44 @@
 			}
 		</tbody>
 	</table>
+	@{
+		var Count = 0;
+	}
+	@foreach (var items in Model)
+	{
+		<div class="bg-info-subtle border-4 border-top d-md-none" data-bs-toggle="collapse" data-bs-target="#collapseExample-@Count" aria-expanded="false"
+			 aria-controls="collapseExample">
+			<div class="d-flex flex-column gap-3">
+				<div class="mb-2 ms-3">
+					<span class="text-muted">@items.FirstName</span>
+				</div>
+				<div class="mb-2 ms-3">
+					<span class="text-muted ms-1">@items.PhoneNumber</span>
+				</div>
+			</div>
+		</div>
+		<div class="collapse border-2 border-top d-md-none rounded-3 bg-info-subtle " id="collapseExample-@Count">
+			<div class="d-flex flex-column">
+				<div class="ms-3">
+					<span class="text-muted">
+						<i class="bi bi-check-circle text-info me-2"></i>Email:<span class="fw-bolder">@items.Email</span>
+					</span>
+				</div>
+				<div class="ms-3 mt-2">
+					<span class="text-muted">
+						<i class="bi bi-person-circle text-info me-2"></i>Phone:<span class="fw-bolder"> @items.PhoneNumber</span>
+					</span>
+				</div>
+				
+				<div class="d-flex justify-content-end mb-2 gap-2">
+					<a class="btn btn-outline-info rounded me-2 mx-4" asp-route-userid="@items.UserId" asp-action="PatientRecords">Explore</a>
+				</div>
+			</div>
+		</div>
+		Count++;
+	}
+
+
 </div>
 <div class="pb-3 mt-3">
     <nav id="pagination" aria-label="Page navigation">
