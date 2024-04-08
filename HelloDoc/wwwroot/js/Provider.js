@@ -37,7 +37,7 @@ $(document).ready(function () {
     var storedStatus = JSON.parse(localStorage.getItem('currentStatus'));
     var statustext = localStorage.getItem('statustext');
 
-    var currentPartial = storedPartial || "NewProviderTablePartial";
+    var currentPartial = storedPartial || "NewTablePartial";
     var currentStatus = storedStatus || [1];
     var currentPage = localStorage.getItem("currentPage") || 1;
     
@@ -82,7 +82,7 @@ $(document).ready(function () {
         $(".Status-btn").removeClass('activee');
         $("#statuslink1").addClass("activee");
         localStorage.setItem('statuslink', '#statuslink1')
-        currentPartial = "NewProviderTablePartial"
+        currentPartial = "NewTablePartial"
         currentStatus = [1];
         localStorage.setItem('currentPartial', currentPartial);
         localStorage.setItem('currentStatus', JSON.stringify(currentStatus));
@@ -90,7 +90,7 @@ $(document).ready(function () {
         currentPage = 1;
         localStorage.setItem("currentPage", currentPage);
         localStorage.setItem("statustext", '(New)')
-        filterTable("NewProviderTablePartial", currentStatus, currentPage, pageSize);
+        filterTable("NewTablePartial", currentStatus, currentPage, pageSize);
     });
 
 
@@ -107,7 +107,7 @@ $(document).ready(function () {
         localStorage.setItem("currentPage", currentPage);
         console.log("hii2")
 
-        currentPartial = "PendingProviderTablePartial"
+        currentPartial = "PendingTablePartial"
         currentStatus = [2];
         $('#statuschange').html('(Pending)');
         localStorage.setItem("statustext", '(Pending)')
@@ -129,7 +129,7 @@ $(document).ready(function () {
         currentStatus = [4, 5];
         currentPage = 1;
         localStorage.setItem("currentPage", currentPage);
-        currentPartial = "ActiveProviderTablePartial";
+        currentPartial = "ActiveTablePartial";
         localStorage.setItem('currentPartial', currentPartial);
         localStorage.setItem('currentStatus', JSON.stringify(currentStatus));
 

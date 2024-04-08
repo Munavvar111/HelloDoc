@@ -36,7 +36,7 @@ namespace HelloDoc.Controllers
             ViewBag.totalPages = totalPages;
             ViewBag.CurrentPage = page;
             ViewBag.PageSize = pageSize;
-
+            ViewBag.IsPhysician = true;
 
             return PartialView(partialName, paginatedData);
         }

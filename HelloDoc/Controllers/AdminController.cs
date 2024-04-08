@@ -1331,7 +1331,7 @@ namespace HelloDoc.Controllers
                     return File(result, "text/csv", "filtered_data.csv"); // Change content type and file name as needed
                 }
             }
-
+            ViewBag.IsPhysician = false;
             return PartialView(partialName, paginatedData);
         }
         #endregion
