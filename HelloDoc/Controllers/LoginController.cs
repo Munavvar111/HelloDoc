@@ -43,6 +43,7 @@ namespace HalloDocPatient.Controllers
                 {
                     var user = await _context.Users.FirstOrDefaultAsync(x => x.Email == a.Email);
                     var admin=_context.Admins.FirstOrDefault(x=>x.Email==a.Email);
+                    var physician=_context.Physicians.FirstOrDefault(x=>x.Email==a.Email);
                     AspnetUser? aspnetuser = _context.AspnetUsers.FirstOrDefault(x => x.Email == a.Email);
                     if (aspnetuser != null)
                     {
@@ -60,20 +61,25 @@ namespace HalloDocPatient.Controllers
                             HttpContext.Session.SetString("Email", a?.Email ?? "");
                             HttpContext.Session.SetInt32("id", user?.Userid ?? 1);
                             HttpContext.Session.SetString("Username", user?.Firstname ?? "");
-                            if (admin!=null)
+                            if (admin != null)
                             {
                                 TempData["SuccessMessage"] = "Login  successful!";
-                                
+
                                 return RedirectToAction("Index", "Admin");
-                                
+
                             }
-                            else if (user!=null)
+                            else if (user != null)
                             {
                                 TempData["SuccessMessage"] = "Login  successful!";
 
                                 return RedirectToAction("Index", "Dashboard");
                             }
+                            else if(physician != null)
+                            {
+                                TempData["SuccessMessage"] = "Login  successful!";
 
+                                return RedirectToAction("Index", "Provider");
+                            }
                         }
                         else
                         {
@@ -103,6 +109,7 @@ namespace HalloDocPatient.Controllers
         public IActionResult LogoutController()
         {
             HttpContext.Session.Clear();
+            ViewBag.IsLogOut=true;
             return RedirectToAction("Index", "Login");
         }
 

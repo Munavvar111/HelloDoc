@@ -3,6 +3,13 @@
     Layout = "~/Views/Shared/_Layout2.cshtml";
     ViewData["Title"] = "Login";
 }
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        
+            localStorage.clear();
+        
+    });
+</script>
 <partial name="ToasterPartialView"></partial>
 <a asp-controller="Home" asp-action="Index" asp-area="" class="link-info d-flex w-100 justify-content-end">
     <span class="material-symbols-outlined"> chevron_left </span>

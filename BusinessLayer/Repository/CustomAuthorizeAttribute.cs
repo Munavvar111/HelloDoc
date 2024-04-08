@@ -11,19 +11,17 @@ using System.Linq;
 public class CustomAuthorizeAttribute : Attribute, IAuthorizationFilter
 {
     private readonly string _role;
-    private readonly string _menuid;
-    public CustomAuthorizeAttribute(string role = "", string menuid = "")
+    private readonly List<string> _menuidList;
+
+    public CustomAuthorizeAttribute(string role = "", params string[] menuidList)
     {
         this._role = role;
-        this._menuid = menuid;
-        
+        this._menuidList = menuidList.ToList();
     }
-
-
 
     public void OnAuthorization(AuthorizationFilterContext context)
     {
-            var jwtServices = context.HttpContext.RequestServices.GetService<IJwtAuth>();
+        var jwtServices = context.HttpContext.RequestServices.GetService<IJwtAuth>();
         var admin = context.HttpContext.RequestServices.GetService<IAdmin>();
 
         if (jwtServices == null)
@@ -48,10 +46,8 @@ public class CustomAuthorizeAttribute : Attribute, IAuthorizationFilter
             {
                 context.Result = new RedirectToRouteResult(new RouteValueDictionary(new { controller = "Login", action = "Index" }));
             }
-            
+
             return;
-
-
         }
 
         var roleClaim = validatedToken.Claims.Where(m => m.Type == "role").FirstOrDefault();
@@ -63,13 +59,12 @@ public class CustomAuthorizeAttribute : Attribute, IAuthorizationFilter
             return;
         }
         var userPermissions = admin.GetUserPermissions(roleType);
-      
-        if (string.IsNullOrWhiteSpace(_role) || !userPermissions.Contains(int.Parse(_menuid)))
+
+        if (string.IsNullOrWhiteSpace(_role) || !_menuidList.Any(menuId => userPermissions.Contains(int.Parse(menuId))))
         {
             context.Result = new RedirectToRouteResult(new RouteValueDictionary(new { controller = "Login", action = "Index" }));
             return;
         }
-
     }
 
     private bool IsAjaxRequest(HttpRequest request)

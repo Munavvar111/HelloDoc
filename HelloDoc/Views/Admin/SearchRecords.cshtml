@@ -96,7 +96,23 @@
 </div>
 <script>
 	$(document).ready(function () {
-		function changeTable(status, patientname, requesttype, providorname, email, phonenumber, exportstatus) {
+		var currentPage = localStorage.getItem("currentPage");
+		if (currentPage) {
+			currentPage = currentPage
+		}
+		else {
+
+			currentPage = 1;
+		}
+		$(document).on("click", "#pagination a.page-link", function () {
+			console.log("Pagination link clicked!");
+			var id = $(this).attr("id");
+			currentPage = $("#" + id).data("page");
+			localStorage.setItem("currentPage", currentPage);
+			console.log("Current Page: " + currentPage);
+			changeTable("0", "", "0", "", "", "", false,currentPage);
+		});
+		function changeTable(status, patientname, requesttype, providorname, email, phonenumber, exportstatus,page) {
 
 			if (status == "1") {
 				status = [1];
@@ -124,7 +140,8 @@
 					providorName: providorname,
 					email: email,
 					phoneNumber: phonenumber,
-					exportStatus: exportstatus
+					exportStatus: exportstatus,
+					page:page
 				},
 				success: function (data) {
 					if (exportstatus == true) {
@@ -154,7 +171,7 @@
 			var ProvidorName = $(".providorName").val();
 			var Email = $(".email").val();
 			var PhoneNumber = $(".phoneNumber").val();
-			changeTable(Status, PatientName, RequestType, ProvidorName, Email, PhoneNumber, false);
+			changeTable(Status, PatientName, RequestType, ProvidorName, Email, PhoneNumber, false,1);
 		});
 
 		$("#clearBtn").click(function () {
@@ -164,7 +181,7 @@
 			$(".providorName").val("");
 			$(".email").val("");
 			$(".phoneNumber").val("");
-			changeTable("0", "", "0", "", "", "", false);
+			changeTable("0", "", "0", "", "", "", false,1);
 		});
 		$("#excelExport").click(function () {
 			var Status = $(".statusSelect").val();
@@ -176,7 +193,7 @@
 			changeTable(Status, PatientName, RequestType, ProvidorName, Email, PhoneNumber, true);
 		});
 		// Call changeTable with default values initially
-		changeTable("0", "", "0", "", "", "", false);
+		changeTable("0", "", "0", "", "", "", false,currentPage);
 	});
 </script>
 

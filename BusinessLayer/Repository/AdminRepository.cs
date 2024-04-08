@@ -12,7 +12,6 @@ using BC = BCrypt.Net.BCrypt;
 using System.Net;
 using System.Collections;
 using System.Transactions;
-using Org.BouncyCastle.Asn1.Ocsp;
 
 namespace BusinessLayer.Repository
 {
@@ -44,30 +43,30 @@ namespace BusinessLayer.Repository
         }
         public void AddRoles(Role role)
         {
-            _context.Roles.Add(role);   
+            _context.Roles.Add(role);
         }
         public Role GetAllRolesById(int roleId)
         {
-            
-           Role? role= _context.Roles.Where(item => item.Roleid == roleId).FirstOrDefault();
-			if (role == null)
-			{
-				throw new Exception("Role not found"); // or use a more specific exception type
-			}
+
+            Role? role = _context.Roles.Where(item => item.Roleid == roleId).FirstOrDefault();
+            if (role == null)
+            {
+                throw new Exception("Role not found"); // or use a more specific exception type
+            }
             return role;
 
-		}
-          public void AddRoleMenus(Rolemenu rolemenu)
+        }
+        public void AddRoleMenus(Rolemenu rolemenu)
         {
-            _context.Rolemenus.Add(rolemenu);   
+            _context.Rolemenus.Add(rolemenu);
         }
         public List<Menu> GetMenuByAccountType(int accounttype)
-		{
-			List<Menu> menus= _context.Menus.Where(item => accounttype == 0 || item.Accounttype == accounttype).ToList();
+        {
+            List<Menu> menus = _context.Menus.Where(item => accounttype == 0 || item.Accounttype == accounttype).ToList();
             return menus;
-		}
-		public List<Region> GetAllRegion()
-		{
+        }
+        public List<Region> GetAllRegion()
+        {
             return _context.Regions.ToList();
         }
         public Physician GetPhysicianByEmail(string email)
@@ -83,14 +82,16 @@ namespace BusinessLayer.Repository
         {
             return _context.Shiftdetails.Find(shiftDetailId);
         }
-        public List<int> GetRoleMenuIdByRoleId(int roleId) {
-			List<int> Rolemenus=_context.Rolemenus.Where(item => item.Roleid == roleId).Select(item => item.Menuid).ToList();
+        public List<int> GetRoleMenuIdByRoleId(int roleId)
+        {
+            List<int> Rolemenus = _context.Rolemenus.Where(item => item.Roleid == roleId).Select(item => item.Menuid).ToList();
             return Rolemenus;
-		}
-        public List<Rolemenu> GetRoleMenuById(int roleId) {
-			List<Rolemenu> Rolemenus=_context.Rolemenus.Where(item => item.Roleid == roleId).ToList();
+        }
+        public List<Rolemenu> GetRoleMenuById(int roleId)
+        {
+            List<Rolemenu> Rolemenus = _context.Rolemenus.Where(item => item.Roleid == roleId).ToList();
             return Rolemenus;
-		}
+        }
         public void UpdateRoleMenus(Rolemenu rolemenu)
         {
             _context.Rolemenus.Update(rolemenu);
@@ -102,10 +103,10 @@ namespace BusinessLayer.Repository
         }
         public void RemoveRangeRoleMenu(List<Rolemenu> rolemenu)
         {
-			_context.Rolemenus.RemoveRange(rolemenu);
-		}
+            _context.Rolemenus.RemoveRange(rolemenu);
+        }
 
-		public IQueryable<Region> GetRegionsByRegionId(int regionId)
+        public IQueryable<Region> GetRegionsByRegionId(int regionId)
         {
             return _context.Regions.Where(i => i.Regionid == regionId);
         }
@@ -139,7 +140,7 @@ namespace BusinessLayer.Repository
             _context.Requeststatuslogs.Update(requeststatuslog);
         }
 
-		public void UpdateHealthPrifessional(Healthprofessional healthprofessional)
+        public void UpdateHealthPrifessional(Healthprofessional healthprofessional)
         {
             _context.Healthprofessionals.Update(healthprofessional);
         }
@@ -149,7 +150,7 @@ namespace BusinessLayer.Repository
             _context.Requeststatuslogs.Add(requeststatuslog);
         }
 
-		public void SaveChanges()
+        public void SaveChanges()
         {
             _context.SaveChanges();
         }
@@ -166,7 +167,7 @@ namespace BusinessLayer.Repository
                                                         join encounter in _context.Encounterforms
                                                         on req.Requestid equals encounter.RequestId into enco
                                                         from eno in enco.Where(e => e != null).DefaultIfEmpty()
-                                                        where req.Isdeleted==false
+                                                        where req.Isdeleted == false
                                                         select new NewRequestTableVM
                                                         {
                                                             PatientName = reqclient.Firstname.ToLower(),
@@ -300,6 +301,7 @@ namespace BusinessLayer.Repository
                 requestclient.Intyear = viewCaseVM.DateOfBirth.Year;
                 requestclient.Strmonth = viewCaseVM.DateOfBirth.Month.ToString();
 
+
                 _context.Update(requestclient);
                 await _context.SaveChangesAsync();
             }
@@ -358,12 +360,11 @@ namespace BusinessLayer.Repository
         {
             try
             {
-
                 Request? request = await _context.Requests.FindAsync(requestId);
 
                 if (request != null)
                 {
-                    request.Status = 2;
+                    request.Status = 1;
                     request.Physicianid = physician;
                     _context.Requests.Update(request);
 
@@ -372,7 +373,7 @@ namespace BusinessLayer.Repository
                         Adminid = adminid,
                         Notes = description,
                         Requestid = requestId,
-                        Status = 2,
+                        Status = 1,
                         Createddate = DateTime.Now
                     };
 
@@ -392,7 +393,7 @@ namespace BusinessLayer.Repository
         #endregion
 
         #region UpdateAdminNotes
-        public async Task<bool> UpdateAdminNotes(int requestId, string adminNotes)
+        public async Task<bool> UpdateAdminNotes(int requestId, string adminNotes, string aspNetId, bool isPhysician)
         {
             try
             {
@@ -400,21 +401,43 @@ namespace BusinessLayer.Repository
 
                 if (requestVisenotes != null)
                 {
-                    requestVisenotes.Adminnotes = adminNotes;
+                    if (isPhysician)
+                    {
+                        requestVisenotes.Physiciannotes = adminNotes;
+                       
+                    }
+                    else
+                    {
+                        requestVisenotes.Adminnotes = adminNotes;
+                    }
+                    requestVisenotes.Modifiedby = aspNetId;
+                    requestVisenotes.Modifieddate = DateTime.Now;
                     _context.Update(requestVisenotes);
                 }
                 else
                 {
-                    Requestnote requestNotes = new Requestnote
+                    if (!isPhysician)
                     {
-
-                        Requestid = requestId,
-                        Adminnotes = adminNotes,
-                        Createddate = DateTime.Now,
-                        Createdby = "admin"
-                    };
-
-                    _context.Add(requestNotes);
+                        Requestnote requestNotes = new Requestnote
+                        {
+                            Requestid = requestId,
+                            Adminnotes = adminNotes,
+                            Createddate = DateTime.Now,
+                            Createdby = aspNetId
+                        };
+                        _context.Add(requestNotes);
+                    }
+                    else
+                    {
+                        Requestnote requestNotes = new Requestnote
+                        {
+                            Requestid = requestId,
+                            Physiciannotes = adminNotes,
+                            Createddate = DateTime.Now,
+                            Createdby = aspNetId
+                        };
+                        _context.Add(requestNotes);
+                    }
                 }
 
                 await _context.SaveChangesAsync();
@@ -533,7 +556,8 @@ namespace BusinessLayer.Repository
                         Phonenumber = request.Phonenumber,
                         Requestid = requestId,
                         Createddate = DateTime.Now,
-                        Reason = blockReason
+                        Reason = blockReason,
+                        Isactive = true
                     };
 
                     _context.Blockrequests.Add(block);
@@ -1084,99 +1108,99 @@ namespace BusinessLayer.Repository
         #endregion
 
         #region CreateShift
-        public void CreateShift(ScheduleModel data,string email)
+        public void CreateShift(ScheduleModel data, string email)
         {
             Admin? admin = _context.Admins.FirstOrDefault(item => item.Email == email);
             List<DateTime> conflictingDates = new List<DateTime>(); // List to store conflicting dates
 
 
-            
-                try
+
+            try
+            {
+                using (var transaction = new TransactionScope())
                 {
-                    using (var transaction = new TransactionScope())
-                    {
-                        Shift shift = new Shift();
-                        shift.Physicianid = data.Physicianid;
-                        shift.Repeatupto = data.Repeatupto;
-                        shift.Startdate = data.Startdate;
+                    Shift shift = new Shift();
+                    shift.Physicianid = data.Physicianid;
+                    shift.Repeatupto = data.Repeatupto;
+                    shift.Startdate = data.Startdate;
                     shift.Createdby = admin.Aspnetuserid;
-                        shift.Createddate = DateTime.Now;
-                        shift.Isrepeat = new BitArray(new[] { true });
-                        shift.Repeatupto = data.Repeatupto;
-                        _context.Shifts.Add(shift);
-                        _context.SaveChanges();
+                    shift.Createddate = DateTime.Now;
+                    shift.Isrepeat = new BitArray(new[] { true });
+                    shift.Repeatupto = data.Repeatupto;
+                    _context.Shifts.Add(shift);
+                    _context.SaveChanges();
 
-                        Shiftdetail sd = new Shiftdetail();
-                        sd.Shiftid = shift.Shiftid;
-                        sd.Shiftdate = new DateTime(data.Startdate.Year, data.Startdate.Month, data.Startdate.Day);
-                        sd.Starttime = data.Starttime;
-                        sd.Endtime = data.Endtime;
-                        sd.Regionid = data.Regionid;
-                        sd.Status = data.Status;
-                        sd.Isdeleted = false;
-                        _context.Shiftdetails.Add(sd);
-                        _context.SaveChanges();
+                    Shiftdetail sd = new Shiftdetail();
+                    sd.Shiftid = shift.Shiftid;
+                    sd.Shiftdate = new DateTime(data.Startdate.Year, data.Startdate.Month, data.Startdate.Day);
+                    sd.Starttime = data.Starttime;
+                    sd.Endtime = data.Endtime;
+                    sd.Regionid = data.Regionid;
+                    sd.Status = data.Status;
+                    sd.Isdeleted = false;
+                    _context.Shiftdetails.Add(sd);
+                    _context.SaveChanges();
 
-                        Shiftdetailregion sr = new Shiftdetailregion();
-                        sr.Shiftdetailid = sd.Shiftdetailid;
-                        sr.Regionid = data.Regionid;
-                        sr.Isdeleted = false;
-                        _context.Shiftdetailregions.Add(sr);
-                        _context.SaveChanges();
+                    Shiftdetailregion sr = new Shiftdetailregion();
+                    sr.Shiftdetailid = sd.Shiftdetailid;
+                    sr.Regionid = data.Regionid;
+                    sr.Isdeleted = false;
+                    _context.Shiftdetailregions.Add(sr);
+                    _context.SaveChanges();
 
-                        if (data.checkWeekday != null)
+                    if (data.checkWeekday != null)
+                    {
+                        List<int> day = data.checkWeekday.Split(',').Select(int.Parse).ToList();
+
+                        foreach (int d in day)
                         {
-                            List<int> day = data.checkWeekday.Split(',').Select(int.Parse).ToList();
-
-                            foreach (int d in day)
+                            DayOfWeek desiredDayOfWeek = (DayOfWeek)d;
+                            DateTime today = DateTime.Today;
+                            DateTime nextOccurrence = new DateTime(data.Startdate.Year, data.Startdate.Month, data.Startdate.Day + 1);
+                            int occurrencesFound = 0;
+                            while (occurrencesFound < data.Repeatupto)
                             {
-                                DayOfWeek desiredDayOfWeek = (DayOfWeek)d;
-                                DateTime today = DateTime.Today;
-                                DateTime nextOccurrence = new DateTime(data.Startdate.Year, data.Startdate.Month, data.Startdate.Day + 1);
-                                int occurrencesFound = 0;
-                                while (occurrencesFound < data.Repeatupto)
+                                if (nextOccurrence.DayOfWeek == desiredDayOfWeek)
                                 {
-                                    if (nextOccurrence.DayOfWeek == desiredDayOfWeek)
-                                    {
 
-                                        Shiftdetail sdd = new Shiftdetail();
-                                        sdd.Shiftid = shift.Shiftid;
-                                        sdd.Shiftdate = nextOccurrence;
-                                        sdd.Starttime = data.Starttime;
-                                        sdd.Endtime = data.Endtime;
-                                        sdd.Regionid = data.Regionid;
-                                        sdd.Status = data.Status;
-                                        sdd.Isdeleted = false;
-                                        _context.Shiftdetails.Add(sdd);
-                                        _context.SaveChanges();
+                                    Shiftdetail sdd = new Shiftdetail();
+                                    sdd.Shiftid = shift.Shiftid;
+                                    sdd.Shiftdate = nextOccurrence;
+                                    sdd.Starttime = data.Starttime;
+                                    sdd.Endtime = data.Endtime;
+                                    sdd.Regionid = data.Regionid;
+                                    sdd.Status = data.Status;
+                                    sdd.Isdeleted = false;
+                                    _context.Shiftdetails.Add(sdd);
+                                    _context.SaveChanges();
 
-                                        Shiftdetailregion srr = new Shiftdetailregion();
-                                        srr.Shiftdetailid = sdd.Shiftdetailid;
-                                        srr.Regionid = data.Regionid;
-                                        srr.Isdeleted = false;
-                                        _context.Shiftdetailregions.Add(srr);
-                                        _context.SaveChanges();
-                                        occurrencesFound++;
-                                    }
-                                    nextOccurrence = nextOccurrence.AddDays(1);
+                                    Shiftdetailregion srr = new Shiftdetailregion();
+                                    srr.Shiftdetailid = sdd.Shiftdetailid;
+                                    srr.Regionid = data.Regionid;
+                                    srr.Isdeleted = false;
+                                    _context.Shiftdetailregions.Add(srr);
+                                    _context.SaveChanges();
+                                    occurrencesFound++;
                                 }
+                                nextOccurrence = nextOccurrence.AddDays(1);
                             }
                         }
-
-                        transaction.Complete();
                     }
 
-                }
-                catch (Exception ex)
-                {
-                    throw new ApplicationException("Failed to submit Form", ex);
+                    transaction.Complete();
                 }
 
             }
-            #endregion
+            catch (Exception ex)
+            {
+                throw new ApplicationException("Failed to submit Form", ex);
+            }
+
+        }
+        #endregion
 
         #region GetProvidersOnCall
-            public ProviderOnCallVM GetProvidersOnCall(int region)
+        public ProviderOnCallVM GetProvidersOnCall(int region)
         {
             var currentTime = DateTime.Now.Hour;
             var onDutyQuery = from shiftDetail in _context.Shiftdetails
@@ -1186,21 +1210,21 @@ namespace BusinessLayer.Repository
                                     shiftDetail.Shiftdate.Date == DateTime.Now.Date &&
                                     currentTime >= shiftDetail.Starttime.Hour &&
                                     currentTime <= shiftDetail.Endtime.Hour &&
-                                    !shiftDetail.Isdeleted && !physician.Isdeleted==false
+                                    !shiftDetail.Isdeleted && !physician.Isdeleted == false
                               select physician;
 
             var onDuty = onDutyQuery.Distinct().ToList();
 
-			var offDutyQuery = from physician in _context.Physicians
-							   join physicianRegion in _context.PhysicianRegions on physician.Physicianid equals physicianRegion.Physicianid
-							   where (region == 0 || physicianRegion.Regionid == region) &&
-									 !_context.Shiftdetails.Any(item => item.Shift.Physicianid == physician.Physicianid &&
+            var offDutyQuery = from physician in _context.Physicians
+                               join physicianRegion in _context.PhysicianRegions on physician.Physicianid equals physicianRegion.Physicianid
+                               where (region == 0 || physicianRegion.Regionid == region) &&
+                                     !_context.Shiftdetails.Any(item => item.Shift.Physicianid == physician.Physicianid &&
                                                                         item.Shiftdate.Date == DateTime.Now.Date &&
-																	   currentTime >= item.Starttime.Hour &&
-																	   currentTime <= item.Endtime.Hour &&
-																	   !item.Isdeleted)
-							   select physician;
-			var offDuty = offDutyQuery.Distinct().ToList();
+                                                                       currentTime >= item.Starttime.Hour &&
+                                                                       currentTime <= item.Endtime.Hour &&
+                                                                       !item.Isdeleted)
+                               select physician;
+            var offDuty = offDutyQuery.Distinct().ToList();
 
             return new ProviderOnCallVM
             {
@@ -1303,7 +1327,7 @@ namespace BusinessLayer.Repository
                               FaxNumber = helthprofesion.Faxnumber,
                               PhoneNumber = helthprofesion.Phonenumber,
                               BusinesContact = helthprofesion.Businesscontact,
-                              HelthProfessionId =(int)helthprofesion.Healthprofessionalid
+                              HelthProfessionId = (int)helthprofesion.Healthprofessionalid
                           })
                         .Where(item =>
                             (string.IsNullOrEmpty(vendorname) || item.BusinessName.Contains(vendorname)) &&
@@ -1383,80 +1407,80 @@ namespace BusinessLayer.Repository
                              .ToList();
             return physicians;
         }
-		#endregion
+        #endregion
 
-		#region GetUserData
-		public List<UserAccess> GetUserData(int role)
-		{
-			var list = (from aspuser in _context.AspnetUsers
-						join physician in _context.Physicians
-						on aspuser.Aspnetuserid equals physician.Aspnetuserid into physicians
-						from totalphy in physicians.DefaultIfEmpty()
-						join admin in _context.Admins
-						on aspuser.Aspnetuserid equals admin.Aspnetuserid into admins
-						from totaladmin in admins.DefaultIfEmpty()
-						join aspnetuserrole in _context.AspnetUserroles
-						on aspuser.Aspnetuserid equals aspnetuserrole.Userid into aspnetusersroles
-						from totalasprole in aspnetusersroles.DefaultIfEmpty()
-						join roletab in _context.Roles
-						on totalasprole.Roleid equals roletab.Roleid into rolesdata
-						from roles in rolesdata.DefaultIfEmpty()
-						where (role == 0 || roles.Accounttype == role)
-						select (roles.Accounttype == 1 ?
-							new UserAccess
-							{
-								AccountType = roles.Name,
-								AccountPOC = totaladmin.Firstname,
-								phone = totaladmin.Mobile,
-								status = totaladmin.Adminid,
-								roleid = roles.Roleid,
-								AccountTypeid = roles.Accounttype,
-								useraccessid = totaladmin.Adminid,
-							} : new UserAccess
-							{
-								AccountType = roles.Name,
-								AccountPOC = totalphy.Firstname,
-								phone = totalphy.Mobile,
-								status = totalphy.Status,
-								roleid = roles.Roleid,
-								AccountTypeid = roles.Accounttype,
-								useraccessid = totalphy.Physicianid,
-							})).ToList();
-			return list;
-		}
-		#endregion
+        #region GetUserData
+        public List<UserAccess> GetUserData(int role)
+        {
+            var list = (from aspuser in _context.AspnetUsers
+                        join physician in _context.Physicians
+                        on aspuser.Aspnetuserid equals physician.Aspnetuserid into physicians
+                        from totalphy in physicians.DefaultIfEmpty()
+                        join admin in _context.Admins
+                        on aspuser.Aspnetuserid equals admin.Aspnetuserid into admins
+                        from totaladmin in admins.DefaultIfEmpty()
+                        join aspnetuserrole in _context.AspnetUserroles
+                        on aspuser.Aspnetuserid equals aspnetuserrole.Userid into aspnetusersroles
+                        from totalasprole in aspnetusersroles.DefaultIfEmpty()
+                        join roletab in _context.Roles
+                        on totalasprole.Roleid equals roletab.Roleid into rolesdata
+                        from roles in rolesdata.DefaultIfEmpty()
+                        where (role == 0 || roles.Accounttype == role)
+                        select (roles.Accounttype == 1 ?
+                            new UserAccess
+                            {
+                                AccountType = roles.Name,
+                                AccountPOC = totaladmin.Firstname,
+                                phone = totaladmin.Mobile,
+                                status = totaladmin.Adminid,
+                                roleid = roles.Roleid,
+                                AccountTypeid = roles.Accounttype,
+                                useraccessid = totaladmin.Adminid,
+                            } : new UserAccess
+                            {
+                                AccountType = roles.Name,
+                                AccountPOC = totalphy.Firstname,
+                                phone = totalphy.Mobile,
+                                status = totalphy.Status,
+                                roleid = roles.Roleid,
+                                AccountTypeid = roles.Accounttype,
+                                useraccessid = totalphy.Physicianid,
+                            })).ToList();
+            return list;
+        }
+        #endregion
 
-		#region GetPhysician
-		public List<Physician> GetPhysiciansByRegion(string region)
-		{
-			if (!int.TryParse(region, out int regionId))
-			{
-				throw new ArgumentException("Invalid region ID format.");
-			}
+        #region GetPhysician
+        public List<Physician> GetPhysiciansByRegion(string region)
+        {
+            if (!int.TryParse(region, out int regionId))
+            {
+                throw new ArgumentException("Invalid region ID format.");
+            }
 
-			var physicians = (from physicianRegion in _context.PhysicianRegions
-							  where physicianRegion.Regionid == regionId
-							  select physicianRegion.Physician)
-							 .ToList();
+            var physicians = (from physicianRegion in _context.PhysicianRegions
+                              where physicianRegion.Regionid == regionId
+                              select physicianRegion.Physician)
+                             .ToList();
 
-			return physicians;
-		}
-		#endregion
+            return physicians;
+        }
+        #endregion
 
         public Request GetRequestById(int requestId)
         {
             return _context.Requests.Find(requestId);
         }
-		public Region GetRegionByName(string state)
+        public Region GetRegionByName(string state)
         {
             return _context.Regions.Where(r => r.Name == state).FirstOrDefault();
         }
 
         public Requestclient GetRequestClientById(int requestid)
         {
-			return _context.Requestclients.Where(item => item.Requestid == requestid).FirstOrDefault();
-		}
+            return _context.Requestclients.Where(item => item.Requestid == requestid).FirstOrDefault();
+        }
 
-	}
+    }
 }
 

@@ -1,22 +1,6 @@
 ﻿@using Microsoft.AspNetCore.Http
 @using Newtonsoft.Json;
-@{
-    string? username = Context.Session.GetString("Username");
-    
-    int userId = Context.Session.GetInt32("UserId") ?? 0; // Use a default value if session data is not available
-    var userPermissionsJson = Context.Session.GetString("UserPermissions");
-    
-    var userPermissions = !string.IsNullOrEmpty(userPermissionsJson) ? JsonConvert.DeserializeObject<List<string>>(userPermissionsJson) : null;
-  
-}
 
-<script>
-    // Check if either username or userId is empty, or if userPermissions is null
-    if (@userPermissionsJson == null) {
-        // Redirect to login page
-        window.location.href = "/Login";
-    }
-</script>
 
 <!DOCTYPE html>
 <html lang="en" data-bs-theme="light">
@@ -85,7 +69,7 @@
                 </div>
 
                 <div class="fw-bolder d-flex align-items-center gap-3">
-                    <span class="text-muted d-none d-md-inline">Welcome,@username</span>
+                    <span class="text-muted d-none d-md-inline">Welcome,</span>
                     <a asp-controller="Login" asp-action="LogoutController" class="btn btn-outline-info d-none d-md-inline">Logout</a>
 
                     <!-- Responsive Logout Icon for Small Screens -->
@@ -106,36 +90,24 @@
 
                     <li class="nav-item text-info">
                         <a class="nav-link @(ViewContext.ActionDescriptor.RouteValues["action"] == "Index" ? "active" : "")"
-                           asp-action="Index" asp-controller="Admin">Home</a>
+                           asp-action="Index" asp-controller="Provider">Home</a>
                     </li>
                    
-                        <li class="nav-item">
-                            <a class="nav-link @(ViewContext.ActionDescriptor.RouteValues["action"] == "Profile" ? "active" : "")"
-                               asp-action="Profile" asp-controller="Admin">Profile</a>
-                        </li>
-                   
+                     
 
                     <li class="nav-item">
                         <a class="nav-link @(ViewContext.ActionDescriptor.RouteValues["action"] == "Profile" ? "active" : "")"
-                           asp-action="Profile" asp-controller="Admin">My Profile</a>
+                           asp-action="Profile" asp-controller="Provider">My Profile</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link @(ViewContext.ActionDescriptor.RouteValues["action"] == "Provider" ? "active" : "")"
-                           asp-action="Provider" asp-controller="Admin">Provider</a>
+                           asp-action="Provider" asp-controller="Provider">Invoicing</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link @(ViewContext.ActionDescriptor.RouteValues["action"] == "Parteners" ? "active" : "")"
-                           asp-action="Parteners" asp-controller="Admin">Parteners</a>
+                           asp-action="Parteners" asp-controller="Provider">My Schedule</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link @(ViewContext.ActionDescriptor.RouteValues["action"] == "Records" ? "active" : "")"
-                           asp-action="Records" asp-controller="Admin">Records</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link @(ViewContext.ActionDescriptor.RouteValues["action"] == "Records" ? "active" : "")"
-                           asp-action="Records" asp-controller="Admin">Records</a>
-                    </li>
-
+                   
                 </ul>
             </div>
 
@@ -144,97 +116,33 @@
 
         <div class="w-100 shadow  px-2 px-md-5 position-relative z-2 pt-2 border-bottom d-none d-sm-block">
             <ul class="nav nav-tabs-info text-info mb-3" id="pills-tab" role="tablist">
-                @if (userPermissions != null && userPermissions.Contains("6"))
-                {
+              
                     <li class="nav-item text-info">
                         <a class="nav-link @(ViewContext.ActionDescriptor.RouteValues["action"] == "Index" ? "active" : "")"
-                           asp-action="Index" asp-controller="Admin">Dashboard</a>
+                       asp-action="Index" asp-controller="Provider">Dashboard</a>
                     </li>
-                }
-                @if (userPermissions != null && userPermissions.Contains("17"))
-                {
+               
                     <li class="nav-item">
                         <a class="nav-link @(ViewContext.ActionDescriptor.RouteValues["action"] == "ProviderLocation" ? "active" : "")"
-                           asp-action="ProviderLocation" asp-controller="Admin">Provider Location</a>
+                       asp-action="ProviderLocation" asp-controller="Provider"> Scehduling</a>
                     </li>
-                }
-                @if (userPermissions != null && userPermissions.Contains("5"))
-                {
+                
                     <li class="nav-item ">
                         <a class="nav-link @(ViewContext.ActionDescriptor.RouteValues["action"] == "Profile" ? "active" : "")"
-                           asp-action="Profile" asp-controller="Admin">My Profile</a>
+                       asp-action="Profile" asp-controller="Provider">My Profile</a>
 
                     </li>
-                }
-                @if (userPermissions != null && userPermissions.Contains("8"))
-                {
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle @(ViewContext.ActionDescriptor.RouteValues["controller"] == "Admin" && (ViewContext.ActionDescriptor.RouteValues["action"] == "Provider" || ViewContext.ActionDescriptor.RouteValues["action"] == "Scheduling") ? "active" : "")" role="button" data-bs-toggle="dropdown" aria-expanded="false">Providers</a>
-                        <ul class="dropdown-menu bg-light mt-3 bg-opacity-0">
-                            <li class="border-bottom">
-                                <a class="dropdown-item" asp-action="Provider" asp-controller="Admin">
-                                    Provider
-                                </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item" asp-action="Scheduling" asp-controller="Admin">
-                                    Scheduling
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
-                }
-                @if (userPermissions != null && userPermissions.Contains("11"))
-                {
+                
+                
                     <li class="nav-item ">
                         <a class="nav-link @(ViewContext.ActionDescriptor.RouteValues["action"] == "Parteners" ? "active" : "")"
-                           asp-action="Parteners" asp-controller="Admin">Parteners</a>
+                       asp-action="Parteners" asp-controller="Provider">Invoicing</a>
                     </li>
-                }
-                @if (userPermissions != null && userPermissions.Contains("7"))
-                {
-                    <li class="nav-item dropdown">
-                        <a class="nav-link  dropdown-toggle @(ViewContext.ActionDescriptor.RouteValues["action"] == "Access" ? "active" : "")" role="button" data-bs-toggle="dropdown" aria-expanded="false"
-                          >Access</a>
-                        <ul class="dropdown-menu bg-light mt-3 bg-opacity-0">
-                            <li class="border-bottom">
-                                <a class="dropdown-item @(ViewContext.ActionDescriptor.RouteValues["action"] == "Access" ? "active" : "")" asp-action="Access" asp-controller="Admin">
-                                    Access
-                                </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item @(ViewContext.ActionDescriptor.RouteValues["action"] == "UserAccess" ? "active" : "")" asp-action="UserAccess" asp-controller="Admin">
-                                    User Access
-                                </a>
-                            </li> 
-                            
-                        </ul>
-                    </li>
-                }
-                @if (userPermissions != null && userPermissions.Contains("3"))
-                {
-                    <!-- Ensure dropdown menu z-index -->
-                    <li class="nav-item dropdown z-1 ">
-                        <button class="nav-link dropdown-toggle  @(ViewContext.ActionDescriptor.RouteValues["action"] == "Records" ? "active" : "")" role="button" data-bs-toggle="dropdown" aria-expanded="false">Records</button>
-                        <ul class="dropdown-menu  mt-3 bg-opacity-0 custom-dropdown-menu bg-body">
-                            <li class="border-bottom z-1">
-                                <a class="dropdown-item @(ViewContext.ActionDescriptor.RouteValues["action"] == "PatientRecords" ? "active" : "")" asp-action="Records" asp-controller="Admin">
-                                    Patient Records
-                                </a>
-                            </li>
-                            <li class="border-bottom z-1">
-                                <a class="dropdown-item @(ViewContext.ActionDescriptor.RouteValues["action"] == "UserAccess" ? "active" : "")" asp-action="SearchRecords" asp-controller="Admin">
-                                    Search Records
-                                </a>
-                            </li>
-                            <li class="border-bottom z-1">
-                                <a class="dropdown-item @(ViewContext.ActionDescriptor.RouteValues["action"] == "UserAccess" ? "active" : "")" asp-action="BlockHistory" asp-controller="Admin">
-                                    Block History
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
-                }
+                
+                   
+                 <!-- Ensure dropdown menu z-index -->
+                    
+                
             </ul>
         </div>
         <main class="container-fluid d-flex flex-column  p-0 bg-light flex-grow-1  ">
@@ -250,7 +158,7 @@
 
 
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/Provider.js" asp-append-version="true"></script>
     <script src="~/js/custom.js" asp-append-version="true"></script>
     <script src="~/js/Validation.js" asp-append-version="true"></script>
     <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>

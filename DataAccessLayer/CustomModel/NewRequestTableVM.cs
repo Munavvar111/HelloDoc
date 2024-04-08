@@ -14,6 +14,7 @@ namespace DataAccessLayer.CustomModel
         public string PatientName { get; set; } =  null!;
 
         public int RequestClientId { get; set; }    
+        public int? PhysicianId { get; set; }    
 
         public DateOnly DateOfBirth { get; set; }
 

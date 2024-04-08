@@ -10,10 +10,20 @@
             <span class="fs-2 text-muted fw-bold">New Request</span>
         </div>
         <div class="d-flex justify-content-end">
-            <a asp-controller="Admin" asp-action="Index" asp-area=""
-               class="btn btn-outline-info d-flex align-items-center">
-                <span class="material-symbols-outlined"> chevron_left </span> Back
-            </a>
+            @if (ViewBag.IsPhysican)
+            {
+                <a asp-action="Index" asp-controller="Provider"
+                   class="btn btn-outline-info d-flex align-items-center">
+                    <span class="material-symbols-outlined"> chevron_left </span> Back
+                </a>
+            }
+            else
+            {
+                <a asp-action="Index" asp-controller="Admin"
+                   class="btn btn-outline-info d-flex align-items-center">
+                    <span class="material-symbols-outlined"> chevron_left </span> Back
+                </a>
+            }
         </div>
     </div>
     <form asp-action="ViewCase" method="post" asp-route-id="@Model.RequestClientId" id="viewcaseform">
@@ -101,19 +111,24 @@
 
                 </div>
             </div>
-            <div class="col">
+                @if (ViewBag.isPhysican!=null && !@ViewBag.IsPhysican)
+                {
+                    
+                <div class="col">
                 @if(Model.status!=1 ){
 
                 <button class="btn btn-outline-info text-info" id="EditBtn" type="button" onclick="toggleEdit()">
                     Edit
                 </button>
-                }
                     <button class="btn btn-outline-info text-info" type="Submit" id="SubBtn">
                     Submit
                     </button><button class="btn btn-outline-info text-info" type="button" id="CanBtn" onclick="toggleCancel()">
                     Cancel
                 </button>
+                }                
             </div>
+                }
+
             <div class="col-12 col-md-12">
                 <h5 class="fw-semibold">Location Information</h5>
             </div>
@@ -160,13 +175,15 @@
         </div>
         <div class="row mb-3 mt-3">
             <div class="d-flex gap-3 align-items-center justify-content-end">
+                        @if (ViewBag.isPhysican != null && !@ViewBag.IsPhysican)
+                        {
                     @if (Model.status == 1)
                     {
-                        
-                    <button type="button" class="btn btn-info text-light mx-3" data-bs-toggle="modal" data-bs-target="#assigncase" data-bs-requestid="@Model.RequestId" data-bs-status="@Model.status">Assign Case</button>
-                    <button type="button" class="btn btn-danger text-light mx-3" data-bs-toggle="modal" data-bs-target="#cancelcaseview" id="examplemodal" data-bs-requestid="@Model.RequestId" data-bs-patientname="@Model.FirstName">Cancel  Case</button>
+                            <button type="button" class="btn btn-info text-light mx-3" data-bs-toggle="modal" data-bs-target="#assigncase" data-bs-requestid="@Model.RequestId" data-bs-status="@Model.status">Assign Case</button>
+                            <button type="button" class="btn btn-danger text-light mx-3" data-bs-toggle="modal" data-bs-target="#cancelcaseview" id="examplemodal" data-bs-requestid="@Model.RequestId" data-bs-patientname="@Model.FirstName">Cancel  Case</button>
+                        }
                     }
-                <button class="btn btn-info text-light mx-3" asp-action="ViewNotes" asp-route-requestid="@Model.RequestId" id="submit">
+                    <button class="btn btn-info text-light mx-3" asp-action="ViewNotes" asp-route-requestid="@Model.RequestId" id="submit">
                     View Notes
                 </button>
                    

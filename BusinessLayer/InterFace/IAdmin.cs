@@ -18,7 +18,7 @@ namespace BusinessLayer.InterFace
         Task UpdateRequestClient(ViewCaseVM viewCaseVM, int id);
         List<ViewNotesVM> GetNotesForRequest(int requestid);
         Task<bool> AssignRequest(int regionId, int physician, string description, int requestId,int adminid);
-        Task<bool> UpdateAdminNotes(int requestId, string adminNotes);
+        Task<bool> UpdateAdminNotes(int requestId, string adminNotes,string AspNetId,bool IsPhysician);
         Task<bool> CancelCase(int requestId, string notes, string cancelReason);
 
         public bool IsSendEmail(string toEmail, string subject, string body, List<string> filenames);

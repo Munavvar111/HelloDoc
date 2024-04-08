@@ -146,20 +146,20 @@ namespace BusinessLayer.Repository
                         if(request!=null)
                         {
                         AddRequestClient(requestModel, request.Requestid);
-                        int count = _context.Requests.Where(x => x.Createddate.Date == request.Createddate.Date).Count() + 1;
-                        var region = _context.Regions.Where(x => x.Name == requestModel.State).FirstOrDefault();
-                        if (region != null)
-                        {
-                            var confirmNum = string.Concat(region?.Abbreviation?.ToUpper(), request.Createddate.ToString("ddMMyy"), requestModel.Lastname.Substring(0, 2).ToUpper() ?? "",
-                           requestModel.Firstname.Substring(0, 2).ToUpper(), count.ToString("D4"));
-                            request.Confirmationnumber = confirmNum;
-                        }
-                        else
-                        {
-                            var confirmNum = string.Concat("ML", request.Createddate.ToString("ddMMyy"), requestModel.Lastname.Substring(0, 2).ToUpper() ?? "",
-                          requestModel.Firstname.Substring(0, 2).ToUpper(), count.ToString("D4"));
-                            request.Confirmationnumber = confirmNum;
-                        }
+                            int count = _context.Requests.Where(x => x.Createddate.Date == request.Createddate.Date).Count() + 1;
+                            var region = _context.Regions.Where(x => x.Name == requestModel.State).FirstOrDefault();
+                            if (region != null)
+                            {
+                                var confirmNum = string.Concat(region?.Abbreviation?.ToUpper(), request.Createddate.ToString("ddMMyy"), requestModel.Lastname.Substring(0, 2).ToUpper() ?? "",
+                               requestModel.Firstname.Substring(0, 2).ToUpper(), count.ToString("D4"));
+                                request.Confirmationnumber = confirmNum;
+                            }
+                            else
+                            {
+                                var confirmNum = string.Concat("ML", request.Createddate.ToString("ddMMyy"), requestModel.Lastname.Substring(0, 2).ToUpper() ?? "",
+                              requestModel.Firstname.Substring(0, 2).ToUpper(), count.ToString("D4"));
+                                request.Confirmationnumber = confirmNum;
+                            }
                         _context.Update(request);
                         _context.SaveChanges();
                         }
