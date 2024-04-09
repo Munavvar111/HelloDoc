@@ -64,6 +64,7 @@ namespace BusinessLayer.Repository
                                                             Regions = _context.Regions.ToList(),
                                                             PhysicianId = req.Physicianid,
                                                             PhysicianName = ps.Firstname + "_" + ps.Lastname,
+                                                            CallType = (int)req.Calltype,
                                                             Cancel = _context.Casetags.Select(cc => new CancelCase
                                                             {
                                                                 CancelCaseReson = cc.Name,

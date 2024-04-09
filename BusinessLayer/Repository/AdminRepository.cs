@@ -404,7 +404,6 @@ namespace BusinessLayer.Repository
                     if (isPhysician)
                     {
                         requestVisenotes.Physiciannotes = adminNotes;
-                       
                     }
                     else
                     {
@@ -1481,6 +1480,20 @@ namespace BusinessLayer.Repository
             return _context.Requestclients.Where(item => item.Requestid == requestid).FirstOrDefault();
         }
 
+        public void UpdateRequest(Request request)
+        {
+            _context.Requests.Update(request);
+        }
+
+        public void AddRequestWiseFile(Requestwisefile requestwisefile)
+        {
+            _context.Requestwisefiles.Add(requestwisefile);
+           
+        }
+        public void UpdateRequestWiseFile(Requestwisefile requestwisefile)
+        {
+            _context.Requestwisefiles.Update(requestwisefile);
+        }
     }
 }
 

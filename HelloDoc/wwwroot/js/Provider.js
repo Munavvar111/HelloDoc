@@ -14,7 +14,7 @@ $(document).ready(function () {
     function updateUIWithCounts() {
         $.ajax({
             type: "GET",
-            url: "/Admin/GetStatusCounts",
+            url: "/Admin/GetStatusCountsProvider",
             success: function (data) {
                 console.log(data);
                 updateUIWithCountsNumber(data);
@@ -136,11 +136,8 @@ $(document).ready(function () {
         $('#statuschange').html('(Active)');
         localStorage.setItem("statustext", '(Active)')
 
-        filterTable("ActiveProviderTablePartial", currentStatus, currentPage, pageSize,);
+        filterTable("ActiveTablePartial", currentStatus, currentPage, pageSize,);
     });
-
-
-
     $("#statuslink4").click(function () {
         
         $("#searchInput").val("");
@@ -194,8 +191,6 @@ $(document).ready(function () {
         else {
             currentPage = 1;
         }
-
-
         $.ajax({
             type: "GET",
             url: "/Provider/FilterPatient",

@@ -63,5 +63,41 @@ namespace HelloDoc.Controllers
             }
             
         }
+        public IActionResult HouseCall(int requestidHouse)
+        {
+            Request request=_admin.GetRequestById(requestidHouse);
+            request.Calltype = 1;
+            _admin.UpdateRequest(request);
+            _admin.SaveChanges();
+            return RedirectToAction("Index");
+
+        }
+        public IActionResult ConfirmHouseCall(int id)
+        {
+            Request request= _admin.GetRequestById(id);
+            request.Status = 6;
+            _admin.UpdateRequest(request);
+                _admin.SaveChanges();
+            return RedirectToAction("Index");
+
+        }
+        public IActionResult Consult(int requestidConsult)
+        {
+            Request request = _admin.GetRequestById(requestidConsult);
+            request.Status = 6;
+            _admin.UpdateRequest(request);
+            _admin.SaveChanges();
+            return RedirectToAction("Index");
+        }
+        public IActionResult ViewUploads(int id)
+        {
+            return RedirectToAction("ViewUploads", "Admin", new { id = id });
+
+        }
+        public IActionResult EncounterForm(int requestid)
+        {
+            return RedirectToAction("EncounterForm", "Admin", new { requestId = requestid });
+
+        }
     }
 }

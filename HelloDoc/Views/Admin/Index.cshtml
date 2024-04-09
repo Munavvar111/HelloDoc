@@ -232,6 +232,8 @@
 <partial name="SendAgreement"></partial>
 <partial name="EncounterPdfModal"></partial>
 <partial name="SendLinkModal"></partial>
+<partial name="TransferCaseProvider"></partial>
+
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
 <script>
@@ -264,6 +266,20 @@
 
 
 </script>
+
+<script>
+    $(document).ready(function () {
+        $('#EncounterProvidermodal').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget);
+            console.log(button)
+            var recipient = button.data('bs-requestid');
+            console.log(recipient);
+            var modal = $(this);
+            modal.find('.HouseCall').attr('asp-route-id', recipient);
+        });
+    });
+</script>
+
 <script>
     $(document).ready(function () {
 
@@ -411,6 +427,33 @@
 
         });
     });
+</script>
+
+<script>
+    $(document).ready(function () {
+
+        $('#transfercaseprovider').on('show.bs.modal', function (event) {
+            console.log("block")
+            var button = $(event.relatedTarget);
+            console.log(button)
+            var recipient = button.data('bs-requestid');
+            var modal = $(this);
+
+
+            modal.find('#requestIdInputTransferProvider').val(recipient);
+
+        });
+
+        $('#TransferCaseProvider').on('hidden.bs.modal', function () {
+
+            $('#transferproviderCaseForm').each(function () {
+                this.reset();
+            })
+
+        });
+
+    });
+
 </script>
 <script>
     $(document).ready(function () {

@@ -20,7 +20,6 @@
         display: inline !important;
     }
 </style>
-
 <div class="container-fluid px-4 text-center py-4">
     <ul class=" nav gx-5 row  gy-4 mt-0 row row-cols-3 row-cols-lg-6 g-2 g-lg-3">
 
@@ -108,6 +107,8 @@
     </div>
 </div>
 <partial name="SendAgreement"></partial>
+<partial name="TransferCaseProvider"></partial>
+<partial name="EncounterProvidermodal"></partial>
 <div id="loader" class="loader"></div>
 <div id="partialContainer">
 </div>
@@ -143,8 +144,25 @@
 
 
     });
+</script>
+<script>
+    $(document).ready(function () {
+        $('#EncounterProvidermodal').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget);
+            console.log(button)
+            var recipient = button.data('bs-requestid');
+            console.log(recipient);
+            var status = button.data('bs-status');
+
+            var modal = $(this);
+            modal.find('#requestidHouseCall').val(recipient);
+            modal.find('#requestidConsult').val(recipient);
+            
+        });
+       
 
 
+    });
 </script>
 <script>
     $(document).ready(function () {
@@ -216,40 +234,29 @@
             $('#cancelCaseForm').each(function () {
                 this.reset();
             })
-
-
         });
-
     });
 
 </script>
-<script>
-
-    $(document).ready(function () {
-    })
-</script>
 
 <script>
     $(document).ready(function () {
-        $('#BlockModal').on('show.bs.modal', function (event) {
+        
+        $('#TransferCaseProvider').on('show.bs.modal', function (event) {
             console.log("block")
             var button = $(event.relatedTarget);
             console.log(button)
             var recipient = button.data('bs-requestid');
-            var patientName = button.data('bs-patientname')
-            console.log(recipient)
             var modal = $(this);
-            modal.find('#patientname').text(patientName)
+            
 
-            modal.find('#requestIdInputBlock').val(recipient);
-            var validator = $("#BlockModal").validate(); // Assuming your form has ID "cancelCaseForm"
-            validator.resetForm();
-
+            modal.find('#requestIdInputTransfer').val(recipient);
+            
         });
 
-        $('#BlockModal').on('hidden.bs.modal', function () {
+        $('#TransferCaseProvider').on('hidden.bs.modal', function () {
 
-            $('#blockCaseForm').each(function () {
+            $('#transferproviderCaseForm').each(function () {
                 this.reset();
             })
 

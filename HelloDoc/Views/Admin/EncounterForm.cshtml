@@ -5,7 +5,9 @@
 }
 @{
     ViewData["Title"] = "Encounter Form";
-    string requestid = Context.Request.Query["requestid"];
+    string requestid = Context.Request.Query["id"];
+    Console.WriteLine(requestid);
+
 }
 
 <section>

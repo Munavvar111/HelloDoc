@@ -13,6 +13,7 @@ namespace DataAccessLayer.CustomModel
         public string? PhysicianName { get; set; }
         public string PatientName { get; set; } =  null!;
 
+        public int? CallType { get; set; } 
         public int RequestClientId { get; set; }    
         public int? PhysicianId { get; set; }    
 

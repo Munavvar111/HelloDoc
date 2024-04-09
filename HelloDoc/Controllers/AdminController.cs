@@ -1608,12 +1608,26 @@ namespace HelloDoc.Controllers
         {
             var counts = new
             {
-                NewCount = _context.Requests.Where(item => item.Status == 1).Count(),
-                PendingCount = _context.Requests.Where(item => item.Status == 2).Count(),
-                ActiveCount = _context.Requests.Where(item => item.Status == 4 || item.Status == 5).Count(),
-                ToClosedCount = _context.Requests.Where(item => item.Status == 3 || item.Status == 7 || item.Status == 8).Count(),
-                ConcludeCount = _context.Requests.Where(item => item.Status == 6).Count(),
-                UnpaidCount = _context.Requests.Where(item => item.Status == 9).Count(),
+                NewCount = _context.Requests.Where(item => item.Status == 1 && item.Isdeleted == false).Count(),
+                PendingCount = _context.Requests.Where(item => item.Status == 2 && item.Isdeleted == false).Count(),
+                ActiveCount = _context.Requests.Where(item => (item.Status == 4 || item.Status == 5) && item.Isdeleted == false).Count(),
+                ToClosedCount = _context.Requests.Where(item => (item.Status == 3 || item.Status == 7 || item.Status == 8) && item.Isdeleted == false).Count(),
+                ConcludeCount = _context.Requests.Where(item => item.Status == 6 && item.Isdeleted == false).Count(),
+                UnpaidCount = _context.Requests.Where(item => item.Status == 9 && item.Isdeleted == false).Count(),
+            };
+            return Json(counts);
+        }
+        public IActionResult GetStatusCountsProvider(int id)
+        {
+            string? Email = HttpContext.Session.GetString("Email");
+
+            Physician physician = _admin.GetPhysicianByEmail(Email);
+            var counts = new
+            {
+                NewCount = _context.Requests.Where(item => item.Status == 1 && item.Physicianid==physician.Physicianid && item.Isdeleted==false).Count(),
+                PendingCount = _context.Requests.Where(item => item.Status == 2 && item.Physicianid == physician.Physicianid && item.Isdeleted == false).Count(),
+                ActiveCount = _context.Requests.Where(item => (item.Status == 4 || item.Status == 5) &&  item.Physicianid == physician.Physicianid && item.Isdeleted == false).Count(),
+                ConcludeCount = _context.Requests.Where(item => item.Status == 6 && item.Physicianid == physician.Physicianid && item.Isdeleted == false).Count(),
             };
             return Json(counts);
         }
@@ -1651,9 +1665,27 @@ namespace HelloDoc.Controllers
         #endregion
 
         #region ViewUploads
-        [CustomAuthorize("Dashboard", "6")]
+        [CustomAuthorize("Dashboard", "6","19")]
+        [HttpGet("Admin/viewuploads/{id}", Name = "AdminViewUpload")]
+        [HttpGet("Provider/viewuploads/{id}", Name = "ProviderUpload")]
         public async Task<IActionResult> ViewUploads(int id)
         {
+            string? email = HttpContext.Session.GetString("Email");
+            if (email == null)
+            {
+                TempData["Error"] = "Session Is Expire Please Login!";
+                return RedirectToAction("Index", "Login");
+            }
+            Physician physician = _admin.GetPhysicianByEmail(email);
+            Admin admin = _admin.GetAdminByEmail(email);
+            if (admin != null)
+            {
+                ViewBag.IsPhysician = false;
+            }
+            if (physician != null)
+            {
+                ViewBag.IsPhysician = true;
+            }
             List<Requestwisefile> reqfile = await _patient.GetRequestwisefileByIdAsync(id);
             List<Requestwisefile> reqfiledeleted = reqfile.Where(item => item.Isdeleted != null && (item.Isdeleted.Length == 0 || !item.Isdeleted[0])).ToList();
             Request? requestclient = _context.Requests.Where(item => item.Requestid == id).FirstOrDefault();
@@ -1678,8 +1710,8 @@ namespace HelloDoc.Controllers
                 {
 
                     file.Isdeleted = new BitArray(new[] { true });
-                    _context.Requestwisefiles.Update(file);
-                    _context.SaveChanges();
+                    _admin.UpdateRequestWiseFile(file);
+                    _admin.SaveChanges();
                     TempData["SuccessMessage"] = "Delete successful!";
                     return Ok(new { message = "File deleted successfully", id = file.Requestid });
 
@@ -1730,18 +1762,56 @@ namespace HelloDoc.Controllers
         #endregion
 
         #region UploadFile
-        [CustomAuthorize("Dashboard", "6")]
+        [CustomAuthorize("Dashboard", "6","19")]
         [HttpPost]
         public async Task<IActionResult> UploadFile(RequestFileViewModel rm, int id)
         {
+            string? email = HttpContext.Session.GetString("Email");
+            if (email == null)
+            {
+                TempData["Error"] = "Session Is Expire Please Login!";
+                return RedirectToAction("Index","Login");
+            }
+            Physician physician = _admin.GetPhysicianByEmail(email);
+            Admin admin = _admin.GetAdminByEmail(email);
             if (rm.File != null)
             {
+                if (physician != null)
+                {
                 String? uniqueFileName = await _patient.AddFileInUploader(rm.File);
-                _patient.AddRequestWiseFile(uniqueFileName, id);
-                return RedirectToAction("ViewUploads", "Admin", new { id = id });
+                    var requestWiseFile = new Requestwisefile();
+                    {
+                        requestWiseFile.Filename = uniqueFileName;
+                        requestWiseFile.Createddate = DateTime.Now;
+                        requestWiseFile.Requestid = id;
+                        requestWiseFile.Isdeleted = new BitArray(new[] { false });
+                        requestWiseFile.Physicianid = physician.Physicianid;
+                    }
+                    _admin.AddRequestWiseFile(requestWiseFile);
+                    _admin.SaveChanges();
+                    return RedirectToAction("ViewUploads", "Provider", new { id = id });
+                }
+                else
+                {
+                    String? uniqueFileName = await _patient.AddFileInUploader(rm.File);
+                    var requestWiseFile = new Requestwisefile();
+                    {
+                        requestWiseFile.Filename = uniqueFileName;
+                        requestWiseFile.Createddate = DateTime.Now;
+                        requestWiseFile.Requestid = id;
+                        requestWiseFile.Isdeleted = new BitArray(new[] { false });
+                        requestWiseFile.Adminid= admin.Adminid;
+                    }
+                    _admin.AddRequestWiseFile(requestWiseFile);
+                    _admin.SaveChanges();
+                    return RedirectToAction("ViewUploads", "Admin", new { id = id });
+                }
             }
             else
             {
+                if(physician!=null)
+                return RedirectToAction("ViewUploads", "Provider", new { id = id });
+                else
                 return RedirectToAction("ViewUploads", "Admin", new { id = id });
             }
         }
@@ -1918,6 +1988,9 @@ namespace HelloDoc.Controllers
 
         }
         #endregion
+
+        [HttpGet("Admin/EncounterForm/{requestId}", Name = "AdminEncounterForm")]
+        [HttpGet("Provider/EncounterForm/{requestId}", Name = "ProviderEncounterForm")]
         public IActionResult EncounterForm(int requestId)
         {
             ViewEncounterForm viewEncounterForm = new ViewEncounterForm();

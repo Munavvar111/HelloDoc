@@ -89,5 +89,9 @@ namespace BusinessLayer.InterFace
 
         void UpdateRequestStatusLog(Requeststatuslog updaterequeststatuslog);
         Requestclient GetRequestClientById(int requestid);
+        void UpdateRequest(Request request);
+
+        void AddRequestWiseFile(Requestwisefile requestwisefile);
+        void UpdateRequestWiseFile(Requestwisefile requestwisefile);
 	}
 }

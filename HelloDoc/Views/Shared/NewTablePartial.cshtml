@@ -350,4 +350,18 @@
 			$('.collapse.show').not('#' + id).collapse('hide');
 		});
 	});
+	function acceptRequest(requestId) {
+		Swal.fire({
+			title: 'Are you sure?',
+			text: 'You are about to accept this request.',
+			icon: 'warning',
+			showCancelButton: true,
+			confirmButtonText: 'Yes, accept it!',	
+			cancelButtonText: 'No, cancel'
+		}).then((result) => {
+			if (result.isConfirmed) {
+				window.location.href = '@Url.Action("Accept", "Provider")/'+  requestId;
+			}
+		});
+	}
 </script>
