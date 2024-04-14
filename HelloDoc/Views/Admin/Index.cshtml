@@ -333,6 +333,7 @@
     $(document).ready(function () {
 
         $('#exampleModal').on('show.bs.modal', function (event) {
+          
             var button = $(event.relatedTarget);
             console.log(button)
             var recipient = button.data('bs-requestid');
@@ -438,6 +439,7 @@
             console.log(button)
             var recipient = button.data('bs-requestid');
             var modal = $(this);
+            console.log(recipient);
 
 
             modal.find('#requestIdInputTransferProvider').val(recipient);

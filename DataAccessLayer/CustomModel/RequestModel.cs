@@ -17,7 +17,7 @@ namespace DataAccessLayer.CustomModel
     {
         [Key]
         [Column("email")]
-        [Required(ErrorMessage ="Please Enter Email")]
+        [Required(ErrorMessage = "Please Enter Email")]
         [RegularExpression(@"^[a-zA-Z0-9._%+-]+@(gmail\.com|yahoo\.com|gov\.in)$", ErrorMessage = "Enter a valid email address with valid domain")]
         public string Email { get; set; } = null!;
 
@@ -35,10 +35,10 @@ namespace DataAccessLayer.CustomModel
         [RegularExpression(@"^[^\s]+$", ErrorMessage = "Invalid LastName")]
         [StringLength(50, ErrorMessage = "Last Name should be between {2} and {1} characters.", MinimumLength = 2)]
         public string Lastname { get; set; } = null!;
-        
+
         [Column("birthdata")]
         [Required(ErrorMessage = "Please Enter BirthDate")]
-        public DateOnly BirthDate { get; set; } 
+        public DateOnly BirthDate { get; set; }
 
         [Column("street")]
         [Required(ErrorMessage = "Please Enter Street")]
@@ -54,7 +54,6 @@ namespace DataAccessLayer.CustomModel
 
         [Column("state")]
         [Required(ErrorMessage = "Please Enter State")]
-        [RegularExpression(@"^(?=.*\S)[a-zA-Z\s.'-]+$", ErrorMessage = "Enter a valid State name")]
         public string State { get; set; } = null!;
 
         [Column("zipcode")]
@@ -65,7 +64,7 @@ namespace DataAccessLayer.CustomModel
 
 
         [DataType(DataType.Password)]
-                [StringLength(20, ErrorMessage = "Password should be between {2} and {1} characters.", MinimumLength = 6)]
+        [StringLength(20, ErrorMessage = "Password should be between {2} and {1} characters.", MinimumLength = 6)]
         public string? Passwordhash { get; set; }
 
         [DataType(DataType.Password)]
@@ -75,11 +74,11 @@ namespace DataAccessLayer.CustomModel
 
         [RegularExpression(@"^\+?(\d[\d-. ]+)?(\([\d-. ]+\))?[\d-. ]+\d$", ErrorMessage = "Please enter valid phone number")]
         [Required(ErrorMessage = "Plese enter your Phone Number"), Display(Name = " ")]
-        [StringLength(20, MinimumLength = 10, ErrorMessage = "Enter valid Mobile Number")] 
+        [StringLength(20, MinimumLength = 10, ErrorMessage = "Enter valid Mobile Number")]
         public string? PhoneNo { get; set; }
-        
+
         [FromForm]
-           public IFormFile? File { get; set; }
+        public IFormFile? File { get; set; }
 
         public string? Notes { get; set; }
 

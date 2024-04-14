@@ -10,6 +10,6 @@ namespace BusinessLayer.InterFace
     public interface IProvider
     {
         List<NewRequestTableVM> SearchPatients(string searchValue, string selectedFilter, int[] currentStatus,string Email);
-        bool RequestAcceptedByProvider(int requestId);
+        bool RequestAcceptedByProvider(int requestId,int physicianId);
     }
 }

@@ -9,10 +9,7 @@
     font-family: "Montserrat", sans-serif;
 }
 
-input,
-button {
-    height: 3rem;
-}
+
 
 a {
     text-decoration: none;
@@ -104,3 +101,16 @@ li {
     .buttons button {
         margin-left: 5px; /* Adjust spacing between buttons */
     }
+.text-info{
+    font-weight:500!important;
+}
+.text-muted{
+    font-weight:500!important;
+}
+.btn-outline-info{
+    font-weight:500!important;
+    border-width:3px;
+}
+.filterByType{
+    margin-top:7px
+}

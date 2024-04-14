@@ -30,18 +30,18 @@
 			{
 
 
-				<tr class="d-none d-xl-table-row text-white" style="vertical-align:middle">
+				<tr class="d-none d-xl-table-row text-white" style="vertical-align:middle;font-weight:500">
 
 
 
 					<td style="background-color:@(GetRowClass(@item.ReqTypeId))!important">@item.PatientName</td>
 					@if (!ViewBag.IsPhysician)
 					{
-						<td style="background-color:@(GetRowClass(item.ReqTypeId))!important">@item.DateOfBirth</td>
+						<td style="background-color:@(GetRowClass(item.ReqTypeId))!important">@item.DateOfBirth.ToString("MMM dd, yyyy")</td>
 						<td style="background-color:@(GetRowClass(item.ReqTypeId))!important">@item.Requestor</td>
 						<td style="background-color:@(GetRowClass(item.ReqTypeId))!important">
 							@if (!string.IsNullOrEmpty(item.PhysicianName))
-							{
+							{	
 								<span>@item.PhysicianName</span>
 							}
 							else
@@ -49,7 +49,7 @@
 								<span>-</span>
 							}
 						</td>
-						<td style="background-color:@(GetRowClass(item.ReqTypeId))!important">5-12-2019</td>
+						<td style="background-color:@(GetRowClass(item.ReqTypeId))!important">@item.DateOfService</td>
 					}
 					<td style="background-color:@(GetRowClass(@item.ReqTypeId))!important">
 							<button class="btn  border-white text-white">

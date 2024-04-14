@@ -1,11 +1,18 @@
 ﻿@using Microsoft.AspNetCore.Http
 @model DataAccessLayer.CustomModel.ViewEncounterForm
 @{
-    Layout = "~/Views/Shared/_Layout4.cshtml";
+    if (ViewBag.IsPhysician)
+    {
+        Layout = "~/Views/Shared/_Layout5.cshtml";
+    }
+    if (!ViewBag.IsPhysician)
+    {
+        Layout = "~/Views/Shared/_Layout4.cshtml";
+    }
 }
 @{
     ViewData["Title"] = "Encounter Form";
-    string requestid = Context.Request.Query["id"];
+    string requestid = Context.Request.Query["requestid"];
     Console.WriteLine(requestid);
 
 }
@@ -17,10 +24,20 @@
             <span class="fs-2 text-muted fw-bold">Encounter Form</span>
         </div>
         <div class="d-flex justify-content-end">
-            <a asp-controller="Admin" asp-action="Index" asp-area=""
-               class="btn btn-outline-info d-flex align-items-center">
-                <span class="material-symbols-outlined"> chevron_left </span> Back
-            </a>
+                @if (ViewBag.IsPhysician)
+                {
+                    <a asp-action="Index" asp-controller="Provider"
+                       class="btn btn-outline-info d-flex align-items-center">
+                        <span class="material-symbols-outlined"> chevron_left </span> Back
+                    </a>
+                }
+                else
+                {
+                    <a asp-action="Index" asp-controller="Admin"
+                       class="btn btn-outline-info d-flex align-items-center">
+                        <span class="material-symbols-outlined"> chevron_left </span> Back
+                    </a>
+                }
         </div>
     </div>
         <div class="container  shadow-lg p-3">
@@ -286,23 +303,22 @@
     </div>
 </div>
 
-
 <script>
     const finalizeButton = document.getElementById('finalize');
+    const saveChangesButton = document.getElementById('savachanges');
     const encounterForm = document.getElementById('encounterForm');
 
     finalizeButton.addEventListener('click', () => {
         const isFinalizedInput = document.getElementById('isfilnalized');
-        isFinalizedInput.value = 1;
+        isFinalizedInput.value = "1";
+        console.log(isFinalizedInput);
+        debugger
         encounterForm.submit();
     });
-</script>
-<script>
-    const savachanges = document.getElementById('savachanges');
 
-    finalizeButton.addEventListener('click', () => {
+    saveChangesButton.addEventListener('click', () => {
         const isFinalizedInput = document.getElementById('isfilnalized');
-        isFinalizedInput.value = 0;
+        isFinalizedInput.value = "0";
         encounterForm.submit();
     });
 </script>

@@ -1,7 +1,14 @@
 ﻿@model DataAccessLayer.CustomModel.RequestModel
 @{
     ViewData["Title"] = "CreateRequest";
-    Layout = "~/Views/Shared/_Layout4.cshtml";
+    if (ViewBag.IsPhysician)
+    {
+        Layout = "~/Views/Shared/_Layout5.cshtml";
+    }
+    if (!ViewBag.IsPhysician)
+    {
+        Layout = "~/Views/Shared/_Layout4.cshtml";
+    }
 }
 
 <!-- Back button -->
@@ -122,6 +129,7 @@
                 </a> *@
             </div>
         </div>
+            @if (!ViewBag.IsPhysician){
 
         <!-- Note -->
         <h4 class="py-3">Notes</h4>
@@ -129,7 +137,17 @@
             <textarea class="form-control" asp-for="Notes" placeholder="Message" id="floatingTextarea2"
                       style="height: 100px"></textarea>
             <label for="floatingTextarea2" class="text-muted">Admin Notes (Optional)</label>
-        </div>
+            </div>
+        }
+        else
+        {
+            <h4 class="py-3">Notes</h4>
+            <div class="form-floating col-12 mb-3">
+                <textarea class="form-control" asp-for="Notes" placeholder="Message" id="floatingTextarea2"
+                          style="height: 100px"></textarea>
+                <label for="floatingTextarea2" class="text-muted">Physician Notes (Optional)</label>
+            </div>
+        }
 
         <!-- buttons -->
         <div class="row py-4">

@@ -20,12 +20,15 @@
                         }
                     </select>
                 </div>
-
+                @if (!ViewBag.IsPhysician)
+                {
+                    
                 <div class="form-floating mb-3">
                     <select class="form-select pt-1 physicianDropdown" asp-for="Physicianid" id="physicianSelect" aria-label="Default select example">
                         <option value="" selected disabled>Physician</option>
                     </select>
                 </div>
+                }
 
                 <div class="col-md-12 form-floating mb-3">
                     <input id="StartDate" asp-for="Startdate" class="form-control rounded vcs" name="Startdate" type="date" placeholder=Suchtext autocomplete=off>

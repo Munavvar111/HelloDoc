@@ -35,17 +35,26 @@
 
 
 
-            <tr class="d-none d-xl-table-row" style="vertical-align:middle">
+            <tr class="d-none d-xl-table-row" style="vertical-align:middle;font-weight:500">
 
 
 
                 <td style="background-color:@(GetRowClass(@item.ReqTypeId))!important">@item.PatientName</td>
                 @if (ViewBag.IsPhysician == false)
                 {
-                    <td style="background-color:@(GetRowClass(@item.ReqTypeId))!important">@item.DateOfBirth</td>
+                    <td style="background-color:@(GetRowClass(item.ReqTypeId))!important">@item.DateOfBirth.ToString("MMM dd, yyyy")</td>
                     <td style="background-color:@(GetRowClass(@item.ReqTypeId))!important">@item.Requestor </td>
-                    <td style="background-color:@(GetRowClass(@item.ReqTypeId))!important">de.jay</td>
-                    <td style="background-color:@(GetRowClass(@item.ReqTypeId))!important">5-12-2019</td>
+                    <td style="background-color:@(GetRowClass(@item.ReqTypeId))!important">
+                        @if (!string.IsNullOrEmpty(item.PhysicianName))
+                        {
+                            <span>@item.PhysicianName</span>
+                        }
+                        else
+                        {
+                            <span>-</span>
+                        }
+                    </td>
+                    <td style="background-color:@(GetRowClass(@item.ReqTypeId))!important">@item.DateOfService.ToString("MMM dd, yyyy")</td>
                 }
                 <td style="background-color:@(GetRowClass(@item.ReqTypeId))!important">
                     <button class="btn  border-white text-white">
@@ -337,9 +346,63 @@
             reverseButtons: true
         }).then((result) => {
             if (result.isConfirmed) {
-                window.location.href = '@Url.Action("ConfirmHouseCall", "Provider")/' + requestId;
+                // Perform AJAX request to confirm the house call
+                $.ajax({
+                    type: 'GET',
+                    url: '@Url.Action("ConfirmHouseCall", "Provider")/' + requestId,
+                    success: function () {
+                        Swal.fire({
+                            title: 'Confirmed!',
+                            text: 'Your house call has been confirmed successfully.',
+                            icon: 'success',
+                            showConfirmButton: false,
+                            timer: 1500
+                        }).then(function () {
+                            // Redirect to Index after showing success message
+                            window.location.href = '@Url.Action("Index", "Provider")';
+                        });
+                    },
+                    error: function () {
+                        // Handle error case if necessary
+                        Swal.fire({
+                            title: 'Error!',
+                            text: 'An error occurred while confirming the house call.',
+                            icon: 'error'
+                        });
+                    }
+                });
+            } else {
+                // Call CancelHouseCall function and show success message
+                CancelHouseCall(requestId);
             }
-        })
+        });
+    }
+
+    function CancelHouseCall(id) {
+        // Perform AJAX request to cancel the house call
+        $.ajax({
+            type: 'GET',
+            url: '@Url.Action("CancelHouseCall", "Provider")/' + id,
+            success: function () {
+                Swal.fire({
+                    title: 'Cancelled!',
+                    text: 'Your house call has been cancelled successfully.',
+                    icon: 'success',
+                    showConfirmButton: false,
+                    timer: 1500
+                }).then(function () {
+                    window.location.href = '@Url.Action("Index", "Provider")';
+                });
+            },
+            error: function () {
+                // Handle error case if necessary
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'An error occurred while cancelling the house call.',
+                    icon: 'error'
+                });
+            }
+        });
     }
 
 </script>

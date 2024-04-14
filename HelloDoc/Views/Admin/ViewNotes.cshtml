@@ -1,4 +1,5 @@
-﻿@{
+﻿@model DataAccessLayer.CustomModel.ViewNotes
+@{
     if (ViewBag.IsPhysician)
     {
         Layout = "~/Views/Shared/_Layout5.cshtml";
@@ -8,288 +9,300 @@
         Layout = "~/Views/Shared/_Layout4.cshtml";
     }
 }
-
 @{
-    // Get the value of the requestid parameter from the URL
-    int requestId = (int)ViewData["RequestId"];
-
+    ViewData["Title"] = "View Notes";
 }
-@model List<DataAccessLayer.CustomModel.ViewNotesVM>
-
-<div class="container bg-light mt-4">
-    <div class="d-flex justify-content-between my-3">
-        <div class="d-flex">
-            <span class="fs-2 text-muted fw-bold">Notes</span>
-        </div>
-        <div class="d-flex justify-content-end">
-            @if (ViewBag.IsPhysician)
-            {
-                <a asp-action="Index" asp-controller="Provider"
-                   class="btn btn-outline-info d-flex align-items-center">
-                    <span class="material-symbols-outlined"> chevron_left </span> Back
-                </a>
-            }
-            else
-            {
-                <a asp-action="Index" asp-controller="Admin"
-                   class="btn btn-outline-info d-flex align-items-center">
-                    <span class="material-symbols-outlined"> chevron_left </span> Back
-                </a>
-            }
-        </div>
-    </div>
-    @if (Model.Count > 0 && Model != null)
-    {
-
-        <div class="row row-cols-1 row-cols-md-2 g-3">
-            <div class="col ">
-                <div class="bg-white border p-3 ">
-                    <div class="d-flex">
-                        <div>
-                            <span class="material-symbols-outlined">
-                                sync_alt
-                            </span>
-                        </div>
-                        <div class="d-flex flex-column ps-3">
-                            <div>
-                                <span class="fw-bolder">
-                                    Transfer Notes
-                                </span>
-                            </div>
-                            <div>
-                                @for (var i = 0; i < @Model.Count; i++)
-                                {
-                                    if (@Model[i].TransferNotes != null && (Model[i].Status != 3 && Model[i].Status != 7))
-                                    {
-                                        <p class="notesbtn m-0">(@(i + 1))@Model[i].AdminName is a Transferd to The Dr.Jay @Model[i].TransferNotes</p>
-                                    }
-                                }
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col">
-                <div class="bg-white border p-3">
-                    <div class="d-flex">
-                        <div>
-                            <span class="material-symbols-outlined">
-                                person
-                            </span>
-                        </div>
-                        <div class="d-flex flex-column ps-3">
-                            <div>
-                                <span class="fw-bolder">Physician Notes</span>
-                            </div>
-                            <div>
-
-                                <p class="text-muted">@Model[0].PhysicianNotes </p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-12 ">
-                <div class="bg-white border p-3">
-                    <div class="d-flex">
-                        <div>
-                            <span class="material-symbols-outlined">
-                                person
-                            </span>
-                        </div>
-                        <div class="d-flex flex-column ps-3">
-                            <div>
-                                <span class="fw-bolder">Admin Notes</span>
-                            </div>
-                            <div>
+@{
+    int requestId = (int)ViewData["requestid"];
+    bool anyNonEmptyNotes = false;
+    string transfernote = "";
+}
 
 
-                                <p class="text-muted">@Model[0].AdminNotes</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            @if (Model[0].Cancelcount > 0)
-            {
-                @for (var i = 0; i < @Model.Count; i++)
-                {
-                    if (Model[i].Status == 3 || Model[i].Status == 7)
+<section>
+   
+    @{
+        <div class="container d-flex flex-column align-items-center">
+            <div class="container d-flex justify-content-between mt-4 mb-3 px-2">
+                <h3 class="fw-bold m-0 d-flex align-items-center">Notes</h3>
+                <div>
+                    @if (ViewBag.IsPhysician)
                     {
-
-                        <div class="col-12 ">
-                            <div class="bg-white border p-3">
+                        <a asp-action="Index" asp-controller="Provider"
+                           class="btn btn-outline-info d-flex align-items-center">
+                            <span class="material-symbols-outlined"> chevron_left </span> Back
+                        </a>
+                    }
+                    else
+                    {
+                        <a asp-action="Index" asp-controller="Admin"
+                           class="btn btn-outline-info d-flex align-items-center">
+                            <span class="material-symbols-outlined"> chevron_left </span> Back
+                        </a>
+                    }
+                </div>
+            </div>
+            <div class="container p-3 bg-white border-0">
+                <div class="row">
+                    <div class="col-md-6 mb-4 p-0">
+                        <div class="mx-2">
+                            <Button type="button" class="w-100 p-3 rounded-3 bg-transparent shadow-lg border-0" data-bs-toggle="modal" data-bs-target="#transfernotesmodal">
                                 <div class="d-flex">
-                                    <div>
-                                        <span class="material-symbols-outlined">
-                                            person
-                                        </span>
+                                    <div class="me-2">
+                                        <i class="fa-solid fa-right-left fa-lg"></i>
                                     </div>
-                                    <div class="d-flex flex-column ps-3">
-                                        <div>
-                                            <span class="fw-bolder">Cancel Notes</span>
-                                        </div>
-                                        <div>
-
-                                            @if (@Model[i].TransferNotes != null && Model[i].Status == 3)
+                                    <div class="w-100 d-flex flex-column">
+                                        <h6 class="text-start">Transfer Notes</h6>
+                                        @if (Model.viewnotes.Count > 0 && @Model != null)
+                                        {
+                                            @for (var i = 0; i < Model.viewnotes.Count; i++)
                                             {
+                                                if (!string.IsNullOrEmpty(Model.viewnotes[i].TransferNotes) && Model.viewnotes[i].TransToPhysicianId != null)
+                                                {
+                                                    anyNonEmptyNotes = true;
+                                                    transfernote = @Model.viewnotes[i].AdminName + " transferred to " + @Model.viewnotes[i].PhysicianName + " at " + @Model.viewnotes[i].CreatedDate + ": " + @Model.viewnotes[i].TransferNotes;
 
-                                                <p class="text-muted">@Model[i].TransferNotes</p>
-                                            }
-                                            else if (Model[i].TransferNotes != null && Model[i].Status == 7)
-                                            {
-                                                <p class="text-muted">@Model[i].TransferNotes</p>
-
+                                                }
                                             }
 
-                                        </div>
+                                            @if (!anyNonEmptyNotes)
+                                            {
+                                                <p class="m-0" style="visibility:hidden">  cvxvcxcv  </p>
+                                            }
+                                            else
+                                            {
+                                                <p class="notesbtn m-0">@transfernote</p>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <p class="m-0" style="visibility:hidden">  cvxvcxcv  </p>
+                                        }
                                     </div>
                                 </div>
+                            </Button>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-4 p-0">
+                        <div class="mx-2">
+                            <Button class="w-100 p-3 rounded-3 bg-transparent shadow-lg border-0">
+                                <div class="d-flex">
+                                    <div class="me-2">
+                                        <i class="fa-solid fa-user-doctor fa-lg"></i>
+                                    </div>
+                                    <div class="w-100 d-flex flex-column">
+                                        <h6 class="text-start">Physician Notes</h6>
+                                        @if (@Model.viewnotes.Count > 0 && @Model != null)
+                                        {
+                                            @if (@Model.viewnotes[0].PhysicianNotes != null)
+                                            {
+                                                <p class="notesbtn m-0">@Model.viewnotes[0].PhysicianNotes</p>
+                                            }
+                                            else
+                                            {
+                                                <p class="m-0" style="visibility:hidden">  cvxvcxcv  </p>
+                                            }
+
+                                        }
+                                        else
+                                        {
+                                            <p class="m-0" style="visibility:hidden">  cvxvcxcv  </p>
+                                        }
+                                    </div>
+                                </div>
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-4 p-0">
+                        <div class="mx-2">
+                            <Button class="w-100 p-3 rounded-3 bg-transparent shadow-lg border-0">
+                                <div class="d-flex">
+                                    <div class="me-2">
+                                        <i class="fa-solid fa-user-tie fa-lg"></i>
+                                    </div>
+                                    <div class=" d-flex flex-column">
+                                        <h6 class="text-start">Admin Notes</h6>
+                                        @if (Model.viewnotes.Count > 0 && @Model != null)
+                                        {
+                                            @if (@Model.viewnotes[0].AdminNotes != null)
+                                            {
+                                                <p class="notesbtn m-0">@Model.viewnotes[0].AdminNotes</p>
+                                            }
+                                            else
+                                            {
+                                                <p class="m-0" style="visibility:hidden">  cvxvcxcv  </p>
+                                            }
+
+                                        }
+                                        else
+                                        {
+                                            <p class="m-0" style="visibility:hidden">  cvxvcxcv  </p>
+                                        }
+                                    </div>
+                                </div>
+                            </Button>
+                        </div>
+                    </div>
+                    @if (Model.viewnotes.Count > 0 && @Model != null)
+                    {
+                        @if (Model.CancelAdmincount > 0)
+                        {
+                            <div class="col-md-6 mb-4 p-0">
+                                <div class="mx-2">
+                                    <Button class="w-100 p-3 rounded-3 bg-transparent shadow-lg border-0">
+                                        <div class="d-flex">
+                                            <div class="me-2">
+                                                <i class="fa-solid fa-ban"></i>
+                                            </div>
+                                            <div class="d-flex flex-column">
+                                                <h6 class="text-start">Admin Cancellation Notes</h6>
+                                                @for (var i = 0; i < @Model.viewnotes.Count; i++)
+                                                {
+                                                    if (@Model.viewnotes[i].TransferNotes != null && @Model.viewnotes[i].Status == 3)
+                                                    {
+                                                        <p class="notesbtn m-0">@Model.viewnotes[i].TransferNotes</p>
+                                                        break;
+                                                    }
+                                                }
+                                            </div>
+                                        </div>
+                                    </Button>
+                                </div>
                             </div>
+                        }
+                    }
+                    @if (Model.viewnotes.Count > 0 && @Model != null)
+                    {
+                        @if (Model.CancelPhysiciancount > 0)
+                        {
+                            <div class="col-md-6 mb-4 p-0">
+                                <div class="mx-2">
+                                    <Button class="w-100 p-3 rounded-3 bg-transparent shadow-lg border-0">
+                                        <div class="d-flex">
+                                            <div class="me-2">
+                                                <i class="fa-solid fa-ban"></i>
+                                            </div>
+                                            <div class="d-flex flex-column">
+                                                <h6 class="text-start">Physician Cancellation Notes</h6>
+                                                @for (var i = 0; i < @Model.viewnotes.Count; i++)
+                                                {
+                                                    if (@Model.viewnotes[i].TransferNotes != null && @Model.viewnotes[i].Status == 3)
+                                                    {
+                                                        <p class="notesbtn m-0">@Model.viewnotes[i].TransferNotes</p>
+                                                        break;
+                                                    }
+                                                }
+                                            </div>
+                                        </div>
+                                    </Button>
+                                </div>
+                            </div>
+                        }
+                    }
+
+                    @if (Model.viewnotes.Count > 0 && @Model != null)
+                    {
+                        @if (@Model.CancelPatientcount > 0)
+                        {
+                            <div class="col-md-6 mb-4 p-0">
+                                <div class="mx-2">
+                                    <Button class="w-100 p-3 rounded-3 bg-transparent shadow-lg border-0">
+                                        <div class="d-flex">
+                                            <div class="me-2">
+                                                <i class="fa-solid fa-ban"></i>
+                                            </div>
+                                            <div class="d-flex flex-column">
+                                                <h6 class="text-start">Patient Cancellation Notes</h6>
+                                                @for (var i = 0; i < @Model.viewnotes.Count; i++)
+                                                {
+                                                    if (@Model.viewnotes[i].TransferNotes != null && @Model.viewnotes[i].Status == 7)
+                                                    {
+                                                        <p class="notesbtn m-0">@Model.viewnotes[i].TransferNotes</p>
+                                                        break;
+                                                    }
+                                                }
+                                            </div>
+                                        </div>
+                                    </Button>
+                                </div>
+                            </div>
+                        }
+                    }
+
+                </div>
+                <div class="row">
+                    <div class="col-md-12 p-0">
+                        <div class="shadow-lg rounded-3 mx-2 p-3">
+                            <form method="post" asp-controller="Admin" asp-action="ViewNotesPost" asp-route-id="@requestId">
+                                <div class="form-floating my-2 mb-3">
+                                    @if (Model.viewnotes.Count > 0)
+                                    {
+                                        <textarea name="adminNotes" asp-for=@Model.viewnotes[0].AdminNotes class="form-control mb-3" placeholder="Admin Notes" id="notes" style="height: 200px"></textarea>
+                                    }
+                                    else
+                                    {
+                                        <textarea name="adminNotes" class="form-control mb-3" placeholder="Admin Notes" id="notes" style="height: 200px"></textarea>
+                                    }
+                                    @if (ViewBag.IsPhysician)
+                                    {
+                                        <label for="notes">Physician Notes</label>
+                                    }
+                                    else
+                                    {
+                                        <label for="notes">Admin Notes</label>
+                                    }
+                                </div>
+                                <div class="d-flex flex-row-reverse">
+                                    <button type="submit" class="btn btn-info p-2">
+                                        Save Changes
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    }
+
+    <div class="modal fade" id="transfernotesmodal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-info">
+                    <h1 class="modal-title text-light  fs-5" id="exampleModalLabel">Transfer Notes</h1>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    @if (Model.viewnotes.Count > 0 && @Model != null)
+                    {
+                        for (var i = 0; i < @Model.viewnotes.Count; i++)
+                        {
+                            if (@Model.viewnotes[i].TransferNotes != null && @Model.viewnotes[i].TransToPhysicianId != null)
+                            {
+                                <p class="">(@(i + 1)) @Model.viewnotes[i].AdminName transferred to @Model.viewnotes[i].PhysicianName at @Model.viewnotes[i].CreatedDate: @Model.viewnotes[i].TransferNotes</p>
+                            }
+                        }
+                        @if (!anyNonEmptyNotes)
+                        {
+                            <div class="w-100 text-center">
+                                <h3 class="m-0">Nothing to Display <i class="fa-regular fa-face-frown-open"></i></h3>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="w-100 text-center">
+                            <h3 class="m-0">Nothing to Display <i class="fa-regular fa-face-frown-open"></i></h3>
                         </div>
                     }
-                }
-
-            }
-
-            <form asp-action="ViewNotesPost" class="col-12 col-md-12 mb-5" method="post" asp-route-id="@requestId">
-                <input type="hidden" />
-                <div class="col-12 col-md-12 mb-5">
-                    <div class="bg-white border p-3">
-                        <div class="form-floating">
-                            @if (@ViewBag.IsPhysician == false)
-                            {
-
-                                <textarea class="form-control"
-                                          placeholder="Leave a comment here"
-                                          name="adminnotes"
-                                          asp-for="@Model[0].AdminNotes"
-                                          id="floatingTextarea2"
-                                          style="height: 100px"></textarea>
-                                <label for="floatingTextarea2">
-
-                                    Admin Notes
-                                </label>
-                            }
-                            else
-                            {
-                                <textarea class="form-control"
-                                          placeholder="Leave a comment here"
-                                          name="adminnotes"
-                                          asp-for="@Model[0].PhysicianNotes"
-                                          id="floatingTextarea2"
-                                          style="height: 100px"></textarea>
-                                <label for="floatingTextarea2">
-
-                                    Physician Notes
-                                </label>
-                            }
-                        </div>
-
-                        <div class="d-flex gap-3 align-items-center justify-content-end mt-3">
-                            <button class="btn btn-info text-light" type="submit" id="submit">
-                                Save Changes
-                            </button>
-
-                        </div>
-                    </div>
-
                 </div>
-            </form>
-
+                <div class="modal-footer">
+                    <button type="button" class="btn btn_hover btn-outline-info" data-bs-dismiss="modal">Cancel</button>
+                </div>
+            </div>
         </div>
-
-    }
-    else
-    {
-        <div class="row row-cols-1 row-cols-md-2 g-3">
-            <div class="col ">
-                <div class="bg-white border p-3 ">
-                    <div class="d-flex">
-                        <div>
-                            <span class="material-symbols-outlined">
-                                sync_alt
-                            </span>
-                        </div>
-                        <div class="d-flex flex-column ps-3">
-                            <div>
-                                <span class="fw-bolder">
-                                    Transfer Notes
-                                </span>
-                            </div>
-                            <div>
-                                <span>-</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col">
-                <div class="bg-white border p-3">
-                    <div class="d-flex">
-                        <div>
-                            <span class="material-symbols-outlined">
-                                person
-                            </span>
-                        </div>
-                        <div class="d-flex flex-column ps-3">
-                            <div>
-                                <span class="fw-bolder">Physician Notes</span>
-                            </div>
-                            <div>
-
-                                <span>-</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-12 ">
-                <div class="bg-white border p-3">
-                    <div class="d-flex">
-                        <div>
-                            <span class="material-symbols-outlined">
-                                person
-                            </span>
-                        </div>
-                        <div class="d-flex flex-column ps-3">
-                            <div>
-                                <span class="fw-bolder">Admin Notes</span>
-                            </div>
-                            <div>
-                                <span>-</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <form asp-action="ViewNotesPost" class="col-12 col-md-12 mb-5" method="post" asp-route-id="@requestId">
-                <input type="hidden" />
-                <div class="col-12 col-md-12 mb-5">
-                    <div class="bg-white border p-3">
-                        <div class="form-floating">
-                            <textarea class="form-control" ,
-                                      name="adminnotes"
-                                      placeholder="Leave a comment here"
-                                      id="floatingTextarea2"
-                                      style="height: 100px"></textarea>
-                            <label for="floatingTextarea2">
-                                Admin Notes
-                            </label>
-                        </div>
-
-                        <div class="d-flex gap-3 align-items-center justify-content-end mt-3">
-                            <button class="btn btn-info text-light" type="submit" id="submit">
-                                Save Changes
-                            </button>
-
-                        </div>
-                    </div>
-
-                </div>
-            </form>
-        </div>
-    }
-</div>
+    </div>
+</section>

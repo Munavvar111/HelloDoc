@@ -36,6 +36,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Views\Modals\" />
+    <Folder Include="Views\Partials\" />
     <Folder Include="wwwroot\content\NewFolder\" />
     <Folder Include="wwwroot\Rotativa\" />
     <Folder Include="wwwroot\uploads\" />

@@ -19,6 +19,8 @@ namespace DataAccessLayer.CustomModel
         public string? PhoneNo { get; set; } 
 
         public string? Email { get; set; }
-        public string? ConfirmNumber { get; set; }       
+        public string? ConfirmNumber { get; set; }    
+        
+        public string? Notes { get; set; }  
     }
 }

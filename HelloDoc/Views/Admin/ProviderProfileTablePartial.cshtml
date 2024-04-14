@@ -1,5 +1,5 @@
 ﻿<div class="table-responsive mt-4 mb-4 d-">
-    <table class="table table-hover d-md-table d-none">
+    <table class="table table-hover d-md-table d-none" style="vertical-align:middle">
         <thead class="table-light">
             <tr>
                 <th scope="col">Stop Notification</th>
@@ -47,8 +47,8 @@
                     </td>
                     <td scope="row">
                         <div class="d-flex">
-                            <a class="btn btn-outline-info rounded me-2" onclick="sendEmailModal(@item.physicianid)">Contact</a>
-                            <a asp-action="PhysicanProfile" asp-route-id="@item.physicianid" class="btn btn-outline-info rounded">Edit</a>
+                            <a class="btn btn-outline-info rounded me-2" data-bs-toggle="modal" data-bs-target="#contactProviderModal" data-bs-providerId="@item.physicianid">Contact</a>
+                                <a asp-action="PhysicanProfile" asp-route-id="@item.physicianid" class="btn btn-outline-info rounded">Edit</a>
                         </div>
                     </td>
                 </tr>
@@ -58,7 +58,7 @@
     <button id="saveButton" class="btn btn-primary mt-3" style="display: none;" >Save</button>
 
 </div>
-
+<partial name="contactProviderModal"></partial>
 
 @{
     var Count = 0;
@@ -106,7 +106,8 @@
                 </span>
             </div>
             <div class="d-flex justify-content-end mb-2 gap-2">
-                <a class="btn btn-outline-info rounded me-2" onclick="sendEmailModal(@items.physicianid)">
+                <a class="btn btn-outline-info rounded me-2" data-bs-toggle="modal" data-bs-target="#contactProviderModal" data-bs-providerId="@items.physicianid">
+                    Contact
                 <small>Contact</small>
                 </a>
                 <a asp-action="PhysicanProfile" asp-route-id="@items.physicianid" class="btn btn-outline-info rounded">
@@ -189,4 +190,29 @@
     // Add event listener to the 'Save' button
     var saveButton = document.getElementById('saveButton');
     saveButton.addEventListener('click', saveChanges);
+</script>
+
+<script>
+    $(document).ready(function () {
+        $('#contactProviderModal').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget);
+            console.log(button)
+            var recipient = button.data('bs-providerId');
+            console.log(recipient);
+            var status = button.data('bs-status');
+
+            var modal = $(this);
+            modal.find('#providerID').val(recipient);
+
+        });
+        $('#contactProviderModal').on('hidden.bs.modal', function () {
+            console.log("hidden")
+            
+
+        });
+
+
+    });
+
+
 </script>

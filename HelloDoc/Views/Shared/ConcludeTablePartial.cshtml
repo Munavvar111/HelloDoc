@@ -26,16 +26,25 @@
 
 
 
-            <tr class=" d-none d-xl-table-row " style="vertical-align: middle">
+            <tr class=" d-none d-xl-table-row " style="vertical-align: middle;font-weight:500">
 
 
 
                 <td style="background-color:@(GetRowClass(@item.ReqTypeId))!important">@item.PatientName</td>
                 @if (!ViewBag.IsPhysician)
                 {
-                    <td style="background-color:@(GetRowClass(@item.ReqTypeId))!important">@item.DateOfBirth</td>
-                    <td style="background-color:@(GetRowClass(@item.ReqTypeId))!important">de.jay</td>
-                    <td style="background-color:@(GetRowClass(@item.ReqTypeId))!important">5-12-2019</td>
+                    <td style="background-color:@(GetRowClass(item.ReqTypeId))!important">@item.DateOfBirth.ToString("MMM dd, yyyy")</td>
+                    <td style="background-color:@(GetRowClass(@item.ReqTypeId))!important">
+                        @if (!string.IsNullOrEmpty(item.PhysicianName))
+                        {
+                            <span>@item.PhysicianName</span>
+                        }
+                        else
+                        {
+                            <span>-</span>
+                        }
+                    </td>
+                    <td style="background-color:@(GetRowClass(@item.ReqTypeId))!important">@item.DateOfService.ToString("MMM dd, yyyy")</td>
                 }
                 <td style="background-color:@(GetRowClass(@item.ReqTypeId))!important">
                     <button class="btn  border-white text-white">
@@ -98,10 +107,9 @@
                             @if (!ViewBag.IsPhysician)
                             {
                                 <a class="dropdown-item" asp-action="ViewCase" asp-controller="Admin" asp-route-id="@item.RequestClientId"><i class="bi bi-x-circle me-3"></i>View Case</a>
-                                <a class="dropdown-item"><i class="bi bi-x-circle me-3"></i>View Uploads</a>
+                                <a class="dropdown-item" asp-action="ViewUploads" asp-controller="Admin" asp-route-id="@item.RequestId"><i class="bi bi-x-circle me-3"></i>View Uploads</a>
                                 <a class="dropdown-item" asp-action="ViewNotes" asp-controller="Admin" asp-route-requestid="@item.RequestId"><i class="bi bi-x-circle me-3"></i>View Notes</a>
                                 <a class="dropdown-item" asp-action="SendOrder" asp-controller="Admin" asp-route-requestid="@item.RequestId"><i class="bi bi-card-text me-3"></i> Order </a>
-                                <a class="dropdown-item" href="#"><i class="bi bi-card-text me-3"></i> Doctor Notes </a>
                                 <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#ClearModal" data-bs-requestid="@item.RequestId"><i class="bi bi-x-circle me-3"></i>Clear Case</a>
                                 @if (@item.isfinalize == null)
                                 {
@@ -121,8 +129,9 @@
                             }
                             @if (ViewBag.IsPhysician)
                             {
+                                <a class="dropdown-item" asp-action="ConcludeCare" asp-controller="Provider" asp-route-requestid="@item.RequestId"><i class="bi bi-x-circle me-3"></i>Conclude Care</a>
                                 <a class="dropdown-item" asp-action="ViewCase" asp-controller="Provider" asp-route-id="@item.RequestClientId"><i class="bi bi-x-circle me-3"></i>View Case</a>
-                                <a class="dropdown-item" asp-action="ViewUploads" asp-controller="Admin" asp-route-id="@item.RequestId"><i class="bi bi-x-circle me-3"></i>View Uploads</a>
+                                <a class="dropdown-item" asp-action="ViewUploads" asp-controller="Provider" asp-route-id="@item.RequestId"><i class="bi bi-x-circle me-3"></i>View Uploads</a>
                                 <a class="dropdown-item" asp-action="ViewNotes" asp-controller="Provider" asp-route-requestid="@item.RequestId"><i class="bi bi-x-circle me-3"></i>View Notes</a>
                                 @if (@item.isfinalize == null)
                                 {

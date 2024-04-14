@@ -3,6 +3,7 @@ using DataAccessLayer.CustomModel;
 using DataAccessLayer.DataModels;
 using Microsoft.AspNetCore.JsonPatch.Internal;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Globalization;
 
 namespace HelloDoc.Controllers
@@ -11,9 +12,11 @@ namespace HelloDoc.Controllers
     {
         private readonly IProvider _provider;
         private readonly IAdmin _admin;
-        public ProviderController(IProvider provider, IAdmin admin)
+        private readonly ILogin _login;
+        public ProviderController(IProvider provider, IAdmin admin,ILogin login)
         {
             _provider = provider;
+            _login= login;  
             _admin = admin;
         }
         [CustomAuthorize("Dashboard", "19")]
@@ -50,7 +53,9 @@ namespace HelloDoc.Controllers
         }
         public IActionResult Accept(int id)
         {
-           bool accepted = _provider.RequestAcceptedByProvider(id);
+            string? Email = HttpContext.Session.GetString("Email");
+            Physician physician = _admin.GetPhysicianByEmail(Email);
+           bool accepted = _provider.RequestAcceptedByProvider(id,physician.Physicianid);
             if (accepted)
             {
                 TempData["SuccessMessage"] = "Accepted successfully";
@@ -69,6 +74,8 @@ namespace HelloDoc.Controllers
             request.Calltype = 1;
             _admin.UpdateRequest(request);
             _admin.SaveChanges();
+            TempData["SuccessMessage"] = "House call has been successfully processed.";
+
             return RedirectToAction("Index");
 
         }
@@ -78,7 +85,7 @@ namespace HelloDoc.Controllers
             request.Status = 6;
             _admin.UpdateRequest(request);
                 _admin.SaveChanges();
-            return RedirectToAction("Index");
+            return Ok();
 
         }
         public IActionResult Consult(int requestidConsult)
@@ -99,5 +106,93 @@ namespace HelloDoc.Controllers
             return RedirectToAction("EncounterForm", "Admin", new { requestId = requestid });
 
         }
+
+        public IActionResult GeneratePDF(int requestid)
+        {
+            return RedirectToAction("GeneratePDF", "Admin", new { requestid = requestid }); 
+        }
+        public IActionResult Scheduling()
+        {
+            return RedirectToAction("Scheduling", "Admin");
+        }
+        public IActionResult CancelHouseCall(int id)
+        {
+            Request request=_admin.GetRequestById(id);
+            request.Calltype = null; _admin.UpdateRequest(request);
+            _admin.SaveChanges();
+            
+            return Ok();
+
+        }
+
+        public IActionResult ConcludeCare(int requestid)
+        {
+            return RedirectToAction("CloseCase", "Admin", new { requestid = requestid });
+        }
+        public IActionResult CreateRequest()
+        {
+            return RedirectToAction("CreateRequest", "Admin");
+        }
+        public IActionResult PhysicanProfile(int id)
+        {
+          
+            return RedirectToAction("PhysicanProfile", "Admin", new {id=id});
+        }
+
+        public IActionResult RequestToAdminForEdit(int requestid,string editadminnotes)
+        {
+			string? requestlink = Url.ActionLink("GrantAccessOfEdit", "Admin", new {id=requestid} ,protocol: HttpContext.Request.Scheme);
+            Physician physician = _admin.GetPhysicianById(requestid);
+            string physicianname = physician.Firstname;
+			if (_login.IsSendEmail("munavvarpopatiya999@gmail.com", "Munavvar", $"Click <a href='{requestlink}'>here</a> to Grant Access {physicianname} Of Edit Physician Account "))
+            {
+				TempData["SuccessMessage"] = "Email Send ScueessFully.";
+                return RedirectToAction("PhysicanProfile", "Provider",new{id=requestid});
+			}
+            else
+            {
+				TempData["Error"] = "Email Unsend.";
+				return RedirectToAction("PhysicanProfile", "Provider");
+            }
+
+
+		}
+        public bool TransferCaseProvider(string TransferDec,int requestid)
+        {
+            Request? request =_admin.GetRequestById(requestid);
+            string? Email = HttpContext.Session.GetString("Email");
+            if (Email == null)
+            {
+                return false;
+            }
+            Physician? physician = _admin.GetPhysicianByEmail(Email);
+            if (physician != null && request != null)
+            {
+                try
+                {
+                    Requeststatuslog requeststatuslog = new Requeststatuslog
+                    {
+                        Requestid = requestid,
+                        Notes = TransferDec,
+                        Status = 2,
+                        Physicianid = physician.Physicianid,
+                        Transtoadmin = new System.Collections.BitArray(new[] {true}),
+                        Createddate = DateTime.Now,
+                    };
+                    _admin.UpdateRequestStatusLog(requeststatuslog);
+                    _admin.SaveChanges();
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    throw new ApplicationException("Failed to submit Form", ex);
+                }
+            }
+            else
+            {
+                return false;
+            }
+        }
+
     }
 }

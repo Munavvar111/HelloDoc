@@ -68,10 +68,10 @@ public partial class User
 
     [Column("createdby")]
     [StringLength(128)]
-    public string? Createdby { get; set; }
+    public string Createdby { get; set; } = null!;
 
     [Column("createddate", TypeName = "timestamp without time zone")]
-    public DateTime? Createddate { get; set; }
+    public DateTime Createddate { get; set; }
 
     [Column("modifiedby")]
     [StringLength(128)]

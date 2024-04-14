@@ -2,7 +2,6 @@
 using DataAccessLayer.CustomModel;
 using DataAccessLayer.DataContext;
 using DataAccessLayer.DataModels;
-using Org.BouncyCastle.Asn1.Ocsp;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,10 +31,11 @@ namespace BusinessLayer.Repository
             friend.Relationname = requestOthers.Relation;
             friend.Phonenumber = requestOthers.PhoneNumberOther;
             friend.Createddate = DateTime.Now;
+            friend.Isdeleted = false;
             _context.Requests.Add(friend);
             _context.SaveChanges();
         }
-        public DataAccessLayer.DataModels.Request GetRequestByEmail(string email)
+        public Request GetRequestByEmail(string email)
         {
             return _context.Requests.OrderBy(e => e.Requestid).LastOrDefault(r => r.Email == email);
         }

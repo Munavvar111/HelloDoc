@@ -3,6 +3,8 @@
     ViewData["Title"] = "BLockHistory";
     Layout = "~/Views/Shared/_Layout4.cshtml";
 }
+<partial name="ToasterPartialView"></partial>
+
 
 <div class="container d-flex justify-content-between my-3">
     <div class="d-flex">
@@ -50,7 +52,7 @@
 		<div class="row">
 			<div class="col text-end mb-3">
 				<button class="btn btn-outline-info me-2 rounded" id="clearBtn">Clear</button>
-				<button class="btn btn-info text-white rounded" id="searchBtn">Search</button>
+				<button class="btn btn-info text-white rounded" id="searchBtnBlock" type="button">Search</button>
 			</div>
 		</div>
 		<div id="BlockResults"></div>
@@ -92,17 +94,15 @@
 			});
 		}
 
-		$("#searchBtn").click(function () {
-			var Name=$(".name").val("");
+		$("#searchBtnBlock").click(function () {
+			var Name = $(".name").val(); // Get the value of the name input field
 			var Email = $(".email").val();
 			var PhoneNumber = $(".phoneNumber").val();
 			changeTable(Name, Email, PhoneNumber, 1);
 		});
 
 		$("#clearBtn").click(function () {
-			$(".name").val("");
-			$(".email").val("");
-			$(".phoneNumber").val("");
+			
 			changeTable(null, null, null, 1);
 		});
 

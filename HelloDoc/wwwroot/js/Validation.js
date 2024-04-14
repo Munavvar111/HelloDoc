@@ -82,6 +82,49 @@
             })
         }
     });
+    
+    $("#transferproviderCaseForm").validate({
+        rules: {
+            transferdec: {
+                required: true
+            }
+        },
+        messages: {
+            transferdec: "Please enter your Reanson."
+        },
+        errorPlacement: function (error, element) {
+            var errorSpan = $("span.error-" + element.attr("name"));
+
+            if (errorSpan.length > 0) {
+                // If the specific span is found, append the error message to it
+                error.appendTo(errorSpan);
+            } else {
+                // If not found, use the default placement (after the input field)
+                error.appendTo(errorSpan);
+            }
+        },
+        submitHandler: function (form) {
+            // If the form is valid, submit it
+            var TransferNotesByProvider = $('#transferdec').val();
+            var requestid = $('#requestIdInputTransferProvider').val();
+            $('#transfercaseprovider').modal('hide');
+            $.ajax({
+                method: 'POST',
+                url: '/Provider/TransferCaseProvider',
+                data: { TransferDec: TransferNotesByProvider, requestid: requestid },
+                success: function (data) {
+                    if (data) {
+                        var storedPartial = localStorage.getItem('currentPartial');
+                        var storedStatus = JSON.parse(localStorage.getItem('currentStatus'));
+
+                        filterTable(storedPartial, storedStatus, 1, 5);
+                        updateUIWithCounts();
+                        toastr.success('Transfer Request SendTo Admin!');
+                    }
+                }
+            })
+        }
+    });
 
     $("#cancelCaseForm").validate({
         rules: {
@@ -389,6 +432,9 @@
             form.submit();
         }
     });
+
+
+
     $("#accountinginfo").validate({
         rules: {
             Address1: {

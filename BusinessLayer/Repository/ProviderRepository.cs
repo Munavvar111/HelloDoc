@@ -80,9 +80,10 @@ namespace BusinessLayer.Repository
         #endregion
 
         #region RequestAcceptedByProvider
-        public bool RequestAcceptedByProvider(int requestId)
+        public bool RequestAcceptedByProvider(int requestId, int physicianId)
         {
             Request? request = _context.Requests.Find(requestId);
+            
             if (request == null)
             {
                 return false;
@@ -92,6 +93,14 @@ namespace BusinessLayer.Repository
                 request.Status = 2;
                 request.Accepteddate = DateTime.Now;
                 _context.Requests.Update(request);
+                _context.SaveChanges();
+                Requeststatuslog requeststatuslog = new Requeststatuslog();
+                requeststatuslog.Status = 2;
+                requeststatuslog.Physicianid = physicianId;
+                requeststatuslog.Createddate= DateTime.Now;
+                requeststatuslog.Requestid=requestId;
+                requeststatuslog.Transtoadmin = new System.Collections.BitArray(new[] { false });
+                _context.Requeststatuslogs.Add(requeststatuslog);
                 _context.SaveChanges();
                 return true;
             }

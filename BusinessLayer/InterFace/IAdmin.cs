@@ -16,10 +16,10 @@ namespace BusinessLayer.InterFace
         List<Region> GetAllRegion();
         ViewCaseVM GetCaseById(int id);
         Task UpdateRequestClient(ViewCaseVM viewCaseVM, int id);
-        List<ViewNotesVM> GetNotesForRequest(int requestid);
+        ViewNotes GetNotesForRequest(int requestid);
         Task<bool> AssignRequest(int regionId, int physician, string description, int requestId,int adminid);
         Task<bool> UpdateAdminNotes(int requestId, string adminNotes,string AspNetId,bool IsPhysician);
-        Task<bool> CancelCase(int requestId, string notes, string cancelReason);
+        Task<bool> CancelCase(int requestId, string notes, string cancelReason,int adminid);
 
         public bool IsSendEmail(string toEmail, string subject, string body, List<string> filenames);
         bool BlockRequest(string blockReason, int requestId);
@@ -31,6 +31,7 @@ namespace BusinessLayer.InterFace
         public List<int> GetUserPermissions(string roleid);
         public Menu GetMenufromMenuid(string menuid);
 
+        List<PhysicianLocation> GetAllPhysicianLocation();
         AdminProfileVm GetAdminProfile(string email);
         void ResetAdminPassword(string email, string newPassword);
         Physician GetPhysicianByEmail(string email);
@@ -43,11 +44,11 @@ namespace BusinessLayer.InterFace
 
         ProviderProfileVm GetPhysicianProfile(int id);
         bool ResetPhysicianPassword(int physicianId, string newPassword);
-        void UpdatePhysicianInformation(int id, string email, string mobileNo, string[] adminRegion, string synchronizationEmail, string npinumber, string medicalLicense);
-        void UpdateProviderProfile(int id, string businessName, string businessWebsite, IFormFile signatureFile, IFormFile photoFile);
-        bool UpdatePhysicianAccountingInfo(int physicianId, string address1, string address2, string city, int state, string zipcode, string mobileNo);
+        void UpdatePhysicianInformation(int id, string email, string mobileNo, string[] adminRegion, string synchronizationEmail, string npinumber, string medicalLicense,string userId);
+        void UpdateProviderProfile(int id, string businessName, string businessWebsite, IFormFile signatureFile, IFormFile photoFile,string AspnerId);
+        bool UpdatePhysicianAccountingInfo(int physicianId, string address1, string address2, string city, int state, string zipcode, string mobileNo,string AspNetId);
         void SaveNotification(List<int> physicianIds, List<bool> checkboxStates);
-		List<ScheduleModel> GetEvents(int region);
+		List<ScheduleModel> GetEvents(int region,bool IsPhysician,int id);
         void CreateShift(ScheduleModel data, string email);
         List<DateTime> IsShiftOverwritting(ScheduleModel data);
         ProviderOnCallVM GetProvidersOnCall(int region);
@@ -93,5 +94,19 @@ namespace BusinessLayer.InterFace
 
         void AddRequestWiseFile(Requestwisefile requestwisefile);
         void UpdateRequestWiseFile(Requestwisefile requestwisefile);
-	}
+
+        void AddRequestNotes(Requestnote requestnote);
+
+        Physician GetPhysicianById(int physicianId);
+
+        List<LogsVM> GetEmailLogs(int? accountType, string? receiverName, string? emailId, DateTime? createdDate, DateTime? sentDate);
+
+        Requestclient GetRequestclientByRequestId(int requestId);   
+        void UpdateRequestNotes (Requestnote updatedrequestnote);
+
+        Requestwisefile GetRequestwisefileByFileName(string filename);
+
+        Requestnote GetRequestNotesByRequestId(int requestid);
+
+    }
 }

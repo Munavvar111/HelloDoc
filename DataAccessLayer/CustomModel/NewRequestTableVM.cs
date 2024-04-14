@@ -9,7 +9,7 @@ namespace DataAccessLayer.CustomModel
 {
     public class NewRequestTableVM
     {
-
+        public DateTime? DateOfService {  get; set; }
         public string? PhysicianName { get; set; }
         public string PatientName { get; set; } =  null!;
 
@@ -32,6 +32,8 @@ namespace DataAccessLayer.CustomModel
         public string? Address { get; set; } 
 
         public string? Notes { get; set; }   
+
+        public string? State {  get; set; }
 
        public string? Phone { get; set; }
 

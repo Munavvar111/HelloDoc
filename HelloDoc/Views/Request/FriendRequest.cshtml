@@ -39,6 +39,8 @@
                        asp-for="PhoneNumberOther"
                        />
             </div>
+            <span asp-validation-for="PhoneNumberOther" class="text-danger"></span>
+            
         </div>
 
         <div class="col">
@@ -49,7 +51,7 @@
                        placeholder="+91 9876543210" 
                        asp-for="EmailOther"/>
                 <label for="floatingInput">Your Email</label>
-                <span asp-validation-for="EmailOther"></span>
+                <span asp-validation-for="EmailOther" class="text-danger"></span>
             </div>
         </div>
         <div class="col">
@@ -109,7 +111,8 @@
                        class="form-control"
                        id="floatingInput"
                        placeholder="name@example.com" 
-                       asp-for="BirthDate"/>
+                       asp-for="BirthDate"
+                       max="@DateTime.Today.ToString("yyyy-MM-dd")" />
                 <label for="floatingInput">Date of Birth</label>
                 <span asp-validation-for="BirthDate" class="text-danger"></span>
             </div>
@@ -253,11 +256,19 @@
     const phoneInput1 = window.intlTelInput(phone1, {
         utilsScript:
             "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",
+        nationalMode: false,
+        showSelectedDialCode: true,
+        autoInsertDialCode: true,
+        formatOnDisplay: false,
     });
     const phone2 = document.querySelector("#phone2");
     const phoneInput2 = window.intlTelInput(phone2, {
         utilsScript:
             "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",
+        nationalMode: false,
+        showSelectedDialCode: true,
+        autoInsertDialCode: true,
+        formatOnDisplay: false,
     });
     document.getElementById("fileInput").onchange = function () {
         let filePath = this.value;

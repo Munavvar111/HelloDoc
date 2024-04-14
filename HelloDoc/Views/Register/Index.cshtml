@@ -9,14 +9,15 @@
 </a>
 <h3 class="fw-semibold">Create Account</h3>
 
-<form class="w-100 needs-validation" method="post" action="">
+<form class="w-100 needs-validation" method="post" asp-action="Index" asp-controller="Register" asp-route-RequestId="@ViewBag.RequestId" asp-route-token="@ViewBag.Token">
     <div class="input-group mb-3 has-validation">
         
         <div class="form-floating flex-grow-1">
             <input type="email"
                    class="form-control"
                    id="floatingInputGroup1"
-                   asp-for="Email" />
+                   asp-for="Email" 
+                   value="@ViewBag.Email" disabled/>
             <label for="floatingInputGroup1" asp-for="Email">Email</label>
 
         </div>

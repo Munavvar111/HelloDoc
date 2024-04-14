@@ -63,7 +63,7 @@
         <a class="btn btn-info text-white" data-bs-toggle="modal" data-bs-target="#SendLink">
             <i class="bi bi-send  me-md-2"></i><span class="d-none d-lg-inline">Send Link</span>
         </a>
-        <a class="btn btn-info  text-white" asp-action="CreateRequest" asp-controller="admin">
+        <a class="btn btn-info  text-white" asp-action="CreateRequest" asp-controller="Provider">
             <i class="bi bi-pencil-square me-md-2"></i><span class="d-none d-lg-inline">
                 Create
                 Requests
@@ -90,28 +90,32 @@
             <div class="col-auto mb-2 d-none d-lg-block filter-item mx-4" data-value="">
                 <button type="button" class="btn border-dark-subtle">All</button>
             </div>
-            <div class="col-auto mb-2 filter-item mx-md-4 d-flex d-flex flex-md-row flex-column" data-value="1">
+            <div class="col-auto mb-2 filter-item mx-md-4 d-flex d-flex flex-md-row flex-column filterByType" data-value="1">
                 <i class="bi bi-circle-fill " style="color: #3ecc4e;"></i><span class="">Patient</span>
             </div>
-            <div class="col-auto mb-2 filter-item mx-md-4 d-flex d-flex flex-md-row flex-column" data-value="2">
+            <div class="col-auto mb-2 filter-item mx-md-4 d-flex d-flex flex-md-row flex-column filterByType" data-value="2">
                 <i class="bi bi-circle-fill" style="color: #FFD43B;"></i><span class="">Family</span>
 
             </div>
-            <div class="col-auto mb-2 filter-item mx-md-4 d-flex d-flex flex-md-row flex-column" data-value="3">
+            <div class="col-auto mb-2 filter-item mx-md-4 d-flex d-flex flex-md-row flex-column filterByType" data-value="3">
                 <i class="bi bi-circle-fill" style="color: #d049b7;"></i><span class="">Business</span>
             </div>
-            <div class="col-auto mb-2 filter-item mx-md-4 d-flex flex-md-row flex-column" data-value="4">
+            <div class="col-auto mb-2 filter-item mx-md-4 d-flex flex-md-row flex-column filterByType" data-value="4">
                 <i class="bi bi-circle-fill" style="color: #3c5bd7;"></i><span class="">Concierge</span>
             </div>
         </div>
     </div>
 </div>
+<div id="partialContainer">
+</div>
 <partial name="SendAgreement"></partial>
 <partial name="TransferCaseProvider"></partial>
 <partial name="EncounterProvidermodal"></partial>
+<partial name="RequestToAdminPartial"></partial>
+<partial name="../Admin/EncounterPdfModal"></partial>
+<partial name="../Admin/SendLinkModal"></partial>
+
 <div id="loader" class="loader"></div>
-<div id="partialContainer">
-</div>
 <div>
 </div>
 
@@ -215,42 +219,16 @@
 
 <script>
     $(document).ready(function () {
-
-        $('#exampleModal').on('show.bs.modal', function (event) {
-            var button = $(event.relatedTarget);
-            console.log(button)
-            var recipient = button.data('bs-requestid');
-            var patientName = button.data('bs-patientname')
-            console.log(recipient)
-            var modal = $(this);
-            modal.find('#patientname').text(patientName)
-            modal.find('#requestIdInputCancel').val(recipient);
-            var validator = $("#exampleModal").validate(); // Assuming your form has ID "cancelCaseForm"
-            validator.resetForm();
-
-        });
-        $('#exampleModal').on('hidden.bs.modal', function () {
-            console.log("hidden")
-            $('#cancelCaseForm').each(function () {
-                this.reset();
-            })
-        });
-    });
-
-</script>
-
-<script>
-    $(document).ready(function () {
         
-        $('#TransferCaseProvider').on('show.bs.modal', function (event) {
+        $('#transfercaseprovider').on('show.bs.modal', function (event) {
             console.log("block")
             var button = $(event.relatedTarget);
             console.log(button)
             var recipient = button.data('bs-requestid');
             var modal = $(this);
             
-
-            modal.find('#requestIdInputTransfer').val(recipient);
+            console.log(recipient);
+            modal.find('#requestIdInputTransferProvider').val(recipient);
             
         });
 
@@ -317,3 +295,26 @@
     });
 </script>
 
+<script>
+    $(document).ready(function () {
+        $('#RequestToAdminEditProfile').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget);
+            console.log(button)
+            var recipient = button.data('bs-physicianid');
+           
+
+            var modal = $(this);
+            modal.find('#requestIdToEditProfile').val(recipient);
+          
+        });
+        $('#RequestToAdminEditProfile').on('hidden.bs.modal', function () {
+            console.log("hidden")
+            $('#requestadminforedit').each(function () {
+                this.reset();
+            })
+
+        });
+
+
+    });
+</script>

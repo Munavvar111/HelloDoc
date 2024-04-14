@@ -1,0 +1,12 @@
+﻿@model List<DataAccessLayer.CustomModel.LogsVM><div class=""></div><table class="table my-3 me-0">    <thead class="table-secondary">        <tr class="table_header">            <th class="py-3">Recipient</th>            <th class="py-3">Action</th>            <th class="py-3">Role Name</th>            @if (Model != null && Model.Count > 0 && Model[0].isSms == true)            {                <th class="py-3">Mobile Number</th>            }            @if (Model != null && Model.Count > 0 && Model[0].isSms == false)            {                <th class="py-3">Email</th>            }            <th class="py-3">Created Date</th>            <th class="py-3">Sent Date</th>            <th class="py-3">Sent</th>            <th class="py-3">Sent Tries</th>            <th class="py-3">Confirmation Number</th>        </tr>    </thead>    <tbody>        @if (Model != null)
+        {
+            foreach (var item in Model)
+            {                <tr class="data-row">                    <td class="py-3">@item.Recipient</td>                    <td class="py-3">@item.Action</td>                    @switch (item.RoleName)
+                    {
+                        case 1:                            <td>Admin</td>                            break;
+                        case 2:                            <td>Physician</td>                            break;
+                        case 3:                            <td>User</td>                            break;
+                    }                    @if (Model != null && Model.Count > 0 && Model[0].isSms == true)
+                    {                        <td class="py-3">@item.MobileNumber</td>                    }                    @if (Model != null && Model.Count > 0 && Model[0].isSms == false)
+                    {                        <td class="py-3">@item.Email</td>                    }                    <td class="py-3">@item.CreatedDate?.ToString("MMM dd, yyyy")</td>                    <td class="py-3">@item.SentDate?.ToString("MMM dd, yyyy")</td>                    <td class="py-3">@(item.Sent == true ? "Yes" : "No")</td>                    <td class="py-3">@item.SentTries</td>                    <td class="py-3">@item.ConfirmationNumber</td>                </tr>            }
+        }    </tbody></table>

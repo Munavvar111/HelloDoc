@@ -84,3 +84,6 @@
 .hidden {
     display: none;
 }
+.Status-btn-text{
+    font-weight:500;
+}

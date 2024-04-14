@@ -1,266 +1,368 @@
 ﻿@using Microsoft.AspNetCore.Http
 @using Newtonsoft.Json;
 @{
-    string? username = Context.Session.GetString("Username");
-    
-    int userId = Context.Session.GetInt32("UserId") ?? 0; // Use a default value if session data is not available
-    var userPermissionsJson = Context.Session.GetString("UserPermissions");
-    
-    var userPermissions = !string.IsNullOrEmpty(userPermissionsJson) ? JsonConvert.DeserializeObject<List<string>>(userPermissionsJson) : null;
-  
+	string? username = Context.Session.GetString("Username");
+
+	int userId = Context.Session.GetInt32("UserId") ?? 0; // Use a default value if session data is not available
+	var userPermissionsJson = Context.Session.GetString("UserPermissions");
+
+	var userPermissions = !string.IsNullOrEmpty(userPermissionsJson) ? JsonConvert.DeserializeObject<List<string>>(userPermissionsJson) : null;
+
 }
 
 <script>
-    // Check if either username or userId is empty, or if userPermissions is null
-    if (@userPermissionsJson == null) {
-        // Redirect to login page
-        window.location.href = "/Login";
-    }
+	// Check if either username or userId is empty, or if userPermissions is null
+	if (@userPermissionsJson == null) {
+		// Redirect to login page
+		window.location.href = "/Login";
+	}
 </script>
 
 <!DOCTYPE html>
 <html lang="en" data-bs-theme="light">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta http-equiv="Content-Security-Policy" content="frame-src 'self' https://www.google.com;">
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<meta http-equiv="Content-Security-Policy" content="frame-src 'self' https://www.google.com;">
 
-    <title>@ViewData["Title"] - HalloDocPatient</title>
-    <link rel="shortcut icon" href="~/images/favicon.png" type="image/x-icon" />
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/style.css" asp-append-version="true" />
-    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
-    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.css" asp-append-version="true" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js" asp-append-version="true"></script>
-
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
-            integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
-            crossorigin="anonymous"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
-            integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
-            crossorigin="anonymous"></script>
+	<title>@ViewData["Title"] - HalloDocPatient</title>
+	<link rel="shortcut icon" href="~/images/favicon.png" type="image/x-icon" />
+	<script src="~/lib/jquery/dist/jquery.min.js"></script>
+	<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+	<link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+	<link rel="stylesheet" href="~/css/style.css" asp-append-version="true" />
+	<script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+	<script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+	<link rel="stylesheet"
+		  href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.css" asp-append-version="true" />
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js" asp-append-version="true"></script>
 
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css" integrity="sha512-dPXYcDub/aeb08c63jRq/k6GaKccl256JQy/AnOq7CAnEZ9FzSL9wSbcZkMp4R26vBsMLFYH4kQ67/bbV8XaCQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+			integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+			crossorigin="anonymous"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+			integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+			crossorigin="anonymous"></script>
 
 
-    <link href="https://cdn.datatables.net/v/bs5/dt-2.0.0/datatables.min.css" rel="stylesheet">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css" integrity="sha512-dPXYcDub/aeb08c63jRq/k6GaKccl256JQy/AnOq7CAnEZ9FzSL9wSbcZkMp4R26vBsMLFYH4kQ67/bbV8XaCQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
 
-    <script src="https://cdn.datatables.net/v/bs5/dt-2.0.0/datatables.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/jquery.validate.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/additional-methods.min.js"></script>
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <link rel="stylesheet" href="https://unpkg.com/bootstrap-table@1.22.3/dist/bootstrap-table.min.css">
+	<link href="https://cdn.datatables.net/v/bs5/dt-2.0.0/datatables.min.css" rel="stylesheet">
 
-    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
-    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+	<script src="https://cdn.datatables.net/v/bs5/dt-2.0.0/datatables.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/jquery.validate.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/additional-methods.min.js"></script>
 
-    @RenderSection("scripts", required: false)
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+	<link rel="stylesheet" href="https://unpkg.com/bootstrap-table@1.22.3/dist/bootstrap-table.min.css">
 
+	<script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+	<script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+
+	@RenderSection("scripts", required: false)
+	<style>
+
+		.nav-item{
+			font-weight:500!important;
+
+		}
+		.sub-menu {
+			display: none;
+			background-color: #fff; /* Background color same as link color */
+			; /* Add border for dropdown */
+		}
+
+			.sub-menu a {
+				display: block;
+				padding: 8px 16px;
+			}
+
+				
+
+		.item:hover .sub-menu {
+			display: block; /* Show dropdown on hover */
+		}
+
+		.sub-menu .sub-item {
+			display: block;
+			padding: 8px 46px;
+			color: #0a58ca;
+		}
+
+	</style>
 
 </head>
 <body style="overflow-y:scroll !important">
 
-    <div class="container-fluid d-flex flex-column max-vw-100 vh-100 p-0 bg-light">
-        <header class="w-100 border-bottom  px-2 px-md-5 position-relative z-2">
-            <section class="d-flex justify-content-between  pb-1">
+	<div class="container-fluid d-flex flex-column max-vw-100 vh-100 p-0 bg-light">
+		<header class="w-100 border-bottom  px-2 px-md-5 position-relative z-2">
+			<section class="d-flex justify-content-between  pb-1">
 
-                <div class="d-sm-none">
-                    <button class="btn btn-outline-info text-center align-middle mt-3" data-bs-toggle="collapse" data-bs-target="#responsiveNav">
-                        <span class="material-symbols-outlined">menu</span>
-                    </button>
-                </div>
+				<div class="d-sm-none">
+					<button class="btn btn-outline-info text-center align-middle mt-3" data-bs-toggle="collapse" data-bs-target="#responsiveNav">
+						<span class="material-symbols-outlined">menu</span>
+					</button>
+				</div>
 
-                <div class="logo-container d-flex gap-3 align-items-center bg-logo bg-opacity-50 pb-2 rounded-3">
-                    <img src="~/images/logo.png" alt="logo" class="w-100 h-100" />
-                </div>
+				<div class="logo-container d-flex gap-3 align-items-center bg-logo bg-opacity-50 pb-2 rounded-3">
+					<img src="~/images/logo.png" alt="logo" class="w-100 h-100" />
+				</div>
 
-                <div class="fw-bolder d-flex align-items-center gap-3">
-                    <span class="text-muted d-none d-md-inline">Welcome,@username</span>
-                    <a asp-controller="Login" asp-action="LogoutController" class="btn btn-outline-info d-none d-md-inline">Logout</a>
+				<div class="fw-bolder d-flex align-items-center gap-3">
+					<span class="text-muted d-none d-md-inline">Welcome,@username</span>
+					<a asp-controller="Login" asp-action="LogoutController" class="btn btn-outline-info d-none d-md-inline">Logout</a>
 
-                    <!-- Responsive Logout Icon for Small Screens -->
-                    <a asp-controller="Login" asp-action="LogoutController" class="btn btn-outline-info d-md-none">
-                        <span class="material-symbols-outlined">exit_to_app</span>
-                    </a>                    <button class="btn btn-outline-info text-center align-middle" id="modeSwitch">
-                        <span class="material-symbols-outlined">dark_mode</span>
-                    </button>
-                </div>
+					<!-- Responsive Logout Icon for Small Screens -->
+					<a asp-controller="Login" asp-action="LogoutController" class="btn btn-outline-info d-md-none">
+						<span class="material-symbols-outlined">exit_to_app</span>
+					</a>                    <button class="btn btn-outline-info text-center align-middle" id="modeSwitch">
+						<span class="material-symbols-outlined">dark_mode</span>
+					</button>
+				</div>
 
-                <!-- Responsive Navigation Toggle -->
+				<!-- Responsive Navigation Toggle -->
 
-            </section>
+			</section>
 
-            <!-- Responsive Navigation -->
-            <div class="collapse d-sm-none" id="responsiveNav">
-                <ul class="nav nav-tabs-info text-muted flex-column">
-
-                    <li class="nav-item text-info">
-                        <a class="nav-link @(ViewContext.ActionDescriptor.RouteValues["action"] == "Index" ? "active" : "")"
-                           asp-action="Index" asp-controller="Admin">Home</a>
-                    </li>
-                   
-                        <li class="nav-item">
-                            <a class="nav-link @(ViewContext.ActionDescriptor.RouteValues["action"] == "Profile" ? "active" : "")"
-                               asp-action="Profile" asp-controller="Admin">Profile</a>
-                        </li>
-                   
-
-                    <li class="nav-item">
-                        <a class="nav-link @(ViewContext.ActionDescriptor.RouteValues["action"] == "Profile" ? "active" : "")"
-                           asp-action="Profile" asp-controller="Admin">My Profile</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link @(ViewContext.ActionDescriptor.RouteValues["action"] == "Provider" ? "active" : "")"
-                           asp-action="Provider" asp-controller="Admin">Provider</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link @(ViewContext.ActionDescriptor.RouteValues["action"] == "Parteners" ? "active" : "")"
-                           asp-action="Parteners" asp-controller="Admin">Parteners</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link @(ViewContext.ActionDescriptor.RouteValues["action"] == "Records" ? "active" : "")"
-                           asp-action="Records" asp-controller="Admin">Records</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link @(ViewContext.ActionDescriptor.RouteValues["action"] == "Records" ? "active" : "")"
-                           asp-action="Records" asp-controller="Admin">Records</a>
-                    </li>
-
-                </ul>
-            </div>
-
-
-        </header>
-
-        <div class="w-100 shadow  px-2 px-md-5 position-relative z-2 pt-2 border-bottom d-none d-sm-block">
-            <ul class="nav nav-tabs-info text-info mb-3" id="pills-tab" role="tablist">
-                @if (userPermissions != null && userPermissions.Contains("6"))
-                {
-                    <li class="nav-item text-info">
-                        <a class="nav-link @(ViewContext.ActionDescriptor.RouteValues["action"] == "Index" ? "active" : "")"
-                           asp-action="Index" asp-controller="Admin">Dashboard</a>
-                    </li>
-                }
-                @if (userPermissions != null && userPermissions.Contains("17"))
-                {
-                    <li class="nav-item">
-                        <a class="nav-link @(ViewContext.ActionDescriptor.RouteValues["action"] == "ProviderLocation" ? "active" : "")"
-                           asp-action="ProviderLocation" asp-controller="Admin">Provider Location</a>
-                    </li>
-                }
-                @if (userPermissions != null && userPermissions.Contains("5"))
-                {
-                    <li class="nav-item ">
-                        <a class="nav-link @(ViewContext.ActionDescriptor.RouteValues["action"] == "Profile" ? "active" : "")"
-                           asp-action="Profile" asp-controller="Admin">My Profile</a>
-
-                    </li>
-                }
-                @if (userPermissions != null && userPermissions.Contains("8"))
-                {
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle @(ViewContext.ActionDescriptor.RouteValues["controller"] == "Admin" && (ViewContext.ActionDescriptor.RouteValues["action"] == "Provider" || ViewContext.ActionDescriptor.RouteValues["action"] == "Scheduling") ? "active" : "")" role="button" data-bs-toggle="dropdown" aria-expanded="false">Providers</a>
-                        <ul class="dropdown-menu bg-light mt-3 bg-opacity-0">
-                            <li class="border-bottom">
-                                <a class="dropdown-item" asp-action="Provider" asp-controller="Admin">
-                                    Provider
-                                </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item" asp-action="Scheduling" asp-controller="Admin">
-                                    Scheduling
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
-                }
-                @if (userPermissions != null && userPermissions.Contains("11"))
-                {
-                    <li class="nav-item ">
-                        <a class="nav-link @(ViewContext.ActionDescriptor.RouteValues["action"] == "Parteners" ? "active" : "")"
-                           asp-action="Parteners" asp-controller="Admin">Parteners</a>
-                    </li>
-                }
-                @if (userPermissions != null && userPermissions.Contains("7"))
-                {
-                    <li class="nav-item dropdown">
-                        <a class="nav-link  dropdown-toggle @(ViewContext.ActionDescriptor.RouteValues["action"] == "Access" ? "active" : "")" role="button" data-bs-toggle="dropdown" aria-expanded="false"
-                          >Access</a>
-                        <ul class="dropdown-menu bg-light mt-3 bg-opacity-0">
-                            <li class="border-bottom">
-                                <a class="dropdown-item @(ViewContext.ActionDescriptor.RouteValues["action"] == "Access" ? "active" : "")" asp-action="Access" asp-controller="Admin">
-                                    Access
-                                </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item @(ViewContext.ActionDescriptor.RouteValues["action"] == "UserAccess" ? "active" : "")" asp-action="UserAccess" asp-controller="Admin">
-                                    User Access
-                                </a>
-                            </li> 
-                            
-                        </ul>
-                    </li>
-                }
-                @if (userPermissions != null && userPermissions.Contains("3"))
-                {
-                    <!-- Ensure dropdown menu z-index -->
-                    <li class="nav-item dropdown z-1 ">
-                        <button class="nav-link dropdown-toggle  @(ViewContext.ActionDescriptor.RouteValues["action"] == "Records" ? "active" : "")" role="button" data-bs-toggle="dropdown" aria-expanded="false">Records</button>
-                        <ul class="dropdown-menu  mt-3 bg-opacity-0 custom-dropdown-menu bg-body">
-                            <li class="border-bottom z-1">
-                                <a class="dropdown-item @(ViewContext.ActionDescriptor.RouteValues["action"] == "PatientRecords" ? "active" : "")" asp-action="Records" asp-controller="Admin">
-                                    Patient Records
-                                </a>
-                            </li>
-                            <li class="border-bottom z-1">
-                                <a class="dropdown-item @(ViewContext.ActionDescriptor.RouteValues["action"] == "UserAccess" ? "active" : "")" asp-action="SearchRecords" asp-controller="Admin">
-                                    Search Records
-                                </a>
-                            </li>
-                            <li class="border-bottom z-1">
-                                <a class="dropdown-item @(ViewContext.ActionDescriptor.RouteValues["action"] == "UserAccess" ? "active" : "")" asp-action="BlockHistory" asp-controller="Admin">
-                                    Block History
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
-                }
-            </ul>
-        </div>
-        <main class="container-fluid d-flex flex-column  p-0 bg-light flex-grow-1  ">
-            @RenderBody()
-        </main>
-        <partial name="~/Views/Shared/_Footer.cshtml" />
-    </div>
+			<!-- Responsive Navigation -->
+			<div class="collapse d-sm-none" id="responsiveNav">
+				<ul class="nav flex-column">
+					@if (userPermissions != null && userPermissions.Contains("6"))
+					{
+						<li class="nav-item">
+							<a class="nav-link @(ViewContext.ActionDescriptor.RouteValues["action"] == "Index" ? "active" : "")"
+							   asp-action="Index" asp-controller="Admin">Dashboard</a>
+						</li>
+					}
+					@if (userPermissions != null && userPermissions.Contains("17"))
+					{
+						<li class="nav-item">
+							<div class="item">
+								<a class="nav-link @(ViewContext.ActionDescriptor.RouteValues["action"] == "ProviderLocation" ? "active" : "")"
+								   asp-action="ProviderLocation" asp-controller="Admin">Provider Location</a>
+								
+							</div>
+						</li>
+					}
+					@if (userPermissions != null && userPermissions.Contains("5"))
+					{
+						<li class="nav-item">
+							<a class="nav-link @(ViewContext.ActionDescriptor.RouteValues["action"] == "Profile" ? "active" : "")"
+							   asp-action="Profile" asp-controller="Admin">My Profile</a>
+						</li>
+					}
+					@if (userPermissions != null && userPermissions.Contains("8"))
+					{
+						<li class="nav-item dropdown">
+							<div class="item">
+								<a class="nav-link dropdown-toggle sub-btn @(new string[] { "Provider", "Scheduling" }.Contains(ViewContext.ActionDescriptor.RouteValues["action"]) ? "active" : "")"
+								   href="#" role="button" aria-expanded="false">Providers</a>
+								<div class="sub-menu bg-light">
+									<a class="sub-item" asp-action="Provider" asp-controller="Admin">Provider</a>
+									<a class="sub-item" asp-action="Scheduling" asp-controller="Admin">Scheduling</a>
+								</div>
+							</div>
+						</li>
+					}
+					@if (userPermissions != null && userPermissions.Contains("11"))
+					{
+						<li class="nav-item">
+							<a class="nav-link @(ViewContext.ActionDescriptor.RouteValues["action"] == "Parteners" ? "active" : "")"
+							   asp-action="Parteners" asp-controller="Admin">Parteners</a>
+						</li>
+					}
+					@if (userPermissions != null && userPermissions.Contains("7"))
+					{
+						<li class="nav-item dropdown">
+							<div class="item">
+								<a class="nav-link dropdown-toggle sub-btn @(ViewContext.ActionDescriptor.RouteValues["action"] == "Access" ? "active" : "")"
+								   href="#" role="button" aria-expanded="false">Access</a>
+								<div class="sub-menu bg-light">
+									<a class="sub-item @(ViewContext.ActionDescriptor.RouteValues["action"] == "Access" ? "active" : "")" asp-action="Access" asp-controller="Admin">Access</a>
+									<a class="sub-item @(ViewContext.ActionDescriptor.RouteValues["action"] == "UserAccess" ? "active" : "")" asp-action="UserAccess" asp-controller="Admin">User Access</a>
+								</div>
+							</div>
+						</li>
+					}
+					@if (userPermissions != null && userPermissions.Contains("3"))
+					{
+						<li class="nav-item dropdown">
+							<div class="item">
+								<a class="nav-link dropdown-toggle sub-btn @(new string[] { "Records", "SearchRecords", "PatientHistory", "BlockHistory" }.Contains(ViewContext.ActionDescriptor.RouteValues["action"]) ? "active" : "")"
+								   href="#" role="button" aria-expanded="false">Records</a>
+								<div class="sub-menu bg-light">
+									<a class="sub-item @(ViewContext.ActionDescriptor.RouteValues["action"] == "Records" ? "active" : "")" asp-action="Records" asp-controller="Admin">Patient Records</a>
+									<a class="sub-item @(ViewContext.ActionDescriptor.RouteValues["action"] == "SearchRecords" ? "active" : "")" asp-action="SearchRecords" asp-controller="Admin">Search Records</a>
+									<a class="sub-item @(ViewContext.ActionDescriptor.RouteValues["action"] == "BlockHistory" ? "active" : "")" asp-action="BlockHistory" asp-controller="Admin">Block History</a>
+									<a class="sub-item @(ViewContext.ActionDescriptor.RouteValues["action"] == "EmailLogs" ? "active" : "")" asp-action="EmailLogs" asp-controller="Admin">Email Logs</a>
+									<a class="sub-item @(ViewContext.ActionDescriptor.RouteValues["action"] == "SmsLogs" ? "active" : "")" asp-action="SmsLogs" asp-controller="Admin">Sms Logs</a>
+								</div>
+							</div>
+						</li>
+					}
+				</ul>
+			</div>
 
 
+		</header>
+
+		<div class="w-100 shadow  px-2 px-md-5 position-relative z-2 pt-2 border-bottom d-none d-sm-block">
+			<ul class="nav nav-tabs-info text-info mb-3" id="pills-tab" role="tablist">
+				@if (userPermissions != null && userPermissions.Contains("6"))
+				{
+					<li class="nav-item text-info">
+						<a class="nav-link @(ViewContext.ActionDescriptor.RouteValues["action"] == "Index" ? "active" : "")"
+						   asp-action="Index" asp-controller="Admin">Dashboard</a>
+					</li>
+				}
+				@if (userPermissions != null && userPermissions.Contains("17"))
+				{
+					<li class="nav-item">
+						<a class="nav-link @(ViewContext.ActionDescriptor.RouteValues["action"] == "ProviderLocation" ? "active" : "")"
+						   asp-action="ProviderLocation" asp-controller="Admin">Provider Location</a>
+					</li>
+				}
+				@if (userPermissions != null && userPermissions.Contains("5"))
+				{
+					<li class="nav-item ">
+						<a class="nav-link @(ViewContext.ActionDescriptor.RouteValues["action"] == "Profile" ? "active" : "")"
+						   asp-action="Profile" asp-controller="Admin">My Profile</a>
+
+					</li>
+				}
+				@if (userPermissions != null && userPermissions.Contains("8"))
+				{
+					<li class="nav-item dropdown">
+						<button class="nav-link dropdown-toggle
+                                @(
+                                    new string[] { "Provider", "Scheduling" }.Contains(ViewContext.ActionDescriptor.RouteValues["action"])
+                                    && ViewContext.ActionDescriptor.RouteValues["controller"] == "Admin"
+                                    ? "active"
+                                    : ""
+                                )"
+								role="button" data-bs-toggle="dropdown" aria-expanded="false">
+							Providers
+						</button>
+						<ul class="dropdown-menu  mt-3 bg-opacity-0 custom-dropdown-menu bg-body">
+							<li class="border-bottom">
+								<a class="dropdown-item" asp-action="Provider" asp-controller="Admin">
+									Provider
+								</a>
+							</li>
+							<li>
+								<a class="dropdown-item" asp-action="Scheduling" asp-controller="Admin">
+									Scheduling
+								</a>
+							</li>
+						</ul>
+					</li>
+				}
+				@if (userPermissions != null && userPermissions.Contains("11"))
+				{
+					<li class="nav-item ">
+						<a class="nav-link @(ViewContext.ActionDescriptor.RouteValues["action"] == "Parteners" ? "active" : "")"
+						   asp-action="Parteners" asp-controller="Admin">Parteners</a>
+					</li>
+				}
+				@if (userPermissions != null && userPermissions.Contains("7"))
+				{
+					<li class="nav-item dropdown z-1" style="padding-top:0px!important">
+						<button class="nav-link  dropdown-toggle @(ViewContext.ActionDescriptor.RouteValues["action"] == "Access" ? "active" : "")" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+							Access
+						</button>
+						<ul class="dropdown-menu  mt-3 bg-opacity-0 custom-dropdown-menu bg-body">
+							<li class="border-bottom">
+								<a class="dropdown-item @(ViewContext.ActionDescriptor.RouteValues["action"] == "Access" ? "active" : "")" asp-action="Access" asp-controller="Admin">
+									Access
+								</a>
+							</li>
+							<li>
+								<a class="dropdown-item @(ViewContext.ActionDescriptor.RouteValues["action"] == "UserAccess" ? "active" : "")" asp-action="UserAccess" asp-controller="Admin">
+									User Access
+								</a>
+							</li>
+
+						</ul>
+					</li>
+				}
+				@if (userPermissions != null && userPermissions.Contains("3"))
+				{
+					<!-- Ensure dropdown menu z-index -->
+					<li class="nav-item dropdown z-1" style="padding-top:0px!important">
+						<button class="nav-link dropdown-toggle  @(new string[] { "Records", "SearchRecords", "PatientHistory", "BlockHistory" }
+  .Contains(ViewContext.ActionDescriptor.RouteValues["action"]) ? "active" : "")" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+							Records
+						</button>
+						<ul class="dropdown-menu  mt-3 bg-opacity-0 custom-dropdown-menu bg-body">
+							<li class="border-bottom z-1">
+								<a class="dropdown-item @(ViewContext.ActionDescriptor.RouteValues["action"] == "Records" ? "active" : "")" asp-action="Records" asp-controller="Admin">
+									Patient Records
+								</a>
+							</li>
+							<li class="border-bottom z-1">
+								<a class="dropdown-item @(ViewContext.ActionDescriptor.RouteValues["action"] == "SearchRecords" ? "active" : "")" asp-action="SearchRecords" asp-controller="Admin">
+									Search Records
+								</a>
+							</li>
+							<li class="border-bottom z-1">
+								<a class="dropdown-item @(ViewContext.ActionDescriptor.RouteValues["action"] == "BlockHistory" ? "active" : "")" asp-action="BlockHistory" asp-controller="Admin">
+									Block History
+								</a>
+							</li>
+							<li class="border-bottom z-1">
+								<a class="dropdown-item @(ViewContext.ActionDescriptor.RouteValues["action"] == "BlockHistory" ? "active" : "")" asp-action="EmailLogs" asp-controller="Admin">
+									Email Logs
+								</a>
+							</li>
+							<li class="border-bottom z-1">
+								<a class="dropdown-item @(ViewContext.ActionDescriptor.RouteValues["action"] == "BlockHistory" ? "active" : "")" asp-action="SmsLogs" asp-controller="Admin">
+									Sms Logs
+								</a>
+							</li>
+						</ul>
+					</li>
+				}
+			</ul>
+		</div>
+		<main class="container-fluid d-flex flex-column  p-0 bg-light flex-grow-1  ">
+			@RenderBody()
+		</main>
+	</div>
 
 
 
 
 
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
-    <script src="~/js/custom.js" asp-append-version="true"></script>
-    <script src="~/js/Validation.js" asp-append-version="true"></script>
-    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
 
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/jquery.validate.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/additional-methods.min.js"></script>
+	<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+	<script src="~/js/site.js" asp-append-version="true"></script>
+	<script src="~/js/custom.js" asp-append-version="true"></script>
+	<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+	<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+
+
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+	<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/jquery.validate.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/additional-methods.min.js"></script>
+	@* <partial name="~/Views/Shared/_Footer.cshtml" /> *@
 
 </body>
 </html>
+<script type="text/javascript">
+	$(document).ready(function () {
+		//jquery for toggle sub menus
+		$('.sub-btn').click(function () {
+			$(this).next('.sub-menu').slideToggle();
+			$(this).find('.dropdown').toggleClass('rotate');
+		});
+
+		
+	});
+</script>

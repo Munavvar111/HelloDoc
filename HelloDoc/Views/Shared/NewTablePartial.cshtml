@@ -28,7 +28,7 @@
 			if (@item.Status == 1)
 			{
 
-				<tr class=" @(GetRowClass(@item.ReqTypeId))  d-none d-xl-table-row text-white" style="vertical-align:middle">
+				<tr class=" @(GetRowClass(@item.ReqTypeId))  d-none d-xl-table-row text-white" style="vertical-align:middle;font-weight:500">
 
 
 
@@ -36,7 +36,7 @@
 					<td style="background-color:@(GetRowClass(@item.ReqTypeId))!important">@item.PatientName</td>
 					@if (ViewBag.IsPhysician == false)
 					{
-						<td style="background-color:@(GetRowClass(@item.ReqTypeId))!important">@item.DateOfBirth</td>
+						<td style="background-color:@(GetRowClass(item.ReqTypeId))!important">@item.DateOfBirth.ToString("MMM dd, yyyy")</td>
 						<td style="background-color:@(GetRowClass(@item.ReqTypeId))!important">@item.Requestor </td>
 						<td style="background-color:@(GetRowClass(@item.ReqTypeId))!important">5-12-2019</td>
 					}
@@ -101,7 +101,7 @@
 								@if(!ViewBag.IsPhysician)
 								{
 									<a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#assigncase" data-bs-requestid="@item.RequestId" data-bs-status="@item.Status" data-bs-status="@item.Status"><i class="bi bi-x-circle me-3"></i>Assign Case</a>
-									<a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#exampleModal" id="examplemodal" data-bs-requestid="@item.RequestId" data-bs-patientname="@item.PatientName"><i class="bi bi-x-circle me-3"></i>Cancel  Case</a>
+									<a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#exampleModal"  data-bs-requestid="@item.RequestId" data-bs-patientname="@item.PatientName"><i class="bi bi-x-circle me-3"></i>Cancel  Case</a>
 									<a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#BlockModal" id="bloclmodal" data-bs-requestid="@item.RequestId" data-bs-patientname="@item.PatientName"><i class="bi bi-x-circle me-3"></i>Block  Case</a>
 									<a class="dropdown-item" asp-action="ViewCase" asp-controller="Admin" asp-route-id="@item.Id"><i class="bi bi-x-circle me-3"></i>View Case</a>
 									<a class="dropdown-item" asp-action="ViewNotes" asp-controller="Admin" asp-route-requestid="@item.RequestId"><i class="bi bi-x-circle me-3"></i>View Notes</a>
@@ -248,7 +248,7 @@
 								<div class="d-flex gap-3 ">
 									<button class="btn w-50 btn-transparent border border-1 text-white rounded-5" style="background-color: #943DB8" data-bs-toggle="modal" data-bs-target="#assigncase" data-bs-requestid="@item.RequestId" data-bs-status="@item.Status" data-bs-status="@item.Status">Assign Case</button>
 
-									<button class="btn w-50 btn-transparent border border-1 text-white  rounded-5" style="background-color:  #E42929" data-bs-toggle="modal" data-bs-target="#exampleModal" id="examplemodal" data-bs-requestid="@item.RequestId" data-bs-patientname="@item.PatientName">Cancel Case</button>
+									<button class="btn w-50 btn-transparent border border-1 text-white  rounded-5" style="background-color:  #E42929" data-bs-toggle="modal" data-bs-target="#exampleModal" data-bs-requestid="@item.RequestId" data-bs-patientname="@item.PatientName">Cancel Case</button>
 								</div>
 								<div class="d-flex gap-3 ">
 									<a type="button" class="btn w-50 btn-transparent border border-1 text-white rounded-5" style="background-color: #228B22" asp-action="ViewNotes" asp-controller="Admin" asp-route-requestid="@item.RequestId">View Notes</a>
@@ -294,11 +294,6 @@
 		}
 	}
 }
-@* Cancel Case *@
-
-@* Assign Case *@
-
-
 
 <div class="pb-3">
 	<nav id="pagination" aria-label="Page navigation">
@@ -350,7 +345,7 @@
 			$('.collapse.show').not('#' + id).collapse('hide');
 		});
 	});
-	function acceptRequest(requestId) {
+	function acceptRequest(requestId) {		
 		Swal.fire({
 			title: 'Are you sure?',
 			text: 'You are about to accept this request.',

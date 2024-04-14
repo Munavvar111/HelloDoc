@@ -1,224 +1,386 @@
 ﻿@model DataAccessLayer.CustomModel.CloseCaseVM;
 @{
-    ViewData["Title"] = "CloseCase";
-    Layout = "~/Views/Shared/_Layout4.cshtml";
+	ViewData["Title"] = "CloseCase";
+	if (ViewBag.IsPhysicIan)
+	{
+		Layout = "~/Views/Shared/_Layout5.cshtml";
+	}
+	if (!ViewBag.IsPhysician)
+	{
+		Layout = "~/Views/Shared/_Layout4.cshtml";
+	}
 }
 
 
 <div class="container bg-light mt-4">
-    <div class="d-flex justify-content-between my-3">
-        <div class="d-flex">
-            <span class="fs-2 text-muted fw-bold">Close Case</span>
-        </div>
-        <div class="d-flex justify-content-end">
-            <a asp-controller="Admin" asp-action="Index" asp-area=""
-               class="btn btn-outline-info d-flex align-items-center">
-                <span class="material-symbols-outlined"> chevron_left </span> Back
-            </a>
-        </div>
-    </div>
-    <div class="container bg-white mt-3">
-        <div class="d-flex justify-content-between p-3">
-            <div class="d-flex flex-column">
-                <div>
-                    <span class="text-muted">Patient Name</span>
-                </div>
-                <div>
-                    <span class="text-info fs-4 fw-bolder">@Model.FirstName</span><span class="text-muted">(@Model.ConfirmNumber)</span>
-                </div>
-            </div>
-            <div class="btn btn-outline-info">
-                Create Invoice Through QuickBooks
-            </div>
-        </div>
-        <div>
-            <span class="fs-4 fw-bold">Documents</span>
-        </div>
-        <div class="table table-responsive mt-4">
-            <table class="table">
-                <thead class="thead-Secondary bg-secondary">
-                    <tr class="d-none d-md-table-row">
-                        <th scope="col" class="bg-muted" style="background-color:#777 !important">Documents</th>
-                        <th scope="col" class="bg-muted" style="background-color:#777 !important">Updated Date </th>
-                        <th scope="col" class="bg-muted" style="background-color:#777 !important">Actions</th>
-                    </tr>   
-                </thead>
-                <tbody>
-                    @foreach (var item in Model.Requestwisefileview)
-                    {
-                        
-                        <tr class="d-none d-md-table-row">
+	<div class="d-flex justify-content-between my-3">
+		<div class="d-flex">
+			<span class="fs-2 text-muted fw-bold">Close Case</span>
+		</div>
+		<div class="d-flex justify-content-end">
+			@if (ViewBag.IsPhysician)
+			{
+				<a asp-action="Index" asp-controller="Provider"
+				   class="btn btn-outline-info d-flex align-items-center">
+					<span class="material-symbols-outlined"> chevron_left </span> Back
+				</a>
+			}
+			else
+			{
+				<a asp-action="Index" asp-controller="Admin"
+				   class="btn btn-outline-info d-flex align-items-center">
+					<span class="material-symbols-outlined"> chevron_left </span> Back
+				</a>
+			}
+		</div>
+	</div>
+	<div class="container bg-white mt-3">
+		<div class="d-flex justify-content-between p-3">
+			<div class="d-flex flex-column">
+				<div>
+					<span class="text-muted">Patient Name</span>
+				</div>
+				<div>
+					<span class="text-info fs-4 fw-bolder">@Model.FirstName</span><span class="text-muted">(@Model.ConfirmNumber)</span>
+				</div>
+			</div>
 
-                            <td class="filename">
-                                @item.Filename.Replace(@"[0-9a-f]{8}(?:-[0-9a-f]{4}){4}[0-9a-f]{12}_", "")
-                            </td>
-                            <td>    
-                                @item.Createddate.Date
+		</div>
+		<div class="d-flex justify-content-between ">
+			@if (ViewBag.IsPhysician)
+			{
+				<span class="fs-4 fw-bold">Encounter Forms</span>
+					
+						<div class="file-input-container d-flex align-items-center">
+					<input type="file" class="form-control" id="ProviderDoc" accept=".pdf" hidden onchange="uploadFile(this.files)" />
+					<label class="input-group-text btn btn-info text-light" for="ProviderDoc">
+								<span class="d-none d-md-inline">Upload</span>
+								<span class="d-md-none">Upload</span>
+							</label>
+						</div>
+					
+					
+					
+			}
+			else
+			{
+				<span class="fs-4 fw-bold">Documents</span>
+			}
+		</div>
+		<div class=" mt-4">
+			<table class="table">
+				<thead class="table-secondary">
 
-                            </td>
-                            <td>
-                                <a class="btn btn-outline-info"
-                                   href="~/uploads/@item.Filename" target="_blank">
-                                    <span class="material-symbols-outlined">cloud_download</span>
-                                </a>
-                            </td>
-                            
-                        </tr>
-                        
-                    }
-                </tbody>
-            </table>
-        </div>
+					<tr class="d-none d-md-table-row">
+						<th scope="col">Documents</th>
+						<th scope="col">Updated Date </th>
+						<th scope="col">Actions</th>
+					</tr>
+				</thead>
+				<tbody>
+					@foreach (var item in Model.Requestwisefileview)
+					{
 
-        <div class="d-md-none border-top border-bottom">
-            <!-- Iterate through documents -->
-            @foreach (var item in Model.Requestwisefileview)
-            {
-                <div class="document">
-                    <p class="filename">@Html.DisplayFor(modelitem => item.Filename)</p>
-                    <p>Updated: @Html.DisplayFor(modelitem => item.Createddate.Day)</p>
-                    <div class="d-flex justify-content-beween">
-                        <a class="btn btn-outline-info"
-                           href="~/uploads/@item.Filename" target="_blank">
-                            <span class="material-symbols-outlined">cloud_download</span>
-                        </a>
-                        
-                    </div>
-                </div>
-            }
-        </div>
-        <form asp-action="CloseCase" method="post" asp-route-requestid="@Model.Requestid">
-            
-        <div class="mt-4">
-            <h3>Patient Information</h3>
-        </div>
-        <div class="row row-cols-1 row-cols-md-2 g-3 mt-3">
-            <div class="col">
-                <div class="form-floating">
-                    <input type="text"
-                           class="form-control"
-                           id="floatingInput"
-                           asp-for="@Model.FirstName"
-                           placeholder="name@example.com"
-                            disabled readonly />
-                    <label for="floatingInput">First Name</label>
-                </div>
-            </div>
-            <div class="col">
-                <div class="form-floating">
-                    <input type="text"
-                           class="form-control"
-                           id="floatingInput"
-                           asp-for="@Model.LastName"
-                           placeholder="name@example.com" disabled readonly/>
-                    <label for="floatingInput">Last Name</label>
-                </div>
-            </div>
-           <div class="col">
-            <div class="form-floating">
-             <input type="date"
-                class="form-control"
-                id="birthdateInput"
-                  asp-for="@Model.BirthDate"
-                  value="@Model.BirthDate.ToString("yyyy-MM-dd")"
-               placeholder="name@example.com"
-                 disabled readonly/>
+						<tr class="d-none d-md-table-row">
 
-    <label for="floatingInput">Date of Birth</label>
-  </div>
-</div>
+							<td class="filename">
+								@item.Filename.Replace(@"[0-9a-f]{8}(?:-[0-9a-f]{4}){4}[0-9a-f]{12}_", "")
+							</td>
+							<td>
+								@item.Createddate.Date
+
+							</td>
+							<td>
+								<a class="btn btn-outline-info"
+								   href="~/uploads/@item.Filename" target="_blank">
+									<span class="material-symbols-outlined">cloud_download</span>
+								</a>
+							</td>
+
+						</tr>
+
+					}
+				</tbody>
+			</table>
+		</div>
+
+		<div class="d-md-none border-top border-bottom">
+			<!-- Iterate through documents -->
+			@foreach (var item in Model.Requestwisefileview)
+			{
+				<div class="document">
+					<p class="filename">@Html.DisplayFor(modelitem => item.Filename)</p>
+					<p>Updated: @Html.DisplayFor(modelitem => item.Createddate.Day)</p>
+					<div class="d-flex justify-content-beween">
+						<a class="btn btn-outline-info"
+						   href="~/uploads/@item.Filename" target="_blank">
+							<span class="material-symbols-outlined">cloud_download</span>
+						</a>
+
+					</div>
+				</div>
+			}
+		</div>
+		<form asp-action="CloseCase" method="post" asp-route-requestid="@Model.Requestid">
+			@if (ViewBag.IsPhysician)
+			{
+				
+				<div class="row row-cols-1 row-cols-md-2 g-3 mt-3">
+
+					<div class="col-12 col-md-12">
+						<div class="form-floating">
+							<textarea class="form-control"
+									  placeholder="Leave a comment here"
+									  id="floatingTextarea2"
+									  style="height: 100px"
+									  asp-for="Notes"></textarea>
+							<label for="floatingTextarea2">
+								
+								<span class="">Provider Notes</span>
+							</label>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="d-flex gap-3 align-items-center justify-content-end mt-3 mb-3">
+
+						<button id="concludeCareBtn" class="btn btn-info text-light fw-bolder" type="button">
+							Conclude Care
+						</button>
+
+						
+					</div>
+				</div>
+			}
+			else
+			{
+
+				<div class="mt-4">
+					<h3>Patient Information</h3>
+				</div>
+				<div class="row row-cols-1 row-cols-md-2 g-3 mt-3">
+					<div class="col">
+						<div class="form-floating">
+							<input type="text"
+								   class="form-control"
+								   id="floatingInput"
+								   asp-for="@Model.FirstName"
+								   placeholder="name@example.com"
+								   disabled readonly />
+							<label for="floatingInput">First Name</label>
+						</div>
+					</div>
+					<div class="col">
+						<div class="form-floating">
+							<input type="text"
+								   class="form-control"
+								   id="floatingInput"
+								   asp-for="@Model.LastName"
+								   placeholder="name@example.com" disabled readonly />
+							<label for="floatingInput">Last Name</label>
+						</div>
+					</div>
+					<div class="col">
+						<div class="form-floating">
+							<input type="date"
+								   class="form-control"
+								   id="birthdateInput"
+								   asp-for="@Model.BirthDate"
+								   value="@Model.BirthDate.ToString("yyyy-MM-dd")"
+								   placeholder="name@example.com"
+								   disabled readonly />
+
+							<label for="floatingInput">Date of Birth</label>
+						</div>
+					</div>
 
 
-            <div class="col">
-                <div class="border rounded-2 tel-container">
-                    <input id="phone2"
-                           type="tel"
-                           asp-for="@Model.PhoneNo"
-                           class="form-control border-0 tel-input"
-                           disabled />
-                </div>
-            </div>
+					<div class="col">
+						<div class="border rounded-2 tel-container">
+							<input id="phone2"
+								   type="tel"
+								   asp-for="@Model.PhoneNo"
+								   class="form-control border-0 tel-input"
+								   disabled />
+						</div>
+					</div>
 
-            <div class="col">
-                <div class="form-floating">
-                    <input type="email"
-                           class="form-control"
-                           id="floatingInput"
-                           placeholder="name@example.com"
-                            disabled="disabled"
-                            asp-for="@Model.Email"
-                           id="Email"  />
-                    <label for="floatingInput">Email</label>
-                </div>
-            </div>
-            
-            </div>
-        <div class="row">
-            <div class="d-flex gap-3 align-items-center justify-content-end">
-                <button class="btn btn-info text-light" id="EditBtn" type="button" onclick="toggleEdit()">
-                    Edit
-                </button>
-                    <button class="btn btn-info text-light" type="Submit" id="SubBtn">
-                        Submit
-                    </button>
-                    <button class="btn btn-info text-light" type="button" data-bs-toggle="modal" data-bs-target="#CloseCaseModal">
-                    Cancel
-                </button>
+					<div class="col">
+						<div class="form-floating">
+							<input type="email"
+								   class="form-control"
+								   id="floatingInput"
+								   placeholder="name@example.com"
+								   disabled="disabled"
+								   asp-for="@Model.Email"
+								   id="Email" />
+							<label for="floatingInput">Email</label>
+						</div>
+					</div>
 
-            </div>
-        </div>
-        </form>
-    </div>
+				</div>
+				<div class="row">
+					<div class="d-flex gap-3 align-items-center justify-content-end">
+						<button class="btn btn-info text-light" id="EditBtn" type="button" onclick="toggleEdit()">
+							Edit
+						</button>
+						<button class="btn btn-info text-light" type="Submit" id="SubBtn">
+							Submit
+						</button>
+						<button class="btn btn-info text-light" type="button" data-bs-toggle="modal" data-bs-target="#CloseCaseModal">
+							Cancel
+						</button>
+
+					</div>
+				</div>
+			}
+		</form>
+	</div>
 
 </div>
 <div class="modal fade" id="CloseCaseModal" tabindex="-1" role="dialog" aria-labelledby="finalizedModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header bg-info text-white">
-                <h1 class="modal-title fs-5 title" id="exampleModalLabel">Encounter Form</h1>
-                <button type="button" class="close bg-info border border-info" data-bs-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true" class="fs-1">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body align-items-center">
-                <p>Are Sure You Want Close This Case</p>
-                
-            </div>
-            <div class="modal-footer">
-                <a class="btn btn-info" asp-action="CloseCaseModal" asp-route-requestid="@Model.Requestid">Submit</a>
-                <button type="button" class="btn btn-info" data-bs-dismiss="modal">Cancel</button>
-            </div>
-        </div>
-    </div>
+	<div class="modal-dialog modal-dialog-centered">
+		<div class="modal-content">
+			<div class="modal-header bg-info text-white">
+				<h1 class="modal-title fs-5 title" id="exampleModalLabel">Encounter Form</h1>
+				<button type="button" class="close bg-info border border-info" data-bs-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true" class="fs-1">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body align-items-center">
+				<p>Are Sure You Want Close This Case</p>
+
+			</div>
+			<div class="modal-footer">
+				<a class="btn btn-info" asp-action="CloseCaseModal" asp-route-requestid="@Model.Requestid">Submit</a>
+				<button type="button" class="btn btn-info" data-bs-dismiss="modal">Cancel</button>
+			</div>
+		</div>
+	</div>
 </div>
-            <script>
-    $("#SubBtn").hide();
+<script>
+	$("#SubBtn").hide();
 
-    function toggleEdit() {
-        // Get all input fields within the form excluding the input with id "Email"
-        var inputFields = document.querySelectorAll('form input');
+	function toggleEdit() {
+		// Get all input fields within the form excluding the input with id "Email"
+		var inputFields = document.querySelectorAll('form input');
 
-        // Toggle the disabled attribute for each input field
-        inputFields.forEach(function (input) {
-            input.disabled = !input.disabled;
-        });
+		// Toggle the disabled attribute for each input field
+		inputFields.forEach(function (input) {
+			input.disabled = !input.disabled;
+		});
 
-        $("#EditBtn").hide();
-        $("#SubBtn").show();
-    }
-            </script>
+		$("#EditBtn").hide();
+		$("#SubBtn").show();
+	}
+</script>
 
 <script>
-    function removeGuidFromFilename() {
-        var filenameElements = document.querySelectorAll('.filename');
-        console.log(filenameElements)
-        filenameElements.forEach(function (filenameElement) {
-            var filename = filenameElement.textContent;
+	function removeGuidFromFilename() {
+		var filenameElements = document.querySelectorAll('.filename');
+		console.log(filenameElements)
+		filenameElements.forEach(function (filenameElement) {
+			var filename = filenameElement.textContent;
 
-            var cleanedFilename = filename.replace(/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/gi, '');
+			var cleanedFilename = filename.replace(/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/gi, '');
 
-            filenameElement.textContent = cleanedFilename;
-        });
-    }
-    removeGuidFromFilename();
+			filenameElement.textContent = cleanedFilename;
+		});
+	}
+	removeGuidFromFilename();
+</script>
+<script>
+	function uploadFile(files) {
+		var formData = new FormData();
+		formData.append('file', files[0]);
+		formData.append('requestId', @Model.Requestid);
+
+		$.ajax({
+			url: '/Admin/ProviderUploadedDoc',
+			type: 'POST',
+			data: formData,
+			processData: false,
+			contentType: false,
+			success: function (response) {
+				if (response === "Bed Request") {
+					// Display "Bed Request" message with SweetAlert
+					Swal.fire({
+						icon: 'error',
+						title: 'Bed Request',
+						text: 'Please log in again!',
+						showConfirmButton: false,
+						timer: 1500
+					}).then(function () {
+						location.reload();
+					});
+				} else if (response === "No File Uploaded") {
+					// Display "No File Uploaded" message with SweetAlert
+					Swal.fire({
+						icon: 'error',
+						title: 'No file uploaded',
+						text: 'No File Is Selected',
+						showConfirmButton: false,
+						timer: 1500
+					}).then(function () {
+						location.reload();
+					});
+				} else {
+					// Handle other success cases
+					console.log('File uploaded successfully');
+					// Display a success message with SweetAlert
+					Swal.fire({
+						icon: 'success',
+						title: 'Success',
+						text: 'File uploaded successfully!',
+						showConfirmButton: false,
+						timer: 1500
+					}).then(function () {
+						location.reload();
+					});
+				}
+			},
+			error: function (xhr, status, error) {
+				// Handle error
+				console.error('Error uploading file: ' + error);
+				// Display an error message with SweetAlert
+				Swal.fire({
+					icon: 'error',
+					title: 'Error',
+					text: 'Error uploading file: ' + error
+				});
+			}
+		});
+	}
+</script>
+
+<script>
+	$(document).ready(function () {
+		// Attach click event to the "Conclude Care" button
+		$('#concludeCareBtn').click(function () {
+			// Make AJAX request to check if encounter form is finalized
+			$.ajax({
+				url: '/Admin/CheckEncounterFormFinalized',
+				type: 'GET',
+				data: { requestId: @Model.Requestid },
+				success: function (response) {
+					// If encounter form is finalized, submit the form
+					if (response === "Finalized") {
+						$('form').submit();
+					} else {
+						// If encounter form is not finalized, show a message
+						Swal.fire({
+							icon: 'error',
+							title: 'Encounter Form Not Finalized',
+							text: 'The encounter form is not finalized yet.',
+							showConfirmButton: false,
+							timer: 1500
+						});
+					}
+				},
+				error: function (xhr, status, error) {
+					console.error('Error checking encounter form: ' + error);
+				}
+			});
+		});
+	});
 </script>

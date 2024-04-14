@@ -76,6 +76,7 @@ namespace HalloDocPatient.Controllers
                             else if(physician != null)
                             {
                                 TempData["SuccessMessage"] = "Login  successful!";
+                                HttpContext.Session.SetInt32("PhysicianId", physician.Physicianid);
 
                                 return RedirectToAction("Index", "Provider");
                             }

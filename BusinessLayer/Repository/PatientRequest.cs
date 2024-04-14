@@ -187,6 +187,7 @@ namespace BusinessLayer.Repository
             request.Email = requestModel.Email;
             request.Createddate = DateTime.Now;
                 request.Phonenumber = requestModel.PhoneNo;
+                request.Isdeleted = false;
             request.Status = 1;
             }
         _context.Requests.Add(request);

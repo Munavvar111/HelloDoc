@@ -203,7 +203,7 @@ namespace HalloDocPatient.Controllers
         [HttpPost]
         public JsonResult CheckEmail([FromBody] string email)
         {
-            User? user = _context.Users.FirstOrDefault(u => u.Email == email);
+            AspnetUser? user = _context.AspnetUsers.FirstOrDefault(u => u.Email == email);
             bool isValid = user == null;
             return Json(isValid);
         }

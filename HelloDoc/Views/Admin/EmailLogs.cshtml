@@ -1,0 +1,126 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout4.cshtml";
+}
+
+
+<section>
+    <div class="container bg-light mt-4">
+
+        <div class="container d-flex justify-content-between mb-3">
+            <div class="d-flex">
+                <span class="fs-2 text-muted fw-bold">Close Case</span>
+            </div>
+            <div class="d-flex justify-content-end">
+                  <a asp-action="Index" asp-controller="Admin"
+                       class="btn btn-outline-info d-flex align-items-center">
+                        <span class="material-symbols-outlined"> chevron_left </span> Back
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="container  shadow p-3 bg-white border-0">
+            <div class="row gx-2">
+                <div class="col-md-2">
+                    <div class="form-floating mb-3">
+                        <select class="py-2 form-control form-select w-100" id="UserType">
+                            <option value="0" selected>All</option>
+                            <option value="1">Admin</option>
+                            <option value="2">Physician</option>
+                            <option value="3">User</option>
+
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" id="ReceiverName" placeholder="Receiver Name">
+                        <label for="ReceiverName">Receive Name</label>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-floating mb-3">
+                        <input type="email" class="form-control" id="email" placeholder="Email">
+                        <label for="email">Email</label>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-floating mb-3">
+                        <input type="date" id='CreatedDate' class="form-control" placeholder="Created Date">
+                        <label for="phone">Created Date</label>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-floating mb-3">
+                        <input type="date" id='SentDate' class="form-control" placeholder="Sent Date">
+                        <label for="SentDate">Sent Date</label>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="d-flex flex-row-reverse">
+                        <button id="SearchFilter" class="btn btn-info text-white mx-1">Search</button>
+                        <button id="ClearFilter" class="btn btn_hover btn-outline-info mx-1">Clear</button>
+                    </div>
+                </div>
+            </div>
+            <div id="EmailLogs">
+            </div>
+        </div>
+        </div>
+</section>
+<script>
+    $(document).ready(function () {
+
+        $("#SearchFilter").on("click", function () {
+            var accounttype = $("#UserType").val();
+            var receivername = $("#ReceiverName").val();
+            var emailid = $("#email").val();
+            var createddate = $("#CreatedDate").val()
+            var sentdate = $("#SentDate").val()
+
+            if (!receivername && !emailid && !createddate && !sentdate && accounttype == 0) {
+                toastr.error("Please Enter some Search Fields");
+            } else {
+                fetchEmailLogs(accounttype, receivername, emailid, createddate, sentdate);
+            }
+        });
+
+        $("#ClearFilter").on("click", function () {
+            clearFiltersAndFetchRecords();
+        });
+
+        fetchEmailLogs(0, "", "", "", "");
+    });
+
+    function fetchEmailLogs(accounttype, receivername, emailid, createddate, sentdate) {
+        $.ajax({
+            method: "GET",
+            url: "/Admin/GetEmailLogs",
+            data: {
+                accounttype: accounttype,
+                receivername: receivername,
+                emailid: emailid,
+                createddate: createddate,
+                sentdate: sentdate
+            },
+            success: function (response) {
+                if (response.code == 401) {
+                    location.reload();
+                } else {
+                    console.log("Function Success");
+                    $('#EmailLogs').html(response);
+                    
+                }
+            },
+            error: function () {
+                toastr.error("Failed to fetch records.");
+            }
+        });
+    }
+
+    function clearFiltersAndFetchRecords() {
+        $("#ReceiverName, #email, #CreatedDate, #SentDate").val("");
+        $("#UserType").val(0);
+
+        fetchEmailLogs(0, "", "", "", "");
+    }
+</script>

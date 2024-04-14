@@ -2,7 +2,14 @@
 
 @{
 	ViewData["Title"] = "PhysicanProfile";
-	Layout = "~/Views/Shared/_Layout4.cshtml";
+	if (ViewBag.IsPhysician)
+	{
+		Layout = "~/Views/Shared/_Layout5.cshtml";
+	}
+	if (!ViewBag.IsPhysician)
+	{
+		Layout = "~/Views/Shared/_Layout4.cshtml";
+	}
 }
 <style>
 
@@ -12,53 +19,125 @@
 	<div class="container bg-light mt-4">
 		<div class="d-flex justify-content-between my-3">
 			<div class="d-flex">
-				<span class="fs-2 text-muted fw-bold">My Profile</span>
+				@if (ViewBag.IsPhysician)
+				{
+					<span class="fs-2 text-muted fw-bold">My Profile</span>
+				}
+				else
+				{
+					<span class="fs-2 text-muted fw-bold">Provider Profile</span>
+				}
 			</div>
+
 			<div class="d-flex justify-content-end">
-				<a asp-controller="Admin" asp-action="Index" asp-area=""
-				   class="btn btn-outline-info d-flex align-items-center">
-					<span class="material-symbols-outlined"> chevron_left </span> Back
-				</a>
+				@if (ViewBag.IsPhysician)
+				{
+					<a asp-controller="Provider" asp-action="Index" asp-area=""
+					   class="btn btn-outline-info d-flex align-items-center">
+						<span class="material-symbols-outlined"> chevron_left </span> Back
+					</a>
+				}
+				else
+				{
+					<a onclick="window.history.back();"
+					   class="btn btn-outline-info d-flex align-items-center">
+						<span class="material-symbols-outlined"> chevron_left </span> Back
+					</a>
+				}
 			</div>
 		</div>
 		<div class="container border rounded-3 p-3 p-md-5 mb-3 d-flex flex-column gap-4 bg-white">
+			@if (ViewBag.IsPhysician && (Model.IsCredential != null && !Model.IsCredential[0]))
+			{
+
+
+				<div class="d-flex justify-content-end">
+					<a class="btn btn-outline-info" data-bs-toggle="modal" data-bs-target="#RequestToAdminEditProfile" data-bs-physicianid="@Model.physicianid">Requste To Admin</a>
+
+				</div>
+			}
 			<h5 class="fw-bold my-3">Account Information</h5>
 			<form method="post" asp-controller="Admin" asp-action="ResetPhysicianPassword" id="resetpassword">
 				<input value="@Model.physicianid" class="d-none" asp-for="physicianid" />
 				<div class="row row-cols-1 row-cols-md-2 g-3">
 					<div class="col">
 						<div class="form-floating">
-							<input asp-for=@Model.Username type="text" class="form-control" id="username" placeholder="User Name" disabled>
+							<input asp-for=@Model.Username type="text" class="form-control" id="username" placeholder="User Name" name="Username" disabled>
 							<label for="username">User Name</label>
 						</div>
 					</div>
 					<div class="col">
 						<div class="form-floating">
-							<input asp-for=@Model.Password type="text" class="form-control" id="Password" placeholder="Password" name="Password">
+							@if (ViewBag.IsPhysician && (Model.IsCredential != null && Model.IsCredential[0]))
+							{
+								<input asp-for=@Model.Password type="text" class="form-control" id="Password" placeholder="Password" name="Password">
+							}
+							@if (ViewBag.IsPhysician && (Model.IsCredential != null && !Model.IsCredential[0]))
+							{
+								<input asp-for=@Model.Password type="text" class="form-control" id="Password" placeholder="Password" name="Password" disabled>
+							}
+							@if (!ViewBag.IsPhysician)
+							{
+								<input asp-for=@Model.Password type="text" class="form-control" id="Password" placeholder="Password" name="Password">
+							}
 							<label for="Password">Password</label>
 							<span class="error-Password text-danger"></span>
 
 						</div>
 					</div>
-					<div class="col">
-						<div class="form-floating mb-3">
-							<select name="" class="py-2 form-control mb-3 w-100 " id="" disabled>
-								<option>Active</option>
-								<option>Name</option>
-							</select>
+					@if (!ViewBag.IsPhysician)
+					{
+
+						<div class="col">
+							<div class="form-floating mb-3">
+								<select name="Status" class="py-2 form-control mb-3 w-100 " id="" disabled>
+									<option>Active</option>
+									<option>Name</option>
+								</select>
+							</div>
 						</div>
-					</div>
-					<div class="col">
-						<div class="form-floating mb-3">
-							<select name="" class="py-2 form-control mb-3 w-100 " id="" disabled>
-								<option>Admin</option>
-								<option>MasterAdmin</option>
-							</select>
+						<div class="col">
+							<div class="form-floating">
+								<select class="form-select " aria-label="Default select example" asp-for="PhysicianRole" value="@Model.PhysicianRole" name="PhysicianRole" disabled>
+
+									<option selected disabled>Select The Role</option>
+									@if (Model.Regions != null)
+									{
+
+										@foreach (var region in Model.Roles)
+										{
+											<option value="@region.Roleid">@region.Name</option>
+										}
+									}
+
+								</select>
+								<span class="error-state text-danger"></span>
+
+							</div>
 						</div>
-					</div>
+					}
 				</div>
-				<div class="d-flex justify-content-end">
-					<button type="submit" class="btn btn-outline-info">Reset Password</button>
+				<div class="d-flex flex-row-reverse gap-2">
+
+					@if (ViewBag.IsPhysician && (Model.IsCredential != null && Model.IsCredential[0]))
+					{
+
+						<button type="submit" class="btn btn-outline-info mt-3">Reset Password</button>
+						
+					}
+					@if (!ViewBag.IsPhysician)
+					{
+
+						<button type="submit" class="btn btn-outline-info mt-3">Reset Password</button>
+						<button class="btn btn-outline-info mt-3" id="EditBtn" type="button" onclick="toggleAccountInfo()">
+							Edit
+						</button>
+
+					}
+					<button class="btn btn-outline-info mt-3" type="Submit" id="SubAccountInfo">
+						Submit
+					</button>
+
 				</div>
 			</form>
 			<h5 class="fw-bold my-3">Physician Information</h5>
@@ -143,9 +222,19 @@
 				</div>
 				<div class="row">
 					<div class="d-flex flex-row-reverse">
-						<button class="btn btn-outline-info" id="EditBtn" type="button" onclick="toggleEdit()">
-							Edit
-						</button>
+						@if (ViewBag.IsPhysician && (Model.IsCredential != null && Model.IsCredential[0]))
+						{
+							<button class="btn btn-outline-info" id="EditBtn" type="button" onclick="toggleEdit()">
+								Edit
+							</button>
+						}
+						@if (!ViewBag.IsPhysician)
+						{
+							<button class="btn btn-outline-info" id="EditBtn" type="button" onclick="toggleEdit()">
+								Edit
+							</button>
+						}
+
 						<button class="btn btn-outline-info mx-3" type="Submit" id="SubBtn">
 							Submit
 						</button>
@@ -217,9 +306,18 @@
 				</div>
 				<div class="row mt-3">
 					<div class="d-flex flex-row-reverse">
-						<button class="btn btn-outline-info" id="EditBtn" type="button" onclick="toggleAdminEdit()">
-							Edit
-						</button>
+						@if (ViewBag.IsPhysician && (Model.IsCredential != null && Model.IsCredential[0]))
+						{
+							<button class="btn btn-outline-info" id="EditBtn" type="button" onclick="toggleAdminEdit()">
+								Edit
+							</button>
+						}
+						@if (!ViewBag.IsPhysician)
+						{
+							<button class="btn btn-outline-info" id="EditBtn" type="button" onclick="toggleAdminEdit()">
+								Edit
+							</button>
+						}
 						<button class="btn btn-outline-info mx-3" type="Submit" id="SubAdminBtn">
 							Submit
 						</button>
@@ -303,9 +401,20 @@
 				</div>
 				<div class="row mt-3">
 					<div class="d-flex flex-row-reverse">
-						<button class="btn btn-outline-info" id="EditBtn" type="button" onclick="toggleProviderEdit()">
-							Edit
-						</button>
+						@if (ViewBag.IsPhysician && (Model.IsCredential != null && Model.IsCredential[0]))
+						{
+
+							<button class="btn btn-outline-info" id="EditBtn" type="button" onclick="toggleProviderEdit()">
+								Edit
+							</button>
+						}
+						@if (!ViewBag.IsPhysician)
+						{
+
+							<button class="btn btn-outline-info" id="EditBtn" type="button" onclick="toggleProviderEdit()">
+								Edit
+							</button>
+						}
 						<button class="btn btn-outline-info mx-3" type="Submit" id="SubProviderBtn">
 							Submit
 						</button>
@@ -319,47 +428,86 @@
 				<div class="d-flex align-items-center gap-3 mb-3">
 					<input type="checkbox" class="form-check-input" id="agreeToICA" name="agreeToICA" @(Model.IsAgreement[0] ? "checked" : "")>
 					<span>Independent Contractor Agreement</span>
-
-					<div class="file-input-container d-flex align-items-center">
-						<input type="file" class="form-control" id="ICA" accept=".pdf" hidden />
-						<label class="input-group-text btn btn-info text-light" for="ICA">
-							<span class="d-none d-md-inline">Upload</span>
-							<span class="d-md-none">Upload</span>
-						</label>
-					</div>
+					@if (ViewBag.IsPhysician && (Model.IsCredential != null && Model.IsCredential[0]))
+					{
+						<div class="file-input-container d-flex align-items-center">
+							<input type="file" class="form-control" id="ICA" accept=".pdf" hidden />
+							<label class="input-group-text btn btn-info text-light" for="ICA">
+								<span class="d-none d-md-inline">Upload</span>
+								<span class="d-md-none">Upload</span>
+							</label>
+						</div>
+					}
+					@if (!ViewBag.IsPhysician)
+					{
+						<div class="file-input-container d-flex align-items-center">
+							<input type="file" class="form-control" id="ICA" accept=".pdf" hidden />
+							<label class="input-group-text btn btn-info text-light" for="ICA">
+								<span class="d-none d-md-inline">Upload</span>
+								<span class="d-md-none">Upload</span>
+							</label>
+						</div>
+					}
 					@if (Model.IsAgreement[0])
 					{
 						<a class="btn btn-info" href="~/Physician/@Model.physicianid/ICA.pdf">View</a>
 					}
 				</div>
+
 				<div class="d-flex align-items-center gap-3 mb-3">
 					<input type="checkbox" class="form-check-input" id="agreeToICA" name="agreeToICA" @(Model.IsBackground[0] ? "checked" : "")>
 					<span>Background Check</span>
-
-					<div class="file-input-container d-flex align-items-center">
-						<input type="file" class="form-control" id="Background" hidden />
-						<label class="input-group-text btn btn-info text-light" for="Background">
-							<span class="d-none d-md-inline">Upload</span>
-							<span class="d-md-none">Upload</span>
-						</label>
-					</div>
+					@if (ViewBag.IsPhysician && (Model.IsCredential != null && Model.IsCredential[0]))
+					{
+						<div class="file-input-container d-flex align-items-center">
+							<input type="file" class="form-control" id="Background" hidden />
+							<label class="input-group-text btn btn-info text-light" for="Background">
+								<span class="d-none d-md-inline">Upload</span>
+								<span class="d-md-none">Upload</span>
+							</label>
+						</div>
+					}
+					@if (!ViewBag.IsPhysician)
+					{
+						<div class="file-input-container d-flex align-items-center">
+							<input type="file" class="form-control" id="Background" hidden />
+							<label class="input-group-text btn btn-info text-light" for="Background">
+								<span class="d-none d-md-inline">Upload</span>
+								<span class="d-md-none">Upload</span>
+							</label>
+						</div>
+					}
 					@if (Model.IsBackground[0])
 					{
 						<a class="btn btn-info" href="~/Physician/@Model.physicianid/Background.pdf">View</a>
 					}
 				</div>
+
 				<div class="d-flex align-items-center gap-3 mb-3">
 					<input type="checkbox" class="form-check-input" id="agreeToICA" name="agreeToICA" @(Model.IsHippa[0] ? "checked" : "")>
 					<span>Hippa Compalience</span>
+					@if (ViewBag.IsPhysician && (Model.IsCredential != null && Model.IsCredential[0]))
+					{
+						<div class="file-input-container d-flex align-items-center">
+							<input type="file" class="form-control" id="Hippa" hidden />
+							<label class="input-group-text btn btn-info text-light" for="Hippa">
+								<span class="d-none d-md-inline">Upload</span>
+								<span class="d-md-none">Upload</span>
 
-					<div class="file-input-container d-flex align-items-center">
-						<input type="file" class="form-control" id="Hippa" hidden />
-						<label class="input-group-text btn btn-info text-light" for="Hippa">
-							<span class="d-none d-md-inline">Upload</span>
-							<span class="d-md-none">Upload</span>
+							</label>
+						</div>
+					}
+					@if (!ViewBag.IsPhysician)
+					{
+						<div class="file-input-container d-flex align-items-center">
+							<input type="file" class="form-control" id="Hippa" hidden />
+							<label class="input-group-text btn btn-info text-light" for="Hippa">
+								<span class="d-none d-md-inline">Upload</span>
+								<span class="d-md-none">Upload</span>
 
-						</label>
-					</div>
+							</label>
+						</div>
+					}
 					@if (Model.IsHippa[0])
 					{
 						<a class="btn btn-info" href="~/Physician/@Model.physicianid/Hippa.pdf">View</a>
@@ -368,14 +516,26 @@
 				<div class="d-flex align-items-center gap-3 mb-3">
 					<input type="checkbox" class="form-check-input" id="agreeToICA" name="agreeToICA" @(Model.NonDiscoluser[0] ? "checked" : "")>
 					<span>Non-disclosure-Agreement</span>
-
-					<div class="file-input-container d-flex align-items-center">
-						<input type="file" class="form-control" id="NonDiscoluser" hidden />
-						<label class="input-group-text btn btn-info text-light" for="NonDiscoluser">
-							<span class="d-none d-md-inline">Upload</span>
-							<span class="d-md-none">Upload</span>
-					</div>
-					</label>
+					@if (ViewBag.IsPhysician && (Model.IsCredential != null && Model.IsCredential[0]))
+					{
+						<div class="file-input-container d-flex align-items-center">
+							<input type="file" class="form-control" id="NonDiscoluser" hidden />
+							<label class="input-group-text btn btn-info text-light" for="NonDiscoluser">
+								<span class="d-none d-md-inline">Upload</span>
+								<span class="d-md-none">Upload</span>
+							</label>
+						</div>
+					}
+					@if (!ViewBag.IsPhysician)
+					{
+						<div class="file-input-container d-flex align-items-center">
+							<input type="file" class="form-control" id="NonDiscoluser" hidden />
+							<label class="input-group-text btn btn-info text-light" for="NonDiscoluser">
+								<span class="d-none d-md-inline">Upload</span>
+								<span class="d-md-none">Upload</span>
+							</label>
+						</div>
+					}
 					@if (Model.NonDiscoluser[0])
 					{
 						<a class="btn btn-info" href="~/Physician/@Model.physicianid/Hippa.pdf">View</a>
@@ -384,15 +544,26 @@
 				<div class="d-flex align-items-center gap-3 mb-3">
 					<input type="checkbox" class="form-check-input" id="agreeToICA" name="agreeToICA" @(Model.License[0] ? "checked" : "")>
 					<span>License-Documents</span>
-
-					<div class="file-input-container d-flex align-items-center">
-						<input type="file" class="form-control" id="License" hidden />
-						<label class="input-group-text btn btn-info text-light" for="License">
-							<span class="d-none d-md-inline">Upload</span>
-							<span class="d-md-none">Upload</span>
-						</label>
-					</div>
-
+					@if (ViewBag.IsPhysician && (Model.IsCredential != null && Model.IsCredential[0]))
+					{
+						<div class="file-input-container d-flex align-items-center">
+							<input type="file" class="form-control" id="License" hidden />
+							<label class="input-group-text btn btn-info text-light" for="License">
+								<span class="d-none d-md-inline">Upload</span>
+								<span class="d-md-none">Upload</span>
+							</label>
+						</div>
+					}
+					@if (!ViewBag.IsPhysician)
+					{
+						<div class="file-input-container d-flex align-items-center">
+							<input type="file" class="form-control" id="License" hidden />
+							<label class="input-group-text btn btn-info text-light" for="License">
+								<span class="d-none d-md-inline">Upload</span>
+								<span class="d-md-none">Upload</span>
+							</label>
+						</div>
+					}
 					@if (Model.License[0])
 					{
 						<a class="btn btn-info" href="~/Physician/@Model.physicianid/License.pdf">View</a>
@@ -405,11 +576,40 @@
 		</div>
 	</div>
 </section>
+<partial name="RequestToAdminPartial"></partial>
+
+<script>
+	$(document).ready(function () {
+		$('#RequestToAdminEditProfile').on('show.bs.modal', function (event) {
+			console.log("sdfslf")
+			var button = $(event.relatedTarget);
+			console.log(button)
+			var recipient = button.data('bs-physicianid');
+
+
+			var modal = $(this);
+			modal.find('#requestIdToEditProfile').val(recipient);
+
+		});
+		$('#RequestToAdminEditProfile').on('hidden.bs.modal', function () {
+			console.log("hidden")
+			$('#requestadminforedit').each(function () {
+				this.reset();
+			})
+
+		});
+
+
+	});
+</script>
 <script>
 
 	$("#SubBtn").hide();
 	$("#SubAdminBtn").hide();
 	$('#SubProviderBtn').hide();
+	$('#SubAccountInfo').hide();
+
+
 	function toggleEdit() {
 		var inputFields = document.querySelectorAll('#administrationinfo input');
 
@@ -427,6 +627,17 @@
 		});
 
 		$("#SubAdminBtn").toggle();
+	}
+	function toggleAccountInfo() {
+		var inputFields = document.querySelectorAll('#resetpassword input, #resetpassword select');
+
+		inputFields.forEach(function (input) {
+			if (input.id !== 'physicianid') {
+				input.disabled = !input.disabled;
+			}
+		});
+
+		$("#SubAccountInfo").toggle();
 	}
 	function toggleProviderEdit() {
 		var inputFields = document.querySelectorAll('#providerprofile input, #providerprofile select,#providerprofile textarea');

@@ -32,6 +32,10 @@ namespace DataAccessLayer.CustomModel
         public List<PhysicianRegion>? WorkingRegions { get; set; }
         public int physicianid { get;set; } 
 
+        public int? PhysicianRole { get; set; }
+
+
+		public List<Role>? Roles { get;set; }
         public string? MedicalLicense { get; set; }  
         public string? NPINumber { get; set; }  
         public string? SynchronizationEmail { get; set; }  
@@ -47,5 +51,6 @@ namespace DataAccessLayer.CustomModel
         public BitArray? IsHippa { get; set; }      
         public BitArray? NonDiscoluser { get; set; }      
         public BitArray? License { get; set; }      
+        public BitArray? IsCredential { get; set; }      
     }
 }
