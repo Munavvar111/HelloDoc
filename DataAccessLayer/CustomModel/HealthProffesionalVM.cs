@@ -14,7 +14,10 @@ namespace DataAccessLayer.CustomModel
             [Display(Name = "Business Name")]
             public string Vendorname { get; set; }
 
-            [Required(ErrorMessage = "Profession is required.")]
+		public int VendorId { get; set; }
+
+
+		[Required(ErrorMessage = "Profession is required.")]
             [Display(Name = "Select Business")]
             public int Profession { get; set; }
 

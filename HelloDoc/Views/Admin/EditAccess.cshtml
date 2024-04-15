@@ -19,8 +19,7 @@
         <div class="">
             <span class="fs-2 text-muted  fw-bold">Details</span>
         </div>
-        <form asp-action="EditAccess" method="post" asp-route-roleid="@Model.roleid">
-
+        <form id="accessForm" asp-action="EditAccess" method="post" asp-route-roleid="@Model.roleid">
             <div class="row row-cols-1 row-cols-md-2">
                 <div class="col">
                     <div class="form-floating mb-4 mt-4">
@@ -48,13 +47,38 @@
             <div id="accesspartial">
             </div>
             <div class="d-flex justify-content-end gap-2 p-3">
-                <button class="btn btn-outline-info" >Save</button>
-                <button class="btn btn-outline-info">Cancel</button>
+                <button class="btn btn-outline-info" id="EditSubmit" type="button">Save</button>
             </div>
         </form>
     </div>
 </div>
+<script>
+    document.getElementById("EditSubmit").addEventListener("click", function () {
+        let checkboxes = document.querySelectorAll('input[name="rolemenu"]');
+        let isChecked = false;
 
+        checkboxes.forEach(function (checkbox) {
+            if (checkbox.checked) {
+                isChecked = true;
+            }
+        });
+
+        if (!isChecked) {
+            Swal.fire({
+                title: 'Warning!',
+                text: 'Please select at least one menu.',
+                icon: 'warning',
+                showConfirmButton: true,
+                confirmButtonColor: '#3085d6',
+                confirmButtonText: 'OK'
+            });
+            return false;
+        }
+        else {
+            document.getElementById("accessForm").submit();
+        }
+    });
+</script>
 <script>
     $(document).ready(function () {
         fetchRoles();

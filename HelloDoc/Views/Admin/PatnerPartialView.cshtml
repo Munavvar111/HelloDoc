@@ -1,6 +1,6 @@
 ﻿@model List<DataAccessLayer.CustomModel.SendOrderModel>
-<div class="bg-white border justify-content-center mt-3 table-responsive">
-    <table class="table">
+<div class="bg-white border justify-content-center mt-3 ">
+    <table class="table d-lg-table d-none">
 
         <thead class="table-secondary">
             <tr>
@@ -25,16 +25,56 @@
                        <td>@item.PhoneNumber</td>
                        <td>@item.BusinesContact</td>
                        <td class="d-flex gap-2">
-                           <a asp-action="EditPartner" class="btn btn-outline-info" asp-route-partnerId="@item.HelthProfessionId">Edit</a>
-                        <a class="btn btn-outline-info" onclick="deleteRecord(@item.HelthProfessionId)">Delete</a>
+                           <a asp-action="EditPartner" class="btn btn-outline-info" asp-route-partnerId="@item.VendorId">Edit</a>
+                        <a class="btn btn-outline-info" onclick="deleteRecord(@item.VendorId)">Delete</a>
                     </td>
                     </tr>
                 </tbody>
             }
         
     </table>
+
+<div class="d-lg-none" style="max-width: 100%;">
+    @{
+        var Count = 0;
+    }
+    @foreach (var items in Model)
+    {
+        <div class="bg-info-subtle border-4 border-top data-mobile-row" data-bs-toggle="collapse" data-bs-target="#collapseExample-@Count" aria-expanded="false"
+             aria-controls="collapseExample">
+            <div class="d-flex flex-column gap-3">
+                <div class="form-check my-4">
+                    <span>@items.BusinessName</span>
+                </div>
+            </div>
+        </div>
+        <div class="collapse border-2 border-top rounded-3 bg-info-subtle " id="collapseExample-@Count">
+            <div class="d-flex flex-column">
+                <div class="ms-3 mt-2">
+                    <span class=""><i class="fas text-info fa-envelope fs-6 border border-1 border-info rounded-5 fs-6 p-2 me-2"></i>Email: @items.Email</span>
+                </div>
+                <div class="ms-3 mt-2">
+                    <span class=""><i class="fas text-info fa-phone fs-6 border border-1 border-info rounded-5 fs-6 p-2 me-2"></i>Fax: @items.FaxNumber</span>
+                </div>
+                <div class="ms-3 mt-2">
+                    <span class=""><i class="fas text-info fa-phone fs-6 border border-1 border-info rounded-5 fs-6 p-2 me-2"></i>Phone Number: @items.PhoneNumber</span>
+                </div>
+                <div class="ms-3 mt-2">
+                    <span class=""><i class="fas text-info fa-envelope fs-6 border border-1 border-info rounded-5 fs-6 p-2 me-2"></i>Business Contact: @items.BusinesContact</span>
+                </div>
+
+                <div class="d-flex justify-content-end mb-2 gap-2 mx-2">
+                    <a asp-action="EditPartner" class="btn btn-outline-info" asp-route-partnerId="@items.VendorId">Edit</a>
+                    <a class="btn btn-outline-info" onclick="deleteRecord(@items.VendorId)">Delete</a>
+                </div>
+            </div>
+        </div>
+        Count++;
+    }
 </div>
-<div class="pb-3 mt-3">
+</div>
+
+<div mt-3">
     <nav id="pagination" aria-label="Page navigation">
         <ul class="pagination justify-content-center mb-0">
             @if (ViewBag.CurrentPage >= 1 && ViewBag.CurrentPage <= ViewBag.TotalPages)

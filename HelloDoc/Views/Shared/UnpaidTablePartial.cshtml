@@ -145,31 +145,31 @@
                         
                         <div class="d-flex align-items-center ">
                             <i class="fa-regular fa-envelope  border border-1 border-info rounded-5 p-2 me-2"></i>
-                            <span class="fs-5">Email: <strong>@item.Email</strong></span>
+                            <span class="fs-5"><span class="text-muted">Email:</span> @item.Email</span>
                         </div>
                         
                             <div class="d-flex align-items-center ">
                                 <i class="fas fa-phone  border border-1 border-info rounded-5 p-2 me-2"></i>
-                                <span class="fs-5">Phone: <strong>@item.Phone</strong></span>
-                            </div>
+                            <span class="fs-5"><span class="text-muted">Phone:</span> @item.Phone</span>
+                        </div>
                         
                             <div class="d-flex align-items-center ">
                                 <i class="fa-regular fa-calendar  border border-1 border-info rounded-5 p-2 me-2"></i>
-                                <span class="fs-5">Date of Service: <strong></strong> </span>
-                            </div>
+                            <span class="fs-5"><span class="text-muted">Date of Service: </span>@item.DateOfService.ToString("MMM dd, yyyy") </span>
+                        </div>
                         
                             <div class="d-flex align-items-center ">
                                 <i class="fa-solid fa-user-doctor  border border-1 border-info rounded-5 p-2 me-2"></i>
-                                <span class="fs-5">Physician: <strong></strong></span>
-                            </div>
+                            <span class="text-muted">Physician:</span>@item.PhysicianName
+                        </div>
                         
 
                         
                             <div class="d-flex flex-column mt-3 gap-3">
                                 <div class="d-flex gap-3 ">
-                                    <button class="btn w-50 btn-transparent border border-1 text-white  rounded-5" style="background-color:  #228B22">View Notes</button>
-                                    <button class="btn w-50 btn-transparent border border-1 text-white rounded-5" style="background-color: #228B22">View Uploads</button>
-                                </div>
+                                <a type="button" class="btn w-50 btn-transparent border border-1 text-white rounded-5" style="background-color: #228B22" asp-action="ViewNotes" asp-controller="Admin" asp-route-requestid="@item.RequestId">View Notes</a>
+                                <a class="btn w-50 btn-transparent border border-1 text-white rounded-5" style="background-color: #228B22" asp-action="ViewUploads" asp-controller="Admin" asp-route-id="@item.RequestId">View Uploads</a>
+                            </div>
                                 <div class="d-flex gap-3">
                                     <button class="btn w-50 btn-transparent border border-1 text-white rounded-5" style="background-color: #228B22">Email</button>
 

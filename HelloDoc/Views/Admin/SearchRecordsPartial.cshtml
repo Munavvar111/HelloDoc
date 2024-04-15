@@ -1,6 +1,6 @@
 ﻿@model List<DataAccessLayer.CustomModel.SearchRecordVM>
 <div class="table-responsive mt-4 mb-4">
-    <table class="table table-hover">
+    <table class="table table-hover d-xl-table d-none">
         <thead class="table-light">
             <tr>
                 <th scope="col">Patient Name</th>
@@ -67,6 +67,128 @@
             }
         </tbody>
     </table>
+    <div class="d-xl-none mt-2">
+        @{
+            var Count = 0;
+        }
+        @foreach (var item in Model)
+        {
+            <div class="bg-info-subtle " data-bs-toggle="collapse" data-bs-target="#collapseexample_@Count"
+                 aria-expanded="false" aria-controls="collapseexample">
+                <div class="d-flex flex-column gap-3  border-bottom border-2 pt-3 pb-5 px-3">
+                    <span class="fs-5">@item.PatientName</span>
+                    <span class="fs-5">@item.PhoneNumber</span>
+                </div>
+            </div>
+
+
+            <div class="collapse " id="collapseexample_@Count">
+                <div class="d-flex flex-column gap-2 bg-info-subtle border-bottom border-2  py-3 px-3 ">
+                    <div class="d-flex align-items-center ">
+                        <i class="fa-regular fa-user  border border-1 text-info border-info rounded-5 p-2 me-2"></i>
+                        <span>Requestor: @item.Requestor</span>
+                    </div>
+                    <div class="d-flex align-items-center ">
+                        <i class="fa-solid fa-calendar-days text-info border border-1 border-info rounded-5 p-2 me-2"></i>
+                        <span>Date of Service: <strong>-</strong></span>
+                    </div>
+                    <div class="d-flex align-items-center ">
+                        <i class="fa-solid fa-calendar-days text-info border border-1 border-info rounded-5 p-2 me-2 "></i>
+                        <span>Case Closed Date: <strong>-</strong></span>
+                    </div>
+                    <div class="d-flex align-items-center ">
+                        <i class="fa-regular fa-envelope text-info border border-1 border-info rounded-5 p-2 me-2 "></i>
+                        <span>Email: <strong>@item.Email</strong></span>
+                    </div>
+                    <div class="d-flex align-items-center ">
+                        <i class="bi bi-telephone text-info border border-1 border-info rounded-5 px-2 py-1 me-2 "></i>
+                        <span>Phone: <strong>@item.PhoneNumber</strong></span>
+                    </div>
+                    <div class="d-flex align-items-center ">
+                        <i class="bi bi-geo-alt text-info border border-1 border-info rounded-5 px-2 py-1 me-2 "></i>
+                        <span>Address: <strong>@item.Address</strong></span>
+                    </div>
+                    <div class="d-flex align-items-center ">
+                        <i class="bi bi-geo-alt text-info border border-1 border-info rounded-5 px-2 py-1 me-2  "></i>
+                        <span>Zipcode: <strong>@item.Zip</strong></span>
+                    </div>
+                    <div class="d-flex align-items-center ">
+                        <i class="bi bi-check-lg text-info border border-1 border-info rounded-5 px-2 py-1 me-2 "></i>
+                        <span>
+                            Request Status:
+                            @{
+                                if (item.RequestStatus == 1)
+                                {
+                                    <strong>Unassigned</strong>
+                                }
+                                else if (item.RequestStatus == 2)
+                                {
+                                    <strong>Accepted</strong>
+                                }
+                                else if (item.RequestStatus == 3)
+                                {
+                                    <strong>Cancelled</strong>
+                                }
+                                else if (item.RequestStatus == 4)
+                                {
+                                    <strong>MDEnRoute</strong>
+                                }
+                                else if (item.RequestStatus == 5)
+                                {
+                                    <strong>MDOnSite</strong>
+                                }
+                                else if (item.RequestStatus == 6)
+                                {
+                                    <strong>Conclude</strong>
+                                }
+                                else if (item.RequestStatus == 7)
+                                {
+                                    <strong>Cancelled By Patient</strong>
+                                }
+                                else if (item.RequestStatus == 8)
+                                {
+                                    <strong>Closed</strong>
+                                }
+                                else if (item.RequestStatus == 9)
+                                {
+                                    <strong>Unpaid</strong>
+                                }
+                                else if (item.RequestStatus == 10)
+                                {
+                                    <strong>Clear</strong>
+                                }
+                            }
+                        </span>
+                    </div>
+                    <div class="d-flex align-items-center ">
+                        <i class="fa-solid fa-user-doctor text-info  border border-1 border-info rounded-5 p-2 me-2"></i>
+                        <span>Provider: <strong>@item.PhysicianName</strong></span>
+                    </div>
+                    <div class="d-flex align-items-center ">
+                        <i class="bi bi-journal text-info border border-1 border-info rounded-5 px-2 py-1 me-2 "></i>
+                        <span>Provider Note: <strong>@item.PhysicianNote</strong></span>
+                    </div>
+                    <div class="d-flex align-items-center ">
+                        <i class="bi bi-journal text-info border border-1 border-info rounded-5 px-2 py-1 me-2 "></i>
+                        <span>Cancelled By Provider Note: <strong>@item.CancelledByProvidor</strong></span>
+                    </div>
+                    <div class="d-flex align-items-center ">
+                        <i class="bi bi-journal text-info border border-1 border-info rounded-5 px-2 py-1 me-2 "></i>
+                        <span>Admin Note: <strong>@item.AdminNotes</strong></span>
+                    </div>
+                    <div class="d-flex align-items-center ">
+                        <i class="bi bi-journal text-info border border-1 border-info rounded-5 px-2 py-1 me-2 "></i>
+                        <span>Patient Note: <strong>@item.PatientNote</strong></span>
+                    </div>
+
+                    <div class="d-flex justify-content-end">
+                        <button class="btn btn-outline-info rounded me-2" onclick="deletePatient(@item.RequestId)">Delete</button>
+                    </div>
+
+                </div>
+            </div>
+        }
+    </div>
 </div>
 <div class="pb-3 mt-3">
     <nav id="pagination" aria-label="Page navigation">

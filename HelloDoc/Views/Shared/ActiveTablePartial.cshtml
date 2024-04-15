@@ -111,7 +111,7 @@
                 }
                 @if (ViewBag.IsPhysician)
                 {
-                    @if (item.CallType!=null&& item.CallType == 1)
+                    @if (item.CallType != null && item.CallType == 1)
                     {
                         <td style="background-color:@(GetRowClass(@item.ReqTypeId))!important"><a class="btn btn-info" onclick="OnHouseCall(@item.RequestId)">Home</a></td>
                     }
@@ -128,27 +128,27 @@
                         <div class="dropdown-menu dropdown-menu-right dropdown-menu-lg-left" aria-labelledby="dropdownMenuButton">
                             @if (!ViewBag.IsPhysician)
                             {
-                                
-                            <a class="dropdown-item" asp-action="ViewCase" asp-controller="Admin" asp-route-id="@item.RequestClientId"><i class="bi bi-x-circle me-3"></i>View Case</a>
-                            <a class="dropdown-item" asp-action="ViewUploads" asp-controller="Admin" asp-route-id="@item.RequestId"><i class="bi bi-x-circle me-3"></i>View Uploads</a>
-                            <a class="dropdown-item" asp-action="ViewNotes" asp-controller="Admin" asp-route-requestid="@item.RequestId"><i class="bi bi-x-circle me-3"></i>View Notes</a>
-                            <a class="dropdown-item" asp-action="SendOrder" asp-controller="Admin" asp-route-requestid="@item.RequestId"><i class="bi bi-card-text me-3"></i> Order </a>
-                            <a class="dropdown-item" href="#" data-toggle="modal" data-target="#exampleModal"><i class="bi bi-x-circle me-3"></i>Doctor Notes</a>
-                            @if (@item.isfinalize == null)
-                            {
-                                <a class="dropdown-item" asp-action="EncounterForm" asp-route-requestid="@item.RequestId"><i class="bi bi-ban me-3"></i>Encounter</a>
 
-                            }
-                            else if (@item.isfinalize)
-                            {
+                                <a class="dropdown-item" asp-action="ViewCase" asp-controller="Admin" asp-route-id="@item.RequestClientId"><i class="bi bi-x-circle me-3"></i>View Case</a>
+                                <a class="dropdown-item" asp-action="ViewUploads" asp-controller="Admin" asp-route-id="@item.RequestId"><i class="bi bi-x-circle me-3"></i>View Uploads</a>
+                                <a class="dropdown-item" asp-action="ViewNotes" asp-controller="Admin" asp-route-requestid="@item.RequestId"><i class="bi bi-x-circle me-3"></i>View Notes</a>
+                                <a class="dropdown-item" asp-action="SendOrder" asp-controller="Admin" asp-route-requestid="@item.RequestId"><i class="bi bi-card-text me-3"></i> Order </a>
+                                <a class="dropdown-item" href="#" data-toggle="modal" data-target="#exampleModal"><i class="bi bi-x-circle me-3"></i>Doctor Notes</a>
+                                @if (@item.isfinalize == null)
+                                {
+                                    <a class="dropdown-item" asp-action="EncounterForm" asp-route-requestid="@item.RequestId"><i class="bi bi-ban me-3"></i>Encounter</a>
 
-                                <button type="button" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#finalizedModal" data-requestid="@item.RequestId"><i class="bi bi-ban me-3"></i>Encounter</button>
-                            }
-                            else
-                            {
-                                <a class="dropdown-item" asp-action="EncounterForm" asp-route-requestid="@item.RequestId"><i class="bi bi-ban me-3"></i>Encounter</a>
+                                }
+                                else if (@item.isfinalize)
+                                {
 
-                            }
+                                    <button type="button" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#finalizedModal" data-requestid="@item.RequestId"><i class="bi bi-ban me-3"></i>Encounter</button>
+                                }
+                                else
+                                {
+                                    <a class="dropdown-item" asp-action="EncounterForm" asp-route-requestid="@item.RequestId"><i class="bi bi-ban me-3"></i>Encounter</a>
+
+                                }
                             }
                             @if (ViewBag.IsPhysician)
                             {
@@ -156,7 +156,7 @@
                                 <a class="dropdown-item" asp-action="ViewUploads" asp-controller="Provider" asp-route-id="@item.RequestId"><i class="bi bi-x-circle me-3"></i>View Uploads</a>
                                 <a class="dropdown-item" asp-action="ViewNotes" asp-controller="Provider" asp-route-requestid="@item.RequestId"><i class="bi bi-x-circle me-3"></i>View Notes</a>
                                 <a class="dropdown-item" asp-action="SendOrder" asp-controller="Provider" asp-route-requestid="@item.RequestId"><i class="bi bi-card-text me-3"></i> Order </a>
-                                <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#EncounterProvidermodal" data-bs-requestid="@item.RequestId"><i class="bi bi-card-text me-3"></i> Order </a>
+                                <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#EncounterProvidermodal" data-bs-requestid="@item.RequestId"><i class="bi bi-card-text me-3"></i> Encounter </a>
                             }
                         </div>
                     </div>
@@ -199,59 +199,115 @@
                 </div>
 
                 <div class="collapse position-relative" id="collapseexample_@item.Id">
-                    <button class="btn position-absolute btn-transparent border-2 rounded-5 viewBtn">View Case</button>
+                    @if (!ViewBag.IsPhysician)
+                    {
+                        <a class="btn position-absolute  border-2 rounded-5 viewBtn bg-secondary" style="position:relative;top:-25px" asp-action="ViewCase" asp-controller="Admin" asp-route-id="@item.Id">View Case</a>
+                    }
+                    @if (ViewBag.IsPhysician)
+                    {
+                        <a class="btn position-absolute  border-2 rounded-5 viewBtn bg-secondary" style="position:relative;top:-25px" asp-action="ViewCase" asp-controller="Provider" asp-route-id="@item.Id">View Case</a>
+                    }
                     <div class="d-flex flex-column gap-2 bg-info-subtle   mb-2 py-3 px-4 ">
-                        <div class="d-flex align-items-center ">
-                            <i class="fa-regular fa-calendar  border border-1 border-info rounded-5 p-2 me-2"></i>
-                            <span class="fs-5"><span class="text-muted">Date of Birth:</span>@item.DateOfBirth </span>
-                        </div>
-                        <div class="d-flex align-items-center ">
-                            <i class="fa-regular fa-envelope  border border-1 border-info rounded-5 p-2 me-2"></i>
-                            <span class="fs-5"><span class="text-muted">Email:</span> @item.Email</span>
-                        </div>
+                        @if (!ViewBag.IsPhysician)
+                        {
+                            <div class="d-flex align-items-center ">
+                                <i class="fa-regular fa-calendar  border border-1 border-info rounded-5 p-2 me-2"></i>
+                                <span class="fs-5"><span class="text-muted">Date of Birth:</span>@item.DateOfBirth.ToString("MMM dd, yyyy") </span>
+                            </div>
+                            <div class="d-flex align-items-center ">
+                                <i class="fa-regular fa-envelope  border border-1 border-info rounded-5 p-2 me-2"></i>
+                                <span class="fs-5"><span class="text-muted">Email:</span> @item.Email</span>
+                            </div>
+                        }
                         <div class="d-flex align-items-center ">
                             <i class="fas fa-phone  border border-1 border-info rounded-5 p-2 me-2"></i>
                             <span class="fs-5"><span class="text-muted">Phone:</span> @item.Phone</span>
                         </div>
-                        <div class="d-flex align-items-center ">
-                            <i class="fa-regular fa-note-sticky  border border-1 border-info rounded-5 p-2 me-2 "></i>
-                            <span class="fs-5"><span class="text-muted">Transfer Notes:</span> </span>
-                        </div>
-                        <div class="d-flex align-items-center ">
-                            <i class="fa-regular fa-calendar  border border-1 border-info rounded-5 p-2 me-2"></i>
-                            <span class="fs-5"><span class="text-muted">Date of Service: </span> </span>
-                        </div>
-                        <div class="d-flex align-items-center ">
-                            <i class="fa-solid fa-user-doctor  border border-1 border-info rounded-5 p-2 me-2"></i>
-                            <span class="fs-5"><span class="text-muted">Physician:</span></span>
-                        </div>
-                        <div class="d-flex align-items-center ">
-                            <i class="fa-regular fa-user  border border-1 border-info rounded-5 p-2 me-2"></i>
-                            <span class="fs-5"><span class="text-muted">Requestor:</span> @item.Requestor</span>
-                        </div>
+                        @if (ViewBag.IsPhysician)
+                        {
+
+                            <div class="d-flex align-items-center ">
+                                <i class="fas fa-phone  border border-1 border-info rounded-5 p-2 me-2"></i>
+                                <span class="fs-5">
+                                    <span class="text-muted">Status:</span>
+                                    @if (item.CallType != null && item.CallType == 1)
+                                    {
+                                        <a class="btn btn-info" onclick="OnHouseCall(@item.RequestId)">Home</a>
+                                    }
+                                    else
+                                    {
+                                        <span>-</span>
+                                    }
+                                </span>
+
+                            </div>
+                        }
+                        @if (!ViewBag.IsPhysician)
+                        {
+                            <div class="d-flex align-items-center ">
+                                <i class="fa-regular fa-note-sticky  border border-1 border-info rounded-5 p-2 me-2 "></i>
+                                <span class="fs-5"><span class="text-muted">Transfer Notes:</span>@item.Notes </span>
+                            </div>
+                            <div class="d-flex align-items-center ">
+                                <i class="fa-regular fa-calendar  border border-1 border-info rounded-5 p-2 me-2"></i>
+                                <span class="fs-5"><span class="text-muted">Date of Service: </span>@item.DateOfService.ToString("MMM dd, yyyy") </span>
+                            </div>
+                            <div class="d-flex align-items-center ">
+                                <i class="fa-solid fa-user-doctor  border border-1 border-info rounded-5 p-2 me-2"></i>
+                                <span class="fs-5">
+                                    <span class="text-muted">Physician:</span>@item.PhysicianName
+
+                                </span>
+
+                            </div>
+                            <div class="d-flex align-items-center ">
+                                <i class="fa-regular fa-user  border border-1 border-info rounded-5 p-2 me-2"></i>
+                                <span class="fs-5"><span class="text-muted">Requestor:</span> @item.Requestor</span>
+                            </div>
+                        }
                         <div class="d-flex flex-column mt-3 gap-3">
                             <div class="d-flex gap-3 ">
-                                <a type="button" class="btn w-50 btn-transparent border border-1 text-white rounded-5" style="background-color: #228B22" asp-action="ViewNotes" asp-controller="Admin" asp-route-requestid="@item.RequestId">View Notes</a>
-                                <a class="btn w-50 btn-transparent border border-1 text-white rounded-5" style="background-color: #228B22" asp-action="ViewUploads" asp-controller="Admin" asp-route-id="@item.RequestId">View Uploads</a>
+                                @if (!ViewBag.IsPhysician)
+                                {
+
+                                    <a type="button" class="btn w-50 btn-transparent border border-1 text-white rounded-5" style="background-color: #228B22" asp-action="ViewNotes" asp-controller="Admin" asp-route-requestid="@item.RequestId">View Notes</a>
+                                    <a class="btn w-50 btn-transparent border border-1 text-white rounded-5" style="background-color: #228B22" asp-action="ViewUploads" asp-controller="Admin" asp-route-id="@item.RequestId">View Uploads</a>
+                                }
+                                @if (ViewBag.IsPhysician)
+                                {
+
+                                    <a type="button" class="btn w-50 btn-transparent border border-1 text-white rounded-5" style="background-color: #228B22" asp-action="ViewNotes" asp-controller="Provider" asp-route-requestid="@item.RequestId">View Notes</a>
+                                    <a class="btn w-50 btn-transparent border border-1 text-white rounded-5" style="background-color: #228B22" asp-action="ViewUploads" asp-controller="Provider" asp-route-id="@item.RequestId">View Uploads</a>
+                                }
                             </div>
                             <div class="d-flex gap-3 ">
-
-                                @if (@item.isfinalize == null)
-                                {
-                                    <a class="btn w-50 btn-transparent border border-1 text-white rounded-5" style="background-color: #228B22" asp-action="EncounterForm" asp-route-requestid="@item.RequestId">Encounter</a>
-
-                                }
-                                else if (@item.isfinalize)
+                                @if (!ViewBag.IsPhysician)
                                 {
 
-                                    <button type="button" class="btn w-50 btn-transparent border border-1 text-white rounded-5" style="background-color: #228B22" data-bs-toggle="modal" data-bs-target="#finalizedModal" data-requestid="@item.RequestId">Encounter</button>
+                                    @if (@item.isfinalize == null)
+                                    {
+                                        <a class="btn w-50 btn-transparent border border-1 text-white rounded-5" style="background-color: #228B22" asp-action="EncounterForm" asp-route-requestid="@item.RequestId">Encounter</a>
+
+                                    }
+                                    else if (@item.isfinalize)
+                                    {
+
+                                        <button type="button" class="btn w-50 btn-transparent border border-1 text-white rounded-5" style="background-color: #228B22" data-bs-toggle="modal" data-bs-target="#finalizedModal" data-requestid="@item.RequestId">Encounter</button>
+                                    }
+                                    else
+                                    {
+                                        <a class="btn w-50 btn-transparent border border-1 text-white rounded-5" style="background-color: #228B22" asp-action="EncounterForm" asp-route-requestid="@item.RequestId">Encounter</a>
+
+                                    }
+                                    <a class="btn w-50 btn-transparent border border-1 text-white rounded-5" style="background-color: #EE9125" asp-action="SendOrder" asp-controller="Admin" asp-route-requestid="@item.RequestId">Orders</a>
                                 }
-                                else
+                                @if (ViewBag.IsPhysician)
                                 {
-                                    <a class="btn w-50 btn-transparent border border-1 text-white rounded-5" style="background-color: #228B22" asp-action="EncounterForm" asp-route-requestid="@item.RequestId">Encounter</a>
+                                    <a class="btn w-50 btn-transparent border border-1 text-white rounded-5" style="background-color: #228B22" data-bs-toggle="modal" data-bs-target="#EncounterProvidermodal" data-bs-requestid="@item.RequestId"><i class="bi bi-card-text me-3"></i> Encounter </a>
+
+                                    <a class="btn w-50 btn-transparent border border-1 text-white rounded-5" style="background-color: #EE9125" asp-action="SendOrder" asp-controller="Provider" asp-route-requestid="@item.RequestId">Orders</a>
 
                                 }
-                                <a class="btn w-50 btn-transparent border border-1 text-white rounded-5" style="background-color: #EE9125" asp-action="SendOrder" asp-controller="Admin" asp-route-requestid="@item.RequestId">Orders</a>
                             </div>
                             <div class="d-flex gap-3">
                                 <a href="@($"mailto:{@item.Email}")" class="btn w-50 btn-transparent border border-1 text-white rounded-5" style="background-color: #228B22">Email</a>
@@ -406,4 +462,3 @@
     }
 
 </script>
-   

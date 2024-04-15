@@ -21,6 +21,8 @@ namespace DataAccessLayer.CustomModel
         public int BusinessId { get; set; }
         public int HelthProfessionId { get; set; }
 
+        public int VendorId {  get; set; }  
+
         [Required(ErrorMessage = "Contact is required.")]
         public string Contact { get; set; }
 

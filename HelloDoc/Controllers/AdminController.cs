@@ -1041,7 +1041,7 @@ namespace HelloDoc.Controllers
 			if (healthprofessional == null)
 			{
 				TempData["Error"] = "Something Is Went Wrong!!";
-				return RedirectToAction("Partner", "Admin");
+				return RedirectToAction("Parteners", "Admin");
 			}
 			List<Healthprofessionaltype> healthprofessionaltype = _admin.GetAllHealthprofessoionalType();
 			List<Region> Regions = _admin.GetAllRegion();
@@ -1058,7 +1058,7 @@ namespace HelloDoc.Controllers
 			healthProffesionalVM.Zip = healthprofessional?.Zip ?? "";
 			healthProffesionalVM.Email = healthprofessional?.Email ?? "";
 			healthProffesionalVM.Phonenumber = healthprofessional?.Phonenumber ?? "";
-			healthProffesionalVM.HealthProfessionId = healthprofessional.Vendorid;
+			healthProffesionalVM.VendorId = healthprofessional.Vendorid;
 			return View(healthProffesionalVM);
 		}
 		#endregion
@@ -1068,10 +1068,15 @@ namespace HelloDoc.Controllers
 		[HttpPost]
 		public IActionResult EditPartner(HealthProffesionalVM healthProffesionalVM)
 		{
-			Healthprofessional? healthprofessional = _admin.GetHealthprofessionalById(healthProffesionalVM.HealthProfessionId);
+			Healthprofessional? healthprofessional = _admin.GetHealthprofessionalById(healthProffesionalVM.VendorId);
+			if (healthprofessional == null)
+			{
+				TempData["Error"] = "Something Is Went Wrong!!";
 
+				return RedirectToAction("Index", "Admin");
+			}
 			healthprofessional.Vendorname = healthProffesionalVM.Vendorname;
-			healthprofessional.Healthprofessionalid = healthProffesionalVM.HealthProfessionId;
+			healthprofessional.Healthprofessionalid = healthProffesionalVM.Profession;
 			healthprofessional.Email = healthProffesionalVM.Email;
 			healthprofessional.Businesscontact = healthProffesionalVM.Businesscontact;
 			healthprofessional.Address = healthProffesionalVM.Address;
@@ -1083,7 +1088,8 @@ namespace HelloDoc.Controllers
 			healthprofessional.Faxnumber = healthProffesionalVM.Faxnumber;
 			_admin.UpdateHealthPrifessional(healthprofessional);
 			_admin.SaveChanges();
-			return RedirectToAction("EditPartner", new { partnerId = healthprofessional.Vendorid });
+            TempData["SuccessMessage"] = "Details Update SuccessFully!!";
+            return RedirectToAction("EditPartner", new { partnerId = healthprofessional.Vendorid });
 		}
 		#endregion
 
@@ -1569,7 +1575,7 @@ namespace HelloDoc.Controllers
 
 		#region SearchPatientDashboard
 		[CustomAuthorize("Dashboard", "6")]
-		public IActionResult SearchPatient(string searchValue, string selectValue, string partialName, string selectedFilter, int[] currentStatus, bool exportdata, bool exportAllData, int page, int pageSize = 5)
+		public IActionResult SearchPatient(string searchValue, string selectValue, string partialName, string selectedFilter, int[] currentStatus, bool exportdata, bool exportAllData, int page, int pageSize = 10)
 		{
 			if (page == 0)
 			{

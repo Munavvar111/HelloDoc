@@ -1,4 +1,5 @@
-﻿<div class="bg-white border justify-content-center mt-3 table-responsive">
+﻿@model List<DataAccessLayer.CustomModel.ReviewShiftVM>;
+<div class="bg-white border justify-content-center mt-3 table-responsive">
     <table class="table">
 
         <thead class="table-secondary" style="vertical-align:middle!important">
@@ -10,7 +11,7 @@
                 <th scope="col">Status</th>
               
             </tr>
-        </thead>
+        </thead>    
         @foreach (var item in Model)
         {
 
@@ -19,7 +20,7 @@
                     <td>
                         <input type="checkbox" class="fileCheckbox form-check form-check-inline" data-filename="@item.ShiftDetailId" />
                     </td>
-                        <td>@item.Firstname</td>
+                    <td>@item.Firstname</td>
                         <td>@item.Shiftdate.Date</td>
 
                     <td>@item.Starttime-@item.Endtime</td>

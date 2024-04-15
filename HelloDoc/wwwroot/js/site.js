@@ -8,7 +8,9 @@
     extendedTimeOut: 1000,
     toastClass: 'toast-red' // Add a custom class for red color styling
 }
+
 $(document).ready(function () {
+   
     function updateUIWithCounts() {
         $.ajax({
             type: "GET",
@@ -60,7 +62,7 @@ $(document).ready(function () {
 
         currentPage = 1;
     }
-    var pageSize = 3;
+    var pageSize = 10;
 
     var status = localStorage.getItem('statuslink');
     $(".Status-btn").removeClass('activee');

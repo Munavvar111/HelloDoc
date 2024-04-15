@@ -94,11 +94,29 @@
 			color: #0a58ca;
 		}
 
+		#loader {
+			display:none;
+			position:fixed;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			background-color: rgba(255, 255, 255, 0.7);
+			z-index: 9999;
+			text-align: center;
+		}
+
+		
 	</style>
 
 </head>
 <body style="overflow-y:scroll !important">
-
+	<div id="loader">
+		<div class="spinner-border text-info" role="status">
+			<span class="visually-hidden">Loading...</span>
+		</div>
+	</div>
+	
 	<div class="container-fluid d-flex flex-column max-vw-100 vh-100 p-0 bg-light">
 		<header class="w-100 border-bottom  px-2 px-md-5 position-relative z-2">
 			<section class="d-flex justify-content-between  pb-1">
@@ -207,6 +225,7 @@
 					}
 				</ul>
 			</div>
+			
 
 
 		</header>
@@ -338,8 +357,6 @@
 
 
 
-
-
 	<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 	<script src="~/js/site.js" asp-append-version="true"></script>
 	<script src="~/js/custom.js" asp-append-version="true"></script>
@@ -355,6 +372,28 @@
 
 </body>
 </html>
+@* <script>
+
+
+	$(window).on('ready', function () {
+		$('#loader').fadeIn();
+	});
+
+	$(window).on('load', function () {
+		$('#loader').fadeOut();
+	});
+	$(document).ajaxStart(function () {
+		console.log("sdfs")
+		$('#loader').fadeIn();
+	});
+
+	// Hide loader on Ajax stop (completion)
+	$(document).ajaxStop(function () {
+		console.log("stop Ajax")
+		$('#loader').fadeOut();
+	});
+	
+</script> *@
 <script type="text/javascript">
 	$(document).ready(function () {
 		//jquery for toggle sub menus

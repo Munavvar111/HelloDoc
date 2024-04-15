@@ -1347,18 +1347,18 @@ namespace BusinessLayer.Repository
                           on shiftis.Shiftid equals shiftdetails.Shiftid
                           join regionis in _context.Regions
                           on shiftdetails.Regionid equals regionis.Regionid
-                          select new
+                          select new ReviewShiftVM
                           {
-                              shiftis.Shiftid,
+                              Shiftid = shiftis.Shiftid,
                               ShiftDetailId = shiftdetails.Shiftdetailid,
-                              shiftis.Physician.Firstname,
-                              shiftis.Physician.Lastname,
-                              shiftdetails.Shiftdate,
-                              shiftdetails.Starttime,
-                              shiftdetails.Endtime,
-                              shiftdetails.Regionid,
+                              Firstname = shiftis.Physician.Firstname,
+                              Lastname = shiftis.Physician.Lastname,
+                              Shiftdate = shiftdetails.Shiftdate,
+                              Starttime = shiftdetails.Starttime,
+                              Endtime = shiftdetails.Endtime,
+                              Regionid = (int)shiftdetails.Regionid,
                               RegionName = regionis.Name,
-                              shiftdetails.Status
+                              Status = shiftdetails.Status
                           }).Where(item => (region == 0 || item.Regionid == region) && item.Status == 1).ToList();
             return shifts;
         }
@@ -1379,6 +1379,7 @@ namespace BusinessLayer.Repository
                               FaxNumber = helthprofesion.Faxnumber,
                               PhoneNumber = helthprofesion.Phonenumber,
                               BusinesContact = helthprofesion.Businesscontact,
+                              VendorId=helthprofesion.Vendorid,
                               HelthProfessionId = (int)helthprofesion.Healthprofessionalid
                           })
                         .Where(item =>

@@ -1,292 +1,334 @@
 ﻿
 
 <table class="table w-100" id="dataTable">
-	<thead class=" table-secondary">
-		<tr class="d-none d-xl-table-row">
-			<th scope="col">Name</th>
-			@if (!@ViewBag.IsPhysician)
-			{
-				<th scope="col">Date Of Birth</th>
-				<th scope="col">Requestor</th>
-				<th scope="col">Physician <br>Name</th>
-				<th scope="col"> Date Of <br>Service</th>
-			}
+    <thead class=" table-secondary">
+        <tr class="d-none d-xl-table-row">
+            <th scope="col">Name</th>
+            @if (!@ViewBag.IsPhysician)
+            {
+                <th scope="col">Date Of Birth</th>
+                <th scope="col">Requestor</th>
+                <th scope="col">Physician <br>Name</th>
+                <th scope="col"> Date Of <br>Service</th>
+            }
 
-			<th scope="col">Phone</th>
-			<th scope="col">Address</th>
-			@if (@ViewBag.IsPhysician == false)
-			{
-				<th scope="col">Notes</th>
-				<th scope="col">Chat With</th>
-			}
-			<th scope="col">Actions</th>
-		</tr>
-	</thead>
-	<tbody>
-		@foreach (var item in Model)
-		{
+            <th scope="col">Phone</th>
+            <th scope="col">Address</th>
+            @if (@ViewBag.IsPhysician == false)
+            {
+                <th scope="col">Notes</th>
+                <th scope="col">Chat With</th>
+            }
+            <th scope="col">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
 
-			if (@item.Status == 2)
-			{
-
-
-				<tr class="d-none d-xl-table-row text-white" style="vertical-align:middle;font-weight:500">
+            if (@item.Status == 2)
+            {
 
 
-
-					<td style="background-color:@(GetRowClass(@item.ReqTypeId))!important">@item.PatientName</td>
-					@if (!ViewBag.IsPhysician)
-					{
-						<td style="background-color:@(GetRowClass(item.ReqTypeId))!important">@item.DateOfBirth.ToString("MMM dd, yyyy")</td>
-						<td style="background-color:@(GetRowClass(item.ReqTypeId))!important">@item.Requestor</td>
-						<td style="background-color:@(GetRowClass(item.ReqTypeId))!important">
-							@if (!string.IsNullOrEmpty(item.PhysicianName))
-							{	
-								<span>@item.PhysicianName</span>
-							}
-							else
-							{
-								<span>-</span>
-							}
-						</td>
-						<td style="background-color:@(GetRowClass(item.ReqTypeId))!important">@item.DateOfService</td>
-					}
-					<td style="background-color:@(GetRowClass(@item.ReqTypeId))!important">
-							<button class="btn  border-white text-white">
-								<i class="bi bi-telephone me-1"></i>
-								@item.Phone
-							</button><br>
-							<span class="text-white">Patient</span>
-							@if (@item.ReqTypeId == 2)
-							{
-								<br />
-								<button class="btn  border-white text-white">
-									<i class="bi bi-telephone me-1"></i>
-									@item.PhoneOther
-								</button>
-
-								<br />
-								<span class="text-white">(Family/Friend)</span>
-							}
-							@if (@item.ReqTypeId == 3)
-							{
-								<br />
-								<button class="btn  border-white text-white">
-									<i class="bi bi-telephone me-1"></i>
-									@item.PhoneOther
-								</button>
-
-								<br />
-								<span class="text-white">(Business)</span>
-							}
-							@if (@item.ReqTypeId == 4)
-							{
-								<br />
-								<button class="btn  border-white text-white">
-									<i class="bi bi-telephone me-1"></i>
-									@item.PhoneOther
-								</button>
-
-								<br />
-								<span class="text-white">(Conciege)</span>
-							}
-						</td>
-
-						<td style="background-color:@(GetRowClass(@item.ReqTypeId))!important">@item.Address</td>
-					@if (@ViewBag.IsPhysician == false)
-					{
-						<td style="background-color:@(GetRowClass(@item.ReqTypeId))!important">@item.Notes</td>
-						<td style="background-color:@(GetRowClass(@item.ReqTypeId))!important">
-							<button class="btn border-white  text-white">
-								<i class="bi bi-person me-1"></i> provider
-							</button>
-
-						</td>
-					}
-						<td style="background-color:@(GetRowClass(@item.ReqTypeId)) !important">
-							<div class="dropdown">
-								<button class="btn border-white @(GetRowClass(@item.ReqTypeId)) text-white" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-									Actions
-								</button>
-								<div class="dropdown-menu dropdown-menu-right dropdown-menu-lg-left" aria-labelledby="dropdownMenuButton">
-									@if (@ViewBag.IsPhysician == false)
-									{
-										<a class="dropdown-item" asp-action="ViewCase" asp-controller="Admin" asp-route-id="@item.RequestClientId"><i class="bi bi-x-circle me-3"></i>View Case</a>
-										<a class="dropdown-item" asp-action="ViewUploads" asp-controller="Admin" asp-route-id="@item.RequestId"><i class="bi bi-x-circle me-3"></i>View Uploads</a>
-										<a class="dropdown-item" asp-action="ViewNotes" asp-controller="Admin" asp-route-requestid="@item.RequestId"><i class="bi bi-x-circle me-3"></i>View Notes</a>
-										<a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#transfercase" data-bs-requestid="@item.RequestId" data-bs-status="@item.Status"><i class="bi bi-x-circle me-3"></i>Transfer Case</a>
-										<a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#ClearModal" id="clearcasemodal" data-bs-requestid="@item.RequestId"><i class="bi bi-x-circle me-3"></i>Clear  Case</a>
-										<a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#sendagrrement" data-bs-phoneno="@item.Phone" data-bs-email="@item.Email" data-bs-requestid="@item.RequestId" data-bs-requesttypeid="@item.ReqTypeId"><i class="bi bi-x-circle me-3"></i>Send Agreement</a>
-									}
-									@if (@ViewBag.IsPhysician == true)
-									{
-										<a class="dropdown-item" asp-action="ViewCase" asp-controller="Provider" asp-route-id="@item.RequestClientId"><i class="bi bi-x-circle me-3"></i>View Case</a>
-										<a class="dropdown-item" asp-action="ViewUploads" asp-controller="Provider" asp-route-id="@item.RequestId"><i class="bi bi-x-circle me-3"></i>View Uploads</a>
-										<a class="dropdown-item" asp-action="ViewNotes" asp-controller="Provider" asp-route-requestid="@item.RequestId"><i class="bi bi-x-circle me-3"></i>View Notes</a>
-									<a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#transfercaseprovider" data-bs-requestid="@item.RequestId"><i class="bi bi-x-circle me-3"></i>Transfer Case</a>
-										<a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#sendagrrement" data-bs-phoneno="@item.Phone" data-bs-email="@item.Email" data-bs-requestid="@item.RequestId" data-bs-requesttypeid="@item.ReqTypeId"><i class="bi bi-x-circle me-3"></i>Send Agreement</a>
-									}
-								</div>
-							</div>
-						</td>
-
-					</tr>
-					<div class="d-xl-none ">
-						<div class="bg-info-subtle " data-bs-toggle="collapse" data-bs-target="#collapseexample_@item.Id"
-							 aria-expanded="false" aria-controls="collapseexample">
-							<div class="flex-column gap-2 border-bottom border-5 pt-3 pb-5 px-4">
-								<div class="d-flex  justify-content-between mb-3">
-									<span class=" fs-5 ">@item.PatientName</span>
-										@if (item.ReqTypeId == 1)
-										{
-										<span class=" fs-5  ">Business</span>
-										}
-										else if (item.ReqTypeId == 2)
-										{
-										<span class=" fs-5  ">Patient</span>
-										}
-										else if (item.ReqTypeId == 3)
-										{
-										<span class=" fs-5  ">Family/Friend</span>
-										}
-										else if (item.ReqTypeId == 4)
-										{
-										<span class=" fs-5 ">Concierge</span>
-										}
-								</div>
-								<div class="d-flex justify-content-between ">
-									<div class="">
-										<span class="fs-5">@item.Address</span>
-									</div>
-									<button class="btn btn-transparent border border-1 border-info text-info rounded-5">Map Location</button>
-								</div>
-
-							</div>
-						</div>
-
-						<div class="collapse position-relative" id="collapseexample_@item.Id">
-							<button class="btn position-absolute btn-transparent border-2 rounded-5 viewBtn">View Case</button>
-							<div class="d-flex flex-column gap-2 bg-info-subtle   mb-2 py-3 px-4 ">
-								<div class="d-flex align-items-center ">
-									<i class="fa-regular fa-calendar  border border-1 border-info rounded-5 p-2 me-2"></i>
-									<span class="fs-5"><span class="text-muted">Date of Birth:</span>@item.DateOfBirth </span>
-								</div>
-								<div class="d-flex align-items-center fw-medium">
-									<i class="fa-regular fa-envelope  border border-1 border-info rounded-5 p-2 me-2"></i>
-									<span class="fs-5"><span class="text-muted">Email:</span> @item.Email</span>
-								</div>
-								<div class="d-flex align-items-center fw-medium">
-									<i class="fas fa-phone  border border-1 border-info rounded-5 p-2 me-2"></i>
-									<span class="fs-5"><span class="text-muted">Phone:</span> @item.Phone</span>
-								</div>
-								<div class="d-flex align-items-center fw-medium">
-									<i class="fa-regular fa-note-sticky  border border-1 border-info rounded-5 p-2 me-2 "></i>
-									<span class="fs-5"><span class="text-muted">Transfer Notes:</span> </span>
-								</div>
-								<div class="d-flex align-items-center fw-medium">
-									<i class="fa-regular fa-calendar  border border-1 border-info rounded-5 p-2 me-2"></i>
-									<span class="fs-5"><span class="text-muted">Date of Service:</span>  </span>
-								</div>
-								<div class="d-flex align-items-center fw-medium">
-									<i class="fa-solid fa-user-doctor  border border-1 border-info rounded-5 p-2 me-2"></i>
-									<span class="fs-5"><span class="text-muted">Physician:</span>@item.PhysicianName </span>
-								</div>
-								<div class="d-flex align-items-center fw-medium">
-									<i class="fa-regular fa-user  border border-1 border-info rounded-5 p-2 me-2"></i>
-									<span class="fs-5"><span class="text-muted">Requestor:</span>@item.Requestor</span>
-								</div>
-								<div class="d-flex flex-column mt-3 gap-3">
-									<div class="d-flex gap-3 ">
-										<button class="btn w-50 btn-transparent border border-1 text-white rounded-5" style="background-color: #EE9125" data-bs-toggle="modal" data-bs-target="#sendagrrement" data-bs-phoneno="@item.Phone" data-bs-email="@item.Email" data-bs-requestid="@item.RequestId" data-bs-requesttypeid="@item.ReqTypeId">Send Agreement</button>
-
-										<a class="btn w-50 btn-transparent border border-1 text-white  rounded-5" style="background-color:  #228B22" asp-action="ViewNotes" asp-controller="Admin" asp-route-requestid="@item.RequestId">View Notes</a>
-									</div>
-									<div class="d-flex gap-3 ">
-										<button class="btn w-50 btn-transparent border border-1 text-white rounded-5" style="background-color: #00ADEF" data-bs-toggle="modal" data-bs-target="#transfercase" data-bs-requestid="@item.RequestId" data-bs-status="@item.Status">Transfer</button>
-										<a class="btn w-50 btn-transparent border border-1 text-white rounded-5" style="background-color: #228B22" asp-action="ViewUploads" asp-controller="Admin" asp-route-id="@item.RequestId">View Uploads</a>
-									</div>
-									<div class="d-flex gap-3">
-										<button class="btn w-50 btn-transparent border border-1 text-white rounded-5" style="background-color: #EE9125" data-bs-toggle="modal" data-bs-target="#ClearModal" id="clearcasemodal" data-bs-requestid="@item.RequestId">Clear Case</button>
-										<a href="@($"mailto:{@item.Email}")" class="btn w-50 btn-transparent border border-1 text-white rounded-5" style="background-color: #228B22">Email</a>
-									</div>
-								</div>
-							</div>
-
-						</div>
-					</div>
-
-					}
-
-				}
-		</table>
+                <tr class="d-none d-xl-table-row text-white" style="vertical-align:middle;font-weight:500">
 
 
-				@functions {
-					public string GetRowClass(int requestTypeId)
-					{
-						switch (requestTypeId)
-						{
-							case 1:
-								return "#32bf50";
-							case 2:
-								return "#ed9418";
-							case 3:
-								return "#cc2336";
-							case 4:
-								return "#54B4D3";
-							default:
-								return "";
-						}
-					}
-			}
-		<div class="pb-3">
-			<nav id="pagination" aria-label="Page navigation">
-				<ul class="pagination justify-content-center mb-0">
-							@if (ViewBag.CurrentPage >= 1 && ViewBag.CurrentPage <= ViewBag.TotalPages)
-							{
-								int prevpage = Convert.ToInt32(ViewBag.CurrentPage) - 1;
-								int currpage = Convert.ToInt32(ViewBag.CurrentPage);
-								int nextpage = Convert.ToInt32(ViewBag.CurrentPage) + 1;
-								if (ViewBag.CurrentPage > 1)
-								{
-							<li class="page-item ">
-								<a class="page-link" id="previous" data-page="@(prevpage)" aria-label="Previous">
-									<span aria-hidden="true">&laquo;</span>
-									<span class="visually-hidden">Previous</span>
-								</a>
-							</li>
-								}
-								for (int z = 0; z < 3; z++)
-								{
-									if (currpage + z <= ViewBag.TotalPages)
-									{
-								<li class="page-item @(currpage + z == ViewBag.CurrentPage ? "active" : "")">
-									<a class="page-link" id="current_@z" data-page="@(currpage + z)" aria-label="Current">
-										<span>@(ViewBag.CurrentPage + z)</span>
-									</a>
-								</li>
-									}
-								}
-								if (ViewBag.CurrentPage < ViewBag.TotalPages)
-								{
-							<li class="page-item ">
-								<a class="page-link" id="next" data-page="@(nextpage)" aria-label="Next">
-									<span aria-hidden="true">&raquo;</span>
-									<span class="visually-hidden">Next</span>
-								</a>
-							</li>
-								}
 
-							}
-				</ul>
-			</nav>
-		</div>
+                    <td style="background-color:@(GetRowClass(@item.ReqTypeId))!important">@item.PatientName</td>
+                    @if (!ViewBag.IsPhysician)
+                    {
+                        <td style="background-color:@(GetRowClass(item.ReqTypeId))!important">@item.DateOfBirth.ToString("MMM dd, yyyy")</td>
+                        <td style="background-color:@(GetRowClass(item.ReqTypeId))!important">@item.Requestor</td>
+                        <td style="background-color:@(GetRowClass(item.ReqTypeId))!important">
+                            @if (!string.IsNullOrEmpty(item.PhysicianName))
+                            {
+                                <span>@item.PhysicianName</span>
+                            }
+                            else
+                            {
+                                <span>-</span>
+                            }
+                        </td>
+                        <td style="background-color:@(GetRowClass(item.ReqTypeId))!important">@item.DateOfService</td>
+                    }
+                    <td style="background-color:@(GetRowClass(@item.ReqTypeId))!important">
+                        <button class="btn  border-white text-white">
+                            <i class="bi bi-telephone me-1"></i>
+                            @item.Phone
+                        </button><br>
+                        <span class="text-white">Patient</span>
+                        @if (@item.ReqTypeId == 2)
+                        {
+                            <br />
+                            <button class="btn  border-white text-white">
+                                <i class="bi bi-telephone me-1"></i>
+                                @item.PhoneOther
+                            </button>
 
-		<script>
-			$(document).ready(function () {
-				$('.collapse').on('show.bs.collapse', function () {
-					var id = $(this).attr('id');
-					$('.collapse.show').not('#' + id).collapse('hide');
-				});
-			});
-		</script>
+                            <br />
+                            <span class="text-white">(Family/Friend)</span>
+                        }
+                        @if (@item.ReqTypeId == 3)
+                        {
+                            <br />
+                            <button class="btn  border-white text-white">
+                                <i class="bi bi-telephone me-1"></i>
+                                @item.PhoneOther
+                            </button>
+
+                            <br />
+                            <span class="text-white">(Business)</span>
+                        }
+                        @if (@item.ReqTypeId == 4)
+                        {
+                            <br />
+                            <button class="btn  border-white text-white">
+                                <i class="bi bi-telephone me-1"></i>
+                                @item.PhoneOther
+                            </button>
+
+                            <br />
+                            <span class="text-white">(Conciege)</span>
+                        }
+                    </td>
+
+                    <td style="background-color:@(GetRowClass(@item.ReqTypeId))!important">@item.Address</td>
+                    @if (@ViewBag.IsPhysician == false)
+                    {
+                        <td style="background-color:@(GetRowClass(@item.ReqTypeId))!important">@item.Notes</td>
+                        <td style="background-color:@(GetRowClass(@item.ReqTypeId))!important">
+                            <button class="btn border-white  text-white">
+                                <i class="bi bi-person me-1"></i> provider
+                            </button>
+
+                        </td>
+                    }
+                    <td style="background-color:@(GetRowClass(@item.ReqTypeId)) !important">
+                        <div class="dropdown">
+                            <button class="btn border-white @(GetRowClass(@item.ReqTypeId)) text-white" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Actions
+                            </button>
+                            <div class="dropdown-menu dropdown-menu-right dropdown-menu-lg-left" aria-labelledby="dropdownMenuButton">
+                                @if (@ViewBag.IsPhysician == false)
+                                {
+                                    <a class="dropdown-item" asp-action="ViewCase" asp-controller="Admin" asp-route-id="@item.RequestClientId"><i class="bi bi-x-circle me-3"></i>View Case</a>
+                                    <a class="dropdown-item" asp-action="ViewUploads" asp-controller="Admin" asp-route-id="@item.RequestId"><i class="bi bi-x-circle me-3"></i>View Uploads</a>
+                                    <a class="dropdown-item" asp-action="ViewNotes" asp-controller="Admin" asp-route-requestid="@item.RequestId"><i class="bi bi-x-circle me-3"></i>View Notes</a>
+                                    <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#transfercase" data-bs-requestid="@item.RequestId" data-bs-status="@item.Status"><i class="bi bi-x-circle me-3"></i>Transfer Case</a>
+                                    <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#ClearModal" id="clearcasemodal" data-bs-requestid="@item.RequestId"><i class="bi bi-x-circle me-3"></i>Clear  Case</a>
+                                    <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#sendagrrement" data-bs-phoneno="@item.Phone" data-bs-email="@item.Email" data-bs-requestid="@item.RequestId" data-bs-requesttypeid="@item.ReqTypeId"><i class="bi bi-x-circle me-3"></i>Send Agreement</a>
+                                }
+                                @if (@ViewBag.IsPhysician == true)
+                                {
+                                    <a class="dropdown-item" asp-action="ViewCase" asp-controller="Provider" asp-route-id="@item.RequestClientId"><i class="bi bi-x-circle me-3"></i>View Case</a>
+                                    <a class="dropdown-item" asp-action="ViewUploads" asp-controller="Provider" asp-route-id="@item.RequestId"><i class="bi bi-x-circle me-3"></i>View Uploads</a>
+                                    <a class="dropdown-item" asp-action="ViewNotes" asp-controller="Provider" asp-route-requestid="@item.RequestId"><i class="bi bi-x-circle me-3"></i>View Notes</a>
+                                    <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#transfercaseprovider" data-bs-requestid="@item.RequestId"><i class="bi bi-x-circle me-3"></i>Transfer Case</a>
+                                    <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#sendagrrement" data-bs-phoneno="@item.Phone" data-bs-email="@item.Email" data-bs-requestid="@item.RequestId" data-bs-requesttypeid="@item.ReqTypeId"><i class="bi bi-x-circle me-3"></i>Send Agreement</a>
+                                }
+                            </div>
+                        </div>
+                    </td>
+
+                </tr>
+                <div class="d-xl-none ">
+                    <div class="bg-info-subtle " data-bs-toggle="collapse" data-bs-target="#collapseexample_@item.Id"
+                         aria-expanded="false" aria-controls="collapseexample">
+                        <div class="flex-column gap-2 border-bottom border-5 pt-3 pb-5 px-4">
+                            <div class="d-flex  justify-content-between mb-3">
+                                <span class=" fs-5 ">@item.PatientName</span>
+                                @if (item.ReqTypeId == 1)
+                                {
+                                    <span class=" fs-5  ">Business</span>
+                                }
+                                else if (item.ReqTypeId == 2)
+                                {
+                                    <span class=" fs-5  ">Patient</span>
+                                }
+                                else if (item.ReqTypeId == 3)
+                                {
+                                    <span class=" fs-5  ">Family/Friend</span>
+                                }
+                                else if (item.ReqTypeId == 4)
+                                {
+                                    <span class=" fs-5 ">Concierge</span>
+                                }
+                            </div>
+                            <div class="d-flex justify-content-between ">
+                                <div class="">
+                                    <span class="fs-5">@item.Address</span>
+                                </div>
+                                <button class="btn btn-transparent border border-1 border-info text-info rounded-5">Map Location</button>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="collapse position-relative" id="collapseexample_@item.Id">
+                        @if (!ViewBag.IsPhysician)
+                        {
+                            <a class="btn position-absolute  border-2 rounded-5 viewBtn bg-secondary" style="position:relative;top:-25px" asp-action="ViewCase" asp-controller="Admin" asp-route-id="@item.Id">View Case</a>
+                        }
+                        @if (ViewBag.IsPhysician)
+                        {
+                            <a class="btn position-absolute  border-2 rounded-5 viewBtn bg-secondary" style="position:relative;top:-25px" asp-action="ViewCase" asp-controller="Provider" asp-route-id="@item.Id">View Case</a>
+                        }
+
+                        <div class="d-flex flex-column gap-2 bg-info-subtle   mb-2 py-3 px-4 ">
+                            @if (!ViewBag.IsPhysician)
+                            {
+                                <div class="d-flex align-items-center ">
+                                    <i class="fa-regular fa-calendar  border border-1 border-info rounded-5 p-2 me-2"></i>
+                                    <span class="fs-5"><span class="text-muted">Date of Birth:</span>@item.DateOfBirth.ToString("MMM dd, yyyy") </span>
+                                </div>
+                                <div class="d-flex align-items-center fw-medium">
+                                    <i class="fa-regular fa-envelope  border border-1 border-info rounded-5 p-2 me-2"></i>
+                                    <span class="fs-5"><span class="text-muted">Email:</span> @item.Email</span>
+                                </div>
+                            }
+
+                            <div class="d-flex align-items-center fw-medium">
+                                <i class="fas fa-phone  border border-1 border-info rounded-5 p-2 me-2"></i>
+                                <span class="fs-5"><span class="text-muted">Phone:</span> @item.Phone</span>
+                            </div>
+                            @if (!ViewBag.IsPhysician)
+                            {
+                                <div class="d-flex align-items-center fw-medium">
+                                    <i class="fa-regular fa-note-sticky  border border-1 border-info rounded-5 p-2 me-2 "></i>
+                                    <span class="fs-5"><span class="text-muted">Transfer Notes:</span>@item.Notes </span>
+                                </div>
+                                <div class="d-flex align-items-center fw-medium">
+                                    <i class="fa-regular fa-calendar  border border-1 border-info rounded-5 p-2 me-2"></i>
+                                    <span class="fs-5"><span class="text-muted">Date of Service:</span> @item.DateOfService.ToString("MMM dd, yyyy") </span>
+                                </div>
+                                <div class="d-flex align-items-center fw-medium">
+                                    <i class="fa-solid fa-user-doctor  border border-1 border-info rounded-5 p-2 me-2"></i>
+                                    <span class="fs-5"><span class="text-muted">Physician:</span>@item.PhysicianName </span>
+                                </div>
+                                <div class="d-flex align-items-center fw-medium">
+                                    <i class="fa-regular fa-user  border border-1 border-info rounded-5 p-2 me-2"></i>
+                                    <span class="fs-5"><span class="text-muted">Requestor:</span>@item.Requestor</span>
+                                </div>
+                            }
+
+                            <div class="d-flex flex-column mt-3 gap-3">
+                                @if (!ViewBag.IsPhysician)
+                                {
+
+                                    <div class="d-flex gap-3 ">
+                                        <button class="btn w-50 btn-transparent border border-1 text-white rounded-5" style="background-color: #EE9125" data-bs-toggle="modal" data-bs-target="#sendagrrement" data-bs-phoneno="@item.Phone" data-bs-email="@item.Email" data-bs-requestid="@item.RequestId" data-bs-requesttypeid="@item.ReqTypeId">Send Agreement</button>
+
+                                        <a class="btn w-50 btn-transparent border border-1 text-white  rounded-5" style="background-color:  #228B22" asp-action="ViewNotes" asp-controller="Admin" asp-route-requestid="@item.RequestId">View Notes</a>
+                                    </div>
+                                }
+                                @if (ViewBag.IsPhysician)
+                                {
+                                    <div class="d-flex gap-3 ">
+                                        <button class="btn w-50 btn-transparent border border-1 text-white rounded-5" style="background-color: #EE9125" data-bs-toggle="modal" data-bs-target="#sendagrrement" data-bs-phoneno="@item.Phone" data-bs-email="@item.Email" data-bs-requestid="@item.RequestId" data-bs-requesttypeid="@item.ReqTypeId">Send Agreement</button>
+
+                                        <a class="btn w-50 btn-transparent border border-1 text-white  rounded-5" style="background-color:  #228B22" asp-action="ViewNotes" asp-controller="Provider" asp-route-requestid="@item.RequestId">View Notes</a>
+                                    </div>
+                                }
+                                @if (!ViewBag.IsPhysician)
+                                {
+
+                                    <div class="d-flex gap-3 ">
+                                        <button class="btn w-50 btn-transparent border border-1 text-white rounded-5" style="background-color: #00ADEF" data-bs-toggle="modal" data-bs-target="#transfercase" data-bs-requestid="@item.RequestId" data-bs-status="@item.Status">Transfer</button>
+                                        <a class="btn w-50 btn-transparent border border-1 text-white rounded-5" style="background-color: #228B22" asp-action="ViewUploads" asp-controller="Admin" asp-route-id="@item.RequestId">View Uploads</a>
+                                    </div>
+                                }
+                                @if (ViewBag.IsPhysician)
+                                {
+                                    <div class="d-flex gap-3 ">
+                                        <button class="btn w-50 btn-transparent border border-1 text-white rounded-5" style="background-color: #00ADEF" data-bs-toggle="modal" data-bs-target="#transfercaseprovider" data-bs-requestid="@item.RequestId">Transfer</button>
+                                        <a class="btn w-50 btn-transparent border border-1 text-white rounded-5" style="background-color: #228B22" asp-action="ViewUploads" asp-controller="Provider" asp-route-id="@item.RequestId">View Uploads</a>
+                                    </div>
+                                }
+                                @if (!ViewBag.IsPhysician)
+                                {
+
+                                    <div class="d-flex gap-3">
+                                        <button class="btn w-50 btn-transparent border border-1 text-white rounded-5" style="background-color: #EE9125" data-bs-toggle="modal" data-bs-target="#ClearModal" id="clearcasemodal" data-bs-requestid="@item.RequestId">Clear Case</button>
+                                        <a href="@($"mailto:{@item.Email}")" class="btn w-50 btn-transparent border border-1 text-white rounded-5" style="background-color: #228B22">Email</a>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            }
+
+        }
+</table>
+
+
+@functions {
+    public string GetRowClass(int requestTypeId)
+    {
+        switch (requestTypeId)
+        {
+            case 1:
+                return "#32bf50";
+            case 2:
+                return "#ed9418";
+            case 3:
+                return "#cc2336";
+            case 4:
+                return "#54B4D3";
+            default:
+                return "";
+        }
+    }
+}
+<div class="pb-3">
+    <nav id="pagination" aria-label="Page navigation">
+        <ul class="pagination justify-content-center mb-0">
+            @if (ViewBag.CurrentPage >= 1 && ViewBag.CurrentPage <= ViewBag.TotalPages)
+            {
+                int prevpage = Convert.ToInt32(ViewBag.CurrentPage) - 1;
+                int currpage = Convert.ToInt32(ViewBag.CurrentPage);
+                int nextpage = Convert.ToInt32(ViewBag.CurrentPage) + 1;
+                if (ViewBag.CurrentPage > 1)
+                {
+                    <li class="page-item ">
+                        <a class="page-link" id="previous" data-page="@(prevpage)" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                            <span class="visually-hidden">Previous</span>
+                        </a>
+                    </li>
+                }
+                for (int z = 0; z < 3; z++)
+                {
+                    if (currpage + z <= ViewBag.TotalPages)
+                    {
+                        <li class="page-item @(currpage + z == ViewBag.CurrentPage ? "active" : "")">
+                            <a class="page-link" id="current_@z" data-page="@(currpage + z)" aria-label="Current">
+                                <span>@(ViewBag.CurrentPage + z)</span>
+                            </a>
+                        </li>
+                    }
+                }
+                if (ViewBag.CurrentPage < ViewBag.TotalPages)
+                {
+                    <li class="page-item ">
+                        <a class="page-link" id="next" data-page="@(nextpage)" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                            <span class="visually-hidden">Next</span>
+                        </a>
+                    </li>
+                }
+
+            }
+        </ul>
+    </nav>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $('.collapse').on('show.bs.collapse', function () {
+            var id = $(this).attr('id');
+            $('.collapse.show').not('#' + id).collapse('hide');
+        });
+    });
+</script>

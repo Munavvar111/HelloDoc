@@ -55,7 +55,7 @@
                 </label>
             </div>
             <div class="d-flex justify-content-end mt-2">
-                <button class="btn btn-outline-info" type="submit" id="filesubmit">
+                <button class="btn btn-outline-info" type="button" id="filesubmit">
                     Submit
                 </button>
             </div>
@@ -193,6 +193,24 @@
     removeGuidFromFilename();
 </script>
 <script>
+    document.getElementById("filesubmit").addEventListener("click", function () {
+        if (document.getElementById("fileInput").files.length === 0) {
+            Swal.fire({
+                title: 'Warning!',
+                text: 'Please select a file to upload.',
+                icon: 'warning',
+                showConfirmButton: true,
+                confirmButtonColor: '#3085d6',
+                confirmButtonText: 'OK'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    return false;
+                }
+            });
+        } else {
+            document.getElementById("patientRequestForm").submit();
+        }
+    });
     document.getElementById("fileInput").onchange = function () {
         let path = this.value.substr(this.value.lastIndexOf('\\') + 1);
         document.getElementById("fileName").innerText = path;
