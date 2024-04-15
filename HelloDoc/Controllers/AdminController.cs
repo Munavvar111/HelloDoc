@@ -218,18 +218,25 @@ namespace HelloDoc.Controllers
 		[HttpGet("Provider/PhysicanProfile/{id}", Name = "ProviderMyProfile")]
 		public IActionResult PhysicanProfile(int id)
 		{
+			string? Email = HttpContext.Session.GetString("Email");
+			if (Email == null)
+			{
+				TempData["Error"] = "Session Is Not Found Please LogedIn Again!!";
+				return RedirectToAction("Index", "Login");
 
+			}
+			Admin? admin = _admin.GetAdminByEmail(Email);
+			Physician? physician = _admin.GetPhysicianByEmail(Email);
+			if(physician != null)
+			{
+				if (physician.Physicianid != id)
+				{
+					TempData["Error"] = "SomeThing Went To Wrong!!";
+					return RedirectToAction("Index", "Provider");
+				}
+			}
 			try
 			{
-				string? Email = HttpContext.Session.GetString("Email");
-				if (Email == null)
-				{
-					TempData["Error"] = "Session Is Not Found Please LogedIn Again!!";
-					return RedirectToAction("Index", "Login");
-
-				}
-				Admin? admin = _admin.GetAdminByEmail(Email);
-				Physician? physician = _admin.GetPhysicianByEmail(Email);
 				if (admin != null)
 				{
 					ViewBag.IsPhysician = false;
@@ -244,7 +251,9 @@ namespace HelloDoc.Controllers
 			catch (InvalidOperationException ex)
 			{
 				TempData["Error"] = ex.Message;
-				return RedirectToAction("Index", "Login");
+				if (admin != null)
+					return RedirectToAction("Index", "Admin");
+				else return RedirectToAction("Index", "Provider");
 			}
 		}
 		#endregion
@@ -1409,16 +1418,48 @@ namespace HelloDoc.Controllers
 		[CustomAuthorize("Role", "7")]
 		public IActionResult EditAccess(int roleid)
 		{
-			List<int> rolemenu = _admin.GetRoleMenuIdByRoleId(roleid);
-			Role role = _admin.GetAllRolesById(roleid);
-			AccessVM accessVM = new AccessVM();
-			accessVM.Menu = rolemenu;
-			accessVM.Name = role.Name;
-			accessVM.roleid = roleid;
-			accessVM.Accounttype = role.Accounttype;
+			try
+			{
+				// Retrieve menu IDs associated with the given role ID
+				List<int> rolemenu = _admin.GetRoleMenuIdByRoleId(roleid);
 
-			return View(accessVM);
+				// Check if the retrieved list is null
+				if (rolemenu == null)
+				{
+					TempData["Error"] = "Error retrieving menu IDs for the role.";
+					return RedirectToAction("Access", "Admin");
+				}
+
+				// Retrieve role details
+				Role role = _admin.GetAllRolesById(roleid);
+
+				// Check if the retrieved role is null
+				if (role == null)
+				{
+					TempData["Error"] = "Role not found.";
+					return RedirectToAction("Access", "Admin");
+				}
+
+				// Construct AccessVM model
+				AccessVM accessVM = new AccessVM
+				{
+					Menu = rolemenu,
+					Name = role.Name,
+					roleid = roleid,
+					Accounttype = role.Accounttype
+				};
+
+				// Return view with AccessVM model
+				return View(accessVM);
+			}
+			catch (Exception ex)
+			{
+				// Log the exception or handle it appropriately
+				TempData["Error"] = "An unexpected error occurred: " + ex.Message;
+				return RedirectToAction("Access", "Admin");
+			}
 		}
+
 		#endregion
 
 		#region EditAccessPost
@@ -1702,6 +1743,13 @@ namespace HelloDoc.Controllers
 			}
 			ViewData["ViewName"] = "Dashboard";
 			ViewData["RequestId"] = requestid;
+			bool requestIdExists = _admin.RequestIdExists(requestid);
+
+			if (!requestIdExists)
+			{
+				TempData["Error"] = "Something Went Wrong";
+				return RedirectToAction("Index", "Admin");
+			}
 			ViewNotes result = _admin.GetNotesForRequest(requestid);
 
 			return View(result);
@@ -2078,6 +2126,12 @@ namespace HelloDoc.Controllers
 			if (physician != null)
 			{
 				ViewBag.IsPhysician = true;
+			}
+			bool RequestIdExist = _admin.RequestIdExists(id);
+			if (!RequestIdExist)
+			{
+				TempData["Error"] = "SomeThing Went Wring";
+				return RedirectToAction("Index", "Admin");
 			}
 			List<Requestwisefile> reqfile = await _patient.GetRequestwisefileByIdAsync(id);
 			List<Requestwisefile> reqfiledeleted = reqfile.Where(item => item.Isdeleted != null && (item.Isdeleted.Length == 0 || !item.Isdeleted[0])).ToList();

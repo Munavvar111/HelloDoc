@@ -235,7 +235,7 @@
             <button class="btn btn-info text-light" type="submit">
                 Submit
             </button>
-            <button type="reset" class="btn btn-outline-info d-flex align-items-center h-100">
+            <button type="reset" class="btn btn-outline-info d-flex align-items-center h-100 cancel-button">
                 Cancel
             </button>
         </div>
@@ -251,6 +251,39 @@
 
 
 <script src="~/js/fileInput.js"></script>
+<script>
+    $(document).ready(function () {
+        // Initialize the validation plugin on your form
+        var validator = $('form').validate();
+
+        // Attach event listener to the form's submit event
+        $('form').submit(function (event) {
+            // Check if the form is valid
+            if (!validator.form()) {
+                // Form is not valid, show validation errors
+                $('.text-danger').show();
+
+                // Prevent the form from being submitted
+                event.preventDefault();
+            } else {
+                // Form is valid, hide all validation errors
+                $('.text-danger').hide();
+            }
+        });
+
+        // Attach event listener to the reset button to hide validation errors
+        $('button[type="reset"]').click(function () {
+            // Hide all validation errors
+            $('.text-danger').hide();
+        });
+
+        // Attach event listener to form fields to hide validation errors on click
+        $('input, textarea, select').click(function () {
+            $(this).next('.text-danger').hide();
+        });
+    });
+
+</script>
 <script>
     const phone1 = document.querySelector("#phone1");
     const phoneInput1 = window.intlTelInput(phone1, {

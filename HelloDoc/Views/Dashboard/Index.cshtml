@@ -45,7 +45,6 @@
                         @if (item.Requestwisefile != null)
                         {
                             
-                        var fileCount = Model.Count(m => m.Request.Requestid == item.Requestwisefile.Requestid &&!item.Requestwisefile.Isdeleted[0]);
 
 
                         <tr data-toggle="collapse" data-target="#details@(item.Request.Createddate)" class="accordion-toggle">
@@ -81,11 +80,11 @@
                                 </a>
                             </td>
                             <td class="d-none d-md-table-cell">
-                                @if (fileCount > 0 && item.Request.Status==6)
+                                @if ( item.Request.Status==6)
                                 {
                                     <a class="btn btn-outline-info"
                                        asp-action="ViewDocument"
-                                       asp-route-requestid="@item.Request.Requestid">Documents (@fileCount)</a>
+                                       asp-route-requestid="@item.Request.Requestid">Documents</a>
                                 }
                             </td>
                         </tr>
@@ -94,11 +93,11 @@
                                 <div id="details@(item.Request.Createddate)" class="accordian-body collapse">
                                     <!-- Additional details here -->
                                     Status: @Html.DisplayFor(modelItem => item.Request.Status) <br />
-                                        @if (fileCount > 0 &&item.Request.Status == 6)
+                                        @if ( item.Request.Status == 6)
                                     {
                                         <a class="btn btn-outline-info"
                                            asp-action="ViewDocument"
-                                           asp-route-requestid="@item.Request.Requestid">Documents (@fileCount)</a>
+                                           asp-route-requestid="@item.Request.Requestid">Documents </a>
                                     }
                                     <!-- Add other fields as needed -->
                                 </div>

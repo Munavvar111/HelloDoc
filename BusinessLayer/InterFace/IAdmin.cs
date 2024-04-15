@@ -85,7 +85,9 @@ namespace BusinessLayer.InterFace
         List<UserAccess> GetUserData(int role);
         List<Physician> GetPhysiciansByRegion(string region);
 
-        void AddRequestStatusLog(Requeststatuslog requeststatuslog);
+        bool RequestIdExists(int requestId);
+
+		void AddRequestStatusLog(Requeststatuslog requeststatuslog);
         Request GetRequestById(int requestId);
 
         void UpdateRequestStatusLog(Requeststatuslog updaterequeststatuslog);

@@ -61,6 +61,11 @@ namespace BusinessLayer.Repository
                     _context.SaveChanges();
                 }
                 }
+            AspnetUserrole aspnetUserrole = new AspnetUserrole();
+            aspnetUserrole.Userid = aspnetUser.Aspnetuserid;
+            aspnetUserrole.Roleid = 2;
+            _context.AspnetUserroles.Add(aspnetUserrole);   
+            _context.SaveChanges(); 
                
             
             

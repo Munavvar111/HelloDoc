@@ -87,7 +87,13 @@ namespace BusinessLayer.Repository
             List<int> Rolemenus = _context.Rolemenus.Where(item => item.Roleid == roleId).Select(item => item.Menuid).ToList();
             return Rolemenus;
         }
-        public List<Rolemenu> GetRoleMenuById(int roleId)
+
+		public bool RequestIdExists(int requestId)
+		{
+			return _context.Requests.Any(item => item.Requestid == requestId);
+		}
+
+		public List<Rolemenu> GetRoleMenuById(int roleId)
         {
             List<Rolemenu> Rolemenus = _context.Rolemenus.Where(item => item.Roleid == roleId).ToList();
             return Rolemenus;
