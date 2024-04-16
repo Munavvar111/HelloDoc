@@ -33,7 +33,7 @@
                 </label>
             </div>
             <div class="d-flex justify-content-end mt-2">
-                <button class="btn btn-outline-info" type="submit">
+                <button class="btn btn-outline-info" type="button" id="paatientFile">
                     Submit
                 </button>
             </div>
@@ -53,6 +53,7 @@
                 <thead class="thead-secondry">
                     <tr>
                         <th scope="col"><input type="checkbox" id="selectAllCheckbox" /></th>
+                        <th scope="col">FileName</th>
                         <th scope="col">Uploader</th>
                         <th scope="col">Updated Date </th>
                         <th scope="col">Actions</th>
@@ -70,7 +71,7 @@
 
                             </td>
                             <td>
-                                @Html.DisplayFor(modelitem => item.Filename)
+                                <div class="filename">@item.Filename</div>
                             </td>
                             <td>
                                 test tester 
@@ -93,11 +94,40 @@
     </div>
 </div>
 <script>
+    function removeGuidFromFilename() {
+        var filenameElements = document.querySelectorAll('.filename');
+        console.log(filenameElements)
+        filenameElements.forEach(function (filenameElement) {
+            var filename = filenameElement.textContent;
+
+            var cleanedFilename = filename.replace(/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/gi, '');
+
+            filenameElement.textContent = cleanedFilename;
+        });
+    }
+    removeGuidFromFilename();
     document.getElementById("fileInput").onchange = function () {
         let path = this.value.substr(this.value.lastIndexOf('\\') + 1);
         document.getElementById("fileName").innerText = path;
     };
-
+    document.getElementById("paatientFile").addEventListener("click", function () {
+        if (document.getElementById("fileInput").files.length === 0) {
+            Swal.fire({
+                title: 'Warning!',
+                text: 'Please select a file to upload.',
+                icon: 'warning',
+                showConfirmButton: true,
+                confirmButtonColor: '#3085d6',
+                confirmButtonText: 'OK'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    return false;
+                }
+            });
+        } else {
+            document.getElementById("patientRequestForm").submit();
+        }
+    });
     document.getElementById("selectAllCheckbox").addEventListener("change", function () {
         // Toggle all checkboxes based on the state of the "Select All" checkbox
         let checkboxes = document.querySelectorAll(".fileCheckbox");
@@ -127,19 +157,20 @@
     });
 
     document.getElementById("fileInput").onchange = function () {
-        let filePath = this.value;
-        let allowedExtensions = [".jpg", ".pdf"];
-
-        let extension = filePath.substring(filePath.lastIndexOf('.'));
-        extension = extension.toLowerCase();
-
-        if (!allowedExtensions.includes(extension)) {
-            toastr.error("Please Select The Pdf Or Jpg")
-            this.value = ""; // Clear file selection if invalid
-            return false; // Prevent further processing
-        }
-
-        let path = filePath.substr(filePath.lastIndexOf('\\') + 1);
+        let path = this.value.substr(this.value.lastIndexOf('\\') + 1);
         document.getElementById("fileName").innerText = path;
+
+        // Check if the selected file is not a PDF
+        if (!path.toLowerCase().endsWith('.pdf')) {
+            Swal.fire(
+                'Warning!',
+                'Please select a PDF file.',
+                'warning'
+            );
+            // Reset the file input to clear the selection
+            this.value = '';
+            document.getElementById("fileName").innerText = 'Select File';
+        }
     };
+
 </script>

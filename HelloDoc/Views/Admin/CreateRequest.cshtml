@@ -17,10 +17,20 @@
         <span class="fs-2 text-muted fw-bold">New Request</span>
     </div>
     <div class="d-flex justify-content-end">
-        <a asp-controller="Admin" asp-action="Index" asp-area=""
-           class="btn btn-outline-info d-flex align-items-center">
-            <span class="material-symbols-outlined"> chevron_left </span> Back
-        </a>
+        @if (ViewBag.IsPhysician)
+        {
+            <a asp-action="Index" asp-controller="Provider"
+               class="btn btn-outline-info d-flex align-items-center">
+                <span class="material-symbols-outlined"> chevron_left </span> Back
+            </a>
+        }
+        else
+        {
+            <a asp-action="Index" asp-controller="Admin"
+               class="btn btn-outline-info d-flex align-items-center">
+                <span class="material-symbols-outlined"> chevron_left </span> Back
+            </a>
+        }
     </div>
 </div>
 

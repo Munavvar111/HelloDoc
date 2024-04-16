@@ -60,12 +60,21 @@ namespace HalloDocPatient.Controllers
                             HttpContext.Session.SetString("UserPermissions", JsonConvert.SerializeObject(rolemenu));
                             HttpContext.Session.SetString("Email", a?.Email ?? "");
                             HttpContext.Session.SetInt32("id", user?.Userid ?? 1);
-                            HttpContext.Session.SetString("Username", user?.Firstname ?? "");
+                            HttpContext.Session.SetString("Username", aspnetuser.Username);
+                            var menulist = _context.Rolemenus.Include(b=>b.Menu).Where(item => item.Roleid == rolefromroleid.Roleid).Select(item => item.Menu.Name).ToList();
+
                             if (admin != null)
                             {
-                                TempData["SuccessMessage"] = "Login  successful!";
-
-                                return RedirectToAction("Index", "Admin");
+                                if (menulist.Contains("Dashboard"))
+                                {
+                                    TempData["SuccessMessage"] = "Login successful!";
+                                    return RedirectToAction("Dashboard", "Admin");
+                                }
+                                else
+                                {
+                                    TempData["SuccessMessage"] = "Login successful!";
+                                    return RedirectToAction(menulist.FirstOrDefault(), "Admin");
+                                }
                             }
                             else if (user != null)
                             {
@@ -137,8 +146,8 @@ namespace HalloDocPatient.Controllers
                     _context.SaveChanges();
                     return RedirectToAction("Index", "Login");
                 }
-
             }
+
             return View(model);
         }
         [HttpPost]

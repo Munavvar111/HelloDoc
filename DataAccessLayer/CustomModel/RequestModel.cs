@@ -49,7 +49,6 @@ namespace DataAccessLayer.CustomModel
         [Column("city")]
         [Required(ErrorMessage = "Please Enter City")]
         [StringLength(50, ErrorMessage = "City should be between {2} and {1} characters.", MinimumLength = 2)]
-        [RegularExpression(@"^(?=.*\S)[a-zA-Z\s.'-]+$", ErrorMessage = "Enter a valid city name")]
         public string City { get; set; } = null!;
 
         [Column("state")]

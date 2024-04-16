@@ -111,20 +111,20 @@
                             <div class="dropdown-menu dropdown-menu-right dropdown-menu-lg-left" aria-labelledby="dropdownMenuButton">
                                 @if (@ViewBag.IsPhysician == false)
                                 {
-                                    <a class="dropdown-item" asp-action="ViewCase" asp-controller="Admin" asp-route-id="@item.RequestClientId"><i class="bi bi-x-circle me-3"></i>View Case</a>
-                                    <a class="dropdown-item" asp-action="ViewUploads" asp-controller="Admin" asp-route-id="@item.RequestId"><i class="bi bi-x-circle me-3"></i>View Uploads</a>
-                                    <a class="dropdown-item" asp-action="ViewNotes" asp-controller="Admin" asp-route-requestid="@item.RequestId"><i class="bi bi-x-circle me-3"></i>View Notes</a>
-                                    <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#transfercase" data-bs-requestid="@item.RequestId" data-bs-status="@item.Status"><i class="bi bi-x-circle me-3"></i>Transfer Case</a>
-                                    <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#ClearModal" id="clearcasemodal" data-bs-requestid="@item.RequestId"><i class="bi bi-x-circle me-3"></i>Clear  Case</a>
-                                    <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#sendagrrement" data-bs-phoneno="@item.Phone" data-bs-email="@item.Email" data-bs-requestid="@item.RequestId" data-bs-requesttypeid="@item.ReqTypeId"><i class="bi bi-x-circle me-3"></i>Send Agreement</a>
+                                    <a class="dropdown-item" asp-action="ViewCase" asp-controller="Admin" asp-route-id="@item.RequestClientId"><i class="fa-regular fa-newspaper me-3"></i>View Case</a>
+                                    <a class="dropdown-item" asp-action="ViewUploads" asp-controller="Admin" asp-route-id="@item.RequestId"><i class="fa-solid fa-upload me-3"></i>View Uploads</a>
+                                    <a class="dropdown-item" asp-action="ViewNotes" asp-controller="Admin" asp-route-requestid="@item.RequestId"><i class="fa-solid fa-notes-medical me-3"></i>View Notes</a>
+                                    <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#transfercase" data-bs-requestid="@item.RequestId" data-bs-status="@item.Status"><i class="fa-regular fa-note-sticky me-3"></i> Transfer Case</a>
+                                    <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#ClearModal" id="clearcasemodal" data-bs-requestid="@item.RequestId"><i class="fa-regular fa-circle-xmark me-3"></i>Clear  Case</a>
+                                    <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#sendagrrement" data-bs-phoneno="@item.Phone" data-bs-email="@item.Email" data-bs-requestid="@item.RequestId" data-bs-requesttypeid="@item.ReqTypeId"><i class="fa-solid fa-file-lines me-3"></i>Send Agreement</a>
                                 }
                                 @if (@ViewBag.IsPhysician == true)
                                 {
-                                    <a class="dropdown-item" asp-action="ViewCase" asp-controller="Provider" asp-route-id="@item.RequestClientId"><i class="bi bi-x-circle me-3"></i>View Case</a>
-                                    <a class="dropdown-item" asp-action="ViewUploads" asp-controller="Provider" asp-route-id="@item.RequestId"><i class="bi bi-x-circle me-3"></i>View Uploads</a>
-                                    <a class="dropdown-item" asp-action="ViewNotes" asp-controller="Provider" asp-route-requestid="@item.RequestId"><i class="bi bi-x-circle me-3"></i>View Notes</a>
-                                    <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#transfercaseprovider" data-bs-requestid="@item.RequestId"><i class="bi bi-x-circle me-3"></i>Transfer Case</a>
-                                    <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#sendagrrement" data-bs-phoneno="@item.Phone" data-bs-email="@item.Email" data-bs-requestid="@item.RequestId" data-bs-requesttypeid="@item.ReqTypeId"><i class="bi bi-x-circle me-3"></i>Send Agreement</a>
+                                    <a class="dropdown-item" asp-action="ViewCase" asp-controller="Provider" asp-route-id="@item.RequestClientId"><i class="fa-regular fa-newspaper me-3"></i>View Case</a>
+                                    <a class="dropdown-item" asp-action="ViewUploads" asp-controller="Provider" asp-route-id="@item.RequestId"><i class="fa-solid fa-upload me-3"></i>View Uploads</a>
+                                    <a class="dropdown-item" asp-action="ViewNotes" asp-controller="Provider" asp-route-requestid="@item.RequestId"><i class="fa-solid fa-notes-medical me-3"></i>View Notes</a>
+                                    <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#transfercaseprovider" data-bs-requestid="@item.RequestId"><i class="fa-regular fa-note-sticky me-3"></i>Transfer Case</a>
+                                    <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#sendagrrement" data-bs-phoneno="@item.Phone" data-bs-email="@item.Email" data-bs-requestid="@item.RequestId" data-bs-requesttypeid="@item.ReqTypeId"><i class="fa-solid fa-file-lines me-3"></i>Send Agreement</a>
                                 }
                             </div>
                         </div>

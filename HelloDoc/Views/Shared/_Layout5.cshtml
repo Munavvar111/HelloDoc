@@ -101,9 +101,14 @@
 
                 <li class="nav-item">
                     <a class="nav-link @(ViewContext.ActionDescriptor.RouteValues["action"] == "Scheduling" ? "active" : "")"
-                       asp-action="Profile" asp-controller="Provider" asp-route-id=@PhysicianId>My Profile</a>
+                       asp-action="Scheduling" asp-controller="Provider"> Scehduling</a>
                 </li>
-               
+
+                <li class="nav-item ">
+                    <a class="nav-link @(ViewContext.ActionDescriptor.RouteValues["action"] == "PhysicanProfile" ? "active" : "")"
+                       asp-action="PhysicanProfile" asp-controller="Provider" asp-route-id="@PhysicianId">My Profile</a>
+
+                </li>
 
             </ul>
         </div>
@@ -125,7 +130,7 @@
 
                 <li class="nav-item ">
                     <a class="nav-link @(ViewContext.ActionDescriptor.RouteValues["action"] == "PhysicanProfile" ? "active" : "")"
-                       asp-action="PhysicanProfile" asp-controller="Provider" asp-route-id="@PhysicianId">My Profile</a>
+                       asp-action="PhysicanProfile" asp-controller="Provider" >My Profile</a>
 
                 </li>
                 

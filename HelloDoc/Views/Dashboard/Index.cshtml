@@ -28,9 +28,7 @@
                     <th class="d-none d-md-table-cell">
                         Status
                     </th>
-                    <th class="d-none d-md-table-cell">
-                        Action
-                    </th>
+                    
                     <th class="d-none d-md-table-cell">
                         Document
                     </th>
@@ -44,41 +42,42 @@
                     {
                         @if (item.Requestwisefile != null)
                         {
-                            
-
-
                         <tr data-toggle="collapse" data-target="#details@(item.Request.Createddate)" class="accordion-toggle">
                             <td>
                                 @Html.DisplayFor(modelItem => item.Request.Createddate)
                             </td>
                             <td class="d-none d-md-table-cell">
-                                @if (item.Request.Status == 1)
-                                {
-                                    <span>New</span>
-                                }
-                                else if (item.Request.Status == 2)
-                                {
-                                    <span>Assign</span>
-                                }
-                                else if (item.Request.Status == 3)
-                                {
-                                    <span>Cancelled</span>
-                                }
-                            </td>
-                            <td class="d-none d-md-table-cell ">
+                                    @if (item.Request.Status == 1)
+                                    {
+                                        <span>New</span>
+                                    }
+                                    else if (item.Request.Status == 1 && item.Request.Physicianid != null)
+                                    {
+                                        <span>Assign</span>
+                                    }
+                                    else if (item.Request.Status == 2)
+                                    {
+                                        <span>Pending</span>
+                                    }
 
-                                <a class="btn btn-outline-info align-items-center">
-                                    <span class="material-symbols-outlined">
-                                        person
-                                    </span>Admin
-                                </a>
-
-                                <a class="btn btn-outline-info">
-                                    <span class="material-symbols-outlined pr">
-                                        person
-                                    </span>Provider
-                                </a>
+                                    else if (item.Request.Status == 4 || item.Request.Status == 5)
+                                    {
+                                        <span>Active</span>
+                                    }
+                                    else if (item.Request.Status == 6)
+                                    {
+                                        <span>Conclude</span>
+                                    }
+                                    else if (item.Request.Status == 3 || item.Request.Status == 7 || item.Request.Status == 9)
+                                    {
+                                        <span>To-Close</span>
+                                    }
+                                    else if (item.Request.Status == 9)
+                                    {
+                                        <span>Unpaid</span>
+                                    }
                             </td>
+                           
                             <td class="d-none d-md-table-cell">
                                 @if ( item.Request.Status==6)
                                 {
@@ -91,7 +90,6 @@
                         <tr>
                             <td colspan="4" class="hiddenRow">
                                 <div id="details@(item.Request.Createddate)" class="accordian-body collapse">
-                                    <!-- Additional details here -->
                                     Status: @Html.DisplayFor(modelItem => item.Request.Status) <br />
                                         @if ( item.Request.Status == 6)
                                     {
@@ -99,7 +97,6 @@
                                            asp-action="ViewDocument"
                                            asp-route-requestid="@item.Request.Requestid">Documents </a>
                                     }
-                                    <!-- Add other fields as needed -->
                                 </div>
                             </td>
                             </tr>
@@ -115,29 +112,33 @@
                                     {
                                         <span>New</span>
                                     }
-                                    else if (item.Request.Status == 2)
+                                    else if (item.Request.Status == 1 && item.Request.Physicianid!=null)
                                     {
                                         <span>Assign</span>
                                     }
-                                    else if (item.Request.Status == 3)
+                                    else if (item.Request.Status == 2)
                                     {
-                                        <span>Cancelled</span>
+                                        <span>Pending</span>
+                                    }
+
+                                    else if (item.Request.Status == 4 || item.Request.Status==5 )
+                                    {
+                                        <span>Active</span>
+                                    } 
+                                    else if (item.Request.Status == 6)
+                                    {
+                                        <span>Conclude</span>
+                                    }
+                                    else if (item.Request.Status == 3 || item.Request.Status==7|| item.Request.Status==9)
+                                    {
+                                        <span>To-Close</span>
+                                    }
+                                    else if (item.Request.Status == 9)
+                                    {
+                                        <span>Unpaid</span>
                                     }
                                 </td>
-                                <td class="d-none d-md-table-cell ">
-
-                                    <a class="btn btn-outline-info align-items-center">
-                                        <span class="material-symbols-outlined">
-                                            person
-                                        </span>Admin
-                                    </a>
-
-                                    <a class="btn btn-outline-info">
-                                        <span class="material-symbols-outlined pr">
-                                            person
-                                        </span>Provider
-                                    </a>
-                                </td>
+                               
                                 <td class="d-none d-md-table-cell">
                                     @if (item.Request.Status == 6)
                                     {
@@ -152,7 +153,6 @@
                             <tr>
                                 <td colspan="4" class="hiddenRow">
                                     <div id="details@(item.Request.Createddate)" class="accordian-body collapse">
-                                        <!-- Additional details here -->
                                         Status: @Html.DisplayFor(modelItem => item.Request.Status) <br />
                                         @if (item.Request.Status == 6)
                                         {
@@ -161,7 +161,6 @@
                                                asp-action="ViewDocument"
                                                asp-route-requestid="@item.Request.Requestid">Documents 0</a>
                                         }   
-                                        <!-- Add other fields as needed -->
                                     </div>
                                 </td>
                             </tr>
@@ -172,19 +171,7 @@
         </table>
     </div>
 
-    <div class="modal fade" id="loginSuccessModal">
-        <div class="modal-dialog">
-            <div class="modal-content">
 
-                <div class="modal-body">
-                    Login Succefull
-                </div>
-                
-            </div>
-        </div>
-    </div>
-
-    <!-- Add this code inside your view, at the end before the closing body tag -->
     
 
 

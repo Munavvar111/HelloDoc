@@ -69,7 +69,7 @@
          aria-controls="collapseExample">
         <div class="d-flex flex-column gap-3">
             <div class="form-check mt-2 ms-3">
-                <input type="checkbox" class="form-check-input px-2 py-2" @(items.OnCallStaus[0] ? "checked" : "") data-physician-id="@items.physicianid">
+                <input type="checkbox" class="form-check-input px-2 py-2" @(items.OnCallStaus[0] ? "checked" : "") data-physicianMo-id="@items.physicianid">
                 <label class="form-check-label" for="flexCheckDefault">
                     @items.Name
                 </label>
@@ -132,16 +132,29 @@
         var currentCheckboxState = Array.from(document.querySelectorAll('input[type="checkbox"]')).map(function (checkbox) {
             return checkbox.checked;
         });
+        if ($('.d-none.d-md-table').is(':visible')) {
 
-        var checkedCheckboxes = document.querySelectorAll('input[type="checkbox"]:checked');
-        checkboxStates = Array.from(checkedCheckboxes).map(function (checkbox) {
-            return checkbox.checked;
-        });
+            var checkedCheckboxes = document.querySelectorAll('.d-none.d-md-table input[type="checkbox"]:checked');
+            checkboxStates = Array.from(checkedCheckboxes).map(function (checkbox) {
+                return checkbox.checked;
+            });
+        } else {
 
-        physicianIds = Array.from(checkedCheckboxes).map(function (checkbox) {
-            return checkbox.getAttribute('data-physician-id');
-        });
-
+            var checkedCheckboxes = document.querySelectorAll('.d-md-none input[type="checkbox"]:checked');
+            checkboxStates = Array.from(checkedCheckboxes).map(function (checkbox) {
+                return checkbox.checked;
+            });
+        }
+        if ($('.d-none.d-md-table').is(':visible')) {
+            physicianIds = Array.from(checkedCheckboxes).map(function (checkbox) {
+                return checkbox.getAttribute('data-physician-id');
+            });
+        }
+        else{
+            physicianIds = Array.from(checkedCheckboxes).map(function (checkbox) {
+                return checkbox.getAttribute('data-physicianMo-id');
+            });
+        }
         var saveButton = document.getElementById('saveButton');
 
         if (JSON.stringify(currentCheckboxState) !== JSON.stringify(initialCheckboxState)) {

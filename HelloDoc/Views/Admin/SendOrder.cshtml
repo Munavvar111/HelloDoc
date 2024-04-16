@@ -1,6 +1,13 @@
 ﻿@model DataAccessLayer.CustomModel.SendOrderModel;
 @{
-    Layout = "~/Views/Shared/_Layout4.cshtml";
+    if (ViewBag.IsPhysician)
+    {
+        Layout = "~/Views/Shared/_Layout5.cshtml";
+    }
+    if (!ViewBag.IsPhysician)
+    {
+        Layout = "~/Views/Shared/_Layout4.cshtml";
+    }
 }
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 
@@ -52,10 +59,20 @@
             <span class="fs-2 text-muted fw-bold">Send Orders</span>
         </div>
         <div class="d-flex justify-content-end">
-            <a asp-controller="Admin" asp-action="Index" asp-area=""
-               class="btn btn-outline-info d-flex align-items-center">
-                <span class="material-symbols-outlined"> chevron_left </span> Back
-            </a>
+            @if (ViewBag.IsPhysician)
+            {
+                <a asp-action="Index" asp-controller="Provider"
+                   class="btn btn-outline-info d-flex align-items-center">
+                    <span class="material-symbols-outlined"> chevron_left </span> Back
+                </a>
+            }
+            else
+            {
+                <a asp-action="Index" asp-controller="Admin"
+                   class="btn btn-outline-info d-flex align-items-center">
+                    <span class="material-symbols-outlined"> chevron_left </span> Back
+                </a>
+            }
         </div>
     </div>
 </div>

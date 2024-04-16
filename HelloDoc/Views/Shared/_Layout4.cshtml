@@ -132,7 +132,7 @@
 				</div>
 
 				<div class="fw-bolder d-flex align-items-center gap-3">
-					<span class="text-muted d-none d-md-inline">Welcome,@username</span>
+					<span class="text-muted d-none d-md-inline">Welcome,<span class="fw-bolder">@username</span></span>
 					<a asp-controller="Login" asp-action="LogoutController" class="btn btn-outline-info d-none d-md-inline">Logout</a>
 
 					<!-- Responsive Logout Icon for Small Screens -->
@@ -180,7 +180,7 @@
 							<div class="item">
 								<a class="nav-link dropdown-toggle sub-btn @(new string[] { "Provider", "Scheduling" }.Contains(ViewContext.ActionDescriptor.RouteValues["action"]) ? "active" : "")"
 								   href="#" role="button" aria-expanded="false">Providers</a>
-								<div class="sub-menu bg-light">
+								<div class="sub-menu bg-light" style="display:block!important">
 									<a class="sub-item" asp-action="Provider" asp-controller="Admin">Provider</a>
 									<a class="sub-item" asp-action="Scheduling" asp-controller="Admin">Scheduling</a>
 								</div>
@@ -235,7 +235,12 @@
 				@if (userPermissions != null && userPermissions.Contains("6"))
 				{
 					<li class="nav-item text-info">
-						<a class="nav-link @(ViewContext.ActionDescriptor.RouteValues["action"] == "Index" ? "active" : "")"
+						<a class="nav-link  @(
+                                    new string[] { "Index","ViewCase", "Viewnotes","viewuploads","ViewUploads","SendOrder","EncounterForm", "CloseCase"}.Contains(ViewContext.ActionDescriptor.RouteValues["action"])
+                                    && ViewContext.ActionDescriptor.RouteValues["controller"] == "Admin"
+                                    ? "active"
+                                    : ""
+                                )"
 						   asp-action="Index" asp-controller="Admin">Dashboard</a>
 					</li>
 				}
@@ -259,7 +264,7 @@
 					<li class="nav-item dropdown">
 						<button class="nav-link dropdown-toggle
                                 @(
-                                    new string[] { "Provider", "Scheduling" }.Contains(ViewContext.ActionDescriptor.RouteValues["action"])
+                                    new string[] { "Provider", "Scheduling","ShiftReview" }.Contains(ViewContext.ActionDescriptor.RouteValues["action"])
                                     && ViewContext.ActionDescriptor.RouteValues["controller"] == "Admin"
                                     ? "active"
                                     : ""
@@ -284,14 +289,15 @@
 				@if (userPermissions != null && userPermissions.Contains("11"))
 				{
 					<li class="nav-item ">
-						<a class="nav-link @(ViewContext.ActionDescriptor.RouteValues["action"] == "Parteners" ? "active" : "")"
+						<a class="nav-link  @(ViewContext.ActionDescriptor.RouteValues["action"] == "Parteners" ? "active" : "")"
 						   asp-action="Parteners" asp-controller="Admin">Parteners</a>
 					</li>
 				}
 				@if (userPermissions != null && userPermissions.Contains("7"))
 				{
 					<li class="nav-item dropdown z-1" style="padding-top:0px!important">
-						<button class="nav-link  dropdown-toggle @(ViewContext.ActionDescriptor.RouteValues["action"] == "Access" ? "active" : "")" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+						<button class="nav-link  dropdown-toggle @(new string[] { "Access", "UserAccess", "EditAccess", "EditProfile" }
+							.Contains(ViewContext.ActionDescriptor.RouteValues["action"]) && ViewContext.ActionDescriptor.RouteValues["controller"] == "Admin" ? "active" : "") role="button" data-bs-toggle="dropdown" aria-expanded="false">
 							Access
 						</button>
 						<ul class="dropdown-menu  mt-3 bg-opacity-0 custom-dropdown-menu bg-body">
@@ -334,15 +340,15 @@
 								</a>
 							</li>
 							<li class="border-bottom z-1">
-								<a class="dropdown-item @(ViewContext.ActionDescriptor.RouteValues["action"] == "BlockHistory" ? "active" : "")" asp-action="EmailLogs" asp-controller="Admin">
+								<a class="dropdown-item @(ViewContext.ActionDescriptor.RouteValues["action"] == "EmailLogs" ? "active" : "")" asp-action="EmailLogs" asp-controller="Admin">
 									Email Logs
 								</a>
 							</li>
-							<li class="border-bottom z-1">
+							@* <li class="border-bottom z-1">
 								<a class="dropdown-item @(ViewContext.ActionDescriptor.RouteValues["action"] == "BlockHistory" ? "active" : "")" asp-action="SmsLogs" asp-controller="Admin">
 									Sms Logs
 								</a>
-							</li>
+							</li> *@
 						</ul>
 					</li>
 				}

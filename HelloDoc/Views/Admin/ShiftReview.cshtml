@@ -6,7 +6,7 @@
 
 	<div class="d-flex justify-content-between my-3">
 		<div class="d-flex">
-			<span class="fs-2 text-muted fw-bold">New Request</span>
+			<span class="fs-2 text-muted fw-bold">Shifts Review</span>
 		</div>
 		<div class="d-flex justify-content-end">
 			<a asp-controller="Admin" asp-action="Index" asp-area=""
@@ -16,15 +16,16 @@
 		</div>
 	</div>
 	<div class="container bg-white p-3">
-		<div class="d-flex justify-content-between flex-wrap	">
+		<div class="d-flex justify-content-between flex-wrap">
 
 		<div class="">
-			<select class="form-select" aria-label="Default select example" id="regionreview">
-				<option selected value="0">All Regions</option>
-				<option value="1">One</option>
-				<option value="2">Two</option>
-				<option value="3">Three</option>
-			</select>
+					<select  class="p-2 px-3 form-control w-100" id="regionreview">
+						<option value="0" selected>Regions</option>
+						@foreach (var region in ViewBag.regions)
+						{
+							<option value="@region.Regionid">@region.Name - (@region.Abbreviation)</option>
+						}
+					</select>
 		</div>
 		<div class="d-flex gap-2 flex-wrap">
 			<button class="btn btn-success">View Current Month Shift</button>

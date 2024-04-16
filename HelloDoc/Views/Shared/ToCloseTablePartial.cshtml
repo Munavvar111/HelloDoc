@@ -52,15 +52,15 @@
                             Actions
                         </button>
                         <div class="dropdown-menu dropdown-menu-right dropdown-menu-lg-left" aria-labelledby="dropdownMenuButton">
-                            <a class="dropdown-item" asp-action="ViewCase" asp-controller="Admin" asp-route-id="@item.RequestClientId"><i class="bi bi-x-circle me-3"></i>View Case</a>
-                            <a class="dropdown-item" asp-action="ViewUploads" asp-controller="Admin" asp-route-id="@item.RequestId"><i class="bi bi-x-circle me-3"></i>View Uploads</a>
-                            <a class="dropdown-item" asp-action="ViewNotes" asp-controller="Admin" asp-route-requestid="@item.RequestId"><i class="bi bi-x-circle me-3"></i>View Notes</a>
-                            <a class="dropdown-item" asp-action="CloseCase" asp-controller="Admin" asp-route-requestid="@item.RequestId"><i class="bi bi-x-circle me-3"></i>Close Case</a>
-                            <a class="dropdown-item" asp-action="SendOrder" asp-controller="Admin" asp-route-requestid="@item.RequestId"><i class="bi bi-card-text me-3"></i> Order </a>
-                            <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#ClearModal" data-bs-requestid="@item.RequestId"><i class="bi bi-x-circle me-3"></i>Clear Case</a>
+                            <a class="dropdown-item" asp-action="ViewCase" asp-controller="Admin" asp-route-id="@item.RequestClientId"><i class="fa-regular fa-newspaper me-3"></i>View Case</a>
+                            <a class="dropdown-item" asp-action="ViewUploads" asp-controller="Admin" asp-route-id="@item.RequestId"><i class="fa-solid fa-upload me-3"></i>View Uploads</a>
+                            <a class="dropdown-item" asp-action="ViewNotes" asp-controller="Admin" asp-route-requestid="@item.RequestId"><i class="fa-solid fa-upload me-3"></i>iew Notes</a>
+                            <a class="dropdown-item" asp-action="CloseCase" asp-controller="Admin" asp-route-requestid="@item.RequestId"><i class="fa-regular fa-circle-xmark me-3"></i>Close Case</a>
+                            <a class="dropdown-item" asp-action="SendOrder" asp-controller="Admin" asp-route-requestid="@item.RequestId"><i class="fa-solid fa-cart-plus me-3"></i> Order </a>
+                            <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#ClearModal" data-bs-requestid="@item.RequestId"><i class="fa-regular fa-circle-xmark me-3"></i>Clear Case</a>
                             @if (@item.isfinalize == null)
                             {
-                                <a class="dropdown-item" asp-action="EncounterForm" asp-route-requestid="@item.RequestId"><i class="bi bi-ban me-3"></i>Encounter</a>
+                                <a class="dropdown-item" asp-action="EncounterForm" asp-route-requestid="@item.RequestId"><i class="fa-regular fa-note-sticky"></i>Encounter</a>
 
                             }
                             else if (@item.isfinalize)
@@ -70,7 +70,7 @@
                             }
                             else
                             {
-                                <a class="dropdown-item" asp-action="EncounterForm" asp-route-requestid="@item.RequestId"><i class="bi bi-ban me-3"></i>Encounter</a>
+                                <a class="dropdown-item" asp-action="EncounterForm" asp-route-requestid="@item.RequestId"><i class="fa-regular fa-note-sticky"></i>Encounter</a>
 
                             }
                         </div>

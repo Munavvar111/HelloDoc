@@ -55,7 +55,7 @@ namespace HelloDoc.Controllers
         {
             string? Email = HttpContext.Session.GetString("Email");
             Physician physician = _admin.GetPhysicianByEmail(Email);
-           bool accepted = _provider.RequestAcceptedByProvider(id,physician.Physicianid);
+            bool accepted = _provider.RequestAcceptedByProvider(id,physician.Physicianid);
             if (accepted)
             {
                 TempData["SuccessMessage"] = "Accepted successfully";
@@ -133,11 +133,7 @@ namespace HelloDoc.Controllers
         {
             return RedirectToAction("CreateRequest", "Admin");
         }
-        public IActionResult PhysicanProfile(int id)
-        {
-          
-            return RedirectToAction("PhysicanProfile", "Admin", new {id=id});
-        }
+        
 
         public IActionResult RequestToAdminForEdit(int requestid,string editadminnotes)
         {

@@ -1,12 +1,24 @@
 // Light Dark Mode Switching js
+var linkdark = document.createElement('link');
+linkdark.rel = "stylesheet";
+linkdark.href = "//cdn.jsdelivr.net/npm/@sweetalert2/theme-dark@4/dark.css";
+var linklight = document.createElement('link');
+linklight.rel = "stylesheet";
+linklight.href = "//cdn.jsdelivr.net/npm/@sweetalert2/theme-minimal/minimal.css";
 document.getElementById("modeSwitch").addEventListener("click", () => {
     const theme = localStorage.getItem("theme") || "light";
     if (theme === "light") {
         applyDarkTheme();
         localStorage.setItem("theme", "dark");
+        document.head.appendChild(linkdark);
+        document.head.removeChild(linklight);
+
     } else if (theme === "dark") {
         applyLightTheme();
         localStorage.setItem("theme", "light");
+        document.head.appendChild(linklight);
+        document.head.removeChild(linkdark);
+
     }
 });
 
@@ -40,8 +52,10 @@ window.addEventListener("DOMContentLoaded", () => {
     const theme = localStorage.getItem("theme") || "light";
     if (theme === "light") {
         applyLightTheme();
+        document.head.appendChild(linklight);
     } else if (theme === "dark") {
         applyDarkTheme();
+        document.head.appendChild(linkdark);
     }
 })
 

@@ -100,91 +100,25 @@
 							<div class="dropdown-menu dropdown-menu-right dropdown-menu-lg-left" aria-labelledby="dropdownMenuButton">
 								@if(!ViewBag.IsPhysician)
 								{
-									<a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#assigncase" data-bs-requestid="@item.RequestId" data-bs-status="@item.Status" data-bs-status="@item.Status"><i class="bi bi-x-circle me-3"></i>Assign Case</a>
-									<a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#exampleModal"  data-bs-requestid="@item.RequestId" data-bs-patientname="@item.PatientName"><i class="bi bi-x-circle me-3"></i>Cancel  Case</a>
-									<a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#BlockModal" id="bloclmodal" data-bs-requestid="@item.RequestId" data-bs-patientname="@item.PatientName"><i class="bi bi-x-circle me-3"></i>Block  Case</a>
-									<a class="dropdown-item" asp-action="ViewCase" asp-controller="Admin" asp-route-id="@item.Id"><i class="bi bi-x-circle me-3"></i>View Case</a>
-									<a class="dropdown-item" asp-action="ViewNotes" asp-controller="Admin" asp-route-requestid="@item.RequestId"><i class="bi bi-x-circle me-3"></i>View Notes</a>
+									<a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#assigncase" data-bs-requestid="@item.RequestId" data-bs-status="@item.Status" data-bs-status="@item.Status"><i class="fa-regular fa-clipboard me-3"></i>Assign Case</a>
+									<a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#exampleModal" data-bs-requestid="@item.RequestId" data-bs-patientname="@item.PatientName"><i class="fa-regular fa-circle-xmark me-3"></i> Cancel  Case</a>
+									<a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#BlockModal" id="bloclmodal" data-bs-requestid="@item.RequestId" data-bs-patientname="@item.PatientName"><i class="fa-solid fa-ban me-3"></i>Block  Case</a>
+									<a class="dropdown-item" asp-action="ViewCase" asp-controller="Admin" asp-route-id="@item.Id"><i class="fa-regular fa-newspaper me-3"></i>View Case</a>
+									<a class="dropdown-item" asp-action="ViewNotes" asp-controller="Admin" asp-route-requestid="@item.RequestId"><i class="fa-solid fa-notes-medical me-3"></i>View Notes</a>
 								}
 								@if(ViewBag.IsPhysician)
 								{
-									<a class="dropdown-item" asp-action="ViewCase" asp-controller="Provider" asp-route-id="@item.Id"><i class="bi bi-x-circle me-3"></i>View Case</a>
-									<a class="dropdown-item" asp-action="ViewNotes" asp-controller="Provider" asp-route-requestid="@item.RequestId"><i class="bi bi-x-circle me-3"></i>View Notes</a>
-									<a class="dropdown-item" onclick="acceptRequest('@item.RequestId')"><i class="bi bi-x-circle me-3"></i>Accept</a>
+									<a class="dropdown-item" asp-action="ViewCase" asp-controller="Provider" asp-route-id="@item.Id"><i class="fa-regular fa-newspaper me-3"></i>View Case</a>
+									<a class="dropdown-item" asp-action="ViewNotes" asp-controller="Provider" asp-route-requestid="@item.RequestId"><i class="fa-solid fa-notes-medical me-3"></i>View Notes</a>
+									<a class="dropdown-item" onclick="acceptRequest('@item.RequestId')">
+										<i class="fa fa-check-circle-o me-3" aria-hidden="true"></i>
+										Accept
+									</a>
 								}
 							</div>
 						</div>
 					</td>
 				</tr>
-
-
-				@* <div class="d-xl-none ">
-		<div class="bg-info-subtle rounded-3 " data-bs-toggle="collapse" data-bs-target="#collapseExample_@item.Id"
-		aria-expanded="false" aria-controls="collapseExample_@item.Id">
-		<div class="flex-column gap-2 border-bottom border-5">
-		<div class="d-flex align-items-center justify-content-between mb-2">
-		<span class=" fs-5 ms-2">@item.PatientName</span>
-		<span class=" fs-5 me-5">Patient</span>
-		</div>
-		<div class="d-flex align-items-center justify-content-between mb-2">
-		<div class="fs-5 ms-2"> @item.Address</div>
-
-		<button class="btn border-info text-info me-1">
-		Map Location
-		</button>
-		</div>
-		</div>
-		</div>
-
-		<div class="collapse" id="collapseExample_@item.Id">
-		<div class=" bg-info-subtle rounded-3 flex-column">
-		<div class="ms-2 fs-5">
-		<i class="bi bi-calendar3 me-1"></i>
-		Date Of Birth:@item.DateOfBirth
-		</div>
-		<div class="ms-2 fs-5">
-		<i class="bi bi-envelope me-1"></i>
-		Email:@item.Email
-		</div>
-		<div class="ms-2 fs-5">
-		<i class="bi bi-telephone me-1"></i>
-		Patient-No:@item.Phone
-		</div>
-		<div class="ms-2 fs-5">
-		<i class="bi bi-journal-bookmark"></i>
-		Notes:@item.Notes
-		</div>
-		<div class="ms-2 fs-5">
-		<i class="bi bi-calendar3 me-1"></i>
-		Date Of Service:3-9-2024
-		</div>
-		<div class="ms-2 fs-5">
-		<i class="bi bi-person-circle me-1"></i>
-		Physician:dr.dhanani
-		</div>
-		<div class="ms-2 fs-5">
-		<i class="bi bi-person me-1"></i>
-		Requestor:Munavvar
-		</div>
-		<div class="d-flex">
-		</div>
-		<div class="ms-2 fs-5">
-		Chat With:
-		<div>
-		<button type="button" class=" btn bg-info-subtle text-info border-info rounded-3">
-		<i class="bi bi-person me-1"></i>
-		Patient
-		</button>
-		<button type="button" class=" btn bg-info-subtle text-info border-info rounded-3">
-		<i class="bi bi-person-circle me-1"></i>
-		Provider
-		</button>
-		</div>
-
-		</div>
-		</div>
-		</div>
-		</div> *@
 
 				<div class="d-xl-none ">
 					<div class="bg-info-subtle " data-bs-toggle="collapse" data-bs-target="#collapseexample_@item.Id"

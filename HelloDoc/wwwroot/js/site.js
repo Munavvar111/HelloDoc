@@ -609,7 +609,24 @@ $(document).ready(function () {
 
             }
         });
-
+    $.ajax({
+        url: '/Admin/GetRegions', // replace with your API endpoint
+        method: 'GET',
+        success: function (data) {
+            console.log(data)
+            var regionSelect = $('.regionDropdown');
+            regionSelect.empty();
+            regionSelect.append('<option value="" disabled selected>Narrow Search By Region</option>');
+            $.each(data, function (key, value) {
+                console.log(key)
+                console.log(value)
+                regionSelect.append('<option value="' + value.regionid + '">' + value.name + '</option>');
+            });
+        },
+        error: function (xhr, textStatus, errorThrown) {
+            console.log(errorThrown);
+        }
+    });
         $('.regionDropdown').on('change', function () {
             console.log("hii")
             var selectregion = $(this).val();

@@ -31,7 +31,7 @@ namespace HalloDocPatient.Controllers
             if (id.HasValue)
             {
 
-                User? user = _patientRequest.GetUserById((int)id);
+                User? user = _patientRequest.GetUserById(id.GetValueOrDefault());
                 ViewData["Name"] = user?.Firstname;
                 RequestFileViewModel viewmodel = new RequestFileViewModel
                 {
