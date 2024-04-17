@@ -33,6 +33,7 @@
             }
         },
         submitHandler: function (form) {
+            debugger
             form.submit();
         }
 

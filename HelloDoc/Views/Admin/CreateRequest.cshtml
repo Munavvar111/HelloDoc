@@ -77,7 +77,8 @@
         <div class="row">
             <div class="form-floating  col-12 col-md-6 mb-3">
                 <input class="form-control" type="date" placeholder="Date Of Birth"
-                       id="floatingDate" asp-for="BirthDate" value="">
+                       id="floatingDate" asp-for="BirthDate" value=""
+                       max="@DateTime.Today.ToString("yyyy-MM-dd")">
                 <label class="text-muted mx-2" for="floatingDate">Date Of Birth(Optional)</label>
 
             </div>

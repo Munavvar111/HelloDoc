@@ -10,7 +10,32 @@
 }
 $(document).ready(function () {
     console.log("kjhsdfk")
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function (position) {
+            var latitude = position.coords.latitude;
+            var longitude = position.coords.longitude;
 
+            $.ajax({
+                url: '/Provider/UpdatePhysicianLocation',
+                type: "POST",
+                data: {
+                    latitude: latitude,
+                    longitude: longitude
+                },
+                success: function (response) {
+                    if (response == true) {
+                        console.log("Location updated successfully.");
+                    }
+                    else {
+                        console.log("You are not a physician");
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error updating location:", error);
+                }
+            });
+        });
+    }
     function updateUIWithCounts() {
         $.ajax({
             type: "GET",

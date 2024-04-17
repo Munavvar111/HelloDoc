@@ -12,7 +12,7 @@
 }
 @{
     ViewData["Title"] = "Encounter Form";
-    string requestid = Context.Request.Query["requestid"];
+    string? requestid = Context.Request.Query["requestid"];
     Console.WriteLine(requestid);
 
 }
@@ -252,9 +252,12 @@
                 </div>
                 <div class="d-flex flex-row-reverse">
                     <buttaon class="p-2 btn btn-outline-info mx-1">Cancel</buttaon>
+                    @if (ViewBag.IsPhysician)
+                    {
                     <button type="button" class="btn p-2 mx-1" style="background-color:indigo; color:white" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
                         Finalize
                     </button>
+                    }
                     <button class="btn btn-info mx-1" id="savachanges">Save Changes</button>
                 </div>
             </form>

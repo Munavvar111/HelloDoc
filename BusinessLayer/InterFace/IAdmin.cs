@@ -14,7 +14,7 @@ namespace BusinessLayer.InterFace
         List<NewRequestTableVM> SearchPatients(string searchValue, string selectValue, string selectedFilter,int[] currentStatus);
         List<NewRequestTableVM> GetAllData();
         List<Region> GetAllRegion();
-        ViewCaseVM GetCaseById(int id);
+        ViewCaseVM GetCaseById(int id,int accountId);
         Task UpdateRequestClient(ViewCaseVM viewCaseVM, int id);
         ViewNotes GetNotesForRequest(int requestid);
         Task<bool> AssignRequest(int regionId, int physician, string description, int requestId,int adminid);
@@ -29,13 +29,13 @@ namespace BusinessLayer.InterFace
         ViewEncounterForm GetEncounterForm(int requestid);
         void SaveOrUpdateEncounterForm(ViewEncounterForm viewEncounterForm, string requestid);
         public List<int> GetUserPermissions(string roleid);
-        public Menu GetMenufromMenuid(string menuid);
+        public Menu? GetMenufromMenuid(string menuid);
 
         List<PhysicianLocation> GetAllPhysicianLocation();
         AdminProfileVm GetAdminProfile(string email);
         void ResetAdminPassword(string email, string newPassword);
-        Physician GetPhysicianByEmail(string email);
-        Admin GetAdminByEmail(string email);
+        Physician? GetPhysicianByEmail(string email);
+        Admin? GetAdminByEmail(string email);
         AspnetUser GetAspNetUserByEmail(string email);
         void UpdateAdministrationInfo(string sessionEmail, string email, string mobileNo, string[] adminRegionIds);
         void UpdateAccountingInfo(string sessionEmail, string address1, string address2, string city, string zipcode, int state, string mobileNo);
@@ -53,7 +53,7 @@ namespace BusinessLayer.InterFace
         List<DateTime> IsShiftOverwritting(ScheduleModel data);
         ProviderOnCallVM GetProvidersOnCall(int region);
         IQueryable<Region> GetRegionsByRegionId(int regionId);
-        Shiftdetail GetShiftDetailById(int shiftDetailId);
+        Shiftdetail? GetShiftDetailById(int shiftDetailId);
 
         void UpdateShiftDetail(Shiftdetail shiftdetail);
         void UpdateHealthPrifessional(Healthprofessional healthprofessional);
@@ -62,11 +62,11 @@ namespace BusinessLayer.InterFace
         List<Healthprofessionaltype> GetAllHealthprofessoionalType();
 
         IEnumerable<SendOrderModel> PartnerFilter(int healthProType, string vendorname);
-        Healthprofessional GetHealthprofessionalById(int healthprofessionalId);
+        Healthprofessional? GetHealthprofessionalById(int healthprofessionalId);
         List<User> GetUsers(string firstName, string lastName, string email, string phoneNumber);
         List<PatientHistoryVM> GetPatientRecords(int userId);
         void CreatePartner(HealthProffesionalVM healthProffesionalVM);
-        Region GetRegionByName(string state);
+        Region? GetRegionByName(string state);
         IEnumerable<Physician> GetPhysiciansByRegion(int region);
 
         List<Role> GetAllRoles();
@@ -91,7 +91,7 @@ namespace BusinessLayer.InterFace
         Request GetRequestById(int requestId);
 
         void UpdateRequestStatusLog(Requeststatuslog updaterequeststatuslog);
-        Requestclient GetRequestClientById(int requestid);
+        Requestclient? GetRequestClientById(int requestid);
         void UpdateRequest(Request request);
 
         void AddRequestWiseFile(Requestwisefile requestwisefile);
@@ -103,12 +103,15 @@ namespace BusinessLayer.InterFace
 
         List<LogsVM> GetEmailLogs(int? accountType, string? receiverName, string? emailId, DateTime? createdDate, DateTime? sentDate);
 
-        Requestclient GetRequestclientByRequestId(int requestId);   
+        Requestclient? GetRequestclientByRequestId(int requestId);   
         void UpdateRequestNotes (Requestnote updatedrequestnote);
 
-        Requestwisefile GetRequestwisefileByFileName(string filename);
+        Requestwisefile? GetRequestwisefileByFileName(string filename);
 
-        Requestnote GetRequestNotesByRequestId(int requestid);
+        Requestnote? GetRequestNotesByRequestId(int requestid);
 
-    }
+        bool UpdatePhysicianLocation(decimal latitude, decimal longitude, int physicianId);
+        List<Role> GetRoleFromAccountType(int accountType); 
+
+	}
 }

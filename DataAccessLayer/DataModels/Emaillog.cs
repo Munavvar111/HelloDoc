@@ -58,4 +58,7 @@ public partial class Emaillog
 
     [Column("isemailsent")]
     public bool? Isemailsent { get; set; }
+
+    [Column(TypeName = "character varying")]
+    public string? Receivername { get; set; }
 }

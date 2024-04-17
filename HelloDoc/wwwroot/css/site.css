@@ -75,3 +75,6 @@
 .Status-btn-text{
     font-weight:500;
 }
+/*.filter-item.active {
+    border-bottom: 2px solid #3ecc4e;*/ /* change the color to match the button color */
+/*}*/

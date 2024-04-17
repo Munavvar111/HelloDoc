@@ -9,13 +9,14 @@
             </div>
             <div class="modal-body align-items-center">
                 <p>Encounter is already finalized.</p>
-                <form asp-action="GeneratePDF" method="post">
+                <form asp-action="GeneratePDF" method="post" class="d-flex justify-content-center">
                     <input class="d-none" id="requestiddownload" name="requestid"/>
-                <button class="btn btn-info" type="submit" id="generetepdf">Download</button>
+                <button class="btn btn-info d-flex justify-content-center align-items-center" type="submit" id="generetepdf">Download</button>
                 </form>
             </div>
-                <button type="submit" class="btn btn-info">Submit</button>
+            <div class="modal-footer">
                 <button type="button" class="btn btn-info" data-bs-dismiss="modal">Cancel</button>
+                </div>
             </div>
         </div>
     </div>

@@ -15,6 +15,7 @@ using System.Collections;
 using System.Data;
 using System.Drawing.Printing;
 using System.Globalization;
+using System.Threading.Channels;
 using System.Web.Helpers;
 using BC = BCrypt.Net.BCrypt;
 
@@ -30,14 +31,16 @@ namespace HelloDoc.Controllers
         private readonly ILogin _login;
         private readonly IUploadProvider _uploadProvider;
         private readonly IDataProtectionProvider _dataProtectionProvider;
+        private readonly IEmailServices _emailService;
 
-        public AdminController(ApplicationDbContext context, IUploadProvider uploadProvider, IAdmin admin, IPatientRequest patient, IDataProtectionProvider dataProtectionProvider, IWebHostEnvironment hostingEnvironment, IJwtAuth jwtAuth, ILogin login)
+        public AdminController(ApplicationDbContext context, IUploadProvider uploadProvider, IEmailServices emailServices, IAdmin admin, IPatientRequest patient, IDataProtectionProvider dataProtectionProvider, IWebHostEnvironment hostingEnvironment, IJwtAuth jwtAuth, ILogin login)
         {
             _context = context;
             _admin = admin;
             _uploadProvider = uploadProvider;
             _patient = patient;
             _jwtAuth = jwtAuth;
+            _emailService = emailServices;
             _hostingEnvironment = hostingEnvironment;
             _login = login;
             _dataProtectionProvider = dataProtectionProvider;
@@ -70,8 +73,8 @@ namespace HelloDoc.Controllers
                 TempData["Error"] = "Invalid session data. Please log in again.";
                 return RedirectToAction("Index", "Login");
             }
-
             var adminProfile = _admin.GetAdminProfile(email);
+            ViewBag.Roles = _admin.GetRoleFromAccountType(2);
 
             if (adminProfile == null)
             {
@@ -144,7 +147,16 @@ namespace HelloDoc.Controllers
         public IActionResult AdministrationInfo(string email, string mobileNo, string[] adminRegion)
         {
             string? sessionEmail = HttpContext.Session.GetString("Email");
+            AspnetUser? AspnetUser = _patient.GetAspnetUserBYEmail(email);
+            if (sessionEmail != email)
+            {
 
+                if (AspnetUser != null)
+                {
+                    TempData["Error"] = "Email Already Exists Pleased Change the Email";
+                    return RedirectToAction("Index", "Admin");
+                }
+            }
             if (string.IsNullOrEmpty(sessionEmail))
             {
                 TempData["Error"] = "Invalid session data. Please log in again.";
@@ -153,6 +165,7 @@ namespace HelloDoc.Controllers
             try
             {
                 _admin.UpdateAdministrationInfo(sessionEmail, email, mobileNo, adminRegion);
+                HttpContext.Session.SetString("Email", email);
                 TempData["SuccessMessage"] = "Your administration details have been updated successfully.";
             }
             catch (InvalidOperationException ex)
@@ -213,8 +226,8 @@ namespace HelloDoc.Controllers
         }
         #endregion
 
-        [CustomAuthorize("Provider", "8", "22")]
         #region PhysicanProfile
+        [CustomAuthorize("Provider", "8", "22")]
         [HttpGet("Admin/PhysicanProfile/{id}", Name = "AdminProviderProfile")]
         [HttpGet("Provider/PhysicanProfile", Name = "ProviderMyProfile")]
         public IActionResult PhysicanProfile(int id)
@@ -267,15 +280,16 @@ namespace HelloDoc.Controllers
                 return RedirectToAction("Index", "Login");
 
             }
+            Physician physician = _admin.GetPhysicianById(physicianId);
             Admin? admin = _admin.GetAdminByEmail(Email);
-            Physician? physicianByEmail = _admin.GetPhysicianByEmail(Email);
-
+            if (physician == null)
+            {
+                TempData["Error"] = "SomeThing Went Wrong";
+            }
             try
             {
-
                 if (password == null)
                 {
-                    Physician physician = _admin.GetPhysicianById(physicianId);
                     physician.Aspnetuser.Username = Username;
                     physician.Roleid = PhysicianRole;
                     physician.Modifiedby = admin != null ? admin.Aspnetuserid : physician.Aspnetuserid;
@@ -401,19 +415,32 @@ namespace HelloDoc.Controllers
 
             }
             Admin? admin = _admin.GetAdminByEmail(Email);
-            Physician? physician = _admin.GetPhysicianByEmail(Email);
+            Physician? physician = _admin.GetPhysicianById(id);
+            Physician? physicianSession = _admin.GetPhysicianByEmail(Email);
+            AspnetUser? aspnetUser = _patient.GetAspnetUserBYEmail(Email);
+            if (physician.Email == email)
+            {
 
+                if (aspnetUser != null)
+                {
+                    TempData["Error"] = "This Email Is Already Exists Please Change";
+                    if (admin != null)
+                        return RedirectToAction("Index", "Admin");
+                    else
+                        return RedirectToAction("Index", "Provider");
+                }
+            }
             try
             {
                 if (admin != null)
                     _admin.UpdatePhysicianInformation(id, email, mobileNo, adminRegion, synchronizationEmail, npinumber, medicalLicense, admin.Aspnetuserid);
-                else
+                else if (physicianSession != null)
                     _admin.UpdatePhysicianInformation(id, email, mobileNo, adminRegion, synchronizationEmail, npinumber, medicalLicense, physician.Aspnetuserid);
                 TempData["SuccessMessage"] = "Physician information has been updated successfully.";
             }
             catch (InvalidOperationException ex)
             {
-                TempData["ErrorMessage"] = ex.Message;
+                TempData["Error"] = ex.Message;
             }
             if (admin != null)
                 return RedirectToAction("PhysicanProfile", "Admin", new { id = id });
@@ -673,6 +700,7 @@ namespace HelloDoc.Controllers
         [HttpGet("Provider/Scheduling", Name = "ProviderScheduling")]
         public IActionResult Scheduling()
         {
+            ViewBag.Regions = _admin.GetAllRegion();
             string? Email = HttpContext.Session.GetString("Email");
             if (Email == null)
             {
@@ -723,7 +751,7 @@ namespace HelloDoc.Controllers
             }
             else
             {
-                string email = HttpContext.Session.GetString("Email");
+                string? email = HttpContext.Session.GetString("Email");
                 if (email == null)
                 {
                     TempData["Error"] = "Session Is Expire Please Login!";
@@ -949,7 +977,7 @@ namespace HelloDoc.Controllers
             {
                 foreach (var id in selectedIds)
                 {
-                    Shiftdetail shiftDetail = _admin.GetShiftDetailById(id);
+                    Shiftdetail? shiftDetail = _admin.GetShiftDetailById(id);
                     if (shiftDetail != null)
                     {
                         shiftDetail.Status = 0; // Change the state to 0
@@ -975,7 +1003,7 @@ namespace HelloDoc.Controllers
             {
                 foreach (var id in selectedIds)
                 {
-                    Shiftdetail shiftDetail = _admin.GetShiftDetailById(id);
+                    Shiftdetail? shiftDetail = _admin.GetShiftDetailById(id);
                     if (shiftDetail != null)
                     {
                         shiftDetail.Isdeleted = true; // Change the state to 0
@@ -1057,6 +1085,7 @@ namespace HelloDoc.Controllers
                 TempData["Error"] = "Something Is Went Wrong!!";
                 return RedirectToAction("Index", "Admin");
             }
+
             List<Healthprofessionaltype> healthprofessionaltype = _admin.GetAllHealthprofessoionalType();
             List<Region> Regions = _admin.GetAllRegion();
             ViewBag.Regions = Regions;
@@ -1083,12 +1112,26 @@ namespace HelloDoc.Controllers
         public IActionResult EditPartner(HealthProffesionalVM healthProffesionalVM)
         {
             Healthprofessional? healthprofessional = _admin.GetHealthprofessionalById(healthProffesionalVM.VendorId);
+            AspnetUser? aspnetUser = _patient.GetAspnetUserBYEmail(healthProffesionalVM.Email);
+
             if (healthprofessional == null)
             {
                 TempData["Error"] = "Something Is Went Wrong!!";
 
                 return RedirectToAction("Index", "Admin");
             }
+
+            if (healthprofessional.Email != healthProffesionalVM.Email)
+            {
+
+                if (aspnetUser != null)
+                {
+                    TempData["Error"] = "Please Check Email Its Already Exist!!";
+                    return RedirectToAction("Index", "Admin");
+
+                }
+            }
+
             healthprofessional.Vendorname = healthProffesionalVM.Vendorname;
             healthprofessional.Healthprofessionalid = healthProffesionalVM.Profession;
             healthprofessional.Email = healthProffesionalVM.Email;
@@ -1593,7 +1636,7 @@ namespace HelloDoc.Controllers
 
             AspnetUserrole aspnetUserrole = new AspnetUserrole();
             aspnetUserrole.Userid = aspnet.Aspnetuserid;
-            aspnetUserrole.Roleid = profileVm.RoleId;
+            aspnetUserrole.Roleid = profileVm.RoleAdminId;
             _context.AspnetUserroles.Add(aspnetUserrole);
             _context.SaveChanges();
             return RedirectToAction("UserAccess", "Admin");
@@ -1607,14 +1650,49 @@ namespace HelloDoc.Controllers
 
         #region Admin&ProviderDashboard
 
+        public IActionResult IndexWithOutDashboard()
+        {
+            string? Email = HttpContext.Session.GetString("Email");
+            if (Email == null)
+            {
+                TempData["Error"] = "Your Session Will Be Expire Please LogedIn Again";
+                return RedirectToAction("Index", "Login");
+            }
+            Admin? admin = _admin.GetAdminByEmail(Email);
+            if (admin == null)
+            {
+                TempData["Error"] = "Your Session Will Be Expire Please LogedIn Again";
+                return RedirectToAction("Index", "Login");
+
+            }
+            var rolefromroleid = HttpContext.Session.GetString("Role");
+
+            var menulist = _context.Rolemenus.Include(b => b.Menu).Where(item => item.Roleid == int.Parse(rolefromroleid)).Select(item => item.Menu.Name).ToList();
+            if (menulist.Contains("Dashboard"))
+            {
+                List<NewRequestTableVM> request = _admin.GetAllData();
+                int newcount = request.Count(item => item.Status == 1);
+                return RedirectToAction("Index");
+            }
+            return View();
+        }
 
         #region Index
         [HttpGet("Admin/Dashboard", Name = "AdminDashboard")]
         public IActionResult Index()
         {
-            List<NewRequestTableVM> request = _admin.GetAllData();
-            int newcount = request.Count(item => item.Status == 1);
-            return View(request.ToList());
+            var rolefromroleid = HttpContext.Session.GetString("Role");
+            var menulist = _context.Rolemenus.Include(b => b.Menu).Where(item => item.Roleid == int.Parse(rolefromroleid)).Select(item => item.Menu.Name).ToList();
+            if (menulist.Contains("Dashboard"))
+            {
+                List<NewRequestTableVM> request = _admin.GetAllData();
+                int newcount = request.Count(item => item.Status == 1);
+                return View(request.ToList());
+            }
+            else
+            {
+                return RedirectToAction("IndexWithOutDashboard");
+            }
         }
         #endregion
 
@@ -1622,6 +1700,13 @@ namespace HelloDoc.Controllers
         [CustomAuthorize("Dashboard", "6")]
         public IActionResult SearchPatient(string searchValue, string selectValue, string partialName, string selectedFilter, int[] currentStatus, bool exportdata, bool exportAllData, int page, int pageSize = 10)
         {
+            ViewBag.Cancel = _context.Casetags.Select(cc => new CancelCase
+            {
+                CancelCaseReson = cc.Name,
+                CancelReasonId = cc.Casetagid
+            }).ToList();
+
+
             if (page == 0)
             {
                 page = 1;
@@ -1687,23 +1772,46 @@ namespace HelloDoc.Controllers
         public IActionResult ViewCase(int id)
         {
             string? Email = HttpContext.Session.GetString("Email");
+            ViewBag.Cancel = _context.Casetags.Select(cc => new CancelCase
+            {
+                CancelCaseReson = cc.Name,
+                CancelReasonId = cc.Casetagid
+            }).ToList();
+
+            ViewBag.Regions = _admin.GetAllRegion();
             if (Email == null)
             {
                 TempData["Error"] = "Your Session Will Be Expire Please LogedIn Again";
                 return RedirectToAction("Index", "Login");
             }
             Admin? admin = _admin.GetAdminByEmail(Email);
+            Physician? physician = _admin.GetPhysicianByEmail(Email);
+            Requestclient request = _admin.GetRequestClientById(id);
+            if (request == null)
+            {
+                TempData["Error"] = "Something Went Wrong";
+                if (admin != null)
+                    return RedirectToAction("Index", "Admin");
+                else
+                    return RedirectToAction("Index", "Provider");
+            }
             if (admin != null)
             {
                 ViewBag.IsPhysican = false;
 
-                ViewCaseVM ViewCase = _admin.GetCaseById(id);
+                ViewCaseVM ViewCase = _admin.GetCaseById(id, 0);
                 return View(ViewCase);
             }
             else
             {
                 ViewBag.IsPhysican = true;
-                ViewCaseVM ViewCase = _admin.GetCaseById(id);
+                if (request.Request.Physicianid != physician.Physicianid)
+                {
+                    TempData["Error"] = "Dont Try To Access It!!";
+                    return RedirectToAction("Index", "Provider");
+                }
+                ViewCaseVM ViewCase = _admin.GetCaseById(id, physician.Physicianid);
+
                 return View(ViewCase);
             }
         }
@@ -1714,8 +1822,22 @@ namespace HelloDoc.Controllers
         [HttpPost]
         public async Task<IActionResult> ViewCase(ViewCaseVM viewCaseVM, int id)
         {
+
             if (ModelState.IsValid)
             {
+
+                Requestclient? requestclient = _admin.GetRequestClientById(id);
+                if (requestclient.Email != viewCaseVM.EmailView)
+                {
+                    AspnetUser? aspnetUser = _admin.GetAspNetUserByEmail(viewCaseVM.EmailView);
+                    if (aspnetUser != null)
+                    {
+                        TempData["Error"] = "This Email Is Already Exsits In DataBase";
+                        return RedirectToAction("ViewCase", new { id });
+
+                    }
+
+                }
                 await _admin.UpdateRequestClient(viewCaseVM, id);
                 return RedirectToAction("ViewCase", new { id });
             }
@@ -1742,24 +1864,31 @@ namespace HelloDoc.Controllers
             }
             Admin? admin = _admin.GetAdminByEmail(Email);
             Physician? physician = _admin.GetPhysicianByEmail(Email);
-            if (admin != null)
+            Requestclient request = _admin.GetRequestclientByRequestId(requestid);
+            if (request == null)
             {
-                ViewBag.IsPhysician = false;
+                TempData["Error"] = "Something Went Wrong";
+                if (admin != null)
+                    return RedirectToAction("Index", "Admin");
+                else
+                    return RedirectToAction("Index", "Provider");
             }
+            if (admin != null)
+                ViewBag.IsPhysician = false;
+
             else
             {
                 ViewBag.IsPhysician = true;
+                if (request.Request.Physicianid != physician.Physicianid)
+                {
+                    TempData["Error"] = "Dont Not Acess Other Request";
+                    return RedirectToAction("Index", "Provider");
+                }
 
             }
             ViewData["ViewName"] = "Dashboard";
             ViewData["RequestId"] = requestid;
-            bool requestIdExists = _admin.RequestIdExists(requestid);
 
-            if (!requestIdExists)
-            {
-                TempData["Error"] = "Something Went Wrong";
-                return RedirectToAction("Index", "Admin");
-            }
             ViewNotes result = _admin.GetNotesForRequest(requestid);
 
             return View(result);
@@ -1929,20 +2058,57 @@ namespace HelloDoc.Controllers
         #endregion
 
         #region SendLinkOfRequest
-        [CustomAuthorize("Dashboard", "6")]
-        public IActionResult SendLink()
+
+        public IActionResult SendLink(string Email, string PhoneNo, string LastNameSendOrder, string FirstNameSendOrder)
         {
-            string? resetLink = Url.ActionLink("PatientRequest", "Request", protocol: HttpContext.Request.Scheme);
-            if (_login.IsSendEmail("munavvarpopatiya999@gmail.com", "Munavvar", $"Click <a href='{resetLink}'>here</a> to Create A new Request"))
+
+            string? SessionEmail = HttpContext.Session.GetString("Email");
+            if (SessionEmail == null)
             {
-                TempData["SuccessMessage"] = "Send Request successful!";
-                return RedirectToAction("Index", "Admin");
+                TempData["Error"] = "Session Is Not Found Please LogedIn Again!!";
+                return RedirectToAction("Index", "Login");
+
+            }
+            Admin? admin = _admin.GetAdminByEmail(SessionEmail);
+            Physician? physician = _admin.GetPhysicianByEmail(SessionEmail);
+
+            string? resetLink = Url.ActionLink("PatientRequest", "Request", protocol: HttpContext.Request.Scheme);
+            string to = Email;
+            string body = $"Click <a href='{resetLink}'>here</a> to Create A new Request";
+            string subject = "RequestLink";
+            if (_login.IsSendEmail(Email, subject, body))
+            {
+                if (admin != null)
+                {
+                    TempData["SuccessMessage"] = "Send Request successful!";
+                    _emailService.EmailLog(to, body, subject, FirstNameSendOrder + " " + LastNameSendOrder, 3, 0, admin.Adminid, 0, 0, true, 1);
+                    return RedirectToAction("Index", "Admin");
+                }
+                else if (physician != null)
+                {
+                    TempData["SuccessMessage"] = "Send Request successful!";
+                    _emailService.EmailLog(to, body, subject, FirstNameSendOrder + " " + LastNameSendOrder, 3, 0, 0, physician.Physicianid, 0, true, 1);
+                    return RedirectToAction("Index", "Provider");
+
+                }
+                else
+                {
+                    TempData["Error"] = "Send Request Unsuccessful!";
+                    return RedirectToAction("Index", "Admin");
+
+                }
+
             }
             else
             {
                 TempData["Error"] = "Send Request Unsuccessful!";
+                if (admin != null)
+                    return RedirectToAction("Index", "Admin");
+                else if (physician != null)
+                    return RedirectToAction("Index", "Provider");
+                else
+                    return RedirectToAction("Index", "Login");
 
-                return RedirectToAction("Index", "Admin");
             }
         }
         #endregion
@@ -2018,11 +2184,15 @@ namespace HelloDoc.Controllers
                     if (physician != null && physician.Aspnetuserid != null)
                     {
 
-                        requestnote.Adminnotes = requestModel.Notes;
+                        requestnote.Physiciannotes = requestModel.Notes;
                         requestnote.Createdby = physician.Aspnetuserid;
+                        request1.Physicianid = physician.Physicianid;
+                        request1.Status = 2;
+                        request1.Createddate = DateTime.Now;
                     }
                     requestnote.Createddate = DateTime.Now;
                     requestnote.Requestid = request1.Requestid;
+
                     _admin.AddRequestNotes(requestnote);
                     _admin.SaveChanges();
                     int count = _context.Requests.Where(x => x.Createddate.Date == request1.Createddate.Date).Count() + 1;
@@ -2039,6 +2209,7 @@ namespace HelloDoc.Controllers
                       requestModel.Firstname.Substring(0, 2).ToUpper(), count.ToString("D4"));
                         request1.Confirmationnumber = confirmNum;
                     }
+
                     _admin.UpdateRequest(request1);
                     _admin.SaveChanges();
                     string token = Guid.NewGuid().ToString();
@@ -2096,7 +2267,12 @@ namespace HelloDoc.Controllers
                 TempData["Error"] = "Session Is Expire Please Login!";
                 return RedirectToAction("Index", "Login");
             }
-            Physician physician = _admin.GetPhysicianByEmail(Email);
+            Physician? physician = _admin.GetPhysicianByEmail(Email);
+            if (physician == null)
+            {
+                TempData["Error"] = "Something Went Wrong Try Leter!!";
+                return RedirectToAction("Index", "Login");
+            }
             var counts = new
             {
                 NewCount = _context.Requests.Where(item => item.Status == 1 && item.Physicianid == physician.Physicianid && item.Isdeleted == false).Count(),
@@ -2137,22 +2313,32 @@ namespace HelloDoc.Controllers
                 TempData["Error"] = "Session Is Expire Please Login!";
                 return RedirectToAction("Index", "Login");
             }
-            Physician physician = _admin.GetPhysicianByEmail(email);
-            Admin admin = _admin.GetAdminByEmail(email);
+            Physician? physician = _admin.GetPhysicianByEmail(email);
+            Admin? admin = _admin.GetAdminByEmail(email);
+            Requestclient request = _admin.GetRequestclientByRequestId(id);
+            if (request == null)
+            {
+                TempData["Error"] = "Something Went Wrong";
+                if (admin != null)
+                    return RedirectToAction("Index", "Admin");
+                else
+                    return RedirectToAction("Index", "Provider");
+            }
             if (admin != null)
             {
                 ViewBag.IsPhysician = false;
             }
             if (physician != null)
             {
+                if (request.Request.Physicianid != physician.Physicianid)
+                {
+                    TempData["Error"] = "Something Went Wrong";
+                    return RedirectToAction("Index", "Provider");
+
+                }
                 ViewBag.IsPhysician = true;
             }
-            bool RequestIdExist = _admin.RequestIdExists(id);
-            if (!RequestIdExist)
-            {
-                TempData["Error"] = "SomeThing Went Wring";
-                return RedirectToAction("Index", "Admin");
-            }
+
             List<Requestwisefile> reqfile = await _patient.GetRequestwisefileByIdAsync(id);
             List<Requestwisefile> reqfiledeleted = reqfile.Where(item => item.Isdeleted != null && (item.Isdeleted.Length == 0 || !item.Isdeleted[0])).ToList();
             Request? requestclient = _admin.GetRequestById(id);
@@ -2240,8 +2426,8 @@ namespace HelloDoc.Controllers
                 TempData["Error"] = "Session Is Expire Please Login!";
                 return RedirectToAction("Index", "Login");
             }
-            Physician physician = _admin.GetPhysicianByEmail(email);
-            Admin admin = _admin.GetAdminByEmail(email);
+            Physician? physician = _admin.GetPhysicianByEmail(email);
+            Admin? admin = _admin.GetAdminByEmail(email);
             if (rm.File != null)
             {
                 if (physician != null)
@@ -2295,18 +2481,18 @@ namespace HelloDoc.Controllers
                 return Ok("Bed Request");
             }
 
-            Physician physician = _admin.GetPhysicianByEmail(email);
+            Physician? physician = _admin.GetPhysicianByEmail(email);
 
             if (file != null)
             {
-                String? uniqueFileName = await _patient.AddFileInUploader(file);
+                string? uniqueFileName = await _patient.AddFileInUploader(file);
                 var requestWiseFile = new Requestwisefile();
                 {
                     requestWiseFile.Filename = uniqueFileName;
                     requestWiseFile.Createddate = DateTime.Now;
                     requestWiseFile.Requestid = requestId;
                     requestWiseFile.Isdeleted = new BitArray(new[] { false });
-                    requestWiseFile.Physicianid = physician.Physicianid;
+                    requestWiseFile.Physicianid = physician?.Physicianid;
                 }
                 _admin.AddRequestWiseFile(requestWiseFile);
                 _admin.SaveChanges();
@@ -2550,8 +2736,8 @@ namespace HelloDoc.Controllers
         #endregion
 
         #region EncounterForm
-        [HttpGet("Admin/EncounterForm/", Name = "AdminEncounterForm")]
-        [HttpGet("Provider/EncounterForm/", Name = "ProviderEncounterForm")]
+        [HttpGet("Admin/EncounterForm", Name = "AdminEncounterForm")]
+        [HttpGet("Provider/EncounterForm", Name = "ProviderEncounterForm")]
         public IActionResult EncounterForm(int requestId)
         {
             string? Email = HttpContext.Session.GetString("Email");
@@ -2563,17 +2749,27 @@ namespace HelloDoc.Controllers
             }
             Admin? admin = _admin.GetAdminByEmail(Email);
             Physician? physician = _admin.GetPhysicianByEmail(Email);
+            Encounterform? encounterFormByRequestId = _context.Encounterforms.Include(r => r.Request).FirstOrDefault(item => item.RequestId == requestId);
+
+
+
             if (admin != null)
-            {
                 ViewBag.IsPhysician = false;
-            }
             if (physician != null)
             {
+                if (encounterFormByRequestId != null && encounterFormByRequestId.Request.Physicianid != physician.Physicianid)
+                {
+                    TempData["Error"] = "Something Went Wrong";
+                    return RedirectToAction("Index", "Provider");
+                }
+                else if (encounterFormByRequestId != null && encounterFormByRequestId.IsFinalize && encounterFormByRequestId.Request.Physicianid == physician.Physicianid)
+                {
+                    TempData["Error"] = "Something Went Wrong";
+                    return RedirectToAction("Index", "Provider");
+                }   
                 ViewBag.IsPhysician = true;
             }
-
             ViewEncounterForm viewEncounterForm = new ViewEncounterForm();
-            Encounterform? encounterFormByRequestId = _context.Encounterforms.FirstOrDefault(item => item.RequestId == requestId);
 
             if (encounterFormByRequestId != null && !encounterFormByRequestId.IsFinalize)
             {
@@ -2596,8 +2792,12 @@ namespace HelloDoc.Controllers
                 }
                 else
                 {
-                    TempData["Error"] = "Something Went Wrong Please Try Again";
-                    return RedirectToAction("Index", "Admin");
+                    TempData["Error"] = "Something Went Wrong";
+
+                    if (admin != null)
+                        return RedirectToAction("Index", "Admin");
+                    else
+                        return RedirectToAction("Index", "Provider");
                 }
 
                 return View(viewEncounterForm);
@@ -2656,8 +2856,19 @@ namespace HelloDoc.Controllers
                 TempData["Error"] = "Session Is Expire Please Login!";
                 return RedirectToAction("Index", "Login");
             }
-            Physician physician = _admin.GetPhysicianByEmail(Email);
+            Physician? physician = _admin.GetPhysicianByEmail(Email);
             Admin? admin = _admin.GetAdminByEmail(Email);
+            Requestclient? requestclient = _admin.GetRequestclientByRequestId(requestid);
+            List<Requestwisefile> requestwisedocument = _context.Requestwisefiles.Where(item => item.Requestid == requestid).ToList();
+            if (requestclient == null)
+            {
+                TempData["Error"] = "Something Went Wrong";
+                if (admin != null)
+                    return RedirectToAction("Index", "Admin");
+                else
+                    return RedirectToAction("Index", "Provider");
+            }
+
             if (admin != null)
             {
                 ViewBag.IsPhysician = false;
@@ -2665,14 +2876,16 @@ namespace HelloDoc.Controllers
             if (physician != null)
             {
                 ViewBag.IsPhysician = true;
-            }
-            Requestclient? requestclient = _admin.GetRequestclientByRequestId(requestid);
-            List<Requestwisefile> requestwisedocument = _context.Requestwisefiles.Where(item => item.Requestid == requestid).ToList();
-            Request? request = _admin.GetRequestById(requestid);
-            if (request != null)
-            {
+                if (requestclient.Request.Physicianid != physician.Physicianid)
+                {
+                    TempData["Error"] = "Dont Not Acess Other Request";
+                    return RedirectToAction("Index", "Provider");
+                }
 
-                string? requestclientnumber = request.Confirmationnumber;
+            }
+            
+
+                string? requestclientnumber = requestclient.Request.Confirmationnumber;
                 CloseCaseVM closecase = new CloseCaseVM();
                 closecase.FirstName = requestclient?.Firstname ?? "";
                 closecase.LastName = requestclient?.Lastname ?? "";
@@ -2685,12 +2898,8 @@ namespace HelloDoc.Controllers
                 closecase.ConfirmNumber = requestclientnumber;
                 closecase.Requestid = requestid;
                 return View(closecase);
-            }
-            else
-            {
-                TempData["Error"] = "Something Went Wrong Please Try Again";
-                return RedirectToAction("Index", "Admin");
-            }
+            
+           
         }
         #endregion
 
@@ -2705,7 +2914,7 @@ namespace HelloDoc.Controllers
                 TempData["Error"] = "Session Is Expire Please Login!";
                 return RedirectToAction("Index", "Login");
             }
-            Physician physician = _admin.GetPhysicianByEmail(Email);
+            Physician? physician = _admin.GetPhysicianByEmail(Email);
             Admin? admin = _admin.GetAdminByEmail(Email);
 
             if (!ModelState.IsValid)
@@ -2779,7 +2988,7 @@ namespace HelloDoc.Controllers
 
         public IActionResult CheckEncounterFormFinalized(int requestId)
         {
-            Encounterform encounterform = _context.Encounterforms.Where(item => item.RequestId == requestId).FirstOrDefault();
+            Encounterform? encounterform = _context.Encounterforms.Where(item => item.RequestId == requestId).FirstOrDefault();
             if (encounterform != null)
             {
                 if (encounterform.IsFinalize)

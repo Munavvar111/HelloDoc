@@ -9,7 +9,7 @@
 			<span class="fs-2 text-muted fw-bold">Shifts Review</span>
 		</div>
 		<div class="d-flex justify-content-end">
-			<a asp-controller="Admin" asp-action="Index" asp-area=""
+			<a asp-controller="Admin" asp-action="Scheduling" asp-area=""
 			   class="btn btn-outline-info d-flex align-items-center">
 				<span class="material-symbols-outlined"> chevron_left </span> Back
 			</a>
@@ -28,7 +28,7 @@
 					</select>
 		</div>
 		<div class="d-flex gap-2 flex-wrap">
-			<button class="btn btn-success">View Current Month Shift</button>
+				<a class="btn btn-success" asp-action="Scheduling">View Current Month Shift</a>
 				<button class="btn btn-success" id="approveSelectedButton" type="button">Approved Selected</button>
 				<button id="deleteSelectedButton" class="btn btn-danger">Delete Selected</button>
 		</div>

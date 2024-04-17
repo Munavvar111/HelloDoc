@@ -54,7 +54,7 @@ namespace HelloDoc.Controllers
         public IActionResult Accept(int id)
         {
             string? Email = HttpContext.Session.GetString("Email");
-            Physician physician = _admin.GetPhysicianByEmail(Email);
+            Physician? physician = _admin.GetPhysicianByEmail(Email);
             bool accepted = _provider.RequestAcceptedByProvider(id,physician.Physicianid);
             if (accepted)
             {
@@ -88,7 +88,20 @@ namespace HelloDoc.Controllers
             return Ok();
 
         }
-        public IActionResult Consult(int requestidConsult)
+		public bool UpdatePhysicianLocation(decimal latitude, decimal longitude)
+		{
+			int? physicianId = HttpContext.Session.GetInt32("PhysicianId");
+			if (physicianId == null)
+			{
+				return false;
+			}
+			else
+			{
+				return _admin.UpdatePhysicianLocation(latitude, longitude, (int)physicianId);
+			}
+		}
+
+		public IActionResult Consult(int requestidConsult)
         {
             Request request = _admin.GetRequestById(requestidConsult);
             request.Status = 6;

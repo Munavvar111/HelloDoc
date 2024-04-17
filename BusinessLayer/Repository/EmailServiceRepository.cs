@@ -4,8 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using BusinessLayer.InterFace;
+using DataAccessLayer.DataContext;
+using DataAccessLayer.DataModels;
 using MailKit.Net.Smtp;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using MimeKit;
 
@@ -14,15 +17,19 @@ namespace BusinessLayer.Repository
 	public class EmailServiceRepository:IEmailServices
 	{
 		private readonly IConfiguration _configuration;
+		[Obsolete]
 		private readonly IHostingEnvironment _hostingEnvironment;
+		private readonly ApplicationDbContext _context;
 
-
-		public EmailServiceRepository(IConfiguration configuration, IHostingEnvironment hostingEnvironment)
+		[Obsolete]
+		public EmailServiceRepository(IConfiguration configuration, IHostingEnvironment hostingEnvironment,ApplicationDbContext context)
 		{
 			_configuration = configuration;
 			_hostingEnvironment = hostingEnvironment;
+			_context = context;	
 		}
 
+		[Obsolete]
 		public bool IsSendEmail(string toEmail, string subject, string body, List<string> filenames)
 		{
 			try
@@ -70,6 +77,49 @@ namespace BusinessLayer.Repository
 			{
 				Console.WriteLine($"Error sending email: {ex.Message}");
 				return false;
+			}
+		}
+		public void EmailLog(string email, string message, string subject, string? name, int? roleId, int? requestId, int? adminId, int? physicianId, int action, bool isSent, int sentTries)
+		{
+			try
+			{
+				Emaillog log = new Emaillog();
+				log.Emailtemplate = message;
+				log.Subjectname = subject;
+				log.Emailid = email;
+				log.Roleid = roleId;
+				log.Createdate = DateTime.Now;
+				log.Sentdate = DateTime.Now;
+				log.Adminid = adminId;
+				log.Requestid = requestId;
+				log.Physicianid = physicianId;
+				log.Action = action;
+				log.Receivername = name;
+
+				if (requestId != null)
+				{
+					Request? request = _context.Requests.FirstOrDefault(r => r.Requestid == requestId);
+					if (request != null && request.Confirmationnumber != null)
+					{
+						log.Confirmationnumber = request.Confirmationnumber;
+					}
+				}
+
+				if (isSent)
+				{
+					log.Isemailsent = true;
+				}
+				else
+				{
+					log.Isemailsent = false;
+				}
+				log.Senttries = sentTries;
+				_context.Emaillogs.Add(log);
+				_context.SaveChanges();
+			}
+			catch (Exception ex)
+			{
+				throw new ApplicationException("Failed to submit Form", ex);
 			}
 		}
 	}

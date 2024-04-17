@@ -15,9 +15,12 @@ namespace BusinessLayer.Repository
     public class ProviderRepository : IProvider
     {
         private readonly ApplicationDbContext _context;
-        private readonly IHostingEnvironment _hostingEnvironment;
+		[Obsolete]
+		private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IConfiguration _configuration;
-        public ProviderRepository(ApplicationDbContext context, IHostingEnvironment hostingEnvironment, IConfiguration configuration)
+
+		[Obsolete]
+		public ProviderRepository(ApplicationDbContext context, IHostingEnvironment hostingEnvironment, IConfiguration configuration)
         {
             _configuration = configuration;
             _context = context;

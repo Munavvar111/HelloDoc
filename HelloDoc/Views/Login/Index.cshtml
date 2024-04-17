@@ -5,9 +5,16 @@
 }
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        
-            localStorage.clear();
-        
+
+        const keys = Object.keys(localStorage);
+
+        // Iterate over all keys
+        for (const key of keys) {
+            // If the key is not "myKey", delete it
+            if (key !== "theme") {
+                localStorage.removeItem(key);
+            }
+        }
     });
 </script>
 <partial name="ToasterPartialView"></partial>

@@ -65,16 +65,11 @@ namespace HalloDocPatient.Controllers
 
                             if (admin != null)
                             {
-                                if (menulist.Contains("Dashboard"))
-                                {
+                               
                                     TempData["SuccessMessage"] = "Login successful!";
                                     return RedirectToAction("Dashboard", "Admin");
-                                }
-                                else
-                                {
-                                    TempData["SuccessMessage"] = "Login successful!";
-                                    return RedirectToAction(menulist.FirstOrDefault(), "Admin");
-                                }
+                                
+                               
                             }
                             else if (user != null)
                             {
