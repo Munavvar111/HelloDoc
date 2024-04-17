@@ -8,9 +8,9 @@ namespace DataAccessLayer.CustomModel
 {
     public class AccessVM
     {
-        public string Name { get; set; }    
+        public string? Name { get; set; }    
         public short Accounttype {  get; set; } 
-        public int roleid { get; set; } 
-        public List<int> Menu { get; set; } 
+        public int Roleid { get; set; } 
+        public List<int>? Menu { get; set; } 
     }
 }

@@ -38,7 +38,7 @@
 					{
 						<td style="background-color:@(GetRowClass(item.ReqTypeId))!important">@item.DateOfBirth.ToString("MMM dd, yyyy")</td>
 						<td style="background-color:@(GetRowClass(@item.ReqTypeId))!important">@item.Requestor </td>
-						<td style="background-color:@(GetRowClass(@item.ReqTypeId))!important">5-12-2019</td>
+						<td style="background-color:@(GetRowClass(@item.ReqTypeId))!important">@item.RequestedDate.ToString("MMM dd, yyyy")</td>
 					}
 					<td style="background-color:@(GetRowClass(@item.ReqTypeId))!important">
 						<button class="btn  border-white text-white">

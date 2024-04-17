@@ -69,6 +69,7 @@ namespace HalloDocPatient.Controllers
                 request.Phonenumber = requestOther.PhoneNumberOther;
                 request.Status = 1;
                 request.Createddate = DateTime.Now;
+                request.Isdeleted = false;
 
                 _context.Requests.Add(request);
                 _context.SaveChanges();
@@ -265,7 +266,7 @@ namespace HalloDocPatient.Controllers
         {
             List<Region> region = _context.Regions.ToList();
             RequestOthers requestmodal = new RequestOthers();
-            requestmodal.Regions = region;
+            ViewBag.Regions = region;
             return View(requestmodal);
         }
         [HttpPost]
@@ -287,6 +288,10 @@ namespace HalloDocPatient.Controllers
                 }
                 return RedirectToAction("Index", "Login");
             }
+            List<Region> region = _context.Regions.ToList();
+
+            ViewBag.Regions = region;
+
             return View(requestOther);
         }
 

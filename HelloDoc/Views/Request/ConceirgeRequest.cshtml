@@ -37,7 +37,7 @@
                        type="tel"
                        class="form-control border-0 tel-input"
                        asp-for="PhoneNumberOther"
-                       name="phone" />
+                        />
             </div>
         </div>
 
@@ -98,9 +98,9 @@
                 <select class="form-select " aria-label="Default select example" name="state" id="cancelReason" asp-for="State">
 
                     <option selected disabled>Select The State</option>
-                    @if (Model.Regions != null)
+                    @if (ViewBag.Regions != null)
                     {
-                    @foreach (var region in Model.Regions)
+                    @foreach (var region in ViewBag.Regions)
                     {
                         <option value="@region.Name">@region.Name</option>
                     }
@@ -200,7 +200,7 @@
                        type="tel"
                        class="form-control border-0 tel-input"
                        asp-for="PhoneNumber"
-                       name="phone" />
+                        />
             </div>
         </div>
     </div>

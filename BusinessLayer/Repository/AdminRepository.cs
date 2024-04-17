@@ -225,12 +225,14 @@ namespace BusinessLayer.Repository
                 Id = item.reqclient?.Requestclientid ?? 0,
                 regionid = item.reqclient?.Regionid ?? 0,
                 Status = item.req.Status,
+                RequestedDate=item.req.Createddate.Date,
                 DateOfService =  GetDateOfService(item.req.Requestid) ,
             State = item.reqclient.State,
                 RequestClientId = item.reqclient?.Requestclientid ?? 0,
                 RequestId = item.reqclient?.Requestid ?? 0,
                 isfinalize = item.eno?.IsFinalize ?? false,
                 Regions = _context.Regions.ToList(),
+                
                 PhysicianName = $"{item.ps?.Firstname} {item.ps?.Lastname}",
                 Cancel = _context.Casetags.Select(cc => new CancelCase
                 {

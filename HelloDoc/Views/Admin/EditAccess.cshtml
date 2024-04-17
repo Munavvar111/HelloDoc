@@ -19,7 +19,7 @@
         <div class="">
             <span class="fs-2 text-muted  fw-bold">Details</span>
         </div>
-        <form id="accessForm" asp-action="EditAccess" method="post" asp-route-roleid="@Model.roleid">
+        <form id="accessForm" asp-action="EditAccess" method="post" asp-route-roleid="@Model.Roleid">
             <div class="row row-cols-1 row-cols-md-2">
                 <div class="col">
                     <div class="form-floating mb-4 mt-4">
@@ -93,7 +93,7 @@
         $.ajax({
             method: "GET",
             url: "/Admin/EditRoleData",
-            data: { region: region,roleid:@Model.roleid },
+            data: { region: region,roleid:@Model.Roleid },
             success: function (response) {
                 if (response.code == 401) {
 

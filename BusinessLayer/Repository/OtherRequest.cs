@@ -57,6 +57,7 @@ namespace BusinessLayer.Repository
             requestclient.State = requestOthers.State;
             requestclient.Regionid = statebyregionid.Regionid;
             requestclient.Zipcode = requestOthers.Zipcode;
+            requestclient.Address=requestclient.Street+","+requestclient.City+","+requestclient.State+","+requestclient.Zipcode;
             _context.Requestclients.Add(requestclient);
             _context.SaveChanges();
         }

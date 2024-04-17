@@ -1493,7 +1493,7 @@ namespace HelloDoc.Controllers
                 {
                     Menu = rolemenu,
                     Name = role.Name,
-                    roleid = roleid,
+                    Roleid = roleid,
                     Accounttype = role.Accounttype
                 };
 
@@ -1682,7 +1682,13 @@ namespace HelloDoc.Controllers
         public IActionResult Index()
         {
             var rolefromroleid = HttpContext.Session.GetString("Role");
-            var menulist = _context.Rolemenus.Include(b => b.Menu).Where(item => item.Roleid == int.Parse(rolefromroleid)).Select(item => item.Menu.Name).ToList();
+            if (rolefromroleid == null)
+            {
+				TempData["Error"] = "Your Session Will Be Expire Please LogedIn Again";
+				return RedirectToAction("Index", "Login");
+
+			}
+			var menulist = _context.Rolemenus.Include(b => b.Menu).Where(item => item.Roleid == int.Parse(rolefromroleid)).Select(item => item.Menu.Name).ToList();
             if (menulist.Contains("Dashboard"))
             {
                 List<NewRequestTableVM> request = _admin.GetAllData();
@@ -1693,7 +1699,7 @@ namespace HelloDoc.Controllers
             {
                 return RedirectToAction("IndexWithOutDashboard");
             }
-        }
+        }   
         #endregion
 
         #region SearchPatientDashboard
@@ -2213,11 +2219,22 @@ namespace HelloDoc.Controllers
                     _admin.UpdateRequest(request1);
                     _admin.SaveChanges();
                     string token = Guid.NewGuid().ToString();
-                    string? resetLink = Url.Action("Index", "Register", new { userId = request1.Requestid, token }, protocol: HttpContext.Request.Scheme);
-                    if (_login.IsSendEmail(requestModel.Email, "Munavvar", $"Click <a href='{resetLink}'>here</a> to Create A new Account"))
+					string? resetLink = Url.Action("Index", "Register", new { userId = request1.Requestid, token }, protocol: HttpContext.Request.Scheme);
+                    string to = requestModel.Email;
+                    string body = $"Click <a href='{resetLink}'>here</a> to Create A new Account";
+                    string subject = "Create Your New Account";
+                    if (_login.IsSendEmail(to, subject, body))
                     {
 
                         TempData["SuccessMessage"] = "Create Request successful!";
+                        if (admin != null)
+                        {
+                            _emailService.EmailLog(to, body, subject, requestModel.Firstname + " " + requestModel.Lastname, 2, 0, admin.Adminid, 0, 0, true, 1);
+                        }
+                        else if (physician != null)
+                        {
+                            _emailService.EmailLog(to, body, subject, requestModel.Firstname + " " + requestModel.Lastname, 2, 0, 0, physician.Physicianid, 0, true, 1);
+                        }
                     }
                     else
                     {
