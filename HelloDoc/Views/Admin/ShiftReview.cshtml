@@ -19,7 +19,7 @@
 		<div class="d-flex justify-content-between flex-wrap">
 
 		<div class="">
-					<select  class="p-2 px-3 form-control w-100" id="regionreview">
+					<select  class="p-2 px-3 form-control " id="regionreview">
 						<option value="0" selected>Regions</option>
 						@foreach (var region in ViewBag.regions)
 						{
@@ -27,10 +27,10 @@
 						}
 					</select>
 		</div>
-		<div class="d-flex gap-2 flex-wrap">
-				<a class="btn btn-success" asp-action="Scheduling">View Current Month Shift</a>
-				<button class="btn btn-success" id="approveSelectedButton" type="button">Approved Selected</button>
-				<button id="deleteSelectedButton" class="btn btn-danger">Delete Selected</button>
+			<div class="d-flex flex-column flex-md-row gap-2 flex-wrap">
+				<a class="btn btn-success mt-2 " asp-action="Scheduling">View Current Month Shift</a>
+				<button class="btn btn-success mt-2" id="approveSelectedButton" type="button">Approved Selected</button>
+				<button id="deleteSelectedButton " class="btn btn-danger mt-2">Delete Selected</button>
 		</div>
 		</div>
 		<div id="requestedshiftpartial">

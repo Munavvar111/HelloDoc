@@ -45,11 +45,15 @@ namespace HalloDocPatient.Controllers
             Requestclient requestclient=_admin.GetRequestclientByRequestId(RequestId);
             lc.Email = requestclient.Email;
             AspnetUser? aspnetUser1 = _context.AspnetUsers.Where(item => item.Email == request.Email).FirstOrDefault();
-            if (request == null && aspnetUser1!=null)
+            if (request == null)
             {
                 return RedirectToAction("Index", "Login");
             }
-            if (ModelState.IsValid)
+            else if (aspnetUser1 == null) {
+				return RedirectToAction("Index", "Login");
+
+			}
+			if (ModelState.IsValid)
             {
                 if ((lc.Passwordhash == lc.ConfirmPasswordhash) && request!=null)
                 {

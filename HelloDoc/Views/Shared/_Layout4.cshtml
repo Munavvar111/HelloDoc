@@ -381,7 +381,6 @@
 		$('#loader').fadeIn();
 	});
 
-	// Hide loader on Ajax stop (completion)
 	$(document).ajaxStop(function () {
 		console.log("stop Ajax")
 		$('#loader').fadeOut();

@@ -80,7 +80,9 @@ namespace BusinessLayer.Repository
               requestOthers.FirstName.Substring(0, 2).ToUpper(), count.ToString("D4"));
                 request1.Confirmationnumber = confirmNum;
             }
-        }
+			_context.Requests.Update(request1);
+			_context.SaveChanges();
+		}
 
         public void AddConceirgeRequest(RequestOthers addconciegeRequest, int RequestTypeID)
         {
@@ -102,7 +104,9 @@ namespace BusinessLayer.Repository
               addconciegeRequest.FirstName.Substring(0, 2).ToUpper(), count.ToString("D4"));
                 request1.Confirmationnumber = confirmNum;
             }
-        }
+			_context.Requests.Update(request1);
+			_context.SaveChanges();
+		}
 
         public void Conceirge(RequestOthers conceirge)
         {

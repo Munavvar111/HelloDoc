@@ -63,7 +63,7 @@ namespace BusinessLayer.Repository
                 }
             AspnetUserrole aspnetUserrole = new AspnetUserrole();
             aspnetUserrole.Userid = aspnetUser.Aspnetuserid;
-            aspnetUserrole.Roleid = 2;
+            aspnetUserrole.Roleid = 3;
             _context.AspnetUserroles.Add(aspnetUserrole);   
             _context.SaveChanges(); 
                
@@ -164,8 +164,8 @@ namespace BusinessLayer.Repository
                                 var confirmNum = string.Concat("ML", request.Createddate.ToString("ddMMyy"), requestModel.Lastname.Substring(0, 2).ToUpper() ?? "",
                               requestModel.Firstname.Substring(0, 2).ToUpper(), count.ToString("D4"));
                                 request.Confirmationnumber = confirmNum;
-                            }
-                        _context.Update(request);
+                            }   
+                        _context.Requests.Update(request);
                         _context.SaveChanges();
                         }
 

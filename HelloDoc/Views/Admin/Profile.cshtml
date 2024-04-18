@@ -68,11 +68,11 @@
 						</div>
 					</div>
 					<div class="col">
-						<div class="form-floating">
-							<input asp-for=@Model.Password type="text" class="form-control" id="Password" placeholder="Password" name="Password">
+						<div class="form-floating position-relative">
+							<input asp-for=@Model.Password type="password" class="form-control" id="Password" placeholder="Password" name="Password">
 							<label for="Password">Password</label>
+							<i class="fas fa-eye eye-icon" id="togglePassword"></i>
 							<span class="error-Password text-danger"></span>
-
 						</div>
 					</div>
 					<div class="col">
@@ -85,7 +85,7 @@
 					</div>
 					<div class="col">
 						<div class="form-floating mb-3">
-							<select class="form-select " aria-label="Default select example"  id="cancelReason" asp-for="RoleId" disabled>
+							<select class="form-select " aria-label="Default select example"  id="cancelReason" asp-for="RoleId" value="@Model.RoleId" disabled>
 
 								<option selected disabled>Role</option>
 								@if (ViewBag.Roles != null)
@@ -257,6 +257,18 @@
 	</div>
 </section>
 <script>
+	document.getElementById('togglePassword').addEventListener('click', function () {
+		var passwordInput = document.getElementById('Password');
+		if (passwordInput.type === 'password') {
+			passwordInput.type = 'text';
+			this.classList.remove('fa-eye');
+			this.classList.add('fa-eye-slash');
+		} else {
+			passwordInput.type = 'password';
+			this.classList.remove('fa-eye-slash');
+			this.classList.add('fa-eye');
+		}
+	});
 
 	$("#SubBtn").hide();
 	$("#SubAdminBtn").hide();

@@ -4,54 +4,69 @@
 
         <thead class="table-secondary" style="vertical-align:middle!important">
             <tr>
-                <th scope="col"><input type="checkbox" id="selectAllCheckbox" class="form-check form-check-inline"  /></th>
+                <th scope="col"><input type="checkbox" id="selectAllCheckbox" class="form-check form-check-inline" /></th>
                 <th scope="col">Staff</th>
                 <th scope="col">Day</th>
                 <th scope="col">Time</th>
                 <th scope="col">Region</th>
-              
+
             </tr>
-        </thead>    
+        </thead>
         @foreach (var item in Model)
         {
 
-                <tbody>
+            <tbody>
                 <tr style="vertical-align:middle!important">
                     <td>
                         <input type="checkbox" class="fileCheckbox form-check form-check-inline" data-filename="@item.ShiftDetailId" />
                     </td>
                     <td>@item.Firstname</td>
-                        <td>@item.Shiftdate.Date</td>
+                    <td>@item.Shiftdate.Date</td>
 
                     <td>@item.Starttime-@item.Endtime</td>
 
 
                     <td>@item.RegionName</td>
-                       
-                    </tr>
-                </tbody>
-            }
+
+                </tr>
+            </tbody>
+        }
     </table>
 </div>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     $(document).ready(function () {
+        // Function to handle the "Select All" checkbox behavior
+        function updateSelectAllCheckbox() {
+            var allChecked = true;
+            $(".fileCheckbox").each(function () {
+                if (!$(this).prop("checked")) {
+                    allChecked = false;
+                    return false; // exit the loop early if any checkbox is not checked
+                }
+            });
+            $("#selectAllCheckbox").prop("checked", allChecked);
+        }
+
+        // Function to handle the "Select All" checkbox change
         $("#selectAllCheckbox").change(function () {
-            let checkboxes = $(".fileCheckbox");
-            checkboxes.prop("checked", $(this).prop("checked"));
-            getSelectedShiftDetails();
+            var isChecked = $(this).prop("checked");
+            $(".fileCheckbox").prop("checked", isChecked);
         });
 
+        // Function to handle individual checkbox changes
         $(".fileCheckbox").change(function () {
-            getSelectedShiftDetails();
+            updateSelectAllCheckbox();
         });
+
+        // Function to handle approve button click
         $("#approveSelectedButton").click(function () {
             let selectedIds = [];
             $(".fileCheckbox:checked").each(function () {
                 selectedIds.push($(this).data("filename"));
             });
             if (selectedIds.length > 0) {
-                // AJAX call
+                // AJAX call to approve selected items
                 $.ajax({
                     url: '/Admin/ApprovedShifts',
                     type: 'POST',
@@ -62,7 +77,6 @@
                         selectedIds.forEach(function (id) {
                             $("tr").has("input.fileCheckbox[data-filename='" + id + "']").remove();
                         });
-                        
                     },
                     error: function (xhr, status, error) {
                         // Handle error
@@ -70,17 +84,23 @@
                     }
                 });
             } else {
-                alert("Please select at least one item to approve.");
+                // If no items are selected, show a warning message
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Please select at least one item to approve.',
+                    confirmButtonText: 'OK',
+                });
             }
         });
 
+        // Function to handle delete button click
         $("#deleteSelectedButton").click(function () {
             let selectedIds = [];
             $(".fileCheckbox:checked").each(function () {
                 selectedIds.push($(this).data("filename"));
             });
             if (selectedIds.length > 0) {
-                // AJAX call
+                // AJAX call to delete selected items
                 if (confirm("Are you sure you want to delete the selected files?")) {
                     $.ajax({
                         url: '/Admin/DeleteSelectedShiftDetails',
@@ -100,25 +120,13 @@
                     });
                 }
             } else {
-                alert("Please select at least one item to delete.");
+                // If no items are selected, show a warning message
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Please select at least one item to delete.',
+                    confirmButtonText: 'OK',
+                });
             }
         });
-    function hideSelectedRows(selectedIds) {
-        console.log("jii")
-        selectedIds.forEach(function (id) {
-            // Remove the row with the corresponding ID
-                var $row = $("tr[data-filename='" + id + "']");
-                console.log("Removing row with ID:", id); // Log the ID being removed for debugging
-                $row.addClass("hidden");
-            });
-    }
-        function getSelectedShiftDetails() {
-            let selectedIds = [];
-            $(".fileCheckbox:checked").each(function () {
-                selectedIds.push($(this).data("filename"));
-            });
-            console.log(selectedIds); // You can perform further actions here
-            // You can use selectedIds to send AJAX requests or perform any other operations
-        }
     });
 </script>

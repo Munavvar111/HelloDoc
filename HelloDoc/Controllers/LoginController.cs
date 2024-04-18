@@ -42,8 +42,9 @@ namespace HalloDocPatient.Controllers
                 if (_login.isLoginValid(a))
                 {
                     var user = await _context.Users.FirstOrDefaultAsync(x => x.Email == a.Email);
-                    var admin=_context.Admins.FirstOrDefault(x=>x.Email==a.Email);
-                    var physician=_context.Physicians.FirstOrDefault(x=>x.Email==a.Email);
+                    var admin=_context.Admins.FirstOrDefault(x=>x.Email==a.Email && (x.Isdeleted == null || !x.Isdeleted));
+                    var physician=_context.Physicians.FirstOrDefault(x=>x.Email==a.Email && (x.Isdeleted == null || !x.Isdeleted.Value));
+
                     AspnetUser? aspnetuser = _context.AspnetUsers.FirstOrDefault(x => x.Email == a.Email);
                     if (aspnetuser != null)
                     {
@@ -84,7 +85,13 @@ namespace HalloDocPatient.Controllers
 
                                 return RedirectToAction("Index", "Provider");
                             }
-                        }
+                            else
+                            {
+								TempData["Error"] = "Login  Unsuccessful!";
+								return RedirectToAction("Index", "Login");
+
+							}
+						}
                         else
                         {
                             TempData["Error"] = "Role Is Not Defind";

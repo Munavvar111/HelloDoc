@@ -36,7 +36,14 @@
                         <span>-</span>
                     }
                 </td>
-                <td style="background-color:@(GetRowClass(@item.ReqTypeId))!important">@item.DateOfService.ToString("MMM dd, yyyy")</td>
+                <td style="background-color:@(GetRowClass(@item.ReqTypeId))!important">@if (item.DateOfService.Hour == 0 && item.DateOfService.Minute == 0 && item.DateOfService.Second == 0)
+                    {
+                        <text>No Service</text>
+                    }
+                    else
+                    {
+                        @item.DateOfService.ToString("MMM dd, yyyy")
+                    }</td>
 
                 <td style="background-color:@(GetRowClass(@item.ReqTypeId))!important">@item.Address</td>
                 <td style="background-color:@(GetRowClass(@item.ReqTypeId))!important">@item.Notes</td>

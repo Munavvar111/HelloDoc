@@ -78,3 +78,13 @@
 /*.filter-item.active {
     border-bottom: 2px solid #3ecc4e;*/ /* change the color to match the button color */
 /*}*/
+.eye-icon {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+}
+.text-white{
+    font-weight:600!important;
+}

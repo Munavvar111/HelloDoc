@@ -13,10 +13,7 @@ using Rotativa.AspNetCore;
 using ServiceStack;
 using System.Collections;
 using System.Data;
-using System.Drawing.Printing;
 using System.Globalization;
-using System.Threading.Channels;
-using System.Web.Helpers;
 using BC = BCrypt.Net.BCrypt;
 
 namespace HelloDoc.Controllers
@@ -74,7 +71,7 @@ namespace HelloDoc.Controllers
                 return RedirectToAction("Index", "Login");
             }
             var adminProfile = _admin.GetAdminProfile(email);
-            ViewBag.Roles = _admin.GetRoleFromAccountType(2);
+            ViewBag.Roles = _admin.GetRoleFromAccountType(1);
 
             if (adminProfile == null)
             {
@@ -226,8 +223,17 @@ namespace HelloDoc.Controllers
         }
         #endregion
 
-        #region PhysicanProfile
-        [CustomAuthorize("Provider", "8", "22")]
+        public bool DeltePhysician(string Email)
+        {
+            var physician = _admin.GetPhysicianByEmail(Email);
+            physician.Isdeleted=true;
+            _context.Physicians.Update(physician);
+            _admin.SaveChanges();
+            return true;
+        }
+
+		#region PhysicanProfile
+		[CustomAuthorize("Provider", "8", "22")]
         [HttpGet("Admin/PhysicanProfile/{id}", Name = "AdminProviderProfile")]
         [HttpGet("Provider/PhysicanProfile", Name = "ProviderMyProfile")]
         public IActionResult PhysicanProfile(int id)
@@ -1620,6 +1626,7 @@ namespace HelloDoc.Controllers
             admin.Zip = profileVm.ZipCode;
             admin.Createdby = aspnet.Aspnetuserid;
             admin.Status = 1;
+            admin.Isdeleted = false;
 
             _context.Admins.Add(admin);
             _context.SaveChanges();
@@ -1681,7 +1688,11 @@ namespace HelloDoc.Controllers
         [HttpGet("Admin/Dashboard", Name = "AdminDashboard")]
         public IActionResult Index()
         {
-            var rolefromroleid = HttpContext.Session.GetString("Role");
+			List<Region> regions = _admin.GetAllRegion();
+
+			ViewBag.regions = regions;
+
+			var rolefromroleid = HttpContext.Session.GetString("Role");
             if (rolefromroleid == null)
             {
 				TempData["Error"] = "Your Session Will Be Expire Please LogedIn Again";
@@ -1706,6 +1717,7 @@ namespace HelloDoc.Controllers
         [CustomAuthorize("Dashboard", "6")]
         public IActionResult SearchPatient(string searchValue, string selectValue, string partialName, string selectedFilter, int[] currentStatus, bool exportdata, bool exportAllData, int page, int pageSize = 10)
         {
+
             ViewBag.Cancel = _context.Casetags.Select(cc => new CancelCase
             {
                 CancelCaseReson = cc.Name,
@@ -1725,7 +1737,6 @@ namespace HelloDoc.Controllers
             ViewBag.totalPages = totalPages;
             ViewBag.CurrentPage = page;
             ViewBag.PageSize = pageSize;
-            List<Region> regions = _admin.GetAllRegion();
             if (exportdata)
             {
                 using (var memoryStream = new MemoryStream())
@@ -1739,7 +1750,6 @@ namespace HelloDoc.Controllers
                 }
             }
             ViewBag.IsPhysician = false;
-            ViewBag.regions = regions;
             return PartialView(partialName, paginatedData);
         }
         #endregion
@@ -2788,7 +2798,7 @@ namespace HelloDoc.Controllers
             }
             ViewEncounterForm viewEncounterForm = new ViewEncounterForm();
 
-            if (encounterFormByRequestId != null && !encounterFormByRequestId.IsFinalize)
+            if (encounterFormByRequestId != null)
             {
                 viewEncounterForm = _admin.GetEncounterForm(requestId);
                 return View(viewEncounterForm);
@@ -2940,9 +2950,12 @@ namespace HelloDoc.Controllers
             }
             else
             {
+                Requeststatuslog requeststatuslog = new Requeststatuslog();
+
                 if (admin != null)
                 {
 
+                        requeststatuslog.Adminid = admin.Adminid;
                     Requestclient? requestclient = _admin.GetRequestclientByRequestId(requestid);
                     if (requestclient != null)
                     {
@@ -2951,12 +2964,14 @@ namespace HelloDoc.Controllers
                         requestclient.Email = closeCaseVM.Email;
                         _context.Requestclients.Update(requestclient);
                         _admin.SaveChanges();
+
                     }
                     return RedirectToAction("CloseCase", "Admin", new { requestid = requestid });
                 }
                 else
                 {
                     Requestnote requestnote = _admin.GetRequestNotesByRequestId(requestid);
+                        requeststatuslog.Physicianid = physician.Physicianid;
                     if (requestnote != null)
                     {
                         requestnote.Physiciannotes = closeCaseVM.Notes;
@@ -2964,6 +2979,7 @@ namespace HelloDoc.Controllers
                         requestnote.Modifieddate = DateTime.Now;
                         _admin.UpdateRequestNotes(requestnote);
                         _admin.SaveChanges();
+
 
                     }
                     else
@@ -2987,7 +3003,6 @@ namespace HelloDoc.Controllers
                     _admin.UpdateRequest(request);
                     _admin.SaveChanges();
 
-                    Requeststatuslog requeststatuslog = new Requeststatuslog();
                     requeststatuslog.Requestid = requestid;
                     requeststatuslog.Status = 8;
                     requeststatuslog.Createddate = DateTime.Now;

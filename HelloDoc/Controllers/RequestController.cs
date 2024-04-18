@@ -96,6 +96,7 @@ namespace HalloDocPatient.Controllers
                 requestclient.Street = requestOther.Street;
                 requestclient.Zipcode = requestOther.Zipcode;
                 requestclient.Regionid = statebyregionid?.Regionid;
+                
 
 
                 _context.Requestclients.Add(requestclient);
@@ -117,6 +118,8 @@ namespace HalloDocPatient.Controllers
                 string token = Guid.NewGuid().ToString();
                 string? resetLink = Url.Action("Index", "Register", new { userId = request.Requestid, token }, protocol: HttpContext.Request.Scheme);
 
+                _context.Requests.Update(request);
+                _context.SaveChanges();
                 if (_login.IsSendEmail("munavvarpopatiya999@gmail.com", "Munavvar", $"Click <a href='{resetLink}'>here</a> to Create A new Account"))
                 {
 
@@ -347,7 +350,14 @@ namespace HalloDocPatient.Controllers
                 }
 
                 request.Status = 4;
-                _context.Update(request);
+                _context.Requests.Update(request);
+                _context.SaveChanges();
+
+                Requeststatuslog requeststatuslog =new Requeststatuslog();
+                requeststatuslog.Status = 4;
+                requeststatuslog.Requestid = id;
+                requeststatuslog.Createddate = DateTime.Now;
+                _context.Requeststatuslogs.Add(requeststatuslog);
                 _context.SaveChanges();
 
                 TempData["SuccessMessage"] = "Agreement completed successfully";

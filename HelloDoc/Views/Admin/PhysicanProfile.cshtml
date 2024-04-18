@@ -570,14 +570,53 @@
 					}
 				</div>
 			</form>
-
+			<div class="d-flex justify-content-end">
+				<button class="btn btn-danger" id="deleteButton">Delete</button>
+			</div>
 
 
 		</div>
 	</div>
 </section>
 <partial name="RequestToAdminPartial"></partial>
-
+<script>
+	$("#deleteButton").click(function () {
+		// Show a SweetAlert confirmation dialog
+		Swal.fire({
+			title: 'Are you sure you want to delete it?',
+			icon: 'warning',
+			showCancelButton: true,
+			confirmButtonColor: '#d33',
+			cancelButtonColor: '#3085d6',
+			confirmButtonText: 'Yes, delete it!'
+		}).then((result) => {
+			if (result.isConfirmed) {
+				$.ajax({
+					type: 'GET',
+					url: '/Admin/DeltePhysician',
+					data: { Email: '@Model.Email' },
+					success: function (data) {
+						console.log(data);
+						Swal.fire(
+							'Deleted!',
+							'Your item has been deleted.',
+							'success'
+						).then(() => {
+							window.location.href = '/Admin/Provider';
+						});
+					},
+					error: function (xhr, status, error) {
+						Swal.fire(
+							'Error!',
+							'An error occurred while deleting the item.',
+							'error'
+						);
+					}
+				});
+			}
+		});
+	});
+</script>
 <script>
 	$(document).ready(function () {
 		$('#RequestToAdminEditProfile').on('show.bs.modal', function (event) {
@@ -760,7 +799,7 @@
 					formData.append('id', @Model.physicianid);
 
 					$.ajax({
-						url: '/Admin/SaveSignatureImage',
+						url: '/A		dmin/SaveSignatureImage',
 						type: 'POST',
 						data: formData,
 						processData: false,
