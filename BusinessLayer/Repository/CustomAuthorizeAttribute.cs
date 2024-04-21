@@ -62,7 +62,7 @@ public class CustomAuthorizeAttribute : Attribute, IAuthorizationFilter
 
         if (string.IsNullOrWhiteSpace(_role) || !_menuidList.Any(menuId => userPermissions.Contains(int.Parse(menuId))))
         {
-            context.Result = new RedirectToRouteResult(new RouteValueDictionary(new { controller = "Login", action = "Index" }));
+            context.Result = new RedirectToRouteResult(new RouteValueDictionary(new { controller = "Login", action = "AccessDenied" }));
             return;
         }
     }

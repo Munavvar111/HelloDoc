@@ -236,10 +236,9 @@
 						<button class="btn btn-info text-light" type="Submit" id="SubBtn">
 							Submit
 						</button>
-						<button class="btn btn-info text-light" type="button" data-bs-toggle="modal" data-bs-target="#CloseCaseModal">
-							Cancel
+						<button class="btn btn-info text-light" type="button" id="closeCaseButton">
+							Close Case
 						</button>
-
 					</div>
 				</div>
 			}
@@ -364,27 +363,70 @@
 
 <script>
 	$(document).ready(function () {
+		// Attach click event to the "Close Case" button
+		$('#closeCaseButton').click(function () {
+			// Show SweetAlert confirmation dialog
+			Swal.fire({
+				title: 'Confirm Close Case',
+				text: 'Are you sure you want to close this case?',
+				icon: 'question',
+				showCancelButton: true,
+				confirmButtonColor: '#3085d6',
+				cancelButtonColor: '#d33',
+				confirmButtonText: 'Yes, close it!'
+			}).then((result) => {
+				// If user confirms, proceed with form submission
+				if (result.isConfirmed) {
+					// Submit the form
+					window.location.href = '@Url.Action("CloseCaseModal", "Admin", new { requestid = Model.Requestid })';
+				}
+			});
+		});
+	});
+</script>
+
+<script>
+	$(document).ready(function () {
 		// Attach click event to the "Conclude Care" button
 		$('#concludeCareBtn').click(function () {
 			// Make AJAX request to check if encounter form is finalized
+			$('#loader').fadeIn()
 			$.ajax({
 				url: '/Admin/CheckEncounterFormFinalized',
 				type: 'GET',
 				data: { requestId: @Model.Requestid },
 				success: function (response) {
-					// If encounter form is finalized, submit the form
-					if (response === "Finalized") {
-						$('form').submit();
-					} else {
-						// If encounter form is not finalized, show a message
-						Swal.fire({
-							icon: 'error',
-							title: 'Encounter Form Not Finalized',
-							text: 'The encounter form is not finalized yet.',
-							showConfirmButton: false,
-							timer: 1500
-						});
-					}
+					$('#loader').fadeOut().promise().done(function () {
+
+						// If encounter form is finalized, submit the form
+						if (response === "Finalized") {
+
+							Swal.fire({
+								title: 'Confirm Submission',
+								text: 'Are you sure you want to Conclude The Care?',
+								icon: 'question',
+								showCancelButton: true,
+								confirmButtonColor: '#3085d6',
+								cancelButtonColor: '#d33',
+								confirmButtonText: 'Yes, submit it!'
+							}).then((result) => {
+								// If user confirms, submit the form
+								if (result.isConfirmed) {
+									$('form').submit();
+								}
+							});
+						} else {
+							$('#loader').fadeOut().promise().done(function () {
+								Swal.fire({
+									icon: 'error',
+									title: 'Encounter Form Not Finalized',
+									text: 'The encounter form is not finalized yet.',
+									showConfirmButton: false,
+									timer: 1500
+								});
+							});
+						}
+					});
 				},
 				error: function (xhr, status, error) {
 					console.error('Error checking encounter form: ' + error);

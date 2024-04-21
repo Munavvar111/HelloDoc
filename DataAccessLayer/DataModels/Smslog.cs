@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -44,12 +43,15 @@ public partial class Smslog
     [Column("sentdate", TypeName = "timestamp without time zone")]
     public DateTime? Sentdate { get; set; }
 
-    [Column("issmssent", TypeName = "bit(1)")]
-    public BitArray? Issmssent { get; set; }
-
     [Column("senttries")]
     public int Senttries { get; set; }
 
     [Column("action")]
     public int? Action { get; set; }
+
+    [Column("issmssent")]
+    public bool? Issmssent { get; set; }
+
+    [Column(TypeName = "character varying")]
+    public string? Recevername { get; set; }
 }

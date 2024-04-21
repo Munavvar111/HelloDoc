@@ -15,7 +15,7 @@
             </a>
         </div>
     </div>
-    <div class="container bg-white border-0">
+    <div class="container bg-white border shadow">
         <div class="">
             <span class="fs-2 text-muted fw-bold">Details</span>
         </div>
@@ -47,7 +47,7 @@
             </div>
             <div class="d-flex justify-content-end gap-2">
                 <button class="btn btn-outline-info">Save</button>
-                <button class="btn btn-outline-info">Cancel</button>
+                <button class="btn btn-outline-info" type="reset">Cancel</button>
             </div>
         </form>
     </div>
@@ -55,6 +55,44 @@
 
 <script>
     $(document).ready(function () {
+        $('form').submit(function (event) {
+            event.preventDefault();
+
+            var roleName = $('#floatingInput').val().trim();
+            if (!roleName) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Please enter a role name.'
+                });
+                return;
+            }
+
+            var accountType = $('#accounttype').val();
+            if (accountType === '0') {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Please select an account type.'
+                });
+                return;
+            }
+
+            var rolesChecked = $('input[name="rolemenu"]:checked').length > 0;
+            if (!rolesChecked) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Please select at least one role.'
+                });
+                return;
+            }
+
+            // If all validations pass, submit the form
+            this.submit();
+        });
+
+
         fetchRoles();
     });
     $("#accounttype").on("change", function () {
@@ -85,4 +123,5 @@
             }
         })
     }
+  
 </script>

@@ -27,7 +27,10 @@ namespace HalloDocPatient.Controllers
             _jwtAuth = jwtAuth;
         }
 
-
+        public IActionResult AccessDenied()
+        {
+            return View();
+        }
 
         public IActionResult Index()
         {

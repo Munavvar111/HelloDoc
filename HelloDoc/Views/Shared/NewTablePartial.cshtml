@@ -300,6 +300,7 @@
 
 <script>
 	$(document).ready(function () {
+		
 		$('.collapse').on('show.bs.collapse', function () {
 			var id = $(this).attr('id');
 			$('.collapse.show').not('#' + id).collapse('hide');

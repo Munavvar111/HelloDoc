@@ -96,7 +96,7 @@ namespace HalloDocPatient.Controllers
                 requestclient.Street = requestOther.Street;
                 requestclient.Zipcode = requestOther.Zipcode;
                 requestclient.Regionid = statebyregionid?.Regionid;
-                
+
 
 
                 _context.Requestclients.Add(requestclient);
@@ -123,6 +123,7 @@ namespace HalloDocPatient.Controllers
                 if (_login.IsSendEmail("munavvarpopatiya999@gmail.com", "Munavvar", $"Click <a href='{resetLink}'>here</a> to Create A new Account"))
                 {
 
+                    TempData["SuccessMessage"] = "Your Request Is Send SuccessFully!!";
                     return RedirectToAction("Index", "Login");
                 }
                 else
@@ -156,17 +157,27 @@ namespace HalloDocPatient.Controllers
                         _patientRequest.AddPatientRequest(requestModel, ReqTypeId: 1);
                         Request? request = _patientRequest.GetRequestByEmail(requestModel.Email);
                         User? user = _patientRequest.GetUserByEmail(requestModel.Email);
-                        
+
                         if (user == null && request != null)
                         {
                             string token = Guid.NewGuid().ToString();
                             string? resetLink = Url.Action("Index", "Register", new { userId = request.Requestid, token }, protocol: HttpContext.Request.Scheme);
-                            
+
                             if (_login.IsSendEmail("munavvarpopatiya999@gmail.com", "Munavvar", $"Click <a href='{resetLink}'>here</a> to Create A new Account"))
+                            {
+                                TempData["SuccessMessage"] = "Your Request Is Send SuccessFully!!";
                                 return RedirectToAction("Index", "Login");
+                            }
+
                             else
+                            {
+                                TempData["Error"] = "Your Request Is Send SuccessFully But Mail Is Send UnSuccessFull!!";
+
                                 return RedirectToAction("Index", "Login");
+
+                            }
                         }
+                        TempData["SuccessMessage"] = "Your Request Is Send SuccessFully!!";
                         _patientRequest.AddRequestWiseFile(uniqueFileName, request?.Requestid ?? 1);
                         return RedirectToAction("Index", "Login");
                     }
@@ -176,12 +187,13 @@ namespace HalloDocPatient.Controllers
                         Request? request = _patientRequest.GetRequestByEmail(requestModel.Email);
                         string token = Guid.NewGuid().ToString();
                         string? resetLink = Url.Action("Index", "Register", new { userId = request?.Requestid ?? 1, token }, protocol: HttpContext.Request.Scheme);
-                        
+
                         if (_login.IsSendEmail("munavvarpopatiya999@gmail.com", "Munavvar", $"Click <a href='{resetLink}'>here</a> to Create A new Account"))
                             return RedirectToAction("Index", "Login");
                         else
                             ModelState.AddModelError(string.Empty, "Email Is Not Send");
-                        
+
+                        TempData["SuccessMessage"] = "Your Request Is Send SuccessFully!!";
                         return RedirectToAction("Index", "Login");
                     }
                 }
@@ -236,6 +248,7 @@ namespace HalloDocPatient.Controllers
 
                     if (_login.IsSendEmail("munavvarpopatiya999@gmail.com", "Munavvar", $"Click <a href='{resetLink}'>here</a> to reset your password."))
                     {
+                        TempData["SuccessMessage"] = "Your Request Is Send SuccessFully!!";
                         return RedirectToAction("Index", "Login");
                     }
                     else
@@ -253,6 +266,7 @@ namespace HalloDocPatient.Controllers
 
                     if (_login.IsSendEmail("munavvarpopatiya777@outlook.com", "Munavvar", $"Click <a href='{resetLink}'>here</a> to reset your password."))
                     {
+                        TempData["SuccessMessage"] = "Your Request Is Send SuccessFully!!";
                         return RedirectToAction("Index", "Login");
                     }
                     else
@@ -283,6 +297,7 @@ namespace HalloDocPatient.Controllers
                 string? resetLink = Url.Action("Index", "Register", new { RequestId = request1?.Requestid ?? 1, token }, protocol: HttpContext.Request.Scheme);
                 if (_login.IsSendEmail("munavvarpopatiya999@gmail.com", "Munavvar", $"Click <a href='{resetLink}'>here</a> to reset your password."))
                 {
+                    TempData["SuccessMessage"] = "Your Request Is Send SuccessFully!!";
                     return RedirectToAction("Index", "Login");
                 }
                 else
@@ -353,7 +368,7 @@ namespace HalloDocPatient.Controllers
                 _context.Requests.Update(request);
                 _context.SaveChanges();
 
-                Requeststatuslog requeststatuslog =new Requeststatuslog();
+                Requeststatuslog requeststatuslog = new Requeststatuslog();
                 requeststatuslog.Status = 4;
                 requeststatuslog.Requestid = id;
                 requeststatuslog.Createddate = DateTime.Now;

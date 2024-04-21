@@ -2,28 +2,28 @@
 @if (TempData.ContainsKey("Error"))
 {
     <script>
-        $(document).ready(function () {
-            Swal.fire({
+        $('#loader').fadeIn().promise().done(function () {
+                Swal.fire({
                 title: 'Error!',
                 text: '@TempData["Error"]',
                 icon: 'error',
                 showConfirmButton: false,
                 timer: 1500
-            });
+            })
         });
     </script>
 }
 @if (TempData.ContainsKey("SuccessMessage"))
 {
     <script>
-        $(document).ready(function () {
+        $('#loader').fadeIn().promise().done(function () {
             Swal.fire({
                 title: 'Success!',
                 text: '@TempData["SuccessMessage"]',
                 icon: 'success',
                 showConfirmButton: false,
                 timer: 1500
-            });
+            })
         });
     </script>
 }

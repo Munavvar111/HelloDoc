@@ -19,6 +19,7 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/style.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/dashboard.css" asp-append-version="true" />
     <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
     <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -57,6 +58,11 @@
 
 </head>
 <body style="overflow-y:scroll !important">
+    <div id="loader">
+        <div class="spinner-border text-info" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
 
     <div class="container-fluid d-flex flex-column max-vw-100 vh-100 p-0 bg-light">
         <header class="w-100 border-bottom  px-2 px-md-5 position-relative z-2">
@@ -154,7 +160,6 @@
 
 
 
-
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/Provider.js" asp-append-version="true"></script>
     <script src="~/js/custom.js" asp-append-version="true"></script>
@@ -168,5 +173,19 @@
     <script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/jquery.validate.min.js"></script>
     <script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/additional-methods.min.js"></script>
 
+
+    <script>
+
+
+        $(window).on('ready', function () {
+            $('#loader').fadeIn();
+        });
+
+        $(window).on('load', function () {
+            $('#loader').fadeOut();
+        });
+        
+
+    </script>
 </body>
 </html>

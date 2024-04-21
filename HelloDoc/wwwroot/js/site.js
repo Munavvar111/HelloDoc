@@ -11,6 +11,8 @@
 
 $(document).ready(function () {
 
+
+
     function updateUIWithCounts() {
         $.ajax({
             type: "GET",
@@ -264,9 +266,9 @@ $(document).ready(function () {
     //ajax for render that partialview
 
     //ajax for filterthe table using search
-
+    
     function filterTable(partialName, currentStatus, page, pageSize, exportdata, exportAllData) {
-
+        
 
         console.log(partialName)
         var searchValue = $("#searchInput").val();

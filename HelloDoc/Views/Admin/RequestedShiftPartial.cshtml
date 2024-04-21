@@ -1,132 +1,188 @@
 ﻿@model List<DataAccessLayer.CustomModel.ReviewShiftVM>;
-<div class="bg-white border justify-content-center mt-3 table-responsive">
-    <table class="table">
+<div class="bg-white border justify-content-center mt-3 ">
+	<table class="table d-md-table d-none">
+		<thead class="table-secondary" style="vertical-align:middle!important">
+			<tr>
+				<th scope="col"><input type="checkbox" class="selectAllCheckbox" class="form-check form-check-inline" /></th>
+				<th scope="col">Staff</th>
+				<th scope="col">Day</th>
+				<th scope="col">Time</th>
+				<th scope="col">Region</th>
 
-        <thead class="table-secondary" style="vertical-align:middle!important">
-            <tr>
-                <th scope="col"><input type="checkbox" id="selectAllCheckbox" class="form-check form-check-inline" /></th>
-                <th scope="col">Staff</th>
-                <th scope="col">Day</th>
-                <th scope="col">Time</th>
-                <th scope="col">Region</th>
+			</tr>
+		</thead>
+		@foreach (var item in Model)
+		{
 
-            </tr>
-        </thead>
-        @foreach (var item in Model)
-        {
+			<tbody>
+				<tr style="vertical-align:middle!important">
+					<td>
+						<input type="checkbox" class="fileCheckbox form-check form-check-inline" data-filename="@item.ShiftDetailId" />
+					</td>
+					<td>@item.Firstname</td>
+					<td>@item.Shiftdate.Date</td>
 
-            <tbody>
-                <tr style="vertical-align:middle!important">
-                    <td>
-                        <input type="checkbox" class="fileCheckbox form-check form-check-inline" data-filename="@item.ShiftDetailId" />
-                    </td>
-                    <td>@item.Firstname</td>
-                    <td>@item.Shiftdate.Date</td>
-
-                    <td>@item.Starttime-@item.Endtime</td>
+					<td>@item.Starttime-@item.Endtime</td>
 
 
-                    <td>@item.RegionName</td>
+					<td>@item.RegionName</td>
 
-                </tr>
-            </tbody>
-        }
-    </table>
+				</tr>
+			</tbody>
+		}
+	</table>
+</div>
+<div class="mt-2 d-md-none bg-white">
+	<input type="checkbox" class="selectAllCheckbox form-check form-check-inline" />
+	@foreach (var item in Model)
+	{
+		<div class="bg-info-subtle">
+			<div class="d-flex flex-column gap-3  border-bottom border-2 py-3 px-3">
+				<div class="d-flex gap-2">
+					<input class="fileCheckbox" type="checkbox" data-filename="@item.ShiftDetailId" />
+					<span>@item.Firstname</span>
+				</div>
+				<span>@item.Shiftdate</span>
+				<span>@item.Starttime - @item.Endtime </span>
+				<td>@item.RegionName</td>
+			</div>
+		</div>
+
+	}
 </div>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-    $(document).ready(function () {
-        // Function to handle the "Select All" checkbox behavior
-        function updateSelectAllCheckbox() {
-            var allChecked = true;
-            $(".fileCheckbox").each(function () {
-                if (!$(this).prop("checked")) {
-                    allChecked = false;
-                    return false; // exit the loop early if any checkbox is not checked
-                }
-            });
-            $("#selectAllCheckbox").prop("checked", allChecked);
-        }
+	$(document).ready(function () {
+		// Function to handle the "Select All" checkbox behavior
+		function updateSelectAllCheckbox() {
+			var container = $('.d-none.d-md-table').is(':visible') ? ".d-none.d-md-table" : ".d-md-none";
+			var allChecked = true;
+			$(container + ' .fileCheckbox').each(function () {
+				if (!$(this).prop("checked")) {
+					allChecked = false;
+					return false; // exit the loop early if any checkbox is not checked
+				}
+			});
+			$(container + ' .selectAllCheckbox').prop("checked", allChecked);
+		}
 
-        // Function to handle the "Select All" checkbox change
-        $("#selectAllCheckbox").change(function () {
-            var isChecked = $(this).prop("checked");
-            $(".fileCheckbox").prop("checked", isChecked);
-        });
+		// Function to handle the "Select All" checkbox change and individual checkbox changes
+		$(".selectAllCheckbox").change(function () {
+			var isChecked = $(this).prop("checked");
+			var container = $(this).closest('.d-none.d-md-table, .d-md-none');
+			container.find('.fileCheckbox').prop("checked", isChecked);
+		});
 
-        // Function to handle individual checkbox changes
-        $(".fileCheckbox").change(function () {
-            updateSelectAllCheckbox();
-        });
+		$(".fileCheckbox").change(function () {
+			updateSelectAllCheckbox();
+		});
 
-        // Function to handle approve button click
-        $("#approveSelectedButton").click(function () {
-            let selectedIds = [];
-            $(".fileCheckbox:checked").each(function () {
-                selectedIds.push($(this).data("filename"));
-            });
-            if (selectedIds.length > 0) {
-                // AJAX call to approve selected items
-                $.ajax({
-                    url: '/Admin/ApprovedShifts',
-                    type: 'POST',
-                    data: { selectedIds: selectedIds },
-                    success: function (response) {
-                        console.log(response);
-                        // Handle success response
-                        selectedIds.forEach(function (id) {
-                            $("tr").has("input.fileCheckbox[data-filename='" + id + "']").remove();
-                        });
-                    },
-                    error: function (xhr, status, error) {
-                        // Handle error
-                        console.error("Error occurred while approving:", error);
-                    }
-                });
-            } else {
-                // If no items are selected, show a warning message
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Please select at least one item to approve.',
-                    confirmButtonText: 'OK',
-                });
-            }
-        });
 
-        // Function to handle delete button click
-        $("#deleteSelectedButton").click(function () {
-            let selectedIds = [];
-            $(".fileCheckbox:checked").each(function () {
-                selectedIds.push($(this).data("filename"));
-            });
-            if (selectedIds.length > 0) {
-                // AJAX call to delete selected items
-                if (confirm("Are you sure you want to delete the selected files?")) {
-                    $.ajax({
-                        url: '/Admin/DeleteSelectedShiftDetails',
-                        type: 'POST',
-                        data: { selectedIds: selectedIds },
-                        success: function (response) {
-                            console.log(response);
-                            // Handle success response
-                            selectedIds.forEach(function (id) {
-                                $("tr").has("input.fileCheckbox[data-filename='" + id + "']").remove();
-                            });
-                        },
-                        error: function (xhr, status, error) {
-                            // Handle error
-                            console.error("Error occurred while deleting:", error);
-                        }
-                    });
-                }
-            } else {
-                // If no items are selected, show a warning message
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Please select at least one item to delete.',
-                    confirmButtonText: 'OK',
-                });
-            }
-        });
-    });
+
+		// Function to handle approve button click
+		$("#approveSelectedButton").click(function () {
+			var selectedIds = [];
+
+			var container = $('.d-none.d-md-table').is(':visible') ? '.d-none.d-md-table' : '.d-md-none';
+			$(container + ' .fileCheckbox:checked').each(function () {
+				selectedIds.push($(this).data("filename"));
+			});
+
+			if (selectedIds.length > 0) {
+				// AJAX call to approve selected items
+				$.ajax({
+					url: '/Admin/ApprovedShifts',
+					type: 'POST',
+					data: { selectedIds: selectedIds },
+					success: function (response) {
+						console.log(response);
+						// Handle success response
+						selectedIds.forEach(function (id) {
+
+							$("tr").has("input.fileCheckbox[data-filename='" + id + "']").remove();
+							$(container + ' .fileCheckbox[data-filename="' + id + '"]').parent().parent().remove(); // Assuming two levels of parent() needed
+						});
+						Swal.fire({
+							icon: 'success',
+							title: 'Items approved successfully!',
+							text: 'Selected items have been approved.',
+							showConfirmButton: false,
+							timer: 1500
+						});
+					},
+					error: function (xhr, status, error) {
+						// Handle error
+						console.error("Error occurred while approving:", error);
+					}
+				});
+			} else {
+				// If no items are selected, show a warning message
+				Swal.fire({
+					icon: 'warning',
+					title: 'Please select at least one item to approve.',
+					confirmButtonText: 'OK',
+				});
+			}
+		});
+
+		// Function to handle delete button click
+		// Function to handle delete button click
+		$("#deleteSelectedButton").click(function () {
+			var selectedIds = [];
+
+			var container = $('.d-none.d-md-table').is(':visible') ? '.d-none.d-md-table' : '.d-md-none';
+			$(container + ' .fileCheckbox:checked').each(function () {
+				selectedIds.push($(this).data("filename"));
+			});
+
+			if (selectedIds.length > 0) {
+				// Show confirmation dialog before deleting
+				Swal.fire({
+					title: 'Are you sure?',
+					text: 'You won\'t be able to revert this!',
+					icon: 'warning',
+					showCancelButton: true,
+					confirmButtonColor: '#3085d6',
+					cancelButtonColor: '#d33',
+					confirmButtonText: 'Yes, delete it!'
+				}).then((result) => {
+					if (result.isConfirmed) {
+						// User confirmed deletion, proceed with AJAX call
+						$.ajax({
+							url: '/Admin/DeleteSelectedShiftDetails',
+							type: 'POST',
+							data: { selectedIds: selectedIds },
+							success: function (response) {
+								console.log(response);
+								// Handle success response
+								selectedIds.forEach(function (id) {
+									// Remove the deleted items from the view
+									$("tr").has("input.fileCheckbox[data-filename='" + id + "']").remove();
+									$(container + ' .fileCheckbox[data-filename="' + id + '"]').parent().parent().remove(); // Assuming two levels of parent() needed
+								});
+								// Show success message
+								Swal.fire({
+									icon: 'success',
+									title: 'Items deleted successfully!',
+									showConfirmButton: false,
+									timer: 1500
+								});
+							},
+							error: function (xhr, status, error) {
+								// Handle error
+								console.error("Error occurred while deleting:", error);
+							}
+						});
+					}
+				});
+			} else {
+				// If no items are selected, show a warning message
+				Swal.fire({
+					icon: 'warning',
+					title: 'Please select at least one item to delete.',
+					confirmButtonText: 'OK',
+				});
+			}
+		});
+	});
 </script>

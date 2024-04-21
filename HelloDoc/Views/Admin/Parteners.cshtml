@@ -1,5 +1,7 @@
 ﻿@{
     Layout = "~/Views/Shared/_Layout4.cshtml";
+    ViewData["Title"] = "Partner";
+
 }
 <div class="container mt-3">
     <span class="fs-2 text-muted fw-bold">Vendor(s)</span>
@@ -32,7 +34,17 @@
 
 
 <script>
-   
+
+    const debounce = (func, delay) => {
+        let debounceTimer
+        return function () {
+            const context = this
+            const args = arguments
+            clearTimeout(debounceTimer)
+            debounceTimer
+                = setTimeout(() => func.apply(context, args), delay)
+        }
+    }
     
     var currentPage = localStorage.getItem("currentPage");
     if (currentPage) {
@@ -51,12 +63,12 @@
         console.log("Current Page: " + currentPage);
         FetchPartners(currentPage);
     });
-        $('#vendorname').on("input", function () {
+    $('#vendorname').on("input", debounce(function () {
         FetchPartners(1);
-        });
+    }, 500));
         $("#helthtype").on("change", function () {
         FetchPartners(1);
-        });
+    });
     function FetchPartners(page) {
             var helthProType = $('#helthtype').val();
             var vendorname = $('#vendorname').val();

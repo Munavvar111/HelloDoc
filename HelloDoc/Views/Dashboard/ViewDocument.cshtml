@@ -48,11 +48,11 @@
             </div>
         </div>
 
-        <div class="table-responsive">
-            <table class="table">
+        <div class="">
+            <table class="table d-none d-md-table" style="vertical-align:middle;">
                 <thead class="thead-secondry">
                     <tr>
-                        <th scope="col"><input type="checkbox" id="selectAllCheckbox" /></th>
+                        <th scope="col"><input type="checkbox" class="selectAllCheckbox" /></th>
                         <th scope="col">FileName</th>
                         <th scope="col">Uploader</th>
                         <th scope="col">Updated Date </th>
@@ -91,6 +91,31 @@
                 </tbody>
             </table>
         </div>
+        <div class="d-md-none">
+            <!-- Iterate through documents -->
+            @if (Model != null && Model.Requestwisefileview != null)
+            {
+                <input type="checkbox" class="selectAllCheckbox" />
+                @foreach (var item in Model.Requestwisefileview)
+                {
+                    <div class="document border-top border-bottom mb-3 mt-3">
+                        <div class="d-flex">
+                            <input type="checkbox" class="fileCheckbox" data-filename="@item.Filename" />
+                            <p class="filename mx-3">@Html.DisplayFor(modelitem => item.Filename)</p>
+                        </div>
+                        <p>Updated: @Html.DisplayFor(modelitem => item.Createddate)</p>
+                        <div class="d-flex justify-content-beween mb-3 gap-3">
+                            <a class="btn btn-outline-info"
+                               href="~/uploads/@item.Filename" target="_blank">
+                                <span class="material-symbols-outlined">cloud_download</span>
+                            </a>
+                            
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+
     </div>
 </div>
 <script>
@@ -128,32 +153,58 @@
             document.getElementById("patientRequestForm").submit();
         }
     });
-    document.getElementById("selectAllCheckbox").addEventListener("change", function () {
-        // Toggle all checkboxes based on the state of the "Select All" checkbox
-        let checkboxes = document.querySelectorAll(".fileCheckbox");
-        checkboxes.forEach(function (checkbox) {
-            checkbox.checked = document.getElementById("selectAllCheckbox").checked;
+    function updateSelectAllCheckbox() {
+        var container = $('.d-none.d-md-table').is(':visible') ? ".d-none.d-md-table" : ".d-md-none";
+        var allChecked = true;
+        $(container + ' .fileCheckbox').each(function () {
+            if (!$(this).prop("checked")) {
+                allChecked = false;
+                return false; // exit the loop early if any checkbox is not checked
+            }
         });
+        $(container + ' .selectAllCheckbox').prop("checked", allChecked);
+    }
+
+    // Function to handle the "Select All" checkbox change and individual checkbox changes
+    $(".selectAllCheckbox").change(function () {
+        var isChecked = $(this).prop("checked");
+        var container = $(this).closest('.d-none.d-md-table, .d-md-none');
+        container.find('.fileCheckbox').prop("checked", isChecked);
     });
 
-    document.getElementById("downloadAllBtn").addEventListener("click", function () {
+    $(".fileCheckbox").change(function () {
+        updateSelectAllCheckbox();
+    });
+
+
+    $("#downloadAllBtn").on("click", function () {
         // Get selected filenames
-        let selectedFiles = [];
-        let checkboxes = document.querySelectorAll(".fileCheckbox:checked");
-        checkboxes.forEach(function (checkbox) {
-            selectedFiles.push(checkbox.dataset.filename);
+        var selectedFiles = [];
+
+        var container = $('.d-none.d-md-table').is(':visible') ? '.d-none.d-md-table' : '.d-md-none';
+        $(container + ' .fileCheckbox:checked').each(function () {
+            selectedFiles.push($(this).data("filename"));
         });
 
-        // Download selected files
-        selectedFiles.forEach(function (filename) {
-            var link = document.createElement("a");
-            link.href = "/uploads/" + filename; // Adjust the path accordingly
-            link.download = filename;
-            link.style.display = "none";
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        });
+        if (selectedFiles.length > 0) {
+
+            // Download selected files
+            selectedFiles.forEach(function (filename) {
+                var link = document.createElement("a");
+                link.href = "/uploads/" + filename; // Adjust the path accordingly
+                link.download = filename;
+                link.style.display = "none";
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            });
+        } else {
+            Swal.fire(
+                'Warning!',
+                'Please select files to Download .',
+                'warning'
+            );
+        }
     });
 
     document.getElementById("fileInput").onchange = function () {

@@ -1,0 +1,108 @@
+﻿@model List<DataAccessLayer.CustomModel.LogsVM>
+
+@if (Model != null && Model.Count > 0)
+{
+    
+    <div class="d-md-none mt-3">
+        @{
+           var count = 0;
+        }
+        @foreach (var item in Model)
+        {
+            <div class="bg-info-subtle " data-bs-toggle="collapse" data-bs-target="#collapseexample_@count"
+                 aria-expanded="false" aria-controls="collapseexample">
+                <div class="d-flex flex-column gap-2  border-bottom border-2 pt-3 pb-5 px-3">
+                    <h6 class="mb-3">@item.Recipient</h6>
+                    <span>Action Name: </span>
+                    <span>Mobile Number: <strong>@item.MobileNumber</strong></span>
+
+                </div>
+            </div>
+
+
+            <div class="collapse " id="collapseexample_@count">
+                <div class="d-flex flex-column gap-2 bg-info-subtle border-bottom border-2  py-3 px-3 ">
+                    <div class="d-flex align-items-center ">
+                        <i class="fa-regular fa-user  border border-1 text-info border-info rounded-5 p-2 me-2"></i>
+                        <span>Role Name: <strong>@item.RoleName</strong></span>
+                    </div>
+                    <div class="d-flex align-items-center ">
+                        <i class="fa-solid fa-calendar-days text-info border border-1 border-info rounded-5 p-2 me-2 "></i>
+                        <span>Create Date: <strong>@item.CreatedDate</strong></span>
+                    </div>
+                    <div class="d-flex align-items-center ">
+                        <i class="fa-solid fa-calendar-days text-info border border-1 border-info rounded-5 p-2 me-2  "></i>
+                        <span>Sent Date: <strong>@item.SentDate</strong></span>
+                    </div>
+                    <div class="d-flex align-items-center ">
+                        <i class="bi bi-check-lg text-info border border-1 border-info rounded-5 px-2 py-1 me-2 "></i>
+                        <span>Sent: <strong>@item.Sent</strong></span>
+                    </div>
+                    <div class="d-flex align-items-center ">
+                        <i class="fa-regular fa-envelope text-info border border-1 border-info rounded-5 p-2 me-2 "></i>
+                        <span>Sent Tries: <strong>@item.SentTries</strong></span>
+                    </div>
+                    <div class="d-flex align-items-center ">
+                        <i class="bi bi-check-lg text-info border border-1 border-info rounded-5 px-2 py-1 me-2 "></i>
+                        <span>Confirmation Number: <strong>@item.ConfirmationNumber</strong></span>
+                    </div>
+
+
+                </div>
+            </div>
+            count++;
+        }
+    </div>
+
+    <div class="mt-2 d-none d-md-block">
+        <table class="table mt-2">
+
+            <thead>
+                <tr>
+                    <th scope="col" style="background-color: #F0F0F0">Recipient</th>
+                    <th scope="col" style="background-color: #F0F0F0">Action</th>
+                    <th scope="col" style="background-color: #F0F0F0">Role</th>
+                    <th scope="col" style="background-color: #F0F0F0">Mobile Number</th>
+                    <th scope="col" style="background-color: #F0F0F0">Create Date</th>
+                    <th scope="col" style="background-color: #F0F0F0">Sent Date</th>
+                    <th scope="col" style="background-color: #F0F0F0">Sent</th>
+                    <th scope="col" style="background-color: #F0F0F0">Sent Tries</th>
+                    <th scope="col" style="background-color: #F0F0F0">Confirmation Number</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model != null)
+                {
+                    foreach (var item in Model)
+                    {
+                        <tr class="align-middle">
+                            <td>@item.Recipient</td>
+                            <td>@item.Action</td>
+                            <td>@item.RoleName </td>
+                            <td>@item.MobileNumber</td>
+                            <td>@item.CreatedDate</td>
+                            <td>@item.SentDate</td>
+                            <td>@item.Sent</td>
+                            <td>@item.SentTries</td>
+                            <td>@item.ConfirmationNumber</td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+    <nav id="pagination" aria-label="Page navigation" class="d-flex justify-content-center">
+        <ul class="pagination">
+            @for (int i = 1; i <= ViewBag.TotalPages; i++)
+            {
+                <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "") mt-0 border-0">
+                    <a class="page-link" data-page="@i" style="cursor:pointer">@i</a>
+                </li>
+            }
+        </ul>
+    </nav>
+}
+else
+{
+    <h5 class="ms-3">No Records Found.</h5>
+}

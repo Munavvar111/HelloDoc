@@ -10,7 +10,7 @@ namespace DataAccessLayer.CustomModel
     {
         public string? Recipient { get; set; }
 
-        public string? Action { get; set; }
+        public int? Action { get; set; }
 
         public int? RoleName { get; set; }
 

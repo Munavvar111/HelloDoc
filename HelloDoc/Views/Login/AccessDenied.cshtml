@@ -1,0 +1,15 @@
+﻿
+@{
+    ViewData["Title"] = "AccessDenied";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container d-flex flex-column gap-3 align-items-center justify-content-center" style="height: 100vh">
+    <h1 class="w3-jumbo w3-animate-top w3-center "><code class="text-danger fs-1">Access Denied</code></h1>
+    <hr class="w3-border-black w3-animate-left" style="margin-left: 50%; margin-right:50%; width:50%">
+    <h4>You don't have to permission to view this page</h4>
+    <h3 class="w3-center w3-animate-zoom">🚫🚫🚫🚫</h3>
+    <h6 class="w3-center w3-animate-zoom text-danger border-1">error code:403 forbidden</h6>
+    <button class="btn border-info border text-info px-3" onclick="history.back()">Back</button>
+</div>
+

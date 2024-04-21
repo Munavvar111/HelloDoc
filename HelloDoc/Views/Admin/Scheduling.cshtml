@@ -11,41 +11,6 @@
 }
 <partial name="ToasterPartialView"></partial>
 <style>
-	.fc-daygrid-event {
-		cursor: pointer;
-	}
-
-	.fc-header-toolbar.fc-header-resources-only {
-		background-color: #ff9999;
-		border: none;
-	}
-
-	.fc-header-toolbar,
-	.fc-daygrid-event {
-		background-color: #CCCCCC !important; /* or any other color code */
-	}
-
-
-	.fc-timeline-header-row {
-		background-color: gray !important;
-	}
-
-	.btn22 {
-		padding: 0.25rem 0.5rem !important;
-	}
-
-	.fc-header-toolbar .fc-button {
-		padding: 0.25rem 0.5rem !important;
-	}
-
-	.input-group {
-		width: 300px;
-	}
-
-	#calendar {
-		margin-top: 2rem;
-	}
-
 	.fc .fc-toolbar-title {
 		font-size: 22px;
 		font-weight: 600;
@@ -118,9 +83,34 @@
 		padding: 4px 5px;
 		border-radius: 50px;
 	}
+
+	.fc-event-title {
+		white-space: normal !important;
+	}
+
+	.fc-daygrid-event-dot {
+		display: none !important;
+	}
+
+	.fc-event-time {
+		display: none !important;
+	}
+
+	.fc-timeline-slot-frame {
+		background-color: #747474;
+	}
+
+	.approved {
+		background-color: #32d97d;
+	}
+
+	.pending {
+		background-color: #e39de8;
+	}
+
 </style>
 <div class="container">
-	<div class="row justify-content-center ">
+	<div class="row justify-content-center">
 		<div class="">
 			<div class="d-flex justify-content-between my-3">
 				<div class="d-flex">
@@ -151,7 +141,7 @@
 					}
 				</div>
 			</div>
-			<div class="container d-flex flex-column  shadow">
+			<div class="container d-flex flex-column  shadow bg-white border">
 				<div class="row mb-0 py-2 pe-2 rounded-3">
 					@if (!ViewBag.IsPhysician)
 					{
@@ -283,7 +273,8 @@
 								color: event.status === 1 ? '#e39de8' : '#32d97d',
 								ShiftDetailId: event.shiftDetailId,
 								region: event.region,
-								status: event.status
+								status: event.status,
+								className: event.status == 1 ? "approved" : "pending"
 							}));
 
 							initializeCalendar(resources, events);
@@ -389,6 +380,7 @@
 				eventClick: function (info) {
 					var shiftDetailId = info.event.extendedProps.ShiftDetailId;
 					var region = info.event.extendedProps.region;
+				
 					$('#eventModal').modal('show');
 					$('#eventModal').on('click', '#editbtn', function () {
 						$('#editbtn').addClass('d-none');
@@ -397,9 +389,35 @@
 						$('#StartTimeView').prop('disabled', false);
 						$('#EndTimeView').prop('disabled', false);
 					});
+					var eventStartDate = new Date(info.event.start);
+
+					// Get the current date
+					var currentDate = new Date();
+
+					console.log("Event Start Date:", eventStartDate);
+					console.log("Current Date:", currentDate);
+
+					// Compare event date with current date
+					if (eventStartDate < currentDate) {
+						// If the event date is prior to the current date, hide the edit button
+						console.log("Event is prior to current date");
+						console.log("Edit button:", $('#editbtn'));
+
+						setTimeout(function () {
+							$('#editbtn').addClass('d-none');
+							$('#returnshift').addClass('d-none');
+							$('#deletebtn').addClass('d-none');
+
+						}, 100);
 
 
-					// Get the ShiftDetailId from the event's extendedProps
+					} else {
+						// If the event date is on or after the current date, show the edit button
+						console.log("Event is on or after current date");
+						$('#editbtn').removeClass('d-none');
+
+					}
+
 
 					console.log(region)
 					// Populate modal content with event details
@@ -578,6 +596,7 @@
 					eventBackgroundColor: event.status == 1 ? '#e39de8' : '#32d97d',
 					color: event.status === 0 ? '#32d97d' : '#e39de8',
 					ShiftDetailId: event.shiftDetailId,
+					className: event.status == 1 ? "approved" : "pending",
 					region: event.region
 				}));
 				calendar.removeAllEvents();

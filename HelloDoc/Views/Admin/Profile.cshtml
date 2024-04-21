@@ -210,20 +210,16 @@
 					<div class="col">
 						<div class="form-floating">
 							<select class="form-select " aria-label="Default select example" name="state" id="cancelReason" asp-for="State" disabled>
-
 								<option selected disabled>Select The State</option>
 								@if (Model.Regions != null)
 								{
-
 									@foreach (var region in Model.Regions)
 									{
 										<option value="@region.Regionid">@region.Name</option>
 									}
 								}
-
 							</select>
 							<span class="error-state text-danger"></span>
-
 						</div>
 					</div>
 					<div class="col">
@@ -235,8 +231,8 @@
 						</div>
 					</div>
 					<div class="col-md-6">
-						<div class="form-floating">
-							<input name="PhoneNumber" type="tel" id='phone2' name="MobileNo" class="form-control" placeholder="(201)555-0123" disabled asp-for="@Model.MobileNo">
+						<div class="border rounded-2 tel-container">
+							<input name="PhoneNumber" type="tel" id='phone2' name="MobileNo" class="form-control border-0 tel-input" placeholder="(201)555-0123" disabled asp-for="@Model.MobileNo">
 							<span class="error-MobileNo text-danger"></span>
 
 						</div>
@@ -297,6 +293,15 @@
 <script>
 	const phone1 = document.querySelector("#phone1");
 	const phoneInput1 = window.intlTelInput(phone1, {
+		utilsScript:
+			"https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",
+		nationalMode: false,
+		showSelectedDialCode: true,
+		autoInsertDialCode: true,
+		formatOnDisplay: false,
+	});
+	const phone2 = document.querySelector("#phone2");
+	const phoneInput2 = window.intlTelInput(phone2, {
 		utilsScript:
 			"https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",
 		nationalMode: false,

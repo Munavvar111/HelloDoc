@@ -50,8 +50,8 @@
                 <div class="border rounded-2 tel-container">
 
                     <input asp-for="Phonenumber" id="phone" type="tel" class="form-control border-0 tel-input">
-                    <span asp-validation-for="Phonenumber" class="text-danger"></span>
                 </div>
+                    <span asp-validation-for="Phonenumber" class="text-danger"></span>
             </div>
 
             <div class="form-floating col-md-6 my-3">
@@ -111,7 +111,7 @@
 
             <div class="my-3 d-flex justify-content-end ">
                 <button class="btn btn-outline-info hover_white hover_primary mx-2 btn-lg" type="submit">Save</button>
-                <button class="btn btn-outline-info hover_white hover_primary btn-lg" type="reset">Cancel</button>
+                <button class="btn btn-outline-info hover_white hover_primary btn-lg" type="reset" id="cancelButton">Cancel</button>
             </div>
         </div>
     </form>
@@ -128,5 +128,28 @@
         showSelectedDialCode: true,
         autoInsertDialCode: true,
         formatOnDisplay: false,
+    });
+</script>
+
+<script>
+    $(document).ready(function () {
+        $('#cancelButton').click(function () {
+            // Clear any previous validation errors
+            $('.text-danger').text('');
+            // Reset the form
+            $('#AddPartner')[0].reset();
+            // Optionally hide password-related fields if they were shown
+            pwdrow.hide();
+            pwdcol.hide();
+            // Optionally reset the file input field
+            $('#fileName').text('Select File');
+            // Remove jQuery validation rules and data
+            $('#AddPartner').validate().resetForm();
+            $('#AddPartner').validate().settings.rules = {};
+            $('#AddPartner').validate().settings.messages = {};
+            // Remove jQuery unobtrusive validation rules
+            $('#AddPartner').removeData('validator');
+            $('#AddPartner').removeData('unobtrusiveValidation');
+        });
     });
 </script>

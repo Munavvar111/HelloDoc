@@ -207,7 +207,7 @@
             <button class="btn btn-info text-light" type="submit" id="submit">
                 Submit
             </button>
-            <button type="reset" class="btn btn-outline-info d-flex align-items-center h-100">
+            <button type="reset" class="btn btn-outline-info d-flex align-items-center" id="cancelButton">
                 Cancel
             </button>
         </div>
@@ -279,4 +279,27 @@
         document.getElementById("fileName").innerText = path;
     };
 </script>
+<script>
+    $(document).ready(function () {
+        $('#cancelButton').click(function () {
+            // Clear any previous validation errors
+            $('.text-danger').text('');
+            // Reset the form
+            $('#patientRequestForm')[0].reset();
+            // Optionally hide password-related fields if they were shown
+            pwdrow.hide();
+            pwdcol.hide();
+            // Optionally reset the file input field
+            $('#fileName').text('Select File');
+            // Remove jQuery validation rules and data
+            $('#patientRequestForm').validate().resetForm();
+            $('#patientRequestForm').validate().settings.rules = {};
+            $('#patientRequestForm').validate().settings.messages = {};
+            // Remove jQuery unobtrusive validation rules
+            $('#patientRequestForm').removeData('validator');
+            $('#patientRequestForm').removeData('unobtrusiveValidation');
+        });
+    });
+</script>
+
 

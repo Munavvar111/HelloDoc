@@ -39,6 +39,8 @@
                        asp-for="PhoneNumberOther"
                         />
             </div>
+            <span asp-validation-for="PhoneNumberOther" class="text-danger"></span>
+
         </div>
 
         <div class="col">
@@ -149,7 +151,7 @@
                        placeholder="name@example.com"
                        asp-for="FirstName"/>
                 <label for="floatingInput">First Name</label>  
-                <span asp-validation-for="FirstName"></span>
+                <span asp-validation-for="FirstName"  class="text-danger"></span>
             </div>
         </div>
         <div class="col">
@@ -160,7 +162,7 @@
                        placeholder="name@example.com"
                        asp-for="LastName"/>
                 <label for="floatingInput">Last Name</label>
-                <span asp-validation-for="LastName"></span>
+                <span asp-validation-for="LastName" class="text-danger"></span>
             </div>
         </div>
         <div class="col">
@@ -202,6 +204,8 @@
                        asp-for="PhoneNumber"
                         />
             </div>
+            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+
         </div>
     </div>
     <div class="row row-cols-1 row-cols-md-2 g-3">
@@ -271,4 +275,37 @@
         let path = filePath.substr(filePath.lastIndexOf('\\') + 1);
         document.getElementById("fileName").innerText = path;
     };
+</script>
+<script>
+    $(document).ready(function () {
+        // Initialize the validation plugin on your form
+        var validator = $('form').validate();
+
+        // Attach event listener to the form's submit event
+        $('form').submit(function (event) {
+            // Check if the form is valid
+            if (!validator.form()) {
+                // Form is not valid, show validation errors
+                $('.text-danger').show();
+
+                // Prevent the form from being submitted
+                event.preventDefault();
+            } else {
+                // Form is valid, hide all validation errors
+                $('.text-danger').hide();
+            }
+        });
+
+        // Attach event listener to the reset button to hide validation errors
+        $('button[type="reset"]').click(function () {
+            // Hide all validation errors
+            $('.text-danger').hide();
+        });
+
+        // Attach event listener to form fields to hide validation errors on click
+        $('input, textarea, select').click(function () {
+            $(this).next('.text-danger').hide();
+        });
+    });
+
 </script>

@@ -108,9 +108,12 @@ li {
     font-weight:500!important;
 }
 .btn-outline-info{
-    font-weight:500!important;
+    font-weight:600!important;
     border-width:3px;
 }
 .filterByType{
     margin-top:7px
+}
+#   dataTable {
+    --bs-table-color: bg-white
 }

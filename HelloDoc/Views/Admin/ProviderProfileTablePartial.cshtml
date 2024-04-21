@@ -106,7 +106,7 @@
                 </span>
             </div>
             <div class="d-flex justify-content-end mb-2 gap-2">
-                <a class="btn btn-outline-info rounded me-2" data-bs-toggle="modal" data-bs-target="#contactProviderModal" data-bs-providerId="@items.physicianid">
+                <a class="btn btn-outline-info rounded me-2" data-bs-toggle="modal" data-bs-target="#contactProviderModal" data-bs-providerid="@items.physicianid">
                     Contact
                 <small>Contact</small>
                 </a>
@@ -212,12 +212,11 @@
         $('#contactProviderModal').on('show.bs.modal', function (event) {
             var button = $(event.relatedTarget);
             console.log(button)
-            var recipient = button.data('bs-providerId');
+            var recipient = button.data('bs-providerid');
             console.log(recipient);
-            var status = button.data('bs-status');
 
             var modal = $(this);
-            modal.find('#providerID').val(recipient);
+            modal.find('#providerContact').val(recipient);
 
         });
         $('#contactProviderModal').on('hidden.bs.modal', function () {

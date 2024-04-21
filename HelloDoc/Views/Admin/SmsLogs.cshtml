@@ -1,0 +1,120 @@
+﻿
+@{
+    ViewData["Title"] = "SmsLogs";
+    Layout = "~/Views/Shared/_Layout4.cshtml";
+}
+
+<div class="container-fluid gx-5 mb-5">
+    <div class="d-flex justify-content-between align-items-center">
+        <h4 class="fw-bold">SMS Logs (Twillio)</h4>
+
+    </div>
+
+    <div class="card mt-3 border border-0 shadow">
+        <div class="card-body px-0">
+
+            <div class="row mx-0">
+                <div class="col-12 col-md-2">
+                    <div class="form-floating mb-3">
+                        <select id="roleDropdown" class="form-select">
+                            <option value="" selected disabled>All</option>
+                            <option value="1">Admin</option>
+                            <option value="2">Physician</option>
+                            <option value="3">Patient</option>
+                        </select>
+                        <label for="roleDropdown">Search By Role</label>
+                    </div>
+                </div>
+                <div class="col-12 col-md-2">
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" id="reciever" placeholder="reciever">
+                        <label for="floatingInput" class="floating-label">Reciever Name</label>
+
+
+                    </div>
+                </div>
+                <div class="col-12 col-md-2">
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" id="mobile" placeholder="Mobile">
+                        <label for="floatingInput" class="floating-label">Mobile Number</label>
+
+                    </div>
+                </div>
+                <div class="col-12 col-md-2">
+                    <div class="form-floating mb-3">
+                        <input type="date" class="form-control" id="createdDate" placeholder="date">
+                        <label for="floatingInput" class="floating-label">Created Date</label>
+                    </div>
+                </div>
+                <div class="col-12 col-md-2">
+                    <div class="form-floating mb-3">
+                        <input type="date" class="form-control" id="sentDate" placeholder="date">
+                        <label for="floatingInput" class="floating-label">Sent Date</label>
+                    </div>
+                </div>
+                <div class="col-md-2 d-flex gap-2 justify-content-end align-items-center">
+                    <div>
+                        <button class="btn border-info text-info" id="clearBtn">Clear</button>
+                        <button class="btn bg-info text-white" id="searchBtn">Search</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="smsLogTable">
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+
+    var currentPage = 1
+    var pageSize = 5
+
+    function getSMSLogs(currentPage, pageSize, role = 0, reciever = "", mobile = "", createdDate = new Date(0), sentDate = new Date(0)) {
+
+        $.ajax({
+            type: 'GET',
+            url: '/Admin/GetSMSLogs',
+            data: { currentPage: currentPage, pageSize: pageSize, role: role, reciever: reciever, mobile: mobile, createdDate: createdDate, sentDate: sentDate },
+            success: function (response) {
+                $('#smsLogTable').html(response)
+            }
+
+        })
+    }
+
+
+    $(document).ready(function () {
+        getSMSLogs(currentPage, pageSize)
+    })
+
+    $('#searchBtn').click(function () {
+        var role = $('#roleDropdown').val()
+        var reciever = $('#reciever').val()
+        var mobile = $('#mobile').val()
+        var createdDate = $('#createdDate').val()
+        var sentDate = $('#sentDate').val()
+        console.log(reciever)
+        getSMSLogs(currentPage, pageSize, role, reciever, mobile, createdDate, sentDate)
+
+    })
+
+    $('#clearBtn').click(function () {
+
+        $('#roleDropdown').val('')
+        $('#reciver').val('')
+        $('#mobile').val('')
+        $('#createdDate').val('')
+        $('#sentDate').val('')
+
+        getSMSLogs(currentPage, pageSize)
+    })
+
+    $(document).on("click", "#pagination a.page-link", function () {
+
+        currentPage = $(this).text().trim();
+        getSMSLogs(currentPage, pageSize)
+
+    })
+</script>
+

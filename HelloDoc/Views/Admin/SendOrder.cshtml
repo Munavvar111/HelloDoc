@@ -106,21 +106,21 @@
         </div>
         <div class="row">
             <div class="form-floating  col-12 col-md-6 mb-3">
-                <input class="form-control" type="tel" placeholder="Business Contact" asp-for="Contact">
+                <input class="form-control" type="tel" placeholder="Business Contact" asp-for="Contact" id="contact">
                 <label class="text-muted mx-2" for="floatingnumber" asp-for="Contact">Business Contact</label>
-                <span asp-validation-for="Contact" class="text-danger error-Contact"></span>
+                <span  class="text-danger error-Contact"></span>
 
             </div>
             <div class="form-floating col-12 col-md-6 mb-3">
                 <input class="form-control" type="email" asp-for="Email" name="Email" id="Email">
                 <label class="text-muted mx-2" for="floatingEmail">email</label>
-                <span asp-validation-for="Email" class="text-danger error-Email"></span>
+                <span  class="text-danger error-Email"></span>
 
             </div>  
             <div class="form-floating col-12 col-md-6 mb-3">
                 <input class="form-control" type="text" id="FaxNumber" asp-for="FaxNumber" name="FaxNumber">
                 <label class="text-muted mx-2" for="floatingFax">Fax Number</label>
-                <span asp-validation-for="Email" class="text-danger error-FaxNumber" ></span>
+                <span  class="text-danger error-FaxNumber" ></span>
 
             </div>
         </div>
@@ -133,7 +133,7 @@
                 <textarea class="form-control" placeholder="Prescription or Order details"  id="Prescription"
                           style="height: 100px" asp-for="Prescription" name="Prescription"></textarea>
                 <label class="text-muted mx-2" asp-for="Prescription" for="floatingTextarea">Prescription or Order details</label>
-                <span asp-validation-for="Email" class="text-danger error-Prescription"></span>
+                <span  class="text-danger error-Prescription"></span>
 
             </div>
         </div>

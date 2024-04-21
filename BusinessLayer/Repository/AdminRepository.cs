@@ -12,6 +12,7 @@ using BC = BCrypt.Net.BCrypt;
 using System.Net;
 using System.Collections;
 using System.Transactions;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace BusinessLayer.Repository
 {
@@ -23,8 +24,8 @@ namespace BusinessLayer.Repository
         private readonly IConfiguration _configuration;
         private readonly IUploadProvider _uploadprovider;
 
-		[Obsolete]
-		public AdminRepository(ApplicationDbContext context, IUploadProvider uploadProvider, IConfiguration configuration, IHostingEnvironment hostingEnvironment)
+        [Obsolete]
+        public AdminRepository(ApplicationDbContext context, IUploadProvider uploadProvider, IConfiguration configuration, IHostingEnvironment hostingEnvironment)
         {
             _context = context;
 
@@ -49,7 +50,7 @@ namespace BusinessLayer.Repository
         {
 
             Role? role = _context.Roles.Where(item => item.Roleid == roleId).FirstOrDefault();
-            if (role == null)   
+            if (role == null)
             {
                 throw new Exception("Role not found"); // or use a more specific exception type
             }
@@ -75,7 +76,7 @@ namespace BusinessLayer.Repository
         }
         public Admin? GetAdminByEmail(string email)
         {
-            return _context.Admins.Include(r=>r.Aspnetuser).FirstOrDefault(item => item.Email == email);
+            return _context.Admins.Include(r => r.Aspnetuser).FirstOrDefault(item => item.Email == email);
         }
 
         public Shiftdetail? GetShiftDetailById(int shiftDetailId)
@@ -88,12 +89,12 @@ namespace BusinessLayer.Repository
             return Rolemenus;
         }
 
-		public bool RequestIdExists(int requestId)
-		{
-			return _context.Requests.Any(item => item.Requestid == requestId);
-		}
+        public bool RequestIdExists(int requestId)
+        {
+            return _context.Requests.Any(item => item.Requestid == requestId);
+        }
 
-		public List<Rolemenu> GetRoleMenuById(int roleId)
+        public List<Rolemenu> GetRoleMenuById(int roleId)
         {
             List<Rolemenu> Rolemenus = _context.Rolemenus.Where(item => item.Roleid == roleId).ToList();
             return Rolemenus;
@@ -120,6 +121,18 @@ namespace BusinessLayer.Repository
         public AspnetUser GetAspNetUserByEmail(string email)
         {
             return _context.AspnetUsers.FirstOrDefault(item => item.Email == email);
+        }
+
+        public Admin? GetAdminEmailById(int adminId)
+        {
+            return _context.Admins
+                      .Where(item => item.Adminid == adminId)
+                      .FirstOrDefault();
+        }
+
+        public void UpdatePhysicianDataBase(Physician physician)
+        {
+            _context.Physicians.Update(physician);
         }
         public List<int> GetUserPermissions(string roleid)
         {
@@ -150,7 +163,7 @@ namespace BusinessLayer.Repository
         {
             return _context.Roles.Where(item => item.Accounttype == accountType).ToList();
         }
-            
+
         public void UpdateHealthPrifessional(Healthprofessional healthprofessional)
         {
             _context.Healthprofessionals.Update(healthprofessional);
@@ -168,8 +181,8 @@ namespace BusinessLayer.Repository
 
         public bool UpdatePhysicianLocation(decimal latitude, decimal longitude, int physicianId)
         {
-            PhysicianLocation? physicianLocationById = _context.PhysicianLocations.Include(b=>b.Physician).Where(item => item.Physicianid == physicianId).FirstOrDefault();
-            
+            PhysicianLocation? physicianLocationById = _context.PhysicianLocations.Include(b => b.Physician).Where(item => item.Physicianid == physicianId).FirstOrDefault();
+
             if (physicianLocationById != null)
             {
                 physicianLocationById.Longitude = longitude;
@@ -181,7 +194,7 @@ namespace BusinessLayer.Repository
             }
             else
             {
-            PhysicianLocation physicianLocation=new PhysicianLocation();
+                PhysicianLocation physicianLocation = new PhysicianLocation();
                 physicianLocation.Latitude = latitude;
                 physicianLocation.Longitude = longitude;
                 physicianLocation.Physicianid = physicianId;
@@ -189,21 +202,21 @@ namespace BusinessLayer.Repository
                 _context.PhysicianLocations.Add(physicianLocation);
                 _context.SaveChanges();
             }
-                return true;
+            return true;
         }
-		#region SearchPatients
-		public List<NewRequestTableVM> SearchPatients(string searchValue, string selectValue, string selectedFilter, int[] currentStatus)
+        #region SearchPatients
+        public List<NewRequestTableVM> SearchPatients(string searchValue, string selectValue, string selectedFilter, int[] currentStatus)
         {
 
             var filteredPatients = _context.Requests.Include(b => b.Requestclients).Include(b => b.Physician)
-                .Include(b => b.Encounterforms).Where(req=>!req.Isdeleted.Value).Where(req=>req.Encounterforms!=null).Select(req => new
+                .Include(b => b.Encounterforms).Where(req => !req.Isdeleted.Value).Where(req => req.Encounterforms != null).Select(req => new
                 {
                     req = req,
                     reqclient = req.Requestclients.FirstOrDefault(),
                     ps = req.Physician,
                     eno = req.Encounterforms.FirstOrDefault()
                 }).ToList();
-                                    
+
 
             var searchRecords = filteredPatients.Select(item => new NewRequestTableVM
             {
@@ -224,14 +237,14 @@ namespace BusinessLayer.Repository
                 Id = item.reqclient?.Requestclientid ?? 0,
                 regionid = item.reqclient?.Regionid ?? 0,
                 Status = item.req.Status,
-                RequestedDate=item.req.Createddate.Date,
-                DateOfService =  GetDateOfService(item.req.Requestid) ,
-            State = item.reqclient.State,
+                RequestedDate = item.req.Createddate.Date,
+                DateOfService = GetDateOfService(item.req.Requestid),
+                State = item.reqclient.State,
                 RequestClientId = item.reqclient?.Requestclientid ?? 0,
                 RequestId = item.reqclient?.Requestid ?? 0,
                 isfinalize = item.eno?.IsFinalize ?? false,
                 Regions = _context.Regions.ToList(),
-                
+
                 PhysicianName = $"{item.ps?.Firstname} {item.ps?.Lastname}",
                 Cancel = _context.Casetags.Select(cc => new CancelCase
                 {
@@ -241,7 +254,7 @@ namespace BusinessLayer.Repository
             }).ToList();
 
             var searchRecord = searchRecords.Where(item =>
-                                    (string.IsNullOrEmpty(searchValue) || item.PatientName.Contains(searchValue)) &&
+                                    (string.IsNullOrEmpty(searchValue) || item.PatientName.ToLower().Contains(searchValue.ToLower().Trim())) &&
                                     (string.IsNullOrEmpty(selectValue) || item.regionid == int.Parse(selectValue)) &&
                                     (string.IsNullOrEmpty(selectedFilter) || item.ReqTypeId == int.Parse(selectedFilter)) &&
                                     currentStatus.Any(status => item.Status == status)).ToList();
@@ -258,8 +271,7 @@ namespace BusinessLayer.Repository
             IQueryable<NewRequestTableVM> GetAllData = from req in _context.Requests
                                                        join reqclient in _context.Requestclients
                                                        on req.Requestid equals reqclient.Requestid
-                                                       join p in _context.Physicians
-                                                               on req.Physicianid equals p.Physicianid into phy
+                                                       join p in _context.Physicians on req.Physicianid equals p.Physicianid into phy
                                                        from ps in phy.DefaultIfEmpty()
                                                        select new NewRequestTableVM
                                                        {
@@ -292,46 +304,52 @@ namespace BusinessLayer.Repository
         #endregion
 
         #region ViewCaseById
-        public ViewCaseVM GetCaseById(int id,int accountId)
+        public ViewCaseVM GetCaseById(int id, int accountId)
         {
-            ViewCaseVM? requestclient = (from req in _context.Requests
-                                         join reqclient in _context.Requestclients
-                                         on req.Requestid equals reqclient.Requestid
-                                         where reqclient.Requestclientid == id   
+            // Retrieve the request client with associated request
+            var requestClientWithRequest = _context.Requestclients
+                .Include(reqclient => reqclient.Request)
+                .Where(reqclient => reqclient.Requestclientid == id)
+                .FirstOrDefault();
 
-                                         select new ViewCaseVM
-                                         {
-                                             status = req.Status,
-                                             RequestId = req.Requestid,
-                                             Notes = reqclient.Notes,
-                                             FirstName = reqclient.Firstname,
-                                             LastName = reqclient.Lastname ?? "",
-                                             DateOfBirth = reqclient.Intyear != null && reqclient.Strmonth != null && reqclient.Intdate != null ? new DateOnly((int)reqclient.Intyear, int.Parse(reqclient.Strmonth), (int)reqclient.Intdate) : new DateOnly(),
-                                             Phone = reqclient.Phonenumber ?? "",
-                                             EmailView = reqclient.Email ?? "",
-                                             Location = reqclient.Location,
-                                             RegionId=reqclient.Regionid,
-                                             RequestClientId = reqclient.Requestclientid,
-                                             PhysicianId=req.Physicianid,
-                                                
-                                         }).FirstOrDefault();
-
-            if (requestclient != null)
+            if (requestClientWithRequest != null)
             {
-                return requestclient;
+                // Access the associated request
+                var req = requestClientWithRequest.Request;
+
+                // Construct the ViewCaseVM object
+                var viewCaseVM = new ViewCaseVM
+                {
+                    status = req.Status,
+                    RequestId = req.Requestid,
+                    Notes = requestClientWithRequest.Notes,
+                    FirstName = requestClientWithRequest.Firstname,
+                    LastName = requestClientWithRequest.Lastname ?? "",
+                    DateOfBirth = requestClientWithRequest.Intyear != null && requestClientWithRequest.Strmonth != null && requestClientWithRequest.Intdate != null ? new DateOnly((int)requestClientWithRequest.Intyear, int.Parse(requestClientWithRequest.Strmonth), (int)requestClientWithRequest.Intdate) : new DateOnly(),
+                    Phone = requestClientWithRequest.Phonenumber ?? "",
+                    EmailView = requestClientWithRequest.Email ?? "",
+                    Location = requestClientWithRequest.Location,
+                    RegionId = requestClientWithRequest.Regionid,
+                    RequestClientId = requestClientWithRequest.Requestclientid,
+                    PhysicianId = req.Physicianid
+                };
+
+                return viewCaseVM;
             }
             else
             {
+                // Return an empty ViewCaseVM if the request client is not found
                 return new ViewCaseVM();
             }
         }
+
         #endregion
 
         #region UpdateViewCase
         public async Task UpdateRequestClient(ViewCaseVM viewCaseVM, int id)
         {
-            Requestclient? requestclient = await _context.Requestclients.Include(b=>b.Request).Where(item=>item.Requestclientid==id).FirstOrDefaultAsync();
-            
+            Requestclient? requestclient = await _context.Requestclients.Include(b => b.Request).Where(item => item.Requestclientid == id).FirstOrDefaultAsync();
+
             if (requestclient != null)
             {
                 requestclient.Firstname = viewCaseVM.FirstName;
@@ -401,7 +419,7 @@ namespace BusinessLayer.Repository
             {
                 ViewNotes viewnotes = new ViewNotes()
                 {
-                    CancelAdmincount =_context.Requeststatuslogs.Where(item=>item.Requestid==requestid && item.Status==3 && item.Adminid!=null).Count(),
+                    CancelAdmincount = _context.Requeststatuslogs.Where(item => item.Requestid == requestid && item.Status == 3 && item.Adminid != null).Count(),
                     CancelPhysiciancount = _context.Requeststatuslogs.Where(item => item.Requestid == requestid && item.Status == 3 && item.Physicianid != null).Count(),
                     CancelPatientcount = _context.Requeststatuslogs.Where(item => item.Requestid == requestid && item.Status == 7).Count(),
                     viewnotes = result,
@@ -419,7 +437,7 @@ namespace BusinessLayer.Repository
                 };
                 return viewnotes;
             }
-            
+
         }
         #endregion
 
@@ -434,7 +452,7 @@ namespace BusinessLayer.Repository
                 {
                     request.Status = 1;
                     request.Physicianid = physician;
-                    request.Modifieddate= DateTime.Now;
+                    request.Modifieddate = DateTime.Now;
                     _context.Requests.Update(request);
 
                     Requeststatuslog requestStatusLog = new Requeststatuslog
@@ -444,7 +462,7 @@ namespace BusinessLayer.Repository
                         Requestid = requestId,
                         Status = 1,
                         Createddate = DateTime.Now,
-                        Transtophysicianid=physician,
+                        Transtophysicianid = physician,
                     };
 
                     _context.Requeststatuslogs.Add(requestStatusLog);
@@ -521,7 +539,7 @@ namespace BusinessLayer.Repository
         #endregion
 
         #region CancelCase
-        public async Task<bool> CancelCase(int requestId, string notes, string cancelReason,int adminid)
+        public async Task<bool> CancelCase(int requestId, string notes, string cancelReason, int adminid)
         {
             try
             {
@@ -641,7 +659,7 @@ namespace BusinessLayer.Repository
                         Notes = blockReason
                     };
 
-                        _context.Requeststatuslogs.Add(requeststatuslog);
+                    _context.Requeststatuslogs.Add(requeststatuslog);
                     _context.SaveChanges();
 
                     return true;
@@ -844,7 +862,7 @@ namespace BusinessLayer.Repository
         #region GetAdminProfile
         public AdminProfileVm GetAdminProfile(string email)
         {
-            var admin = _context.Admins.Include(b=>b.Aspnetuser).FirstOrDefault(item => item.Email == email);
+            var admin = _context.Admins.Include(b => b.Aspnetuser).FirstOrDefault(item => item.Email == email);
             var adminProfile = new AdminProfileVm();
 
             if (admin != null)
@@ -950,12 +968,12 @@ namespace BusinessLayer.Repository
         #region GetProvider
         public List<ProviderVM> GetProviders(string region)
         {
-            var providers =(from phy in _context.Physicians
+            var providers = (from phy in _context.Physicians
                              join role in _context.Roles on phy.Roleid equals role.Roleid
                              join notify in _context.PhysicianNotifications on phy.Physicianid equals notify.Physicianid
                              join phyregion in _context.PhysicianRegions on phy.Physicianid equals phyregion.Physicianid
-							 where ((string.IsNullOrEmpty(region) || phyregion.Regionid == int.Parse(region)) && (phy.Isdeleted == null || !phy.Isdeleted.Value))
-							 select new ProviderVM
+                             where ((string.IsNullOrEmpty(region) || phyregion.Regionid == int.Parse(region)) && (phy.Isdeleted == null || !phy.Isdeleted.Value))
+                             select new ProviderVM
                              {
                                  Name = phy.Firstname,
                                  status = phy.Status,
@@ -971,7 +989,7 @@ namespace BusinessLayer.Repository
         #region GetPhysicianProfile
         public ProviderProfileVm GetPhysicianProfile(int id)
         {
-            var physician = _context.Physicians.Include(b=>b.Aspnetuser).FirstOrDefault(item => item.Physicianid == id);
+            var physician = _context.Physicians.Include(b => b.Aspnetuser).FirstOrDefault(item => item.Physicianid == id);
             var role = _context.Roles.Where(item => item.Accounttype == 2).ToList();
             if (physician == null)
             {
@@ -980,7 +998,7 @@ namespace BusinessLayer.Repository
 
             var providerProfile = new ProviderProfileVm
             {
-                Username=physician.Aspnetuser.Username??"",
+                Username = physician.Aspnetuser.Username ?? "",
                 FirstName = physician.Firstname,
                 LastName = physician.Lastname ?? "",
                 Email = physician.Email,
@@ -1005,9 +1023,9 @@ namespace BusinessLayer.Repository
                 IsHippa = physician.Istrainingdoc,
                 NonDiscoluser = physician.Isnondisclosuredoc,
                 License = physician.Islicensedoc,
-                IsCredential=physician.Iscredentialdoc,
-                Roles=role,
-                PhysicianRole=(int)physician.Roleid,
+                IsCredential = physician.Iscredentialdoc,
+                Roles = role,
+                PhysicianRole = (int)physician.Roleid,
             };
 
             return providerProfile;
@@ -1113,7 +1131,7 @@ namespace BusinessLayer.Repository
         #endregion
 
         #region UpdatePhysicianAccountingInfo
-        public bool UpdatePhysicianAccountingInfo(int physicianId, string address1, string address2, string city, int state, string zipcode, string mobileNo,string AspNetId)
+        public bool UpdatePhysicianAccountingInfo(int physicianId, string address1, string address2, string city, int state, string zipcode, string mobileNo, string AspNetId)
         {
             Physician? physician = _context.Physicians.FirstOrDefault(item => item.Physicianid == physicianId);
             if (physician != null)
@@ -1174,9 +1192,9 @@ namespace BusinessLayer.Repository
                                       join pd in _context.Physicians on s.Physicianid equals pd.Physicianid
                                       join sd in _context.Shiftdetails on s.Shiftid equals sd.Shiftid into shiftGroup
                                       from sd in shiftGroup.DefaultIfEmpty()
-                                      where !IsPhysician ||(IsPhysician && pd.Physicianid==id)
+                                      where !IsPhysician || (IsPhysician && pd.Physicianid == id)
                                       where (pd.Isdeleted == null || !pd.Isdeleted.Value)
-									  select new ScheduleModel
+                                      select new ScheduleModel
                                       {
                                           Shiftid = sd.Shiftdetailid,
                                           Status = sd.Status,
@@ -1212,11 +1230,11 @@ namespace BusinessLayer.Repository
                     shift.Startdate = data.Startdate;
                     if (admin != null)
                     {
-                    shift.Createdby = admin.Aspnetuserid;
+                        shift.Createdby = admin.Aspnetuserid;
                     }
-                    if (physician != null && physician.Aspnetuserid!=null)
+                    if (physician != null && physician.Aspnetuserid != null)
                     {
-                    shift.Createdby = physician.Aspnetuserid;
+                        shift.Createdby = physician.Aspnetuserid;
                     }
                     shift.Createddate = DateTime.Now;
                     shift.Isrepeat = new BitArray(new[] { true });
@@ -1389,6 +1407,7 @@ namespace BusinessLayer.Repository
                           on shiftis.Shiftid equals shiftdetails.Shiftid
                           join regionis in _context.Regions
                           on shiftdetails.Regionid equals regionis.Regionid
+                          where !shiftdetails.Isdeleted
                           select new ReviewShiftVM
                           {
                               Shiftid = shiftis.Shiftid,
@@ -1421,11 +1440,11 @@ namespace BusinessLayer.Repository
                               FaxNumber = helthprofesion.Faxnumber,
                               PhoneNumber = helthprofesion.Phonenumber,
                               BusinesContact = helthprofesion.Businesscontact,
-                              VendorId=helthprofesion.Vendorid,
+                              VendorId = helthprofesion.Vendorid,
                               HelthProfessionId = (int)helthprofesion.Healthprofessionalid
                           })
                         .Where(item =>
-                            (string.IsNullOrEmpty(vendorname) || item.BusinessName.Contains(vendorname)) &&
+                            (string.IsNullOrEmpty(vendorname) || item.BusinessName.ToLower().Contains(vendorname.ToLower().Trim())) &&
                             (healthProType == 0 || item.HelthProfessionId == healthProType))
                         .ToList();
             return orders;
@@ -1436,10 +1455,10 @@ namespace BusinessLayer.Repository
         public List<User> GetUsers(string firstName, string lastName, string email, string phoneNumber)
         {
             return _context.Users.Where(item =>
-                (string.IsNullOrEmpty(firstName) || item.Firstname.Contains(firstName)) &&
-                (string.IsNullOrEmpty(lastName) || item.Lastname.Contains(lastName)) &&
-                (string.IsNullOrEmpty(email) || item.Email.Contains(email)) &&
-                (string.IsNullOrEmpty(phoneNumber) || item.Mobile.Contains(phoneNumber))).ToList();
+                (string.IsNullOrEmpty(firstName) || item.Firstname.ToLower().Contains(firstName.ToLower().Trim())) &&
+                (string.IsNullOrEmpty(lastName) || item.Lastname.ToLower().Contains(lastName.Trim().ToLower())) &&
+                (string.IsNullOrEmpty(email) || item.Email.ToLower().Contains(email.Trim().ToLower())) &&
+                (string.IsNullOrEmpty(phoneNumber) || item.Mobile.ToLower().Contains(phoneNumber.Trim().ToLower()))).ToList();
         }
         #endregion
 
@@ -1487,13 +1506,14 @@ namespace BusinessLayer.Repository
             var region = GetRegionByName(healthProffesionalVM.State);
             if (region != null)
                 healthprofessional.Regionid = region.Regionid;
-
+            
             _context.Healthprofessionals.Add(healthprofessional);
             _context.SaveChanges();
         }
         #endregion
 
-        public DateTime GetDateOfService(int requestid) {
+        public DateTime GetDateOfService(int requestid)
+        {
             var requestStatusLog = _context.Requeststatuslogs
                 ?.OrderByDescending(x => x.Createddate)
                 ?.FirstOrDefault(x => x.Requestid == requestid && x.Status == 2);
@@ -1504,86 +1524,86 @@ namespace BusinessLayer.Repository
             return requestStatusLog.Createddate;
         }
 
-		public string GetDashboardNotesName(int requestid)
-		{
-			Requeststatuslog? requeststatuslog = _context.Requeststatuslogs.OrderByDescending(x => x.Createddate).Where(x => x.Requestid == requestid).FirstOrDefault();
-			Admin? admin = new Admin();
-			Physician? physician = new Physician();
-			Physician? transphysician = new Physician();
+        public string GetDashboardNotesName(int requestid)
+        {
+            Requeststatuslog? requeststatuslog = _context.Requeststatuslogs.OrderByDescending(x => x.Createddate).Where(x => x.Requestid == requestid).FirstOrDefault();
+            Admin? admin = new Admin();
+            Physician? physician = new Physician();
+            Physician? transphysician = new Physician();
 
-			if (requeststatuslog != null)
-			{
-				if (requeststatuslog.Adminid != null)
-				{
-					admin = _context.Admins.FirstOrDefault(x => x.Adminid == requeststatuslog.Adminid);
-				}
-				if (requeststatuslog.Physicianid != null)
-				{
-					physician = _context.Physicians.FirstOrDefault(x => x.Physicianid == requeststatuslog.Physicianid);
-				}
-				if (requeststatuslog.Transtophysicianid != null)
-				{
-					transphysician = _context.Physicians.FirstOrDefault(x => x.Physicianid == requeststatuslog.Transtophysicianid);
-				}
+            if (requeststatuslog != null)
+            {
+                if (requeststatuslog.Adminid != null)
+                {
+                    admin = _context.Admins.FirstOrDefault(x => x.Adminid == requeststatuslog.Adminid);
+                }
+                if (requeststatuslog.Physicianid != null)
+                {
+                    physician = _context.Physicians.FirstOrDefault(x => x.Physicianid == requeststatuslog.Physicianid);
+                }
+                if (requeststatuslog.Transtophysicianid != null)
+                {
+                    transphysician = _context.Physicians.FirstOrDefault(x => x.Physicianid == requeststatuslog.Transtophysicianid);
+                }
 
-				if (requeststatuslog.Adminid != null && admin != null && transphysician != null)
-				{
-					if (requeststatuslog.Status == 1 && requeststatuslog.Transtophysicianid != null)
-					{
-						return "Admin " + admin.Firstname + " " + admin.Lastname + " transferred to Physician " + transphysician.Firstname + " " + transphysician.Lastname + " on " + requeststatuslog.Createddate.ToString();
-					}
-					else if (requeststatuslog.Status == 3)
-					{
-						return "Admin " + admin.Firstname + " " + admin.Lastname + " cancelled on " + requeststatuslog.Createddate.ToString();
-					}
-				}
+                if (requeststatuslog.Adminid != null && admin != null && transphysician != null)
+                {
+                    if (requeststatuslog.Status == 1 && requeststatuslog.Transtophysicianid != null)
+                    {
+                        return "Admin " + admin.Firstname + " " + admin.Lastname + " transferred to Physician " + transphysician.Firstname + " " + transphysician.Lastname + " on " + requeststatuslog.Createddate.ToString();
+                    }
+                    else if (requeststatuslog.Status == 3)
+                    {
+                        return "Admin " + admin.Firstname + " " + admin.Lastname + " cancelled on " + requeststatuslog.Createddate.ToString();
+                    }
+                }
 
-				if (requeststatuslog.Physicianid != null && physician != null)
-				{
-					if (requeststatuslog.Status == 3)
-					{
-						return "Physician " + physician.Firstname + " " + physician.Lastname + " cancelled on " + requeststatuslog.Createddate.ToString();
-					}
-					else if (requeststatuslog.Status == 2 && requeststatuslog.Transtoadmin !=new BitArray(new[] {true}) )
-					{
-						if (requeststatuslog.Physicianid == requeststatuslog.Transtophysicianid)
-						{
-							return "Physician " + physician.Firstname + " " + physician.Lastname + " created request " + requeststatuslog.Createddate.ToString();
-						}
-						else
-						{
-							return "Physician " + physician.Firstname + " " + physician.Lastname + " accepted request on " + requeststatuslog.Createddate.ToString();
-						}
-					}
-					else if (requeststatuslog.Status == 2 && requeststatuslog.Transtoadmin != new BitArray(new[] {true}))
-					{
-						return "Physician " + physician.Firstname + " " + physician.Lastname + " requested to transfer request on " + requeststatuslog.Createddate.ToString();
-					}
-					else if (requeststatuslog.Status == 8)
-					{
-						return "Physician " + physician.Firstname + " " + physician.Lastname + " concluded request " + requeststatuslog.Createddate.ToString();
-					}
+                if (requeststatuslog.Physicianid != null && physician != null)
+                {
+                    if (requeststatuslog.Status == 3)
+                    {
+                        return "Physician " + physician.Firstname + " " + physician.Lastname + " cancelled on " + requeststatuslog.Createddate.ToString();
+                    }
+                    else if (requeststatuslog.Status == 2 && requeststatuslog.Transtoadmin!=new BitArray(new[] {true}))
+                    {
+                        if (requeststatuslog.Physicianid == requeststatuslog.Transtophysicianid)
+                        {
+                            return "Physician " + physician.Firstname + " " + physician.Lastname + " created request " + requeststatuslog.Createddate.ToString();
+                        }
+                        else
+                        {
+                            return "Physician " + physician.Firstname + " " + physician.Lastname + " accepted request on " + requeststatuslog.Createddate.ToString();
+                        }
+                    }
+                    else if (requeststatuslog.Status == 2 && requeststatuslog.Transtoadmin[0])
+                    {
+                        return "Physician " + physician.Firstname + " " + physician.Lastname + " requested to transfer request on " + requeststatuslog.Createddate.ToString();
+                    }
+                    else if (requeststatuslog.Status == 8)
+                    {
+                        return "Physician " + physician.Firstname + " " + physician.Lastname + " concluded request " + requeststatuslog.Createddate.ToString();
+                    }
 
-					return "";
-				}
+                    return "";
+                }
 
-				if (requeststatuslog.Adminid == null && requeststatuslog.Physicianid == null)
-				{
-					if (requeststatuslog.Status == 4)
-					{
-						return "Patient accepted agreement on " + requeststatuslog.Createddate.ToString();
-					}
-					else if (requeststatuslog.Status == 7)
-					{
-						return "Patient rejected agreement on " + requeststatuslog.Createddate.ToString();
-					}
-				}
-			}
+                if (requeststatuslog.Adminid == null && requeststatuslog.Physicianid == null)
+                {
+                    if (requeststatuslog.Status == 4)
+                    {
+                        return "Patient accepted agreement on " + requeststatuslog.Createddate.ToString();
+                    }
+                    else if (requeststatuslog.Status == 7)
+                    {
+                        return "Patient rejected agreement on " + requeststatuslog.Createddate.ToString();
+                    }
+                }
+            }
 
-			return "";
-		}
-		#region GetPhysiciansByRegion
-		public IEnumerable<Physician> GetPhysiciansByRegion(int region)
+            return "";
+        }
+        #region GetPhysiciansByRegion
+        public IEnumerable<Physician> GetPhysiciansByRegion(int region)
         {
             var physicians = (from physicianRegion in _context.PhysicianRegions
                               where region == 0 || physicianRegion.Regionid == region
@@ -1610,8 +1630,8 @@ namespace BusinessLayer.Repository
                         on totalasprole.Roleid equals roletab.Roleid into rolesdata
                         from roles in rolesdata.DefaultIfEmpty()
                         where (role == 0 || roles.Accounttype == role)
-                        where roles.Isdeleted!=new BitArray(new[] {true})
-                        where !totaladmin.Isdeleted ||  !totalphy.Isdeleted.Value
+                        where roles.Isdeleted != new BitArray(new[] { true })
+                        where !totaladmin.Isdeleted || !totalphy.Isdeleted.Value
                         select (roles.Accounttype == 1 ?
                             new UserAccess
                             {
@@ -1645,17 +1665,17 @@ namespace BusinessLayer.Repository
             }
 
             var physicians = (from physicianRegion in _context.PhysicianRegions
-                              where physicianRegion.Regionid == regionId &&(physicianRegion.Physician.Isdeleted == null || !physicianRegion.Physician.Isdeleted.Value)
-							  select physicianRegion.Physician)
+                              where physicianRegion.Regionid == regionId && (physicianRegion.Physician.Isdeleted == null || !physicianRegion.Physician.Isdeleted.Value)
+                              select physicianRegion.Physician)
                              .ToList();
 
             return physicians;
         }
         #endregion
 
-        public Request GetRequestById(int requestId)
+        public Request? GetRequestById(int requestId)
         {
-            return _context.Requests.Find(requestId);
+            return _context.Requests.Include(req=>req.Requestclients).Where(item=>item.Requestid==requestId).FirstOrDefault();
         }
         public Region? GetRegionByName(string state)
         {
@@ -1664,12 +1684,12 @@ namespace BusinessLayer.Repository
 
         public Requestclient? GetRequestClientById(int requestid)
         {
-            return _context.Requestclients.Include(b=>b.Request).Where(item => item.Requestclientid == requestid).FirstOrDefault();
+            return _context.Requestclients.Include(b => b.Request).Where(item => item.Requestclientid == requestid).FirstOrDefault();
         }
 
         public Requestclient? GetRequestclientByRequestId(int requestId)
         {
-            return _context.Requestclients.Include(b=>b.Request).Where(item => item.Requestid == requestId).FirstOrDefault();
+            return _context.Requestclients.Include(b => b.Request).Where(item => item.Requestid == requestId).FirstOrDefault();
         }
 
         public Requestnote? GetRequestNotesByRequestId(int requestid)
@@ -1692,7 +1712,7 @@ namespace BusinessLayer.Repository
         public void AddRequestWiseFile(Requestwisefile requestwisefile)
         {
             _context.Requestwisefiles.Add(requestwisefile);
-           
+
         }
         public void UpdateRequestWiseFile(Requestwisefile requestwisefile)
         {
@@ -1709,15 +1729,15 @@ namespace BusinessLayer.Repository
             _context.Requestnotes.Update(requestnote);
         }
 
-		public Physician? GetPhysicianById(int physicianId)
+        public Physician? GetPhysicianById(int physicianId)
         {
-            Physician? physician = _context.Physicians.Include(b=>b.Aspnetuser).Where(item=>item.Physicianid==physicianId).FirstOrDefault();
+            Physician? physician = _context.Physicians.Include(b => b.Aspnetuser).Where(item => item.Physicianid == physicianId).FirstOrDefault();
             return physician;
         }
 
         public List<PhysicianLocation> GetAllPhysicianLocation()
         {
-           return _context.PhysicianLocations.ToList();
+            return _context.PhysicianLocations.ToList();
         }
 
         public List<LogsVM> GetEmailLogs(int? accountType, string? receiverName, string? emailId, DateTime? createdDate, DateTime? sentDate)
@@ -1726,19 +1746,43 @@ namespace BusinessLayer.Repository
                           select new LogsVM
                           {
                               isSms = false,
-                              Recipient = e.Subjectname,
+                              Recipient = e.Receivername,
                               ConfirmationNumber = e.Confirmationnumber,
                               Email = e.Emailid,
                               SentDate = e.Sentdate,
                               CreatedDate = e.Createdate,
                               Sent = e.Isemailsent,
                               SentTries = e.Senttries,
-                              Action = e.Subjectname,
+                              Action = e.Action,
                               RoleName = e.Roleid
                           }).Where(item =>
                           (accountType == 0 || item.RoleName == accountType) &&
-                          (string.IsNullOrEmpty(receiverName) || (item.Recipient != null && item.Recipient.ToLower().Contains(receiverName))) &&
-                          (string.IsNullOrEmpty(emailId) || (item.Email != null && item.Email.ToLower().Contains(emailId))) &&
+                          (string.IsNullOrEmpty(receiverName) || (item.Recipient != null && item.Recipient.ToLower().Contains(receiverName.Trim().ToLower()))) &&
+                          (string.IsNullOrEmpty(emailId) || (item.Email != null && item.Email.ToLower().Contains(emailId.ToLower().Trim()))) &&
+                          (createdDate == new DateTime() || item.CreatedDate.Value.Date == createdDate.Value.Date) &&
+                          (sentDate == new DateTime() || item.SentDate.Value.Date == sentDate.Value.Date)).ToList();
+
+            return result;
+        } 
+        public List<LogsVM> GetSmsLogs(int? role, string? reciever, string? mobile, DateTime? createdDate, DateTime? sentDate)
+        {
+            var result = (from e in _context.Smslogs
+                          select new LogsVM
+                          {
+                              isSms = false,
+                              Recipient = e.Recevername,
+                              ConfirmationNumber = e.Confirmationnumber,
+                              MobileNumber = e.Mobilenumber,
+                              SentDate = e.Sentdate,
+                              CreatedDate = e.Createdate,
+                              Sent=e.Issmssent,
+                              SentTries = e.Senttries,
+                              Action = e.Action,
+                              RoleName = e.Roleid
+                          }).Where(item =>
+                          (role == 0 || item.RoleName == role) &&
+                          (string.IsNullOrEmpty(reciever) || (item.Recipient != null && item.Recipient.ToLower().Contains(reciever.Trim().ToLower()))) &&
+                          (string.IsNullOrEmpty(mobile) || (item.Email != null && item.Email.ToLower().Contains(mobile.ToLower().Trim()))) &&
                           (createdDate == new DateTime() || item.CreatedDate.Value.Date == createdDate.Value.Date) &&
                           (sentDate == new DateTime() || item.SentDate.Value.Date == sentDate.Value.Date)).ToList();
 

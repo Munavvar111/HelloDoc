@@ -2,6 +2,8 @@
 
 @{
     Layout = "~/Views/Shared/_Layout4.cshtml";
+    ViewData["Title"] = "Dashboard";
+
 }
     <partial name="ToasterPartialView"></partial>
 @section scripts{
@@ -177,10 +179,10 @@
 <div class="row mt-4 mb-4 container-fluid">
     <div class="col-xl-3 col-md-6 col-12 mb-2">
         <div class="input-group input-group-height">
-            <i class="bi bi-search text-muted position-absolute" style="padding-top: 10px; padding-left: 10px;"></i>
-            <input class="form-control" type="search" placeholder="Search Patients"
-                   aria-label="Search" id="searchInput">
+            
+            <input class="form-control" type="search" placeholder="Search Patients" aria-label="Search" id="searchInput">
         </div>
+
     </div>
 
     <div class="col-xl-3 col-md-6 col-12 mb-2">
@@ -195,8 +197,8 @@
         </div>
     </div>
 
-    <div class="col-xl-6 col-md-12 d-xl-flex justify-content-xl-end  mb-2">
-        <div class="d-flex flex-wrap align-items-center">
+    <div class="col-xl-6 col-md-12 d-xl-flex justify-content-xl-end  mb-2 fw-bold">
+        <div class="d-flex flex-wrap align-items-center  gap-2">
             <div class="col-auto mb-2 d-none d-lg-block filter-item mx-4" data-value="">
                 <button type="button" class="btn border-dark-subtle">All</button>
             </div>

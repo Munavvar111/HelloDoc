@@ -2,6 +2,7 @@
 using DataAccessLayer.CustomModel;
 using DataAccessLayer.DataContext;
 using DataAccessLayer.DataModels;
+using Geocoding;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -86,7 +87,7 @@ namespace BusinessLayer.Repository
         public bool RequestAcceptedByProvider(int requestId, int physicianId)
         {
             Request? request = _context.Requests.Find(requestId);
-            
+            Physician? physician=_context.Physicians.Where(item=>item.Physicianid==physicianId).FirstOrDefault();    
             if (request == null)
             {
                 return false;
@@ -95,6 +96,7 @@ namespace BusinessLayer.Repository
             {
                 request.Status = 2;
                 request.Accepteddate = DateTime.Now;
+               
                 _context.Requests.Update(request);
                 _context.SaveChanges();
                 Requeststatuslog requeststatuslog = new Requeststatuslog();
@@ -102,6 +104,7 @@ namespace BusinessLayer.Repository
                 requeststatuslog.Physicianid = physicianId;
                 requeststatuslog.Createddate= DateTime.Now;
                 requeststatuslog.Requestid=requestId;
+                requeststatuslog.Notes=physician.Firstname +"Is Accepted Request" + DateTime.Now.ToString();    
                 requeststatuslog.Transtoadmin = new System.Collections.BitArray(new[] { false });
                 _context.Requeststatuslogs.Add(requeststatuslog);
                 _context.SaveChanges();

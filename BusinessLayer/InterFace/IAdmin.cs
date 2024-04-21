@@ -88,7 +88,7 @@ namespace BusinessLayer.InterFace
         bool RequestIdExists(int requestId);
 
 		void AddRequestStatusLog(Requeststatuslog requeststatuslog);
-        Request GetRequestById(int requestId);
+        Request? GetRequestById(int requestId);
 
         void UpdateRequestStatusLog(Requeststatuslog updaterequeststatuslog);
         Requestclient? GetRequestClientById(int requestid);
@@ -102,6 +102,7 @@ namespace BusinessLayer.InterFace
         Physician GetPhysicianById(int physicianId);
 
         List<LogsVM> GetEmailLogs(int? accountType, string? receiverName, string? emailId, DateTime? createdDate, DateTime? sentDate);
+        List<LogsVM> GetSmsLogs(int? role, string? reciever, string? mobile, DateTime? createdDate, DateTime? sentDate);
 
         Requestclient? GetRequestclientByRequestId(int requestId);   
         void UpdateRequestNotes (Requestnote updatedrequestnote);
@@ -113,5 +114,11 @@ namespace BusinessLayer.InterFace
         bool UpdatePhysicianLocation(decimal latitude, decimal longitude, int physicianId);
         List<Role> GetRoleFromAccountType(int accountType); 
 
-	}
+        Admin? GetAdminEmailById(int adminId);
+
+        void UpdatePhysicianDataBase(Physician physician);
+
+
+
+    }
 }
