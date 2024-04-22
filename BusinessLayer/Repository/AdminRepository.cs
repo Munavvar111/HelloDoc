@@ -180,6 +180,74 @@ namespace BusinessLayer.Repository
             _context.SaveChanges();
         }
 
+        public Request? GetRequestById(int requestId)
+        {
+            return _context.Requests.Include(req => req.Requestclients).Where(item => item.Requestid == requestId).FirstOrDefault();
+        }
+        public Region? GetRegionByName(string state)
+        {
+            return _context.Regions.Where(r => r.Name == state).FirstOrDefault();
+        }
+
+        public Requestclient? GetRequestClientById(int requestid)
+        {
+            return _context.Requestclients.Include(b => b.Request).Where(item => item.Requestclientid == requestid).FirstOrDefault();
+        }
+
+        public Requestclient? GetRequestclientByRequestId(int requestId)
+        {
+            return _context.Requestclients.Include(b => b.Request).Where(item => item.Requestid == requestId).FirstOrDefault();
+        }
+
+        public Requestnote? GetRequestNotesByRequestId(int requestid)
+        {
+            return _context.Requestnotes.Where(item => item.Requestid == requestid).FirstOrDefault();
+        }
+
+        public Requestwisefile? GetRequestwisefileByFileName(string FileName)
+        {
+            return _context.Requestwisefiles.FirstOrDefault(item => item.Filename == FileName);
+        }
+
+        public void UpdateRequest(Request request)
+        {
+            _context.Requests.Update(request);
+        }
+
+
+
+        public void AddRequestWiseFile(Requestwisefile requestwisefile)
+        {
+            _context.Requestwisefiles.Add(requestwisefile);
+
+        }
+        public void UpdateRequestWiseFile(Requestwisefile requestwisefile)
+        {
+            _context.Requestwisefiles.Update(requestwisefile);
+        }
+
+        public void AddRequestNotes(Requestnote requestnote)
+        {
+            _context.Requestnotes.Add(requestnote);
+        }
+
+        public void UpdateRequestNotes(Requestnote requestnote)
+        {
+            _context.Requestnotes.Update(requestnote);
+        }
+
+        public Physician? GetPhysicianById(int physicianId)
+        {
+            Physician? physician = _context.Physicians.Include(b => b.Aspnetuser).Where(item => item.Physicianid == physicianId).FirstOrDefault();
+            return physician;
+        }
+
+        public List<PhysicianLocation> GetAllPhysicianLocation()
+        {
+            return _context.PhysicianLocations.ToList();
+        }
+
+        #region UpdatePhysicianLocation
         public bool UpdatePhysicianLocation(decimal latitude, decimal longitude, int physicianId)
         {
             PhysicianLocation? physicianLocationById = _context.PhysicianLocations.Include(b => b.Physician).Where(item => item.Physicianid == physicianId).FirstOrDefault();
@@ -205,6 +273,8 @@ namespace BusinessLayer.Repository
             }
             return true;
         }
+        #endregion
+
         #region SearchPatients
         public List<NewRequestTableVM> SearchPatients(string searchValue, string selectValue, string selectedFilter, int[] currentStatus)
         {
@@ -1523,6 +1593,7 @@ namespace BusinessLayer.Repository
         }
         #endregion
 
+        #region GetDateOfService
         public DateTime GetDateOfService(int requestid)
         {
             var requestStatusLog = _context.Requeststatuslogs
@@ -1534,6 +1605,9 @@ namespace BusinessLayer.Repository
             }
             return requestStatusLog.Createddate;
         }
+        #endregion
+
+        #region GetDashboardNotesName
 
         public string GetDashboardNotesName(int requestid)
         {
@@ -1620,6 +1694,8 @@ namespace BusinessLayer.Repository
 
             return "";
         }
+        #endregion
+
         #region GetPhysiciansByRegion
         public IEnumerable<Physician> GetPhysiciansByRegion(int region)
         {
@@ -1691,73 +1767,8 @@ namespace BusinessLayer.Repository
         }
         #endregion
 
-        public Request? GetRequestById(int requestId)
-        {
-            return _context.Requests.Include(req=>req.Requestclients).Where(item=>item.Requestid==requestId).FirstOrDefault();
-        }
-        public Region? GetRegionByName(string state)
-        {
-            return _context.Regions.Where(r => r.Name == state).FirstOrDefault();
-        }
-
-        public Requestclient? GetRequestClientById(int requestid)
-        {
-            return _context.Requestclients.Include(b => b.Request).Where(item => item.Requestclientid == requestid).FirstOrDefault();
-        }
-
-        public Requestclient? GetRequestclientByRequestId(int requestId)
-        {
-            return _context.Requestclients.Include(b => b.Request).Where(item => item.Requestid == requestId).FirstOrDefault();
-        }
-
-        public Requestnote? GetRequestNotesByRequestId(int requestid)
-        {
-            return _context.Requestnotes.Where(item => item.Requestid == requestid).FirstOrDefault();
-        }
-
-        public Requestwisefile? GetRequestwisefileByFileName(string FileName)
-        {
-            return _context.Requestwisefiles.FirstOrDefault(item => item.Filename == FileName);
-        }
-
-        public void UpdateRequest(Request request)
-        {
-            _context.Requests.Update(request);
-        }
-
-
-
-        public void AddRequestWiseFile(Requestwisefile requestwisefile)
-        {
-            _context.Requestwisefiles.Add(requestwisefile);
-
-        }
-        public void UpdateRequestWiseFile(Requestwisefile requestwisefile)
-        {
-            _context.Requestwisefiles.Update(requestwisefile);
-        }
-
-        public void AddRequestNotes(Requestnote requestnote)
-        {
-            _context.Requestnotes.Add(requestnote);
-        }
-
-        public void UpdateRequestNotes(Requestnote requestnote)
-        {
-            _context.Requestnotes.Update(requestnote);
-        }
-
-        public Physician? GetPhysicianById(int physicianId)
-        {
-            Physician? physician = _context.Physicians.Include(b => b.Aspnetuser).Where(item => item.Physicianid == physicianId).FirstOrDefault();
-            return physician;
-        }
-
-        public List<PhysicianLocation> GetAllPhysicianLocation()
-        {
-            return _context.PhysicianLocations.ToList();
-        }
-
+        
+        #region GetEmailLogs
         public List<LogsVM> GetEmailLogs(int? accountType, string? receiverName, string? emailId, DateTime? createdDate, DateTime? sentDate)
         {
             var result = (from e in _context.Emaillogs.Include(req=>req.Role)
@@ -1782,7 +1793,10 @@ namespace BusinessLayer.Repository
                           (sentDate == new DateTime() || item.SentDate.Value.Date == sentDate.Value.Date)).ToList();
 
             return result;
-        } 
+        }
+        #endregion
+
+        #region GetSmsLogs
         public List<LogsVM> GetSmsLogs(int? role, string? reciever, string? mobile, DateTime? createdDate, DateTime? sentDate)
         {
             var result = (from e in _context.Smslogs.Include(req=>req.Role)
@@ -1808,6 +1822,7 @@ namespace BusinessLayer.Repository
 
             return result;
         }
+        #endregion
 
     }
 }

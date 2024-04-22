@@ -11,7 +11,8 @@ public partial class Smslog
 {
     [Key]
     [Column("smslogid")]
-    public int Smslogid { get; set; }
+    [Precision(9, 0)]
+    public decimal Smslogid { get; set; }
 
     [Column("smstemplate", TypeName = "character varying")]
     public string Smstemplate { get; set; } = null!;
@@ -48,11 +49,11 @@ public partial class Smslog
     [Column("action")]
     public int? Action { get; set; }
 
-    [Column(TypeName = "character varying")]
-    public string? Receivername { get; set; }
-
     [Column("issmssent")]
     public bool? Issmssent { get; set; }
+
+    [Column(TypeName = "character varying")]
+    public string? Receivername { get; set; }
 
     [ForeignKey("Roleid")]
     [InverseProperty("Smslogs")]

@@ -30,6 +30,8 @@ public partial class ApplicationDbContext : DbContext
 
     public virtual DbSet<Business> Businesses { get; set; }
 
+    public virtual DbSet<Car> Cars { get; set; }
+
     public virtual DbSet<Casetag> Casetags { get; set; }
 
     public virtual DbSet<Concierge> Concierges { get; set; }
@@ -128,8 +130,6 @@ public partial class ApplicationDbContext : DbContext
         modelBuilder.Entity<AspnetUser>(entity =>
         {
             entity.HasKey(e => e.Aspnetuserid).HasName("aspnet_users_pkey");
-
-            entity.Property(e => e.Aspnetuserid).HasDefaultValueSql("1");
         });
 
         modelBuilder.Entity<AspnetUserrole>(entity =>
@@ -270,8 +270,6 @@ public partial class ApplicationDbContext : DbContext
         {
             entity.HasKey(e => e.Requestid).HasName("request_pkey");
 
-            entity.Property(e => e.Requestid).UseIdentityAlwaysColumn();
-
             entity.HasOne(d => d.Physician).WithMany(p => p.Requests).HasConstraintName("request_physicianid_fkey");
 
             entity.HasOne(d => d.User).WithMany(p => p.Requests).HasConstraintName("request_userid_fkey");
@@ -293,8 +291,6 @@ public partial class ApplicationDbContext : DbContext
         modelBuilder.Entity<Requestclient>(entity =>
         {
             entity.HasKey(e => e.Requestclientid).HasName("requestclient_pkey");
-
-            entity.Property(e => e.Requestclientid).UseIdentityAlwaysColumn();
 
             entity.HasOne(d => d.Region).WithMany(p => p.Requestclients).HasConstraintName("requestclient_regionid_fkey");
 
@@ -432,8 +428,6 @@ public partial class ApplicationDbContext : DbContext
         {
             entity.HasKey(e => e.Smslogid).HasName("smslog_pkey");
 
-            entity.Property(e => e.Smslogid).UseIdentityAlwaysColumn();
-
             entity.HasOne(d => d.Role).WithMany(p => p.Smslogs).HasConstraintName("smslog_roleid_fkey");
         });
 
@@ -441,7 +435,7 @@ public partial class ApplicationDbContext : DbContext
         {
             entity.HasKey(e => e.Userid).HasName("user_pkey");
 
-            entity.Property(e => e.Userid).UseIdentityAlwaysColumn();
+            entity.Property(e => e.Userid).HasIdentityOptions(3L, null, null, null, null, null);
 
             entity.HasOne(d => d.Aspnetuser).WithMany(p => p.Users).HasConstraintName("user_aspnetuserid_fkey");
         });
