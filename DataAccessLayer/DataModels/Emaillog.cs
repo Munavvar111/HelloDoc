@@ -60,4 +60,8 @@ public partial class Emaillog
 
     [Column(TypeName = "character varying")]
     public string? Receivername { get; set; }
+
+    [ForeignKey("Roleid")]
+    [InverseProperty("Emaillogs")]
+    public virtual Role? Role { get; set; }
 }

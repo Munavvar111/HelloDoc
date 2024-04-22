@@ -15,7 +15,7 @@
             {
                 <tr>
                     <td scope="row">
-                        <input type="checkbox" class="form-check-input" name="fileIds" @(item.OnCallStaus[0] ? "checked" : "") data-physician-id="@item.physicianid">
+                        <input type="checkbox" class="form-check-input" name="fileIds" @(item.IsNotificationStoped[0] ? "checked" : "") data-physician-id="@item.physicianid">
                     </td>
                     <td scope="row">@item.Name</td>
                     <td scope="row">@item.Role</td>

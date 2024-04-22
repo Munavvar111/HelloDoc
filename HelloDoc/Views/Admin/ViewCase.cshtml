@@ -130,7 +130,7 @@
                                 Submit
                             </button>
 
-                            <button class="btn btn-outline-info" type="button" id="CanBtn" onclick="toggleCancel()">
+                            <button class="btn btn-outline-info" type="reset" id="CanBtn" onclick="toggleCancel()">
                                 Cancel
                             </button>
                         }
@@ -219,6 +219,22 @@
 </div>
 <partial name="AssignCase"></partial>
 <partial name="CancelCaseView" model="@Model"></partial>
+<script>
+    $(document).ready(function () {
+        $('#CanBtn').click(function () {
+            // Clear any previous validation errors
+            $('.text-danger').text('');
+            // Reset the form
+            $('#viewcaseform')[0].reset();
+            // Optionally reset the file input field
+            $('#viewcaseform').validate().resetForm();;
+            // Remove jQuery unobtrusive validation rules
+            $('#viewcaseform').removeData('validator');
+            $('#viewcaseform').removeData('unobtrusiveValidation');
+        });
+    });
+</script>
+
 
 <script>
     $("#SubBtn").hide();

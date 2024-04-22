@@ -51,7 +51,7 @@ namespace BusinessLayer.InterFace
 		List<ScheduleModel> GetEvents(int region,bool IsPhysician,int id);
         void CreateShift(ScheduleModel data, string email);
         List<DateTime> IsShiftOverwritting(ScheduleModel data);
-        ProviderOnCallVM GetProvidersOnCall(int region);
+        ProviderOnCallVM GetProvidersOnCall(int region,int physicianid);
         IQueryable<Region> GetRegionsByRegionId(int regionId);
         Shiftdetail? GetShiftDetailById(int shiftDetailId);
 

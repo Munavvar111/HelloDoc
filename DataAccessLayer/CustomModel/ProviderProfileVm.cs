@@ -13,7 +13,7 @@ namespace DataAccessLayer.CustomModel
     {
         public string? Username { get; set; }
         public string? Password { get; set; }
-        public string? Status { get; set; }
+        public short? Status { get; set; }
         public string? Role { get; set; }
 
         public string? FirstName { get; set; }

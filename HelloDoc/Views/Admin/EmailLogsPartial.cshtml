@@ -1,14 +1,104 @@
-﻿@model List<DataAccessLayer.CustomModel.LogsVM><div class=""></div><table class="table my-3 me-0 d-xl-table d-none table-responsive">    <thead class="table-secondary">        <tr class="table_header">            <th class="py-3">Recipient</th>            <th class="py-3">Action</th>            <th class="py-3">Role Name</th>            @if (Model != null && Model.Count > 0 && Model[0].isSms == true)            {                <th class="py-3">Mobile Number</th>            }            @if (Model != null && Model.Count > 0 && Model[0].isSms == false)            {                <th class="py-3">Email</th>            }            <th class="py-3">Created Date</th>            <th class="py-3">Sent Date</th>            <th class="py-3">Sent</th>            <th class="py-3">Sent Tries</th>            <th class="py-3">Confirmation Number</th>        </tr>    </thead>    <tbody>        @if (Model != null)
+﻿@model List<DataAccessLayer.CustomModel.LogsVM>
+<div class=""></div>
+<table class="table my-3 me-0 d-xl-table d-none table-responsive">
+    <thead class="table-secondary">
+        <tr class="table_header">
+            <th class="py-3">Recipient</th>
+            <th class="py-3">Action</th>
+            <th class="py-3">Role Name</th>
+            @if (Model != null && Model.Count > 0 && Model[0].isSms == true)
+            {
+                <th class="py-3">Mobile Number</th>
+
+            }
+            @if (Model != null && Model.Count > 0 && Model[0].isSms == false)
+            {
+                <th class="py-3">Email</th>
+
+            }
+            <th class="py-3">Created Date</th>
+            <th class="py-3">Sent Date</th>
+            <th class="py-3">Sent</th>
+            <th class="py-3">Sent Tries</th>
+            <th class="py-3">Confirmation Number</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model != null)
         {
             foreach (var item in Model)
-            {                <tr class="data-row">                    <td class="py-3">@item.Recipient</td>                    <td class="py-3">@item.Action</td>                    @switch (item.RoleName)
+            {
+                <tr class="data-row">
+                    <td class="py-3">@item.Recipient</td>
+                    <td class="py-3">@item.Action</td>
+                            <td class="py-3">@item.RoleName</td>
+                    
+                    @if (Model != null && Model.Count > 0 && Model[0].isSms == true)
                     {
-                        case 2:                            <td>Admin</td>                            break;
-                        case 4:                            <td>Physician</td>                            break;
-                        case 3:                            <td>User</td>                            break;
-                    }                    @if (Model != null && Model.Count > 0 && Model[0].isSms == true)
-                    {                        <td class="py-3">@item.MobileNumber</td>                    }                    @if (Model != null && Model.Count > 0 && Model[0].isSms == false)
-                    {                        <td class="py-3">@item.Email</td>                    }                    <td class="py-3">@item.CreatedDate?.ToString("MMM dd, yyyy")</td>                    <td class="py-3">@item.SentDate?.ToString("MMM dd, yyyy")</td>                    <td class="py-3">@(item.Sent == true ? "Yes" : "No")</td>                    <td class="py-3">@item.SentTries</td>                    <td class="py-3">@item.ConfirmationNumber</td>                </tr>            }
-        }    </tbody></table>@{    var Count = 0;}<div class="d-xl-none mt-3">    @foreach (var item in Model)
-    {        <div class="bg-info-subtle " data-bs-toggle="collapse" data-bs-target="#collapseexample_@Count"             aria-expanded="false" aria-controls="collapseexample">            <div class="d-flex flex-column gap-3  border-bottom border-2 pt-3 pb-5 px-3">                <h6 class="mb-3">@item.Recipient</h6>                <span>Action Name: <strong>@item.Action</strong></span>                <span>Email: <strong>@item.Email</strong></span>            </div>        </div>        <div class="collapse " id="collapseexample_@Count">            <div class="d-flex flex-column gap-2 bg-info-subtle border-bottom border-2  py-3 px-3 ">                <div class="d-flex align-items-center ">                    <i class="fa-regular fa-user  border border-1 text-info border-info rounded-5 p-2 me-2"></i>                    <span>Role Name: <strong>@item.RoleName</strong></span>                </div>                <div class="d-flex align-items-center ">                    <i class="fa-solid fa-calendar-days text-info border border-1 border-info rounded-5 p-2 me-2 "></i>                    <span>Create Date: <strong>@item.CreatedDate</strong></span>                </div>                <div class="d-flex align-items-center ">                    <i class="fa-solid fa-calendar-days text-info border border-1 border-info rounded-5 p-2 me-2  "></i>                    <span>Sent Date: <strong>@item.SentDate</strong></span>                </div>                <div class="d-flex align-items-center ">                    <i class="bi bi-check-lg text-info border border-1 border-info rounded-5 px-2 py-1 me-2 "></i>                    <span>Sent: <strong>@item.Sent</strong></span>                </div>                <div class="d-flex align-items-center ">                    <i class="fa-regular fa-envelope text-info border border-1 border-info rounded-5 p-2 me-2 "></i>                    <span>Sent Tries: <strong>@item.SentTries</strong></span>                </div>                <div class="d-flex align-items-center ">                    <i class="bi bi-check-lg text-info border border-1 border-info rounded-5 px-2 py-1 me-2 "></i>                    <span>Confirmation Number: <strong>@item.ConfirmationNumber</strong></span>                </div>            </div>        </div>
-        Count++;    }</div>
+                        <td class="py-3">@item.MobileNumber</td>
+                    }
+                    @if (Model != null && Model.Count > 0 && Model[0].isSms == false)
+                    {
+                        <td class="py-3">@item.Email</td>
+                    }
+                    <td class="py-3">@item.CreatedDate?.ToString("MMM dd, yyyy")</td>
+                    <td class="py-3">@item.SentDate?.ToString("MMM dd, yyyy")</td>
+                    <td class="py-3">@(item.Sent == true ? "Yes" : "No")</td>
+                    <td class="py-3">@item.SentTries</td>
+                    <td class="py-3">@item.ConfirmationNumber</td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
+
+@{
+    var Count = 0;
+}
+<div class="d-xl-none mt-3">
+    @foreach (var item in Model)
+    {
+        <div class="bg-info-subtle " data-bs-toggle="collapse" data-bs-target="#collapseexample_@Count"
+             aria-expanded="false" aria-controls="collapseexample">
+            <div class="d-flex flex-column gap-3  border-bottom border-2 pt-3 pb-5 px-3">
+                <h6 class="mb-3">@item.Recipient</h6>
+                <span>Action Name: <strong>@item.Action</strong></span>
+                <span>Email: <strong>@item.Email</strong></span>
+
+            </div>
+        </div>
+
+
+        <div class="collapse " id="collapseexample_@Count">
+            <div class="d-flex flex-column gap-2 bg-info-subtle border-bottom border-2  py-3 px-3 ">
+                <div class="d-flex align-items-center ">
+                    <i class="fa-regular fa-user  border border-1 text-info border-info rounded-5 p-2 me-2"></i>
+                    <span>Role Name: <strong>@item.RoleName</strong></span>
+                </div>
+                <div class="d-flex align-items-center ">
+                    <i class="fa-solid fa-calendar-days text-info border border-1 border-info rounded-5 p-2 me-2 "></i>
+                    <span>Create Date: <strong>@item.CreatedDate</strong></span>
+                </div>
+                <div class="d-flex align-items-center ">
+                    <i class="fa-solid fa-calendar-days text-info border border-1 border-info rounded-5 p-2 me-2  "></i>
+                    <span>Sent Date: <strong>@item.SentDate</strong></span>
+                </div>
+                <div class="d-flex align-items-center ">
+                    <i class="bi bi-check-lg text-info border border-1 border-info rounded-5 px-2 py-1 me-2 "></i>
+                    <span>Sent: <strong>@item.Sent</strong></span>
+                </div>
+                <div class="d-flex align-items-center ">
+                    <i class="fa-regular fa-envelope text-info border border-1 border-info rounded-5 p-2 me-2 "></i>
+                    <span>Sent Tries: <strong>@item.SentTries</strong></span>
+                </div>
+                <div class="d-flex align-items-center ">
+                    <i class="bi bi-check-lg text-info border border-1 border-info rounded-5 px-2 py-1 me-2 "></i>
+                    <span>Confirmation Number: <strong>@item.ConfirmationNumber</strong></span>
+                </div>
+
+
+            </div>
+        </div>
+        Count++;
+    }
+</div>

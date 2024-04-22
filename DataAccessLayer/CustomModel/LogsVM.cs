@@ -12,7 +12,7 @@ namespace DataAccessLayer.CustomModel
 
         public int? Action { get; set; }
 
-        public int? RoleName { get; set; }
+        public string? RoleName { get; set; }
 
         public string? MobileNumber { get; set; }
 
@@ -29,6 +29,7 @@ namespace DataAccessLayer.CustomModel
         public string? ConfirmationNumber { get; set; }
 
         public bool isSms { get; set; }
+            public int AccountType { get; set; }    
 
 
     }

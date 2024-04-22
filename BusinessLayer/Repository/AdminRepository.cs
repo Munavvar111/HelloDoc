@@ -13,6 +13,7 @@ using System.Net;
 using System.Collections;
 using System.Transactions;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
+using System.Linq;
 
 namespace BusinessLayer.Repository
 {
@@ -974,14 +975,20 @@ namespace BusinessLayer.Repository
                              join phyregion in _context.PhysicianRegions on phy.Physicianid equals phyregion.Physicianid
                              where ((string.IsNullOrEmpty(region) || phyregion.Regionid == int.Parse(region)) && (phy.Isdeleted == null || !phy.Isdeleted.Value))
                              select new ProviderVM
-                             {
+                             {  
                                  Name = phy.Firstname,
                                  status = phy.Status,
                                  Role = role.Name,
                                  OnCallStaus = new BitArray(new[] { notify.Isnotificationstopped[0] }),
+                                 IsNotificationStoped=notify.Isnotificationstopped,
                                  regions = _context.Regions.ToList(),
                                  physicianid = phy.Physicianid
                              }).Distinct().ToList();
+            foreach (var provider in providers)
+            {
+                var onCall = GetProvidersOnCall(0,provider.physicianid);
+                provider.OnCallStaus[0] = onCall.OnDuty.Any(item => item.Physicianid == provider.physicianid);
+            }
             return providers;
         }
         #endregion
@@ -1002,6 +1009,7 @@ namespace BusinessLayer.Repository
                 FirstName = physician.Firstname,
                 LastName = physician.Lastname ?? "",
                 Email = physician.Email,
+                Status=physician.Status,
                 Address1 = physician.Address1 ?? "",
                 Address2 = physician.Address2 ?? "",
                 City = physician.City ?? "",
@@ -1064,11 +1072,12 @@ namespace BusinessLayer.Repository
         #region UpdatePhysicianInformation
         public void UpdatePhysicianInformation(int id, string email, string mobileNo, string[] adminRegion, string synchronizationEmail, string npinumber, string medicalLicense, string userId)
         {
-            var physician = _context.Physicians.FirstOrDefault(item => item.Physicianid == id);
-
+            var physician = _context.Physicians.Include(req=>req.Aspnetuser).FirstOrDefault(item => item.Physicianid == id);
+            
             if (physician != null)
             {
                 physician.Email = email;
+                physician.Aspnetuser.Email = email;
                 physician.Mobile = mobileNo;
                 physician.Npinumber = npinumber;
                 physician.Syncemailaddress = synchronizationEmail;
@@ -1312,13 +1321,14 @@ namespace BusinessLayer.Repository
         #endregion
 
         #region GetProvidersOnCall
-        public ProviderOnCallVM GetProvidersOnCall(int region)
+        public ProviderOnCallVM GetProvidersOnCall(int region,int physicianid)
         {
             var currentTime = DateTime.Now.Hour;
             var onDutyQuery = from shiftDetail in _context.Shiftdetails
                               join physician in _context.Physicians on shiftDetail.Shift.Physicianid equals physician.Physicianid
                               join physicianRegion in _context.PhysicianRegions on physician.Physicianid equals physicianRegion.Physicianid
                               where (region == 0 || physicianRegion.Regionid == region) &&
+                              (physicianid==0 || physician.Physicianid==physicianid) &&
                                     shiftDetail.Shiftdate.Date == DateTime.Now.Date &&
                                     currentTime >= shiftDetail.Starttime.Hour &&
                                     currentTime <= shiftDetail.Endtime.Hour &&
@@ -1330,6 +1340,7 @@ namespace BusinessLayer.Repository
             var offDutyQuery = from physician in _context.Physicians
                                join physicianRegion in _context.PhysicianRegions on physician.Physicianid equals physicianRegion.Physicianid
                                where (region == 0 || physicianRegion.Regionid == region) &&
+                                                             (physicianid == 0 || physician.Physicianid == physicianid) &&
                                      !_context.Shiftdetails.Any(item => item.Shift.Physicianid == physician.Physicianid &&
                                                                         item.Shiftdate.Date == DateTime.Now.Date &&
                                                                        currentTime >= item.Starttime.Hour &&
@@ -1598,6 +1609,13 @@ namespace BusinessLayer.Repository
                         return "Patient rejected agreement on " + requeststatuslog.Createddate.ToString();
                     }
                 }
+                if (requeststatuslog.Adminid != null)
+                {
+                    if (requeststatuslog.Status == 9)
+                    {
+                        return "Admin Closed The Request on" + requeststatuslog.Createddate.ToString();
+                    }
+                }
             }
 
             return "";
@@ -1742,7 +1760,7 @@ namespace BusinessLayer.Repository
 
         public List<LogsVM> GetEmailLogs(int? accountType, string? receiverName, string? emailId, DateTime? createdDate, DateTime? sentDate)
         {
-            var result = (from e in _context.Emaillogs
+            var result = (from e in _context.Emaillogs.Include(req=>req.Role)
                           select new LogsVM
                           {
                               isSms = false,
@@ -1754,9 +1772,10 @@ namespace BusinessLayer.Repository
                               Sent = e.Isemailsent,
                               SentTries = e.Senttries,
                               Action = e.Action,
-                              RoleName = e.Roleid
+                              RoleName = e.Role.Name,
+                              AccountType=e.Role.Accounttype,
                           }).Where(item =>
-                          (accountType == 0 || item.RoleName == accountType) &&
+                          (accountType == 0 || item.AccountType == accountType) &&
                           (string.IsNullOrEmpty(receiverName) || (item.Recipient != null && item.Recipient.ToLower().Contains(receiverName.Trim().ToLower()))) &&
                           (string.IsNullOrEmpty(emailId) || (item.Email != null && item.Email.ToLower().Contains(emailId.ToLower().Trim()))) &&
                           (createdDate == new DateTime() || item.CreatedDate.Value.Date == createdDate.Value.Date) &&
@@ -1766,11 +1785,11 @@ namespace BusinessLayer.Repository
         } 
         public List<LogsVM> GetSmsLogs(int? role, string? reciever, string? mobile, DateTime? createdDate, DateTime? sentDate)
         {
-            var result = (from e in _context.Smslogs
+            var result = (from e in _context.Smslogs.Include(req=>req.Role)
                           select new LogsVM
                           {
                               isSms = false,
-                              Recipient = e.Recevername,
+                              Recipient = e.Receivername,
                               ConfirmationNumber = e.Confirmationnumber,
                               MobileNumber = e.Mobilenumber,
                               SentDate = e.Sentdate,
@@ -1778,9 +1797,10 @@ namespace BusinessLayer.Repository
                               Sent=e.Issmssent,
                               SentTries = e.Senttries,
                               Action = e.Action,
-                              RoleName = e.Roleid
+                              RoleName = e.Role.Name,
+                              AccountType=e.Role.Accounttype
                           }).Where(item =>
-                          (role == 0 || item.RoleName == role) &&
+                          (role == 0 || item.AccountType == role) &&
                           (string.IsNullOrEmpty(reciever) || (item.Recipient != null && item.Recipient.ToLower().Contains(reciever.Trim().ToLower()))) &&
                           (string.IsNullOrEmpty(mobile) || (item.Email != null && item.Email.ToLower().Contains(mobile.ToLower().Trim()))) &&
                           (createdDate == new DateTime() || item.CreatedDate.Value.Date == createdDate.Value.Date) &&

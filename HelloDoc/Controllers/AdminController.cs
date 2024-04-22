@@ -170,11 +170,11 @@ namespace HelloDoc.Controllers
         #region AdministrationInfo
         [CustomAuthorize("MyProfile", "5")]
         [HttpPost]
-        public IActionResult AdministrationInfo(string email, string mobileNo, string[] adminRegion)
+        public IActionResult AdministrationInfo(string EmailProvider, string mobileNo, string[] adminRegion)
         {
             string? sessionEmail = HttpContext.Session.GetString("Email");
-            AspnetUser? AspnetUser = _patient.GetAspnetUserBYEmail(email);
-            if (sessionEmail != email)
+            AspnetUser? AspnetUser = _patient.GetAspnetUserBYEmail(EmailProvider);
+            if (sessionEmail != EmailProvider)
             {
 
                 if (AspnetUser != null)
@@ -191,8 +191,8 @@ namespace HelloDoc.Controllers
             try
             {
                 //update Admin Administration Details Like Email.PhoneNo,its Working Region
-                _admin.UpdateAdministrationInfo(sessionEmail, email, mobileNo, adminRegion);
-                HttpContext.Session.SetString("Email", email);
+                _admin.UpdateAdministrationInfo(sessionEmail, EmailProvider, mobileNo, adminRegion);
+                HttpContext.Session.SetString("Email", EmailProvider);
                 TempData["SuccessMessage"] = "Your administration details have been updated successfully.";
             }
             catch (InvalidOperationException ex)
@@ -275,7 +275,7 @@ namespace HelloDoc.Controllers
                 string body = "Please Connect Through To Use For Further Conversation";
                 if (_login.IsSendEmail(to, subject, body))
                 {
-                    _emailService.EmailLog(to, body, subject, physician.Firstname + " " + physician.Lastname, admin.Roleid, physician.Roleid, admin.Adminid, physician.Physicianid, 0, true, 1);
+                    _emailService.EmailLog(to, body, subject, physician.Firstname + " " + physician.Lastname, admin.Roleid,0, admin.Adminid, physician.Physicianid, 0, true, 1);
                     TempData["SuccessMessage"] = "Send Request successful!";
                     return RedirectToAction("Provider","Admin");
                 }
@@ -353,7 +353,7 @@ namespace HelloDoc.Controllers
         #region ResetPhysicianPassword
         //Reset Physician Profile like its status
         [CustomAuthorize("Provider", "8", "22")]
-        public IActionResult ResetPhysicianPassword(string password, int physicianId, string Username, string Status, int PhysicianRole)
+        public IActionResult ResetPhysicianPassword(string password, int physicianId, string Username, int Status, int PhysicianRole)
         {
             string? Email = HttpContext.Session.GetString("Email");
             if (Email == null)
@@ -376,6 +376,7 @@ namespace HelloDoc.Controllers
                 {
                     physician.Aspnetuser.Username = Username;
                     physician.Roleid = PhysicianRole;
+                    physician.Status = (short?)Status;
                     physician.Modifiedby = admin != null ? admin.Aspnetuserid : physician.Aspnetuserid;
                     physician.Modifieddate = DateTime.Now;
                     _admin.UpdatePhysicianDataBase(physician);
@@ -489,7 +490,7 @@ namespace HelloDoc.Controllers
         #region PhysicianInformation
         [CustomAuthorize("Provider", "8", "22")]
         [HttpPost]
-        public IActionResult PhysicianInformation(string email, int id, string mobileNo, string[] adminRegion, string synchronizationEmail, string npinumber, string medicalLicense)
+        public IActionResult PhysicianInformation(string EmailProvider, int id, string mobileNo, string[] adminRegion, string synchronizationEmail, string npinumber, string medicalLicense)
         {
             string? Email = HttpContext.Session.GetString("Email");
             if (Email == null)
@@ -502,7 +503,8 @@ namespace HelloDoc.Controllers
             Physician? physician = _admin.GetPhysicianById(id);
             Physician? physicianSession = _admin.GetPhysicianByEmail(Email);
             AspnetUser? aspnetUser = _patient.GetAspnetUserBYEmail(Email);
-            if (physician.Email == email)
+
+            if (physician.Email != EmailProvider)
             {
 
                 if (aspnetUser != null)
@@ -514,12 +516,13 @@ namespace HelloDoc.Controllers
                         return RedirectToAction("Index", "Provider");
                 }
             }
+            
             try
             {
                 if (admin != null)
-                    _admin.UpdatePhysicianInformation(id, email, mobileNo, adminRegion, synchronizationEmail, npinumber, medicalLicense, admin.Aspnetuserid);
+                    _admin.UpdatePhysicianInformation(id, EmailProvider, mobileNo, adminRegion, synchronizationEmail, npinumber, medicalLicense, admin.Aspnetuserid);
                 else if (physicianSession != null)
-                    _admin.UpdatePhysicianInformation(id, email, mobileNo, adminRegion, synchronizationEmail, npinumber, medicalLicense, physician.Aspnetuserid);
+                    _admin.UpdatePhysicianInformation(id, EmailProvider, mobileNo, adminRegion, synchronizationEmail, npinumber, medicalLicense, physician.Aspnetuserid);
                 TempData["SuccessMessage"] = "Physician information has been updated successfully.";
             }
             catch (InvalidOperationException ex)
@@ -647,6 +650,14 @@ namespace HelloDoc.Controllers
                 return RedirectToAction("Index", "Login");
             }
             Admin? admin = _admin.GetAdminByEmail(email);
+
+            AspnetUser aspnetUserExists = _admin.GetAspNetUserByEmail(createProvider.Email);
+            if (aspnetUserExists != null)
+            {
+                TempData["Error"] = "This Email Id Is Already Exists!";
+                return RedirectToAction("UserAccess", "Admin");
+
+            }
 
             AspnetUser aspnetUser = new AspnetUser();
             aspnetUser.Username = createProvider.UserName;
@@ -863,7 +874,7 @@ namespace HelloDoc.Controllers
         #region ProviderOnCallFetch
         public IActionResult ProviderOnCallFetch(int region)
         {
-            ProviderOnCallVM model = _admin.GetProvidersOnCall(region);
+            ProviderOnCallVM model = _admin.GetProvidersOnCall(region,0);
             return PartialView("ProviderOnCallPartial", model);
         }
         #endregion
@@ -1695,6 +1706,7 @@ namespace HelloDoc.Controllers
                 TempData["Error"] = "Send Request Unsuccessful!";
                 return RedirectToAction("CreateAdmin", "Admin");
             }
+            
 
             AspnetUser aspnet = new AspnetUser();
             aspnet.Email = profileVm?.Email ?? "";

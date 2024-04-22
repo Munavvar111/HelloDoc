@@ -78,7 +78,7 @@
             var createddate = $("#CreatedDate").val()
             var sentdate = $("#SentDate").val()
 
-            if (!receivername && !emailid && !createddate && !sentdate && accounttype == 0) {
+            if (!receivername && !emailid && !createddate && !sentdate) {
                 toastr.error("Please Enter some Search Fields");
             } else {
                 fetchEmailLogs(accounttype, receivername, emailid, createddate, sentdate);

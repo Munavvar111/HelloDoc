@@ -274,7 +274,7 @@
 								ShiftDetailId: event.shiftDetailId,
 								region: event.region,
 								status: event.status,
-								className: event.status == 1 ? "approved" : "pending"
+								className: event.status == 0 ? "approved" : "pending"
 							}));
 
 							initializeCalendar(resources, events);
@@ -596,8 +596,8 @@
 					eventBackgroundColor: event.status == 1 ? '#e39de8' : '#32d97d',
 					color: event.status === 0 ? '#32d97d' : '#e39de8',
 					ShiftDetailId: event.shiftDetailId,
-					className: event.status == 1 ? "approved" : "pending",
-					region: event.region
+					className: event.status == 0 ? "approved" : "pending",
+							region: event.region
 				}));
 				calendar.removeAllEvents();
 				calendar.addEventSource(events);
@@ -628,7 +628,8 @@
 					eventBackgroundColor: event.status == 1 ? '#e39de8' : '#32d97d',
 					color: event.status === 0 ? '#32d97d' : '#e39de8',
 					ShiftDetailId: event.shiftDetailId,
-					region: event.region
+					region: event.region,
+					className: event.status == 0 ? "approved" : "pending"
 				}));
 				calendar.removeAllEvents();
 				calendar.addEventSource(events);
@@ -670,7 +671,8 @@
 					eventBackgroundColor: event.status == 0 ? '#e39de8' : '#32d97d',
 					color: event.status === 0 ? '#32d97d' : '#e39de8',
 					ShiftDetailId: event.shiftDetailId,
-					region: event.region
+					region: event.region,
+					className: event.status == 0 ? "approved" : "pending"
 				}));
 				calendar.removeAllEvents(); // Remove existing events
 				calendar.addEventSource(events); // Add updated events

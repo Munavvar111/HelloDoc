@@ -15,6 +15,7 @@ namespace DataAccessLayer.CustomModel
         public string Role { get; set; } = null!;   
 
         public BitArray? OnCallStaus {  get; set; }   
+        public BitArray? IsNotificationStoped {  get; set; }   
 
         public short? status { get; set; }
         public List<Region> regions { get; set; } = null!;

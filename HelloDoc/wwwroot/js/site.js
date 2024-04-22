@@ -885,7 +885,7 @@ $(document).ready(function () {
             lastname: {
                 required: true
             },
-            email: {
+            EmailProvider: {
                 required: true,
                 email: true
             },
@@ -905,7 +905,7 @@ $(document).ready(function () {
         messages: {
             firstname: "Please enter your First Name.",
             lastname: "Please enter your Last Name.",
-            email: {
+            EmailProvider: {
                 required: "Please enter an email address.",
                 email: "Please enter a valid email address."
             },
@@ -949,7 +949,9 @@ $(document).ready(function () {
                 required: true
             },
             Password: {
-                required: true
+                required: true,
+                minlength: 8, // Minimum password eelength (adjust as needed)
+                complexity: true // Custom rule for password complexity (explained below)
             },
             FirstName: {
                 required: true
@@ -983,6 +985,11 @@ $(document).ready(function () {
             LastName: "Please enter your Last Name.",
             Password: "Please Enter Password",
             RoleId: "Please Enter Role",
+            Password: {
+                required: "Please enter a password",
+                minlength: "Password must be at least {0} characters long",
+                complexity: "Password must contain a mix of uppercase, lowercase letters, numbers, and special characters"
+            },
             Email: {
                 required: "Please enter an email address.",
                 email: "Please enter a valid email address."
