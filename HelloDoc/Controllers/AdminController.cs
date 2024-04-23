@@ -1478,7 +1478,7 @@ namespace HelloDoc.Controllers
             return View();
         }
 
-        public IActionResult GetEmailLogs(int accounttype, string receivername, string emailid, DateTime createddate, DateTime sentdate)
+        public IActionResult GetEmailLogs(int accounttype, string receivername, string emailid, DateTime createddate, DateTime sentdate)    
         {
             List<LogsVM> logs = _admin.GetEmailLogs(accounttype, receivername, emailid, createddate, sentdate);
             return PartialView("EmailLogsPartial", logs);
@@ -1503,10 +1503,16 @@ namespace HelloDoc.Controllers
 
         #region AccessPage
 
+        
         #region Access
+        /// <summary>
+        /// Its Showed The All Role Are Present In The Database
+        /// </summary>
+        
         [CustomAuthorize("Role", "7")]
         public IActionResult Access()
         {
+            //This Page Show The All Role In DataBase
             List<Role> roles = _admin.GetAllRoles();
             var list = roles.Where(item => item.Isdeleted != null && (item.Isdeleted.Length == 0 || !item.Isdeleted[0]));
             return View(list.ToList());
@@ -1517,6 +1523,7 @@ namespace HelloDoc.Controllers
         [CustomAuthorize("Role", "7")]
         public IActionResult CreateAccess()
         {
+            //Create Access View Page
             return View();
         }
         #endregion
@@ -1526,6 +1533,7 @@ namespace HelloDoc.Controllers
         [HttpPost]
         public IActionResult CreateAccess(int[] rolemenu, string rolename, int accounttype)
         {
+            //New Role Is Add In Role Table And Role-Menu Table
             Role role = new Role();
             role.Name = rolename;
             role.Accounttype = (short)accounttype;
@@ -1552,6 +1560,7 @@ namespace HelloDoc.Controllers
         [CustomAuthorize("Role", "7")]
         public IActionResult RoleData(int region)
         {
+            //Role Data Is Ajax Method That Give All Role In Present In Database
             List<Menu> menuList = _admin.GetMenuByAccountType(region);
             return PartialView("accesspartial", menuList);
         }
@@ -1561,7 +1570,12 @@ namespace HelloDoc.Controllers
         [CustomAuthorize("Role", "7")]
         public IActionResult EditRoleData(int region, int roleid)
         {
+            //Onclick The Edit Btn It Will Show EditRole View 
+            //Menulist Give The List Of All Menu Present In The Menu Table
+            //Region="Patient","Admin","Physician"
             List<Menu> menuList = _admin.GetMenuByAccountType(region);
+            
+            //rolemenu give The Menuid of the particular role Has How Many Menuid
             List<int>? rolemenu = _admin.GetRoleMenuIdByRoleId(roleid);
 
             RoleMenuViewModel viewModel = new RoleMenuViewModel
@@ -1614,7 +1628,6 @@ namespace HelloDoc.Controllers
             }
             catch (Exception ex)
             {
-                // Log the exception or handle it appropriately
                 TempData["Error"] = "An unexpected error occurred: " + ex.Message;
                 return RedirectToAction("Access", "Admin");
             }
@@ -1627,7 +1640,10 @@ namespace HelloDoc.Controllers
         [HttpPost]
         public IActionResult EditAccess(int roleid, int[] rolemenu, string rolename, int accounttype)
         {
+            
             Role role = _admin.GetAllRolesById(roleid);
+
+            //rolemenu give The Menuid of the particular role Has How Many Menuid
             List<Rolemenu> menulist = _admin.GetRoleMenuById(roleid);
             role.Name = rolename;
             role.Accounttype = (short)accounttype;
@@ -1652,6 +1668,7 @@ namespace HelloDoc.Controllers
         [CustomAuthorize("Role", "7")]
         public IActionResult DeleteRole(int roleId)
         {
+            //Delete Role Is Used To Not Disply The Role In View 
             Role? role = _admin.GetAllRolesById(roleId);
             if (role != null)
             {
@@ -1755,6 +1772,8 @@ namespace HelloDoc.Controllers
 
 
         #region Admin&ProviderDashboard
+
+        #region IndexWithOutDashboardPageAccess
         [HttpGet("Admin/Index", Name = "AdminIndex")]
         public IActionResult IndexWithOutDashboard()
         {
@@ -1793,6 +1812,7 @@ namespace HelloDoc.Controllers
             //else show Its View
             return View();
         }
+        #endregion
 
         #region Index
         [HttpGet("Admin/Dashboard", Name = "AdminDashboard")]
@@ -1872,11 +1892,13 @@ namespace HelloDoc.Controllers
         }
         #endregion
 
-
+        #region GetAllRegion
         public ActionResult<IEnumerable<Region>> GetRegions()
         {
             return _admin.GetAllRegion();
         }
+        #endregion
+
         #region ExportAll
         [CustomAuthorize("Dashboard", "6")]
         public IActionResult ExportAll(string currentStatus)
@@ -2430,11 +2452,8 @@ namespace HelloDoc.Controllers
         }
         #endregion
 
-        /// <summary>
-        /// GetCount The Status
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
+        #region GetStatusCount
+
         public IActionResult GetStatusCounts(int id)
         {
             var countsdetails = _admin.GetStatusCountsAsync(id);
@@ -2474,6 +2493,7 @@ namespace HelloDoc.Controllers
             };
             return Json(counts);
         }
+        #endregion
 
         #region GetPhysician
         public IActionResult GetPhysician(string region)
@@ -2868,6 +2888,7 @@ namespace HelloDoc.Controllers
         [HttpPost]
         public IActionResult ClearCase(int requestidclearcase)
         {
+            //Clear Case Is The Modal That Will Used To Clear The Case It Will Not Show The Dashboard It Will Closed The case Without Any Further Treetment
             try
             {
                 string? email = HttpContext.Session.GetString("Email");
@@ -2911,23 +2932,18 @@ namespace HelloDoc.Controllers
         #endregion
 
         #region GeneratePDF
-
         [HttpGet("Admin/GeneratePDF", Name = "AdminGeneratePDF")]
         [HttpGet("Provider/GeneratePDF", Name = "ProviderGeneratePDF")]
-
         public IActionResult GeneratePDF(int requestid)
         {
-
+            //Generate Pdf Is Used When  Physician Is Finalize The Encounter Form After That They Will Able To Download The Encounter Form 
             ViewEncounterForm viewEncounterForm = _admin.GetEncounterForm(requestid);
 
             if (viewEncounterForm == null)
             {
                 return NotFound();
             }
-
-
-
-            //return View("EncounterFormDetails", encounterFormView);
+            //For That It Used Rotativa EncounterFormDetails Is View That Map The Relation
             return new ViewAsPdf("EncounterFormDetails", viewEncounterForm)
             {
                 FileName = "Encounter_Form.pdf"
@@ -3049,8 +3065,8 @@ namespace HelloDoc.Controllers
         [HttpGet("Provider/ConcludeCare/", Name = "ProviderConcludeCare")]
         public async Task<IActionResult> CloseCase(int requestid)
         {
-            //close and conclude care have same page it open Admin in to close state
-      
+            //close and conclude care have same page it open Admin in to-close state
+            //In Physician It open In conclude-state 
             string? Email = HttpContext.Session.GetString("Email");
             if (Email == null)
             {
@@ -3086,7 +3102,8 @@ namespace HelloDoc.Controllers
                 }
 
             }
-
+            //This Is Visible ONly In Admin Beacuse In Physician There Are Only Physician  Notes 
+            
 
             string? requestclientnumber = requestclient.Request.Confirmationnumber;
             CloseCaseVM closecase = new CloseCaseVM();
@@ -3127,7 +3144,8 @@ namespace HelloDoc.Controllers
             else
             {
                 Requeststatuslog requeststatuslog = new Requeststatuslog();
-
+                //Check If Admin Is Not Null Then It Will Close State In Admin Dashboard
+                //Else Its Conclude Care In Physician Dashboard
                 if (admin != null)
                 {
 
@@ -3144,10 +3162,12 @@ namespace HelloDoc.Controllers
                     }
                     return RedirectToAction("CloseCase", "Admin", new { requestid = requestid });
                 }
+                //Conclude Care In Physician Dashboard
                 else
                 {
                     Requestnote? requestnote = _admin.GetRequestNotesByRequestId(requestid);
                     requeststatuslog.Physicianid = physician.Physicianid;
+                    //If Already Exsits Then It Will Be Update The Note
                     if (requestnote != null)
                     {
                         requestnote.Physiciannotes = closeCaseVM.Notes;
@@ -3155,8 +3175,6 @@ namespace HelloDoc.Controllers
                         requestnote.Modifieddate = DateTime.Now;
                         _admin.UpdateRequestNotes(requestnote);
                         _admin.SaveChanges();
-
-
                     }
                     else
                     {
@@ -3197,6 +3215,9 @@ namespace HelloDoc.Controllers
         #region CheckEncounterFormFinalized
         public IActionResult CheckEncounterFormFinalized(int requestId)
         {
+            //This Method Used When Physician Click On Conclude Care
+            //It Checked The Encoutner Form Is Finalized Or Not If Encounter Form Is Not Finalized Show Sweet Alert
+            
             Encounterform? encounterform = _admin.GetEncounteFormByRequestId(requestId);
             if (encounterform != null)
             {
@@ -3220,10 +3241,10 @@ namespace HelloDoc.Controllers
 
         #endregion
 
-        //GrantAccessOfEditPhysicianAccount
         #region GrantAccessOfEdit
         public IActionResult GrantAccessOfEdit(int id)
         {
+        //GrantAccessOfEditPhysicianAccount
             Physician physician = _admin.GetPhysicianById(id);
             physician.Iscredentialdoc = new BitArray(new[] { true });
             _admin.UpdatePhysicianDataBase(physician);
