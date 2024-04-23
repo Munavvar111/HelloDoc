@@ -43,8 +43,8 @@ namespace HelloDoc.Controllers
         }
 
         #region ProviderLocationPage
-        //ProviderLocation View
         [CustomAuthorize("ProviderLocation", "17")]
+        //ProviderLocation View
         public IActionResult ProviderLocation()
         {
             return View();
@@ -61,13 +61,16 @@ namespace HelloDoc.Controllers
         #region AdminProfilePage
 
         #region Profile
-        //Admin Profile Page 
+        //Admin Profile Page
+        
         [CustomAuthorize("MyProfile", "5")]
         public IActionResult Profile()
         {
+            
             try
             {
-                //Get The Email From The Session
+                ///Get The Email From The Session
+                
                 string? email = HttpContext.Session.GetString("Email");
                 //Check The Session Is Null Or Not
                 if (string.IsNullOrEmpty(email))
@@ -2427,7 +2430,11 @@ namespace HelloDoc.Controllers
         }
         #endregion
 
-
+        /// <summary>
+        /// GetCount The Status
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         public IActionResult GetStatusCounts(int id)
         {
             var countsdetails = _admin.GetStatusCountsAsync(id);
@@ -3042,6 +3049,8 @@ namespace HelloDoc.Controllers
         [HttpGet("Provider/ConcludeCare/", Name = "ProviderConcludeCare")]
         public async Task<IActionResult> CloseCase(int requestid)
         {
+            //close and conclude care have same page it open Admin in to close state
+      
             string? Email = HttpContext.Session.GetString("Email");
             if (Email == null)
             {
@@ -3050,10 +3059,12 @@ namespace HelloDoc.Controllers
             }
             Physician? physician = _admin.GetPhysicianByEmail(Email);
             Admin? admin = _admin.GetAdminByEmail(Email);
+           
             Requestclient? requestclient = _admin.GetRequestclientByRequestId(requestid);
             List<Requestwisefile> requestwisedocument = await _patient.GetRequestwisefileByIdAsync(requestid);
             if (requestclient == null)
             {
+                
                 TempData["Error"] = "Something Went Wrong";
                 if (admin != null)
                     return RedirectToAction("Index", "Admin");
@@ -3090,7 +3101,7 @@ namespace HelloDoc.Controllers
             closecase.ConfirmNumber = requestclientnumber;
             closecase.Requestid = requestid;
             return View(closecase);
-
+           
 
         }
         #endregion
@@ -3183,6 +3194,7 @@ namespace HelloDoc.Controllers
         }
         #endregion
 
+        #region CheckEncounterFormFinalized
         public IActionResult CheckEncounterFormFinalized(int requestId)
         {
             Encounterform? encounterform = _admin.GetEncounteFormByRequestId(requestId);
@@ -3204,6 +3216,7 @@ namespace HelloDoc.Controllers
 
             }
         }
+        #endregion
 
         #endregion
 
