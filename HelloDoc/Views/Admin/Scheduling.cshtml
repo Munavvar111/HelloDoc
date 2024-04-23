@@ -234,6 +234,7 @@
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar-scheduler@6.1.11/index.global.min.js"></script>
 <script>
+
 	var calendar;
 
 	document.addEventListener('DOMContentLoaded', function () {
@@ -380,7 +381,7 @@
 				eventClick: function (info) {
 					var shiftDetailId = info.event.extendedProps.ShiftDetailId;
 					var region = info.event.extendedProps.region;
-				
+
 					$('#eventModal').modal('show');
 					$('#eventModal').on('click', '#editbtn', function () {
 						$('#editbtn').addClass('d-none');
@@ -424,44 +425,44 @@
 					var event = info.event;
 					var modalBody = document.querySelector('#eventModal .modal-body');
 					var eventDetails = `
-								<form asp-action="viewshift">
-								<input class="d-none" id="shiftDetailId" value="${shiftDetailId}">
-								   <div class="form-floating mb-3 mt-3">
-							<select class="form-control" aria-label="Default select example" id="selectregion" disabled>
-									<option value="${region[0].name}">${region[0].name}</option>
+		<form asp-action="viewshift">
+			<input class="d-none" id="shiftDetailId" value="${shiftDetailId}">
+				<div class="form-floating mb-3 mt-3">
+					<select class="form-control" aria-label="Default select example" id="selectregion" disabled>
+						<option value="${region[0].name}">${region[0].name}</option>
 
-							</select>
-						</div>
-								<div class="form-floating mb-3 mt-3">
-												<select class="form-select pt-1 physicianDropdown" asp-for="Physicianid" id="physicianSelect" aria-label="Default select example" disabled>
-												<option value="" selected disabled>${event.title}</option>
-											</select>
-										</div>
-												<div class="col-md-12 form-floating mb-3">
-								<input id="StartDateView" class="form-control rounded vcs" name="Startdate" type="date" placeholder="Suchtext" autocomplete="off" value="${formatDate(event.start)}" disabled>
+					</select>
+				</div>
+				<div class="form-floating mb-3 mt-3">
+					<select class="form-select pt-1 physicianDropdown" asp-for="Physicianid" id="physicianSelect" aria-label="Default select example" disabled>
+						<option value="" selected disabled>${event.title}</option>
+					</select>
+				</div>
+				<div class="col-md-12 form-floating mb-3">
+					<input id="StartDateView" class="form-control rounded vcs" name="Startdate" type="date" placeholder="Suchtext" autocomplete="off" value="${formatDate(event.start)}" disabled>
 						<label for="StartDate">Shifted Date</label>
 						<div class="d-flex gap-2 mt-3">
-						<div class="col-md-6 form-floating mb-3">
-								<input id="StartTimeView" asp-for="Starttime" disabled class="form-control rounded vcs" name="Starttime" type="time" placeholder="Suchtext" autocomplete="off" value="${formatTime(event.start)}" >
-						<label for="StartTime">Start</label>
-					</div>
-					<div class="col-md-6 form-floating mb-3">
-								<input id="EndTimeView" asp-for="Endtime" disabled	 class="form-control rounded vcs" name="Endtime" type="time" placeholder="Suchtext" autocomplete="off" value="${formatTime(event.end)}" >
-						<label for="EndTime">End</label>
-					</div>
-					</div>
+							<div class="col-md-6 form-floating mb-3">
+								<input id="StartTimeView" asp-for="Starttime" disabled class="form-control rounded vcs" name="Starttime" type="time" placeholder="Suchtext" autocomplete="off" value="${formatTime(event.start)}" required >
+									<label for="StartTime">Start</label>
+							</div>
+							<div class="col-md-6 form-floating mb-3">
+								<input id="EndTimeView" asp-for="Endtime" disabled class="form-control rounded vcs" name="Endtime" type="time" placeholder="Suchtext" autocomplete="off" value="${formatTime(event.end)}" required>
+									<label for="EndTime">End</label>
+							</div>
+						</div>
 						<div class="d-flex justify-content-end gap-2">
 	@if (!ViewBag.IsPhysician)
 	{
 
-			<button class="btn btn-info" id="returnshift"  type="button">Return</button>
-					<button class="btn btn-info" id="editbtn" type="button">Edit</button>
-						<button class="btn btn-success d-none" id="savebtn"  type="button">Save</button>
-					<button class="btn btn-danger" id="deletebtn" type="button">Delete</button>
+					<button class="btn btn-info" id="returnshift"  type="button">Return</button>
+							<button class="btn btn-info" id="editbtn" type="button">Edit</button>
+								<button class="btn btn-success d-none" id="savebtn"  type="button">Save</button>
+							<button class="btn btn-danger" id="deletebtn" type="button">Delete</button>
 	}
-			</div>
+						</div>
 					</form>
-									`;
+					`;
 					modalBody.innerHTML = eventDetails;
 				},
 				eventBackgroundColor: function (event) {
@@ -543,6 +544,9 @@
 			});
 		}
 	});
+
+
+
 
 </script>
 
@@ -647,6 +651,7 @@
 		var startTime = $('#StartTimeView').val();
 		var endTime = $('#EndTimeView').val();
 		var selectedRegion = $('#selectregion').val();
+		
 
 		console.log(shiftDetailId);
 		$.ajax({

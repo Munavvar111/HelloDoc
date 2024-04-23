@@ -69,7 +69,7 @@
          aria-controls="collapseExample">
         <div class="d-flex flex-column gap-3">
             <div class="form-check mt-2 ms-3">
-                <input type="checkbox" class="form-check-input px-2 py-2" @(items.OnCallStaus[0] ? "checked" : "") data-physicianMo-id="@items.physicianid">
+                <input type="checkbox" class="form-check-input px-2 py-2" @(items.IsNotificationStoped[0] ? "checked" : "") data-physicianMo-id="@items.physicianid">
                 <label class="form-check-label" for="flexCheckDefault">
                     @items.Name
                 </label>

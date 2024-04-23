@@ -264,7 +264,7 @@
             $(container + ' .fileCheckbox:checked').each(function () {
                 selectedFiles.push($(this).data("filename"));
             });
-
+            console.log(selectedFiles)
                 if (selectedFiles.length > 0) {
 
                     // Download selected files

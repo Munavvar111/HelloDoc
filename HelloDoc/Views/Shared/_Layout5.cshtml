@@ -4,7 +4,14 @@
     int? PhysicianId = Context.Session.GetInt32("PhysicianId");
     string? username = Context.Session.GetString("Email");
 }
+@{
 
+    int userId = Context.Session.GetInt32("UserId") ?? 0; // Use a default value if session data is not available
+    var userPermissionsJson = Context.Session.GetString("UserPermissions");
+
+    var userPermissions = !string.IsNullOrEmpty(userPermissionsJson) ? JsonConvert.DeserializeObject<List<string>>(userPermissionsJson) : null;
+
+}
 
 <!DOCTYPE html>
 <html lang="en" data-bs-theme="light">
@@ -97,25 +104,29 @@
 
         <div class="collapse d-sm-none" id="responsiveNav">
             <ul class="nav nav-tabs-info text-muted flex-column">
-
+                @if (userPermissions != null && userPermissions.Contains("19"))
+                {
                 <li class="nav-item text-info">
                     <a class="nav-link @(ViewContext.ActionDescriptor.RouteValues["action"] == "Index" ? "active" : "")"
                        asp-action="Index" asp-controller="Provider">Home</a>
                 </li>
 
-
-
+                }
+                @if (userPermissions != null && userPermissions.Contains("20"))
+                {
                 <li class="nav-item">
                     <a class="nav-link @(ViewContext.ActionDescriptor.RouteValues["action"] == "Scheduling" ? "active" : "")"
                        asp-action="Scheduling" asp-controller="Provider"> Scehduling</a>
                 </li>
+                }
+                @if (userPermissions != null && userPermissions.Contains("22"))
+                {
+                    <li class="nav-item ">
+                        <a class="nav-link @(ViewContext.ActionDescriptor.RouteValues["action"] == "PhysicanProfile" ? "active" : "")"
+                        asp-action="PhysicanProfile" asp-controller="Provider" asp-route-id="@PhysicianId">My Profile</a>
 
-                <li class="nav-item ">
-                    <a class="nav-link @(ViewContext.ActionDescriptor.RouteValues["action"] == "PhysicanProfile" ? "active" : "")"
-                       asp-action="PhysicanProfile" asp-controller="Provider" asp-route-id="@PhysicianId">My Profile</a>
-
-                </li>
-
+                    </li>
+                }
             </ul>
         </div>
 
@@ -123,23 +134,28 @@
 
         <div class="w-100 shadow  px-2 px-md-5 position-relative z-2 pt-2 border-bottom d-none d-sm-block">
             <ul class="nav nav-tabs-info text-info mb-3" id="pills-tab" role="tablist">
+                @if (userPermissions != null && userPermissions.Contains("19"))
+                {
+                    <li class="nav-item text-info">
+                        <a class="nav-link @(ViewContext.ActionDescriptor.RouteValues["action"] == "Index" ? "active" : "")"
+                        asp-action="Index" asp-controller="Provider">Dashboard</a>
+                    </li>
+                }
+                @if (userPermissions != null && userPermissions.Contains("20"))
+                {
+                    <li class="nav-item">
+                        <a class="nav-link @(ViewContext.ActionDescriptor.RouteValues["action"] == "Scheduling" ? "active" : "")"
+                        asp-action="Scheduling" asp-controller="Provider"> Scehduling</a>
+                    </li>
+                }
+                @if (userPermissions != null && userPermissions.Contains("22"))
+                {
+                    <li class="nav-item ">
+                        <a class="nav-link @(ViewContext.ActionDescriptor.RouteValues["action"] == "PhysicanProfile" ? "active" : "")"
+                        asp-action="PhysicanProfile" asp-controller="Provider" >My Profile</a>
 
-                <li class="nav-item text-info">
-                    <a class="nav-link @(ViewContext.ActionDescriptor.RouteValues["action"] == "Index" ? "active" : "")"
-                       asp-action="Index" asp-controller="Provider">Dashboard</a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link @(ViewContext.ActionDescriptor.RouteValues["action"] == "Scheduling" ? "active" : "")"
-                       asp-action="Scheduling" asp-controller="Provider"> Scehduling</a>
-                </li>
-
-                <li class="nav-item ">
-                    <a class="nav-link @(ViewContext.ActionDescriptor.RouteValues["action"] == "PhysicanProfile" ? "active" : "")"
-                       asp-action="PhysicanProfile" asp-controller="Provider" >My Profile</a>
-
-                </li>
-                
+                    </li>
+                }
 
                 <!-- Ensure dropdown menu z-index -->
 

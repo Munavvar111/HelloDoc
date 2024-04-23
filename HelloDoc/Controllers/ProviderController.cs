@@ -19,9 +19,53 @@ namespace HelloDoc.Controllers
             _login= login;  
             _admin = admin;
         }
-        [CustomAuthorize("Dashboard", "19")]
         public IActionResult Index()
         {
+            string? rolefromroleid = HttpContext.Session.GetString("Role");
+            if (rolefromroleid == null)
+            {
+                TempData["Error"] = "Your Session Will Be Expire Please LogedIn Again";
+                return RedirectToAction("Index", "Login");
+
+            }
+            List<string> menulist = _admin.GetMenuNamesByRoleId(int.Parse(rolefromroleid));
+            if (menulist.Contains("Dashboard"))
+            {
+                return View();
+            }
+            else
+            {
+                return RedirectToAction("IndexWithOutDashboard");
+            }
+        }
+        public IActionResult IndexWithOutDashboard()
+        {
+            ViewData["Title"] = "Dashboard";
+            string? Email = HttpContext.Session.GetString("Email");
+            if (Email == null)
+            {
+                TempData["Error"] = "Your Session Will Be Expire Please LogedIn Again";
+                return RedirectToAction("Index", "Login");
+            }
+            Physician? physician = _admin.GetPhysicianByEmail(Email);
+            if (physician == null)
+            {
+                TempData["Error"] = "Your Session Will Be Expire Please LogedIn Again";
+                return RedirectToAction("Index", "Login");
+
+            }
+            string? rolefromroleid = HttpContext.Session.GetString("Role");
+            if (rolefromroleid == null)
+            {
+                TempData["Error"] = "Your Session Will Be Expire Please LogedIn Again";
+                return RedirectToAction("Index", "Login");
+
+            }
+            List<string> menulist = _admin.GetMenuNamesByRoleId(int.Parse(rolefromroleid));
+            if (menulist.Contains("Dashboard"))
+            {
+                return RedirectToAction("Index");
+            }
             return View();
         }
 

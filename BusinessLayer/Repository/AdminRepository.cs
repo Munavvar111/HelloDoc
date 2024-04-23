@@ -165,6 +165,34 @@ namespace BusinessLayer.Repository
             return _context.Roles.Where(item => item.Accounttype == accountType).ToList();
         }
 
+        public void UpdateRequestClientDataBase(Requestclient requestclient)
+        {
+            _context.Requestclients.Update(requestclient);
+        }
+
+        public void AddAspNetUser(AspnetUser aspnetUser)
+        {
+            _context.AspnetUsers.Add(aspnetUser);
+        }
+        public void AddPhysician(Physician physician)
+        {
+            _context.Physicians.Add(physician);
+        }
+        public void AddAdmin(Admin admin)
+        {
+            _context.Admins.Add(admin);
+        }
+
+        public  List<CancelCase> GetCancelCases()
+        {
+            return  _context.Casetags
+                .Select(cc => new CancelCase
+                {
+                    CancelCaseReson = cc.Name,
+                    CancelReasonId = cc.Casetagid
+                }).ToList();
+        }
+
         public void UpdateHealthPrifessional(Healthprofessional healthprofessional)
         {
             _context.Healthprofessionals.Update(healthprofessional);
@@ -178,6 +206,14 @@ namespace BusinessLayer.Repository
         public void SaveChanges()
         {
             _context.SaveChanges();
+        }
+        public List<string> GetMenuNamesByRoleId(int roleId)
+        {
+            return _context.Rolemenus
+                .Include(b => b.Menu)
+                .Where(item => item.Roleid == roleId)
+                .Select(item => item.Menu.Name)
+                .ToList();
         }
 
         public Request? GetRequestById(int requestId)
@@ -245,6 +281,77 @@ namespace BusinessLayer.Repository
         public List<PhysicianLocation> GetAllPhysicianLocation()
         {
             return _context.PhysicianLocations.ToList();
+        }
+
+        public Encounterform? GetEncounteFormByRequestId(int requestid)
+        {
+            return _context.Encounterforms.Include(r => r.Request).FirstOrDefault(item => item.RequestId == requestid);
+        }
+
+        public void UpdateEncounterForm(Encounterform encounterform)
+        {
+            _context.Encounterforms.Update(encounterform);
+        }
+
+        public void AddAspnetUserRole(string UserId,int RoleId)
+        {
+            AspnetUserrole aspnetUserrole = new AspnetUserrole();
+            aspnetUserrole.Userid = UserId;
+            aspnetUserrole.Roleid = RoleId;
+            _context.AspnetUserroles.Add(aspnetUserrole);
+            _context.SaveChanges();
+        }
+
+        public RequestStatusCounts GetStatusCountsAsync(int id)
+        {
+            return new RequestStatusCounts
+            {
+                NewCount =  _context.Requests
+                    .Where(item =>  item.Status == 1 && item.Isdeleted==false && (id==0 || item.Physicianid==id) )
+                    .Count(),
+                PendingCount =  _context.Requests
+                    .Where(item =>  item.Status == 2 && item.Isdeleted == false && (id == 0 || item.Physicianid == id))
+                    .Count(),
+                ActiveCount =  _context.Requests
+                    .Where(item =>  (item.Status == 4 || item.Status == 5) && item.Isdeleted == false && (id == 0 || item.Physicianid == id))
+                    .Count(),
+                ToClosedCount =  _context.Requests
+                    .Where(item =>  (item.Status == 3 || item.Status == 7 || item.Status == 8) && item.Isdeleted == false && (id == 0 || item.Physicianid == id))
+                    .Count(),
+                ConcludeCount =  _context.Requests
+                    .Where(item =>  item.Status == 6 && item.Isdeleted == false && (id == 0 || item.Physicianid == id))
+                    .Count(),
+                UnpaidCount =  _context.Requests
+                    .Where(item =>  item.Status == 9 && item.Isdeleted == false && (id == 0 || item.Physicianid == id))
+                    .Count()
+            };
+        }
+
+        public void AddPhysicianRegion(int PhysicianId,int RegionId)
+        {
+            PhysicianRegion physicianRegion = new PhysicianRegion();
+            physicianRegion.Physicianid = PhysicianId;
+            physicianRegion.Regionid = RegionId;
+            _context.PhysicianRegions.Add(physicianRegion);
+            _context.SaveChanges();
+        }
+        public void AddAdminRegion(int AdminId,int RegionId)
+        {
+            AdminRegion adminRegion = new AdminRegion();
+            adminRegion.Adminid = AdminId;
+            adminRegion.Regionid = RegionId;
+            _context.AdminRegions.Add(adminRegion);
+            _context.SaveChanges(); 
+        }
+
+        public void AddPhysicianNotification(int PhysicianId)
+        {
+            PhysicianNotification physicianNotification = new PhysicianNotification();
+            physicianNotification.Physicianid =PhysicianId;
+            physicianNotification.Isnotificationstopped = new BitArray(new[] { true });
+            _context.PhysicianNotifications.Add(physicianNotification);
+            _context.SaveChanges();
+
         }
 
         #region UpdatePhysicianLocation

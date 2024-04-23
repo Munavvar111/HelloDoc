@@ -112,7 +112,7 @@
 			console.log("Current Page: " + currentPage);
 			changeTable("0", "", "0", "", "", "", false,currentPage);
 		});
-		function changeTable(status, patientname, requesttype, providorname, email, phonenumber, exportstatus,page) {
+		function changeTable(status, patientname, requesttype, providorname, email, phonenumber, exportstatus, page, fromDos, toDos) {
 
 			if (status == "1") {
 				status = [1];
@@ -141,7 +141,9 @@
 					email: email,
 					phoneNumber: phonenumber,
 					exportStatus: exportstatus,
-					page:page
+					page:page,
+					fromDos:fromDos,
+					toDos:toDos
 				},
 				success: function (data) {
 					if (exportstatus == true) {
@@ -171,7 +173,9 @@
 			var ProvidorName = $(".providorName").val();
 			var Email = $(".email").val();
 			var PhoneNumber = $(".phoneNumber").val();
-			changeTable(Status, PatientName, RequestType, ProvidorName, Email, PhoneNumber, false,1);
+			var fromDos = $(".startingDate").val();
+			var toDos = $(".endDate").val();
+			changeTable(Status, PatientName, RequestType, ProvidorName, Email, PhoneNumber, false, 1, fromDos, toDos);
 		});
 
 		$("#clearBtn").click(function () {
@@ -181,7 +185,7 @@
 			$(".providorName").val("");
 			$(".email").val("");
 			$(".phoneNumber").val("");
-			changeTable("0", "", "0", "", "", "", false,1);
+			changeTable("0", "", "0", "", "", "", false, 1, "", "");
 		});
 		$("#excelExport").click(function () {
 			var Status = $(".statusSelect").val();
@@ -190,7 +194,9 @@
 			var ProvidorName = $(".providorName").val();
 			var Email = $(".email").val();
 			var PhoneNumber = $(".phoneNumber").val();
-			changeTable(Status, PatientName, RequestType, ProvidorName, Email, PhoneNumber, true);
+			var fromDos = $(".startingDate").val();
+			var toDos = $(".endDate").val();
+			changeTable(Status, PatientName, RequestType, ProvidorName, Email, PhoneNumber, true, fromDos, toDos);
 		});
 		// Call changeTable with default values initially
 		changeTable("0", "", "0", "", "", "", false,currentPage);

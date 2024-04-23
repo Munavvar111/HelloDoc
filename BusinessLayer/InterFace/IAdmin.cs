@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -118,6 +119,29 @@ namespace BusinessLayer.InterFace
 
         void UpdatePhysicianDataBase(Physician physician);
 
+        List<string> GetMenuNamesByRoleId(int roleId);
+
+        Encounterform? GetEncounteFormByRequestId(int requestid);    
+
+        void UpdateEncounterForm(Encounterform encounterform);  
+
+        void  AddAspnetUserRole(string UserId,int RoleId);
+
+        void AddPhysicianRegion(int PhysicianId, int RegionId);
+
+        void AddAdminRegion(int AdminId, int RegionId);
+
+        void AddPhysicianNotification(int PhysicianId);
+
+        void UpdateRequestClientDataBase(Requestclient requestclient);
+
+        void AddAspNetUser(AspnetUser aspnetUser);
+        void AddPhysician(Physician physician);
+
+        void AddAdmin(Admin admin);
+        List<CancelCase> GetCancelCases();
+
+            RequestStatusCounts GetStatusCountsAsync(int id);
 
 
     }

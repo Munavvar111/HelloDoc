@@ -1,0 +1,52 @@
+﻿@{
+    ViewData["Title"] = "Dashboard";
+    Layout = "~/Views/Shared/_Layout5.cshtml";
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Welcome To The Site</title>
+    <style>
+    
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            text-align: center;
+        }
+
+        h1 {
+            color: #007bff;
+            margin-bottom: 20px;
+        }
+
+        p {
+            font-size: 18px;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+            .button:hover {
+                background-color: #0056b3;
+            }
+    </style>
+</head>
+<partial name="ToasterPartialView"></partial>
+
+<body>
+    <div class="container bg-light border-0">
+        <h1>Welcome To The Site</h1>
+        <p>It seems you don't have access to the dashboard. But don't worry, you can still explore the site! 🤝</p>
+    </div>
+</body>
+</html>

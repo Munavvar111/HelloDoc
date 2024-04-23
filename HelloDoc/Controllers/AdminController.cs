@@ -17,7 +17,7 @@ using BC = BCrypt.Net.BCrypt;
 
 namespace HelloDoc.Controllers
 {
-	public class AdminController : Controller
+    public class AdminController : Controller
     {
         private readonly ApplicationDbContext _context;
         private readonly IAdmin _admin;
@@ -56,93 +56,94 @@ namespace HelloDoc.Controllers
         {
             return _admin.GetAllPhysicianLocation();
         }
-		#endregion
+        #endregion
 
-		#region AdminProfilePage
+        #region AdminProfilePage
 
-		#region Profile
-		//Admin Profile Page 
-		[CustomAuthorize("MyProfile", "5")]
-		public IActionResult Profile()
-		{
-			try
-			{
-				string? email = HttpContext.Session.GetString("Email");
+        #region Profile
+        //Admin Profile Page 
+        [CustomAuthorize("MyProfile", "5")]
+        public IActionResult Profile()
+        {
+            try
+            {
+                //Get The Email From The Session
+                string? email = HttpContext.Session.GetString("Email");
+                //Check The Session Is Null Or Not
+                if (string.IsNullOrEmpty(email))
+                {
+                    TempData["Error"] = "Invalid session data. Please log in again.";
+                    return RedirectToAction("Index", "Login");
+                }
 
-				if (string.IsNullOrEmpty(email))
-				{
-					TempData["Error"] = "Invalid session data. Please log in again.";
-					return RedirectToAction("Index", "Login");
-				}
-
-				//GetProfile Date From Controller
-				AdminProfileVm adminProfile = _admin.GetAdminProfile(email);
+                //GetProfile Date From Controller
+                AdminProfileVm adminProfile = _admin.GetAdminProfile(email);
 
                 //GetAll Role Regardign The Admin
-				ViewBag.Roles = _admin.GetRoleFromAccountType(1);
+                ViewBag.Roles = _admin.GetRoleFromAccountType(1);
 
                 //Check adminProfile Is Not Null
-				if (adminProfile == null)
-				{
-					TempData["Error"] = "Something went wrong while fetching admin profile.";
-					return RedirectToAction("Index", "Admin");
-				}
+                if (adminProfile == null)
+                {
+                    TempData["Error"] = "Something went wrong while fetching admin profile.";
+                    return RedirectToAction("Index", "Admin");
+                }
 
-				return View(adminProfile);
-			}
-			catch (Exception ex)
-			{
-				
-				TempData["Error"] = "An error occurred while processing your request. Please try again later."+ex.Message;
-				return RedirectToAction("Index", "Admin");
-			}
-		}
+                return View(adminProfile);
+            }
+            catch (Exception ex)
+            {
 
-		#endregion
+                TempData["Error"] = "An error occurred while processing your request. Please try again later." + ex.Message;
+                return RedirectToAction("Index", "Admin");
+            }
+        }
 
-		#region ProfileByID
-		[CustomAuthorize("MyProfile", "5")]
-		//Edit The Profile From UserAccess
-		public IActionResult EditProfile(int adminid)
-		{
-			try
-			{
-				if (adminid == 0)
-				{
-					TempData["Error"] = "Admin ID value is not valid.";
-					return RedirectToAction("Index", "Admin");
-				}
+        #endregion
 
-				// Get Admin Details From The AdminID
-				Admin? admin = _admin.GetAdminEmailById(adminid);
-				if (admin == null)
-				{
-					TempData["Error"] = "Admin details not found.";
-					return RedirectToAction("Index", "Admin");
-				}
+        #region ProfileByID
+        [CustomAuthorize("MyProfile", "5")]
+        //Edit The Profile From UserAccess
+        public IActionResult EditProfile(int adminid)
+        {
+            try
+            {
+                if (adminid == 0)
+                {
+                    TempData["Error"] = "Admin ID value is not valid.";
+                    return RedirectToAction("Index", "Admin");
+                }
 
-				// Get Particular Admin Data
-				AdminProfileVm adminProfile = _admin.GetAdminProfile(admin.Email);
+                // Get Admin Details From The AdminID
+                Admin? admin = _admin.GetAdminEmailById(adminid);
+                if (admin == null)
+                {
+                    TempData["Error"] = "Admin details not found.";
+                    return RedirectToAction("Index", "Admin");
+                }
 
-				if (adminProfile == null)
-				{
-					TempData["Error"] = "Admin profile data not found.";
-					return RedirectToAction("Index", "Admin");
-				}
+                // Get Particular Admin Data
+                AdminProfileVm adminProfile = _admin.GetAdminProfile(admin.Email);
 
-				return View("Profile", adminProfile);
-			}
-			catch (Exception ex)
-			{
-				
-				TempData["Error"] = "An error occurred while processing your request. Please try again later.";
-				return RedirectToAction("Index", "Admin");
-			}
-		}
-		#endregion
+                if (adminProfile == null)
+                {
+                    TempData["Error"] = "Admin profile data not found.";
+                    return RedirectToAction("Index", "Admin");
+                }
 
-		#region ResetAdminPassword
-		[CustomAuthorize("MyProfile", "5")]
+                return View("Profile", adminProfile);
+            }
+            catch (Exception ex)
+            {
+
+                TempData["Error"] = "An error occurred while processing your request. Please try again later.";
+                return RedirectToAction("Index", "Admin");
+            }
+        }
+        #endregion
+
+        #region ResetAdminPassword
+        [CustomAuthorize("MyProfile", "5")]
         [HttpPost]
         public IActionResult ResetAdminPassword(string password)
         {
@@ -172,17 +173,21 @@ namespace HelloDoc.Controllers
         [HttpPost]
         public IActionResult AdministrationInfo(string EmailProvider, string mobileNo, string[] adminRegion)
         {
+            //Session Email Is Null Or Not Check
             string? sessionEmail = HttpContext.Session.GetString("Email");
+
             AspnetUser? AspnetUser = _patient.GetAspnetUserBYEmail(EmailProvider);
+            //Check If  Session  Is Not Equal To The UpdatedEmail 
             if (sessionEmail != EmailProvider)
             {
-
+                //Check Email Is Already Exist In AspNetUser
                 if (AspnetUser != null)
                 {
                     TempData["Error"] = "Email Already Exists Pleased Change the Email";
                     return RedirectToAction("Index", "Admin");
                 }
             }
+            //If Updated Email Is Null Or Ematy
             if (string.IsNullOrEmpty(sessionEmail))
             {
                 TempData["Error"] = "Invalid session data. Please log in again.";
@@ -209,7 +214,6 @@ namespace HelloDoc.Controllers
         public IActionResult AccountingInfo(string address1, string address2, string city, int state, string zipcode, string mobileNo)
         {
             string? sessionEmail = HttpContext.Session.GetString("Email");
-
             if (string.IsNullOrEmpty(sessionEmail))
             {
                 TempData["Error"] = "Invalid session data. Please log in again.";
@@ -237,27 +241,29 @@ namespace HelloDoc.Controllers
         #region ProviderPage
 
         #region Provider
-        //In Admin Dashboard Provider Page In This All Provider Details
         [CustomAuthorize("Provider", "8")]
         public IActionResult Provider()
         {
+            //In Admin Dashboard Provider Page In This All Provider Details
             List<Region> region = _admin.GetAllRegion();
             return View(region);
         }
         #endregion
 
         #region ProviderData
-        //Get All Provider Data By Its Working Region
         [CustomAuthorize("Provider", "8")]
         public IActionResult ProviderData(string region)
         {
+            //Get All Provider Data By Its Working Region
             List<ProviderVM> providers = _admin.GetProviders(region);
             return PartialView("ProviderProfileTablePartial", providers);
         }
-		#endregion
+        #endregion
 
-        public IActionResult ContactProvider(int ProviderId,int radioForprovider,string messageForProvider)
+        #region ContactProvider
+        public IActionResult ContactProvider(int ProviderId, int radioForprovider, string messageForProvider)
         {
+            //GetPhysician Details Using PhysicianId
             Physician physician = _admin.GetPhysicianById(ProviderId);
             string? Email = HttpContext.Session.GetString("Email");
             if (Email == null)
@@ -266,53 +272,55 @@ namespace HelloDoc.Controllers
                 return RedirectToAction("Index", "Login");
 
             }
+            //Get Admin Details Using Session Email
             Admin? admin = _admin.GetAdminByEmail(Email);
 
             if (radioForprovider == 1)
             {
+                //Send The Mail For Physician
                 string to = physician.Email;
                 string subject = "Contact Provider";
                 string body = "Please Connect Through To Use For Further Conversation";
                 if (_login.IsSendEmail(to, subject, body))
                 {
-                    _emailService.EmailLog(to, body, subject, physician.Firstname + " " + physician.Lastname, admin.Roleid,0, admin.Adminid, physician.Physicianid, 0, true, 1);
+                    _emailService.EmailLog(to, body, subject, physician.Firstname + " " + physician.Lastname, admin.Roleid, 0, admin.Adminid, physician.Physicianid, 0, true, 1);
                     TempData["SuccessMessage"] = "Send Request successful!";
-                    return RedirectToAction("Provider","Admin");
+                    return RedirectToAction("Provider", "Admin");
                 }
                 else
                 {
                     TempData["Error"] = "Send Request successful!";
-                    return RedirectToAction("Provider","Admin");
+                    return RedirectToAction("Provider", "Admin");
 
                 }
             }
             return RedirectToAction("Provider", "Admin");
         }
-
+        #endregion
 
         #region DeletePhysician
-        //Delete The Physician In Edit Physician Page 
         public bool DeltePhysician(string Email)
         {
+            //Delete The Physician In Edit Physician Page 
             Physician? physician = _admin.GetPhysicianByEmail(Email);
             if (physician == null)
             {
                 return false;
             }
-            physician.Isdeleted=true;
+            physician.Isdeleted = true;
             _admin.UpdatePhysicianDataBase(physician);
             _admin.SaveChanges();
             return true;
         }
-		#endregion
+        #endregion
 
-		#region PhysicanProfile
-		//Edit Physician Profile Page In that Admin Edit The Physician Details
-		[CustomAuthorize("Provider", "8", "22")]
+        #region PhysicanProfile
+        [CustomAuthorize("Provider", "8", "22")]
         [HttpGet("Admin/PhysicanProfile/{id}", Name = "AdminProviderProfile")]
         [HttpGet("Provider/PhysicanProfile", Name = "ProviderMyProfile")]
         public IActionResult PhysicanProfile(int id)
         {
+            //Edit Physician Profile Page In that Admin Edit The Physician Details
             string? Email = HttpContext.Session.GetString("Email");
             if (Email == null)
             {
@@ -364,16 +372,17 @@ namespace HelloDoc.Controllers
             }
             Physician physician = _admin.GetPhysicianById(physicianId);
             Admin? admin = _admin.GetAdminByEmail(Email);
-			if (physician == null || physician.Aspnetuser == null)
-			{
-				TempData["Error"] = "Something Went Wrong";
-				return RedirectToAction("Index", "Home"); 
-			}
+            if (physician == null || physician.Aspnetuser == null)
+            {
+                TempData["Error"] = "Something Went Wrong";
+                return RedirectToAction("Index", "Home");
+            }
 
-			try
-			{
+            try
+            {
                 if (password == null)
                 {
+                    //If Password Is NUll Then Update Its Username,role,status Detils
                     physician.Aspnetuser.Username = Username;
                     physician.Roleid = PhysicianRole;
                     physician.Status = (short?)Status;
@@ -385,7 +394,7 @@ namespace HelloDoc.Controllers
                 }
                 else
                 {
-
+                    //if password is not null then update Its password details
                     bool passwordChanged = _admin.ResetPhysicianPassword(physicianId, password);
                     if (passwordChanged)
                     {
@@ -417,6 +426,7 @@ namespace HelloDoc.Controllers
         {
             try
             {
+                //check the signature if is not null or not
                 if (signatureImage != null && signatureImage.Length > 0)
                 {
                     string fileName = _uploadProvider.UploadSignature(signatureImage, id);
@@ -445,7 +455,7 @@ namespace HelloDoc.Controllers
         [HttpPost]
         public IActionResult UploadDoc(string fileName, IFormFile File, int physicianid)
         {
-
+            //Upload The Onboarding Docs in the database
             Physician? physician = _admin.GetPhysicianById(physicianid);
             if (physician != null)
             {
@@ -516,7 +526,7 @@ namespace HelloDoc.Controllers
                         return RedirectToAction("Index", "Provider");
                 }
             }
-            
+
             try
             {
                 if (admin != null)
@@ -621,7 +631,7 @@ namespace HelloDoc.Controllers
         {
             List<Region> regions = _admin.GetAllRegion();
             List<Role> roles = _admin.GetRoleFromAccountType(2);
-            List<Role> providerrole = roles.Where(item => item.Isdeleted[0]).ToList();
+            List<Role> providerrole = roles.Where(item => !item.Isdeleted[0]).ToList();
             CreateProviderVM createProvider = new CreateProviderVM();
             createProvider.Regions = regions;
             createProvider.Roles = providerrole;
@@ -665,7 +675,7 @@ namespace HelloDoc.Controllers
             aspnetUser.Email = createProvider.Email;
             aspnetUser.Passwordhash = BC.HashPassword(createProvider.Passwordhash);
             aspnetUser.Phonenumber = createProvider.PhoneNo;
-            _context.AspnetUsers.Add(aspnetUser);
+            _admin.AddAspNetUser(aspnetUser);
             _admin.SaveChanges();
             Physician physician = new Physician();
             physician.Roleid = createProvider.RoleId;
@@ -733,8 +743,8 @@ namespace HelloDoc.Controllers
             {
                 physician.Istrainingdoc = new BitArray(new[] { false });
             }
-            _context.Physicians.Add(physician);
-            _context.SaveChanges();
+            _admin.AddPhysician(physician);
+            _admin.SaveChanges();
             if (createProvider.File != null)
             {
                 string photo = _uploadProvider.UploadPhoto(createProvider.File, physician.Physicianid);
@@ -759,26 +769,15 @@ namespace HelloDoc.Controllers
             {
                 string ICA = _uploadProvider.UploadDocFile(createProvider.NonDiscoluser, physician.Physicianid, "NonDiscoluser");
             }
-            PhysicianNotification physicianNotification = new PhysicianNotification();
-            physicianNotification.Physicianid = physician.Physicianid;
-            physicianNotification.Isnotificationstopped = new BitArray(new[] { true });
-            _context.PhysicianNotifications.Add(physicianNotification);
-            _context.SaveChanges();
+            _admin.AddPhysicianNotification(physician.Physicianid);
             foreach (string item in adminRegion)
             {
 
-                PhysicianRegion physicianRegion = new PhysicianRegion();
-                physicianRegion.Physicianid = physician.Physicianid;
-                physicianRegion.Regionid = int.Parse(item);
-                _context.PhysicianRegions.Add(physicianRegion);
+                _admin.AddPhysicianRegion(physician.Physicianid, int.Parse(item));
             }
-            _context.SaveChanges();
+            _admin.SaveChanges();
 
-            AspnetUserrole aspnetUserrole = new AspnetUserrole();
-            aspnetUserrole.Userid = aspnetUser.Aspnetuserid;
-            aspnetUserrole.Roleid = createProvider.RoleId;
-            _context.AspnetUserroles.Add(aspnetUserrole);
-            _context.SaveChanges();
+            _admin.AddAspnetUserRole(aspnetUser.Aspnetuserid, createProvider.RoleId);
 
             return RedirectToAction("Provider");
         }
@@ -874,7 +873,7 @@ namespace HelloDoc.Controllers
         #region ProviderOnCallFetch
         public IActionResult ProviderOnCallFetch(int region)
         {
-            ProviderOnCallVM model = _admin.GetProvidersOnCall(region,0);
+            ProviderOnCallVM model = _admin.GetProvidersOnCall(region, 0);
             return PartialView("ProviderOnCallPartial", model);
         }
         #endregion
@@ -918,7 +917,7 @@ namespace HelloDoc.Controllers
             {
                 id = e.Shiftid,
                 resourceId = e.Physicianid,
-                title =e.Starttime.ToString()+"_"+e.Endtime.ToString()+" "+ e.PhysicianName,
+                title = e.Starttime.ToString() + "-" + e.Endtime.ToString() + " " + e.PhysicianName,
                 start = new DateTime(e.Shiftdate.Value.Year, e.Shiftdate.Value.Month, e.Shiftdate.Value.Day, e.Starttime.Hour, e.Starttime.Minute, e.Starttime.Second),
                 end = new DateTime(e.Shiftdate.Value.Year, e.Shiftdate.Value.Month, e.Shiftdate.Value.Day, e.Endtime.Hour, e.Endtime.Minute, e.Endtime.Second),
                 ShiftDetailId = e.ShiftDetailId,
@@ -975,7 +974,7 @@ namespace HelloDoc.Controllers
                 {
                     id = e.Shiftid,
                     resourceId = e.Physicianid,
-                    title = e.PhysicianName,
+                    title = e.Starttime.ToString() + "-" + e.Endtime.ToString() + " " + e.PhysicianName,
                     start = new DateTime(e.Shiftdate.Value.Year, e.Shiftdate.Value.Month, e.Shiftdate.Value.Day, e.Starttime.Hour, e.Starttime.Minute, e.Starttime.Second),
                     end = new DateTime(e.Shiftdate.Value.Year, e.Shiftdate.Value.Month, e.Shiftdate.Value.Day, e.Endtime.Hour, e.Endtime.Minute, e.Endtime.Second),
                     ShiftDetailId = e.ShiftDetailId,
@@ -1007,7 +1006,7 @@ namespace HelloDoc.Controllers
             {
                 id = e.Shiftid,
                 resourceId = e.Physicianid,
-                title = e.PhysicianName,
+                title = e.Starttime.ToString() + "-" + e.Endtime.ToString() + " " + e.PhysicianName,
                 start = new DateTime(e.Shiftdate.Value.Year, e.Shiftdate.Value.Month, e.Shiftdate.Value.Day, e.Starttime.Hour, e.Starttime.Minute, e.Starttime.Second),
                 end = new DateTime(e.Shiftdate.Value.Year, e.Shiftdate.Value.Month, e.Shiftdate.Value.Day, e.Endtime.Hour, e.Endtime.Minute, e.Endtime.Second),
                 ShiftDetailId = e.ShiftDetailId,
@@ -1037,7 +1036,7 @@ namespace HelloDoc.Controllers
             {
                 id = e.Shiftid,
                 resourceId = e.Physicianid,
-                title = e.PhysicianName,
+                title = e.Starttime.ToString() + "-" + e.Endtime.ToString() + " " + e.PhysicianName,
                 start = new DateTime(e.Shiftdate.Value.Year, e.Shiftdate.Value.Month, e.Shiftdate.Value.Day, e.Starttime.Hour, e.Starttime.Minute, e.Starttime.Second),
                 end = new DateTime(e.Shiftdate.Value.Year, e.Shiftdate.Value.Month, e.Shiftdate.Value.Day, e.Endtime.Hour, e.Endtime.Minute, e.Endtime.Second),
                 ShiftDetailId = e.ShiftDetailId,
@@ -1226,14 +1225,14 @@ namespace HelloDoc.Controllers
 
                 }
             }
-			Region? region = _admin.GetRegionByName(healthProffesionalVM.State);
+            Region? region = _admin.GetRegionByName(healthProffesionalVM.State);
             if (region != null)
             {
                 healthprofessional.Regionid = region.Regionid;
             }
-            
 
-			healthprofessional.Vendorname = healthProffesionalVM.Vendorname;
+
+            healthprofessional.Vendorname = healthProffesionalVM.Vendorname;
             healthprofessional.Healthprofessionalid = healthProffesionalVM.Profession;
             healthprofessional.Email = healthProffesionalVM.Email;
             healthprofessional.Businesscontact = healthProffesionalVM.Businesscontact;
@@ -1299,7 +1298,7 @@ namespace HelloDoc.Controllers
                 Email = user?.Email ?? "",
                 PhoneNumber = user?.Mobile ?? "",
                 Address = user?.City ?? "",
-                UserId = user?.Userid??0
+                UserId = user?.Userid ?? 0
             }).ToList();
             int pageSize = 3;
             int totalItems = patientHistoryVms.Count();
@@ -1338,7 +1337,7 @@ namespace HelloDoc.Controllers
         }
 
         #region GetPatientSearchRecords
-        public IActionResult GetPatientSearchRecords(int[] status, string patientName, int requestType, string providorName, string email, string phoneNumber, bool exportStatus, int page)
+        public IActionResult GetPatientSearchRecords(int[] status, string patientName, int requestType, string providorName, string email, string phoneNumber, bool exportStatus, int page,DateTime fromDos,DateTime toDos)
         {
             var data = (from r in _context.Requests
                         join rc in _context.Requestclients on r.Requestid equals rc.Requestid
@@ -1358,7 +1357,7 @@ namespace HelloDoc.Controllers
             {
                 PatientName = $"{item.RequestClient.Firstname} {item.RequestClient.Lastname}",
                 Requestor = $"{item.Request.Firstname} {item.Request.Lastname}",
-                DateOfService = GetDateofService(item.Request.Requestid),
+                DateOfService = item.Request.Accepteddate,
                 ServiceDate = GetDateofService(item.Request.Requestid)?.ToString("MMMM dd, yyyy") ?? "",
                 DateofClose = GetCloseDate(item.Request.Requestid)?.ToString("MMMM dd, yyyy") ?? "",
                 CloseDate = GetCloseDate(item.Request.Requestid),
@@ -1384,9 +1383,9 @@ namespace HelloDoc.Controllers
       (status.Length == 0 || status.Contains(item.RequestStatus)) && item.IsDelted == false &&
       (requestType == 0 || item.RequestTypeId == requestType)
 
-  //&&
-  //(fromdos == null || item.dateofservice >= fromdos) &&
-  //(todos == null || item.dateofservice <= todos)
+  &&
+  (fromDos == DateTime.MinValue || item.DateOfService?.Date >= fromDos.Date) &&
+  (toDos == new DateTime() || item.DateOfService?.Date <= toDos.Date)
   ).ToList();
             int pageSize = 3;
             int totalItems = searchRecord.Count();
@@ -1487,7 +1486,7 @@ namespace HelloDoc.Controllers
             return View();
         }
 
-        public IActionResult GetSMSLogs(int currentPage,int pageSize,int role,string reciever,string mobile,DateTime createdDate,DateTime sentDate)
+        public IActionResult GetSMSLogs(int currentPage, int pageSize, int role, string reciever, string mobile, DateTime createdDate, DateTime sentDate)
         {
             List<LogsVM> logs = _admin.GetSmsLogs(role, reciever, mobile, createdDate, sentDate);
             return PartialView("SmsLogsPartial", logs);
@@ -1641,6 +1640,7 @@ namespace HelloDoc.Controllers
                 _admin.AddRoleMenus(rolemenu1);
             }
             _admin.SaveChanges();
+            TempData["SuccessMessage"] = "Your Role Update SuccessFull!!";
             return RedirectToAction("Access", new { roleid = roleid });
         }
         #endregion
@@ -1687,7 +1687,7 @@ namespace HelloDoc.Controllers
         #region CreateAdmin
         public IActionResult CreateAdmin()
         {
-            List<Role> roles =_admin.GetRoleFromAccountType(1);
+            List<Role> roles = _admin.GetRoleFromAccountType(1);
             List<Region> region = _admin.GetAllRegion();
             AdminProfileVm profile = new AdminProfileVm();
             profile.Regions = region;
@@ -1706,7 +1706,7 @@ namespace HelloDoc.Controllers
                 TempData["Error"] = "Send Request Unsuccessful!";
                 return RedirectToAction("CreateAdmin", "Admin");
             }
-            
+
 
             AspnetUser aspnet = new AspnetUser();
             aspnet.Email = profileVm?.Email ?? "";
@@ -1715,8 +1715,8 @@ namespace HelloDoc.Controllers
             aspnet.Createddat = DateTime.Now;
             aspnet.Passwordhash = BC.HashPassword(profileVm?.Password ?? "");
             aspnet.Phonenumber = profileVm?.MobileNo ?? "";
-            _context.AspnetUsers.Add(aspnet);
-            _context.SaveChanges();
+            _admin.AddAspNetUser(aspnetUser);   
+            _admin.SaveChanges();
 
             Admin admin = new Admin();
             admin.Email = profileVm?.Email ?? "";
@@ -1733,24 +1733,15 @@ namespace HelloDoc.Controllers
             admin.Status = 1;
             admin.Isdeleted = false;
 
-            _context.Admins.Add(admin);
-            _context.SaveChanges();
+            _admin.AddAdmin(admin);
+            _admin.SaveChanges();
 
             foreach (int region in adminRegion)
             {
-
-                AdminRegion adminregions = new AdminRegion();
-                adminregions.Adminid = admin.Adminid;
-                adminregions.Regionid = region;
-                _context.AdminRegions.Add(adminregions);
-                _context.SaveChanges();
+                _admin.AddAdminRegion(admin.Adminid, region);
             }
+            _admin.AddAspnetUserRole(aspnetUser.Aspnetuserid, profileVm.RoleAdminId);
 
-            AspnetUserrole aspnetUserrole = new AspnetUserrole();
-            aspnetUserrole.Userid = aspnet.Aspnetuserid;
-            aspnetUserrole.Roleid = profileVm.RoleAdminId;
-            _context.AspnetUserroles.Add(aspnetUserrole);
-            _context.SaveChanges();
             return RedirectToAction("UserAccess", "Admin");
         }
         #endregion
@@ -1764,14 +1755,17 @@ namespace HelloDoc.Controllers
         [HttpGet("Admin/Index", Name = "AdminIndex")]
         public IActionResult IndexWithOutDashboard()
         {
+            //If Admin have not access Of Dashboard then it will redirct here  
             ViewData["Title"] = "Dashboard";
             string? Email = HttpContext.Session.GetString("Email");
+            //check the session data if someone try to access it without login then it will show message
             if (Email == null)
             {
                 TempData["Error"] = "Your Session Will Be Expire Please LogedIn Again";
                 return RedirectToAction("Index", "Login");
             }
             Admin? admin = _admin.GetAdminByEmail(Email);
+            //if someone login and then its not admin then it will show error message
             if (admin == null)
             {
                 TempData["Error"] = "Your Session Will Be Expire Please LogedIn Again";
@@ -1779,19 +1773,21 @@ namespace HelloDoc.Controllers
 
             }
             string? rolefromroleid = HttpContext.Session.GetString("Role");
-			if (rolefromroleid == null)
-			{
-				TempData["Error"] = "Your Session Will Be Expire Please LogedIn Again";
-				return RedirectToAction("Index", "Login");
+            if (rolefromroleid == null)
+            {
+                TempData["Error"] = "Your Session Will Be Expire Please LogedIn Again";
+                return RedirectToAction("Index", "Login");
 
-			}
-			List<string> menulist = _context.Rolemenus.Include(b => b.Menu).Where(item => item.Roleid == int.Parse(rolefromroleid)).Select(item => item.Menu.Name).ToList();
+            }
+            List<string> menulist = _admin.GetMenuNamesByRoleId(int.Parse(rolefromroleid));
+            //Check The RoleList If some admin with dashboard access try to access this page then it will redirect to dashboard
             if (menulist.Contains("Dashboard"))
             {
                 List<NewRequestTableVM> request = _admin.GetAllData();
                 int newcount = request.Count(item => item.Status == 1);
                 return RedirectToAction("Index");
             }
+            //else show Its View
             return View();
         }
 
@@ -1799,56 +1795,63 @@ namespace HelloDoc.Controllers
         [HttpGet("Admin/Dashboard", Name = "AdminDashboard")]
         public IActionResult Index()
         {
-            ViewData["Title"] ="Dashboard";
-			List<Region> regions = _admin.GetAllRegion();
+            ViewData["Title"] = "Dashboard";
+            List<Region> regions = _admin.GetAllRegion();
 
-			ViewBag.regions = regions;
+            ViewBag.regions = regions;
 
-			string? rolefromroleid = HttpContext.Session.GetString("Role");
+            string? rolefromroleid = HttpContext.Session.GetString("Role");
             if (rolefromroleid == null)
             {
-				TempData["Error"] = "Your Session Will Be Expire Please LogedIn Again";
-				return RedirectToAction("Index", "Login");
+                TempData["Error"] = "Your Session Will Be Expire Please LogedIn Again";
+                return RedirectToAction("Index", "Login");
 
-			}
-			List<string> menulist = _context.Rolemenus.Include(b => b.Menu).Where(item => item.Roleid == int.Parse(rolefromroleid)).Select(item => item.Menu.Name).ToList();
+            }
+            List<string> menulist = _admin.GetMenuNamesByRoleId(int.Parse(rolefromroleid));
+            //Check The RoleList If its contain dashboard in menu then it will show dashboard
             if (menulist.Contains("Dashboard"))
             {
                 List<NewRequestTableVM> request = _admin.GetAllData();
                 int newcount = request.Count(item => item.Status == 1);
                 return View(request.ToList());
             }
+            //else it will redirect to indexwithoutpage
             else
-            {
                 return RedirectToAction("IndexWithOutDashboard");
-            }
-        }   
+        }
         #endregion
 
         #region SearchPatientDashboard
         [CustomAuthorize("Dashboard", "6")]
         public IActionResult SearchPatient(string searchValue, string selectValue, string partialName, string selectedFilter, int[] currentStatus, bool exportdata, bool exportAllData, int page, int pageSize = 10)
         {
-
-            ViewBag.Cancel = _context.Casetags.Select(cc => new CancelCase
-            {
-                CancelCaseReson = cc.Name,
-                CancelReasonId = cc.Casetagid
-            }).ToList();
-
-
+            //Its Define ALl Cancel Reason Theat Stored In Database
+            ViewBag.Cancel = _admin.GetCancelCases();
+            //For Pagination Error If Page Not Found Then It show Firstpage
             if (page == 0)
             {
                 page = 1;
             }
+            //Search Value ==Filter The Database Accoeding To Its name If Admin Search name Theat Start With 'm'
+            //Select Value == filter The DataAccoeding TO Its Region
+            //Select Filter == filter The DataAccoeding To Its RequestTypeId ,Ex:'Patient','Friend','Conciege','Family Friend01'
+            //Pass The Current Status If Admin Click In New Then It Will Passed Status=[1],panding=[2],active=[4,5],conclude=[8],toclose=[3,7,9],unpaid=[10]
+
             List<NewRequestTableVM> filteredPatients = _admin.SearchPatients(searchValue, selectValue, selectedFilter, currentStatus);
+
+            //Export The Data
             List<NewRequestTableVM> ExportData = _admin.SearchPatients(searchValue, selectValue, selectedFilter, currentStatus);
+
+            //Total Item In Filterpatients Result 
             int totalItems = filteredPatients.Count();
+            //Count TotalPage
             int totalPages = (int)Math.Ceiling((double)totalItems / pageSize);
             List<NewRequestTableVM> paginatedData = filteredPatients.Skip((page - 1) * pageSize).Take(pageSize).ToList();
             ViewBag.totalPages = totalPages;
             ViewBag.CurrentPage = page;
             ViewBag.PageSize = pageSize;
+
+            //If admin Click Exportdata  Then it download the excel File 
             if (exportdata)
             {
                 using (var memoryStream = new MemoryStream())
@@ -1866,6 +1869,7 @@ namespace HelloDoc.Controllers
         }
         #endregion
 
+
         public ActionResult<IEnumerable<Region>> GetRegions()
         {
             return _admin.GetAllRegion();
@@ -1874,6 +1878,7 @@ namespace HelloDoc.Controllers
         [CustomAuthorize("Dashboard", "6")]
         public IActionResult ExportAll(string currentStatus)
         {
+            //ExportAll Data Are ExportAll Data In That Paticular Data If State Is New Then It will Make Excel Of That state All Data
             int[]? statusArray = currentStatus?.Split(',')?.Select(int.Parse).ToArray();
             string searchValue = "";
             string selectValue = "";
@@ -1886,7 +1891,7 @@ namespace HelloDoc.Controllers
                 csvWriter.WriteRecords(filteredPatientsd);
                 writer.Flush();
                 var result = memoryStream.ToArray();
-                return File(result, "text/csv", "filtered_data.csv"); // Change content type and file name as needed
+                return File(result, "text/csv", "filtered_data.csv");
             }
         }
         #endregion
@@ -1899,13 +1904,10 @@ namespace HelloDoc.Controllers
         [HttpGet("Provider/viewcase/{id}", Name = "ProviderCase")]
         public IActionResult ViewCase(int id)
         {
+            //In This Id Is RequestClient Id 
+            // Physician And Admin Both Are Used The Same ViewCase Page
             string? Email = HttpContext.Session.GetString("Email");
-            ViewBag.Cancel = _context.Casetags.Select(cc => new CancelCase
-            {
-                CancelCaseReson = cc.Name,
-                CancelReasonId = cc.Casetagid
-            }).ToList();
-
+            ViewBag.Cancel = _admin.GetCancelCases();
             ViewBag.Regions = _admin.GetAllRegion();
             if (Email == null)
             {
@@ -1914,8 +1916,10 @@ namespace HelloDoc.Controllers
             }
             Admin? admin = _admin.GetAdminByEmail(Email);
             Physician? physician = _admin.GetPhysicianByEmail(Email);
+            //Get Data From The RequestClient Table
             Requestclient? request = _admin.GetRequestClientById(id);
             ViewCaseVM ViewCase = new ViewCaseVM();
+            //If requestclient Details Is Null Or Not IF Null Then Redirect To The Dashboard Page
             if (request == null)
             {
                 TempData["Error"] = "Something Went Wrong";
@@ -1928,25 +1932,26 @@ namespace HelloDoc.Controllers
             {
                 ViewBag.IsPhysican = false;
 
-                 ViewCase = _admin.GetCaseById(id, 0);
+                ViewCase = _admin.GetCaseById(id, 0);
             }
-            else if(physician!=null)
+            else if (physician != null)
             {
                 ViewBag.IsPhysican = true;
                 if (request.Request.Physicianid != physician.Physicianid)
                 {
+                    //Physician Is Try To Access Other Patient ViewCase Detials 
                     TempData["Error"] = "Dont Try To Access It!!";
                     return RedirectToAction("Index", "Provider");
                 }
-                 ViewCase = _admin.GetCaseById(id, physician.Physicianid);
+                ViewCase = _admin.GetCaseById(id, physician.Physicianid);
 
             }
-                return View(ViewCase);
-            
+            return View(ViewCase);
+
         }
         #endregion
 
-        #region ViewCase
+        #region ViewCasePost
         [CustomAuthorize("Dashboard", "6")]
         [HttpPost]
         public async Task<IActionResult> ViewCase(ViewCaseVM viewCaseVM, int id)
@@ -1954,8 +1959,9 @@ namespace HelloDoc.Controllers
 
             if (ModelState.IsValid)
             {
-
+                //Update Viewcase Detials
                 Requestclient? requestclient = _admin.GetRequestClientById(id);
+                //If Enter Email Is Already Exists In database Or Not Is Checked
                 if (requestclient.Email != viewCaseVM.EmailView)
                 {
                     AspnetUser? aspnetUser = _admin.GetAspNetUserByEmail(viewCaseVM.EmailView);
@@ -1963,9 +1969,7 @@ namespace HelloDoc.Controllers
                     {
                         TempData["Error"] = "This Email Is Already Exsits In DataBase";
                         return RedirectToAction("ViewCase", new { id });
-
                     }
-
                 }
                 await _admin.UpdateRequestClient(viewCaseVM, id);
                 return RedirectToAction("ViewCase", new { id });
@@ -1984,6 +1988,8 @@ namespace HelloDoc.Controllers
         [HttpGet("Provider/Viewnotes", Name = "ProviderNotes")]
         public IActionResult Viewnotes(int requestid)
         {
+            // Physician And Admin Both Are Used The Same ViewCase Page
+            //Check The Session Details If Session Is Exist Or Not
             string? Email = HttpContext.Session.GetString("Email");
             if (Email == null)
             {
@@ -1991,9 +1997,11 @@ namespace HelloDoc.Controllers
                 return RedirectToAction("Index", "Login");
 
             }
+            //Get Session Logged User Data
             Admin? admin = _admin.GetAdminByEmail(Email);
             Physician? physician = _admin.GetPhysicianByEmail(Email);
             Requestclient? request = _admin.GetRequestclientByRequestId(requestid);
+            //If Request Is not IN database Then Show Error And Redirct To The Login
             if (request == null)
             {
                 TempData["Error"] = "Something Went Wrong";
@@ -2002,10 +2010,11 @@ namespace HelloDoc.Controllers
                 else
                     return RedirectToAction("Index", "Provider");
             }
+            //If Admin Is Logged In then It Pass Viewbag It include Some More Funcation Like Edit btn For Admin
             if (admin != null)
                 ViewBag.IsPhysician = false;
 
-            else if(physician!=null)
+            else if (physician != null)
             {
                 ViewBag.IsPhysician = true;
                 if (request.Request.Physicianid != physician.Physicianid)
@@ -2017,7 +2026,7 @@ namespace HelloDoc.Controllers
             }
             ViewData["ViewName"] = "Dashboard";
             ViewData["RequestId"] = requestid;
-
+            //Get Nots From The Repository
             ViewNotes result = _admin.GetNotesForRequest(requestid);
 
             return View(result);
@@ -2043,17 +2052,23 @@ namespace HelloDoc.Controllers
             {
                 if (admin != null)
                 {
+                    //Update The Notes In RequestNotes Table Admin Notes;
+                    //Here IsPhysician Is False
                     await _admin.UpdateAdminNotes(id, adminNotes, admin.Aspnetuserid, IsPhysician);
                     return RedirectToAction("ViewNotes", new { requestid = id });
                 }
                 if (physician != null && physician.Aspnetuserid != null)
                 {
+
+                    //Update The Notes In RequestNotes Table Physician Notes;
+                    //Here IsPhysician Is True
                     await _admin.UpdateAdminNotes(id, adminNotes, physician.Aspnetuserid, IsPhysician = true);
                     return RedirectToAction("ViewNotes", "Provider", new { requestid = id });
                 }
             }
             else
             {
+                //Handle The Error If Notes Is Not Found
                 TempData["Error"] = "Notes Is Not Found Try Again!!";
                 return RedirectToAction("ViewNotes", new { requestid = id });
 
@@ -2071,6 +2086,8 @@ namespace HelloDoc.Controllers
         [HttpPost]
         public async Task<IActionResult> AssignRequest(int regionid, int physician, string description, int requestid, int status)
         {
+            //Assign RequestModal In That Admin Assign The Patient To Then Physician 
+            //Check The Session
             string? email = HttpContext.Session.GetString("Email");
             int? id = HttpContext.Session.GetInt32("id");
             if (email == null)
@@ -2081,6 +2098,8 @@ namespace HelloDoc.Controllers
             Admin? admin = _admin.GetAdminByEmail(email);
             if (admin != null)
             {
+                //In This It Assgin The Physician To Patient In THis State Is Not
+                //Changed After That Physician Show That Request In Physician Dashboard In New State
                 bool result = await _admin.AssignRequest(regionid, physician, description, requestid, admin.Adminid);
                 TempData["SuccessMessage"] = "Assign successfully";
 
@@ -2108,7 +2127,7 @@ namespace HelloDoc.Controllers
             Admin? admin = _admin.GetAdminByEmail(email);
             if (admin != null)
             {
-
+                //Transfer Request Is In That Admin Transfer Request To The Another Physician It WIll Redirect To The New State After Transfer
                 bool result = await _admin.AssignRequest(regionid, physician, description, requestid, admin.Adminid);
                 return Json(result);
             }
@@ -2122,6 +2141,8 @@ namespace HelloDoc.Controllers
         #region CloseCaseModal
         public IActionResult CloseCaseModal(int requestid)
         {
+            //Close Case Modal Is Visible In When Admin Is Click In Close Case In ToClose State 
+            //After Close The case Request Is Go On Unpaid State
             Request? request = _admin.GetRequestById(requestid);
             string? email = HttpContext.Session.GetString("Email");
             int? id = HttpContext.Session.GetInt32("id");
@@ -2153,6 +2174,8 @@ namespace HelloDoc.Controllers
         [CustomAuthorize("Dashboard", "6")]
         public async Task<IActionResult> CancelCase(string notes, string cancelReason, int requestid)
         {
+            //Cancel Case Is Admin Can Cancel In New,panding State 
+            //After Cancel Request Is Go ON cancel Case It Will Showd In To Close State
             string? Email = HttpContext.Session.GetString("Email");
             if (Email == null)
             {
@@ -2161,7 +2184,7 @@ namespace HelloDoc.Controllers
 
             }
             Admin? admin = _admin.GetAdminByEmail(Email);
-
+            //It Change update The Notes And Cancel The Request
             bool result = await _admin.CancelCase(requestid, notes, cancelReason, admin.Adminid);
             TempData["SuccessMessage"] = "Cancel successfully";
             return Json(result);
@@ -2172,6 +2195,7 @@ namespace HelloDoc.Controllers
         [HttpPost]
         public IActionResult BlockRequest(string blockreason, int requestid)
         {
+            //It Will Visible In admin New State WHere Admin Can BLock The Request After That User Will Not Able To Create Request With That Partclure Email;
             bool success = _admin.BlockRequest(blockreason, requestid);
             if (success)
             {
@@ -2190,7 +2214,7 @@ namespace HelloDoc.Controllers
 
         public IActionResult SendLink(string Email, string PhoneNo, string LastNameSendOrder, string FirstNameSendOrder)
         {
-
+            //This Page Will Send The Email Of Thew Create Request Page To The Particlur Email That Admin Fill In the FOrm 
             string? SessionEmail = HttpContext.Session.GetString("Email");
             if (SessionEmail == null)
             {
@@ -2272,47 +2296,12 @@ namespace HelloDoc.Controllers
             requestmoel.Regions = region;
             return View(requestmoel);
         }
-		#endregion
+        #endregion
 
 
-		[HttpPost]
-		public ActionResult DownloadSelectedFiles(string[] filenames)
-		{
-			// Assuming files are stored in the wwwroot/uploads directory
-			string rootPath = Path.Combine(_hostingEnvironment.WebRootPath, "uploads");
 
-			// Create a temporary memory stream to store the zip file content
-			using (MemoryStream memoryStream = new MemoryStream())
-			{
-				// Create a zip archive and add the selected files to it
-				using (System.IO.Compression.ZipArchive archive = new System.IO.Compression.ZipArchive(memoryStream, System.IO.Compression.ZipArchiveMode.Create, true))
-				{
-					foreach (string filename in filenames)
-					{
-						string filePath = Path.Combine(rootPath, filename);
-						if (System.IO.File.Exists(filePath))
-						{
-							string entryName = Path.GetFileName(filePath);
-							var entry = archive.CreateEntry(entryName);
-
-							using (var entryStream = entry.Open())
-							using (var fileStream = System.IO.File.OpenRead(filePath))
-							{
-								fileStream.CopyTo(entryStream);
-							}
-						}
-					}
-				}
-
-				// Reset the memory stream position to the beginning
-				memoryStream.Position = 0;
-
-				// Return the zip file as a downloadable response
-				return File(memoryStream, "application/zip", "SelectedFiles.zip");
-			}
-		}
-		#region CreateRequestPost
-		[CustomAuthorize("Dashboard", "6", "19")]
+        #region CreateRequestPost
+        [CustomAuthorize("Dashboard", "6", "19")]
         [HttpPost]
         public IActionResult CreateRequest(RequestModel requestModel)
         {
@@ -2333,12 +2322,12 @@ namespace HelloDoc.Controllers
                 int? id = HttpContext.Session.GetInt32("id");
                 Region? statebyregionid = _admin.GetRegionByName(requestModel.State);
 
-
+                //Add Request In Request Table
                 _patient.AddRequest(requestModel, 0, 1);
                 Request? request1 = _patient.GetRequestByEmail(requestModel.Email);
                 if (request1 != null)
                 {
-
+                    //Add Requestclient Table 
                     _patient.AddRequestClient(requestModel, request1.Requestid);
 
 
@@ -2376,6 +2365,7 @@ namespace HelloDoc.Controllers
                     _admin.AddRequestNotes(requestnote);
                     _admin.SaveChanges();
 
+                    //Genrate Confirmation Number
                     int count = _context.Requests.Where(x => x.Createddate.Date == request1.Createddate.Date).Count() + 1;
                     Region region = _admin.GetRegionByName(requestModel.State);
                     if (region != null)
@@ -2394,7 +2384,7 @@ namespace HelloDoc.Controllers
                     _admin.UpdateRequest(request1);
                     _admin.SaveChanges();
                     string token = Guid.NewGuid().ToString();
-					string? resetLink = Url.Action("Index", "Register", new { userId = request1.Requestid, token }, protocol: HttpContext.Request.Scheme);
+                    string? resetLink = Url.Action("Index", "Register", new { userId = request1.Requestid, token }, protocol: HttpContext.Request.Scheme);
                     string to = requestModel.Email;
                     string body = $"Click <a href='{resetLink}'>here</a> to Create A new Account";
                     string subject = "Create Your New Account";
@@ -2440,14 +2430,16 @@ namespace HelloDoc.Controllers
 
         public IActionResult GetStatusCounts(int id)
         {
+            var countsdetails = _admin.GetStatusCountsAsync(id);
+
             var counts = new
             {
-                NewCount = _context.Requests.Where(item => item.Status == 1 && item.Isdeleted == false).Count(),
-                PendingCount = _context.Requests.Where(item => item.Status == 2 && item.Isdeleted == false).Count(),
-                ActiveCount = _context.Requests.Where(item => (item.Status == 4 || item.Status == 5) && item.Isdeleted == false).Count(),
-                ToClosedCount = _context.Requests.Where(item => (item.Status == 3 || item.Status == 7 || item.Status == 8) && item.Isdeleted == false).Count(),
-                ConcludeCount = _context.Requests.Where(item => item.Status == 6 && item.Isdeleted == false).Count(),
-                UnpaidCount = _context.Requests.Where(item => item.Status == 9 && item.Isdeleted == false).Count(),
+                NewCount =countsdetails.NewCount,
+                PendingCount = countsdetails.PendingCount,
+                ActiveCount = countsdetails.ActiveCount,
+                ToClosedCount = countsdetails.ToClosedCount,
+                ConcludeCount = countsdetails.ConcludeCount,
+                UnpaidCount = countsdetails.UnpaidCount,
             };
             return Json(counts);
         }
@@ -2465,12 +2457,13 @@ namespace HelloDoc.Controllers
                 TempData["Error"] = "Something Went Wrong Try Leter!!";
                 return RedirectToAction("Index", "Login");
             }
+            var countsdetails = _admin.GetStatusCountsAsync(physician.Physicianid);
             var counts = new
             {
-                NewCount = _context.Requests.Where(item => item.Status == 1 && item.Physicianid == physician.Physicianid && item.Isdeleted == false).Count(),
-                PendingCount = _context.Requests.Where(item => item.Status == 2 && item.Physicianid == physician.Physicianid && item.Isdeleted == false).Count(),
-                ActiveCount = _context.Requests.Where(item => (item.Status == 4 || item.Status == 5) && item.Physicianid == physician.Physicianid && item.Isdeleted == false).Count(),
-                ConcludeCount = _context.Requests.Where(item => item.Status == 6 && item.Physicianid == physician.Physicianid && item.Isdeleted == false).Count(),
+                NewCount =countsdetails.NewCount,
+                PendingCount = countsdetails.PendingCount,
+                ActiveCount = countsdetails.ActiveCount,
+                ConcludeCount = countsdetails.ConcludeCount
             };
             return Json(counts);
         }
@@ -2499,6 +2492,8 @@ namespace HelloDoc.Controllers
         [HttpGet("Provider/viewuploads/{id}", Name = "ProviderUpload")]
         public async Task<IActionResult> ViewUploads(int id)
         {
+            //Here Id Is Request Id
+            //In This Page Show All Doucment Uploaded By Admin ,Physician And (User:-In Conclude State)
             string? email = HttpContext.Session.GetString("Email");
             if (email == null)
             {
@@ -2508,6 +2503,7 @@ namespace HelloDoc.Controllers
             Physician? physician = _admin.GetPhysicianByEmail(email);
             Admin? admin = _admin.GetAdminByEmail(email);
             Requestclient? request = _admin.GetRequestclientByRequestId(id);
+            //Check The Email Is Exist Or Not 
             if (request == null)
             {
                 TempData["Error"] = "Something Went Wrong";
@@ -2530,7 +2526,7 @@ namespace HelloDoc.Controllers
                 }
                 ViewBag.IsPhysician = true;
             }
-
+            //Get All File That Are Uploaded
             List<Requestwisefile> reqfile = await _patient.GetRequestwisefileByIdAsync(id);
             List<Requestwisefile> reqfiledeleted = reqfile.Where(item => item.Isdeleted != null && (item.Isdeleted.Length == 0 || !item.Isdeleted[0])).ToList();
             Request? requestclient = _admin.GetRequestById(id);
@@ -2802,12 +2798,13 @@ namespace HelloDoc.Controllers
         public IActionResult VendorNameByHelthProfession(int helthprofessionaltype)
         {
             List<Healthprofessional> vendorname = _context.Healthprofessionals.Where(item => item.Healthprofessionalid == helthprofessionaltype).ToList();
+
             return Ok(vendorname);
         }
 
         public IActionResult BusinessDetails(int vendorname)
         {
-            Healthprofessional? businessdetails = _context.Healthprofessionals.Where(item => item.Healthprofessionalid == vendorname).FirstOrDefault();
+            Healthprofessional? businessdetails = _admin.GetHealthprofessionalById(vendorname);
             return Ok(businessdetails);
         }
 
@@ -2815,7 +2812,8 @@ namespace HelloDoc.Controllers
         [HttpPost]
         public IActionResult SendAgreement(int requestid, string agreementemail, string agreementphoneno)
         {
-            Request? request=_admin.GetRequestById(requestid);   
+            //In This Page Will Show In the Send Agreement Of the Request I
+            Request? request = _admin.GetRequestById(requestid);
             string? Email = HttpContext.Session.GetString("Email");
             if (Email == null)
             {
@@ -2833,7 +2831,7 @@ namespace HelloDoc.Controllers
             string subject = "Accept Agreement";
             if (admin != null)
             {
-                
+
                 if (_login.IsSendEmail(to, subject, body))
                 {
                     _emailService.EmailLog(to, body, subject, request.Firstname + " " + request.Lastname, admin.Roleid, requestid, admin.Adminid, 0, 0, true, 1);
@@ -2859,7 +2857,7 @@ namespace HelloDoc.Controllers
         }
         #endregion
 
-        #region CleaeCasePost
+        #region ClearCasePost
         [HttpPost]
         public IActionResult ClearCase(int requestidclearcase)
         {
@@ -2945,8 +2943,7 @@ namespace HelloDoc.Controllers
             }
             Admin? admin = _admin.GetAdminByEmail(Email);
             Physician? physician = _admin.GetPhysicianByEmail(Email);
-            Encounterform? encounterFormByRequestId = _context.Encounterforms.Include(r => r.Request).FirstOrDefault(item => item.RequestId == requestId);
-
+            Encounterform? encounterFormByRequestId = _admin.GetEncounteFormByRequestId(requestId);
 
 
             if (admin != null)
@@ -2962,7 +2959,7 @@ namespace HelloDoc.Controllers
                 {
                     TempData["Error"] = "Something Went Wrong";
                     return RedirectToAction("Index", "Provider");
-                }   
+                }
                 ViewBag.IsPhysician = true;
             }
             ViewEncounterForm viewEncounterForm = new ViewEncounterForm();
@@ -3026,11 +3023,10 @@ namespace HelloDoc.Controllers
             else
             {
                 _admin.SaveOrUpdateEncounterForm(viewEncounterForm, requestid);
-                Encounterform? encounter = _context.Encounterforms
-                .FirstOrDefault(item => item.RequestId == int.Parse(requestid));
+                Encounterform? encounter = _admin.GetEncounteFormByRequestId(int.Parse(requestid));
                 encounter.IsFinalize = true;
-                _context.Encounterforms.Update(encounter);
-                _context.SaveChanges();
+                _admin.UpdateEncounterForm(encounter);
+                _admin.SaveChanges();
                 TempData["SuccessMessage"] = "Encounter Form Finalize SuccessFully!!";
 
                 if (admin != null)
@@ -3044,7 +3040,7 @@ namespace HelloDoc.Controllers
         #region CloseCase
         [HttpGet("Admin/CloseCase/", Name = "AdminCloseCase")]
         [HttpGet("Provider/ConcludeCare/", Name = "ProviderConcludeCare")]
-        public IActionResult CloseCase(int requestid)
+        public async Task<IActionResult> CloseCase(int requestid)
         {
             string? Email = HttpContext.Session.GetString("Email");
             if (Email == null)
@@ -3055,7 +3051,7 @@ namespace HelloDoc.Controllers
             Physician? physician = _admin.GetPhysicianByEmail(Email);
             Admin? admin = _admin.GetAdminByEmail(Email);
             Requestclient? requestclient = _admin.GetRequestclientByRequestId(requestid);
-            List<Requestwisefile> requestwisedocument = _context.Requestwisefiles.Where(item => item.Requestid == requestid).ToList();
+            List<Requestwisefile> requestwisedocument = await _patient.GetRequestwisefileByIdAsync(requestid);
             if (requestclient == null)
             {
                 TempData["Error"] = "Something Went Wrong";
@@ -3079,23 +3075,23 @@ namespace HelloDoc.Controllers
                 }
 
             }
-            
 
-                string? requestclientnumber = requestclient.Request.Confirmationnumber;
-                CloseCaseVM closecase = new CloseCaseVM();
-                closecase.FirstName = requestclient?.Firstname ?? "";
-                closecase.LastName = requestclient?.Lastname ?? "";
-                closecase.Email = requestclient?.Email ?? "";
-                closecase.PhoneNo = requestclient?.Phonenumber ?? "";
-                closecase.BirthDate = requestclient != null && requestclient.Intyear != null && requestclient.Strmonth != null && requestclient.Intdate != null
-                                      ? new DateOnly((int)requestclient.Intyear, int.Parse(requestclient.Strmonth), (int)requestclient.Intdate)
-                                      : new DateOnly();
-                closecase.Requestwisefileview = requestwisedocument;
-                closecase.ConfirmNumber = requestclientnumber;
-                closecase.Requestid = requestid;
-                return View(closecase);
-            
-           
+
+            string? requestclientnumber = requestclient.Request.Confirmationnumber;
+            CloseCaseVM closecase = new CloseCaseVM();
+            closecase.FirstName = requestclient?.Firstname ?? "";
+            closecase.LastName = requestclient?.Lastname ?? "";
+            closecase.Email = requestclient?.Email ?? "";
+            closecase.PhoneNo = requestclient?.Phonenumber ?? "";
+            closecase.BirthDate = requestclient != null && requestclient.Intyear != null && requestclient.Strmonth != null && requestclient.Intdate != null
+                                  ? new DateOnly((int)requestclient.Intyear, int.Parse(requestclient.Strmonth), (int)requestclient.Intdate)
+                                  : new DateOnly();
+            closecase.Requestwisefileview = requestwisedocument;
+            closecase.ConfirmNumber = requestclientnumber;
+            closecase.Requestid = requestid;
+            return View(closecase);
+
+
         }
         #endregion
 
@@ -3124,14 +3120,14 @@ namespace HelloDoc.Controllers
                 if (admin != null)
                 {
 
-                        requeststatuslog.Adminid = admin.Adminid;
+                    requeststatuslog.Adminid = admin.Adminid;
                     Requestclient? requestclient = _admin.GetRequestclientByRequestId(requestid);
                     if (requestclient != null)
                     {
 
                         requestclient.Phonenumber = closeCaseVM.PhoneNo;
                         requestclient.Email = closeCaseVM.Email;
-                        _context.Requestclients.Update(requestclient);
+                        _admin.UpdateRequestClientDataBase(requestclient);
                         _admin.SaveChanges();
 
                     }
@@ -3140,7 +3136,7 @@ namespace HelloDoc.Controllers
                 else
                 {
                     Requestnote? requestnote = _admin.GetRequestNotesByRequestId(requestid);
-                        requeststatuslog.Physicianid = physician.Physicianid;
+                    requeststatuslog.Physicianid = physician.Physicianid;
                     if (requestnote != null)
                     {
                         requestnote.Physiciannotes = closeCaseVM.Notes;
@@ -3189,7 +3185,7 @@ namespace HelloDoc.Controllers
 
         public IActionResult CheckEncounterFormFinalized(int requestId)
         {
-            Encounterform? encounterform = _context.Encounterforms.Where(item => item.RequestId == requestId).FirstOrDefault();
+            Encounterform? encounterform = _admin.GetEncounteFormByRequestId(requestId);
             if (encounterform != null)
             {
                 if (encounterform.IsFinalize)

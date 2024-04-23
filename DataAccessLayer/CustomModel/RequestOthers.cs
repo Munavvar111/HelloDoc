@@ -89,5 +89,14 @@ namespace DataAccessLayer.CustomModel
 		public List<Region>? Regions { get; set; }
 
 	}
+    public class RequestStatusCounts
+    {
+        public int NewCount { get; set; }
+        public int PendingCount { get; set; }
+        public int ActiveCount { get; set; }
+        public int ToClosedCount { get; set; }
+        public int ConcludeCount { get; set; }
+        public int UnpaidCount { get; set; }
+    }
 
 }
