@@ -63,5 +63,10 @@ namespace BAL.Repository
             _context.Tasks.Update(task);
             _context.SaveChanges(); return true;
         }
+
+        public Task GetTaskById(int TaskId)
+        {
+            return _context.Tasks.Find(TaskId);
+        }
     }
 }

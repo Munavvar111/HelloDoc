@@ -21,5 +21,7 @@ namespace BAL.Interface
 
 
         bool UpdateTask(string TaskName, string Asignee, string Discription, DateTime DueDate, string City, string Category, int TaskId); 
+
+        Task GetTaskById(int TaskId);
     }
 }

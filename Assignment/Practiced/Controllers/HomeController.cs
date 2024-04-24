@@ -26,6 +26,7 @@ namespace Practiced.Controllers
 
         public IActionResult Index()
         {
+            //Pass Categorys In Database
             ViewBag.Categorys = _taskmanger.GetAllCategories();
             return View();
         }
@@ -40,10 +41,16 @@ namespace Practiced.Controllers
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
+
+        /// <summary>
+        /// GetAll Task In Main Page In It Will Render In partialVIew TaskManagement Partial
+        /// </summary>
         public IActionResult GetTaskDetails(string searchValue, int page = 1)
         {
+            //Get All Categorys From The Repositry
             ViewBag.Categorys = _taskmanger.GetAllCategories();
 
+            //For Pagination The Table
             var DetailsTask = _taskmanger.GetTaskDetails(searchValue);
             int totalItems = DetailsTask.Count();
             int pageSize = 5;
@@ -60,18 +67,21 @@ namespace Practiced.Controllers
         [HttpPost]
         public IActionResult AddTaskDetails(string Taskname, string Asignee, string Discription, DateTime DueDate, string City, int Category)
         {
+            //Add Task In DataBase
             if (_taskmanger.AddTask(Taskname, Asignee, Discription, DueDate, City, Category))
             {
                 return Ok();
             }
             else
             {
+                //Show Paasedd Message In Javascript And Handle that in javascript
                 return Ok();
             }
         }
         [HttpPost]
         public IActionResult EditTaskDetails(string Taskname, string Asignee, string Discription, DateTime DueDate, string City, string Category, int TaskID)
         {
+            //Edit The Task Details Using Modal
             if(_taskmanger.UpdateTask(Taskname,Asignee,Discription,DueDate,City,Category,TaskID))
             {
             return Ok();
@@ -81,6 +91,7 @@ namespace Practiced.Controllers
         }
         public IActionResult DeleteTask(int taskid)
         {
+            //Delete The Task
             if (_taskmanger.DeleteTask(taskid))
             {
                 return RedirectToAction("Index");
@@ -92,7 +103,9 @@ namespace Practiced.Controllers
 
         public IActionResult TaskDetailsFromId(int item)
         {
-            var task = _context.Tasks.Find(item);
+            //Fetch Task Details On EditTask Modal
+            //Here Item Is TaskId
+            var task = _taskmanger.GetTaskById(item);
             return Json(task);
         }
     }
