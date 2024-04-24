@@ -949,34 +949,70 @@ $(document).ready(function () {
         })
     })
 
+    $('#sendcase').validate({
 
+        rules: {
 
-
-    $('#SendAgreementBtn').click(function () {
-        var requestid = $('#requestIdInputAgreement').val();
-        var agreementemail = $('#agreementemail').val();
-        var agreementphoneno = $('#agreementphoneno').val();
-
-        $.ajax({
-            method: "POST",
-            url: '/Admin/SendAgreement',
-            data: { requestid: requestid, agreementemail: agreementemail, agreementphoneno: agreementphoneno },
-            success: function (response) {
-                console.log(response)
-                if (response.isPhysician == true) {
-                    window.location.href = '/Provider';
-                } else {
-                    window.location.href = '/Admin';
-                }
+            agreementemail: {
+                required: true,
+                email: true
             },
-            error: function (jqXHR, textStatus, errorThrown) {
-                if (jqXHR.status === 500 && jqXHR.responseJSON != null && jqXHR.responseJSON.message === 'Session Is Not Found') {
-                    toastr.error("Session has expired. Please log in again.");
-                } else {
-                    toastr.error("An error occurred. Please try again later.");
-                }
-            }
-        })
-    })
+            agreementphoneno: {
+                required: true,
+                pattern: /^\+?[1-9][0-9]{7,14}$/
 
+            },
+        },
+        messages: {
+            agreementemail: {
+                required: "Please enter an email address.",
+                email: "Please enter a valid email address."
+            },
+            agreementphoneno: {
+                required: "Please enter your mobile phone number.",
+                pattern: "Please enter a valid phone number (e.g., 123-456-7890)."
+            },
+
+        },
+        errorPlacement: function (error, element) {
+            var errorSpan = $("span.error-" + element.attr("name"));
+
+            if (errorSpan.length > 0) {
+                // If the specific span is found, append the error message to it
+                error.appendTo(errorSpan);
+            } else {
+                // If not found, use the default placement (after the input field)
+                error.insertAfter(element);
+            }
+        },
+        submitHandler: function (form) {
+
+
+            var requestid = $('#requestIdInputAgreement').val();
+            var agreementemail = $('#agreementemail').val();
+            var agreementphoneno = $('#agreementphoneno').val();
+
+            $.ajax({
+                method: "POST",
+                url: '/Admin/SendAgreement',
+                data: { requestid: requestid, agreementemail: agreementemail, agreementphoneno: agreementphoneno },
+                success: function (response) {
+                    console.log(response)
+                    if (response.isPhysician == true) {
+                        window.location.href = '/Provider';
+                    } else {
+                        window.location.href = '/Admin/Dashboard';
+                    }
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    if (jqXHR.status === 500 && jqXHR.responseJSON != null && jqXHR.responseJSON.message === 'Session Is Not Found') {
+                        toastr.error("Session has expired. Please log in again.");
+                    } else {
+                        toastr.error("An error occurred. Please try again later.");
+                    }
+                }
+            })
+        }
+
+    })
 })
