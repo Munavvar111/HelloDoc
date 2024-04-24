@@ -1,3 +1,5 @@
+using BAL.Interface;
+using BAL.Repository;
 using DAL.DataContext;
 using Microsoft.EntityFrameworkCore;
 
@@ -5,6 +7,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddScoped<ITaskManger, TaskManegerRepo>();
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {

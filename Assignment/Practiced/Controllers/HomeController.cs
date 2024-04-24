@@ -1,4 +1,6 @@
-﻿using DAL.DataContext;
+﻿using BAL.Interface;
+using BAL.Repository;
+using DAL.DataContext;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
@@ -13,16 +15,18 @@ namespace Practiced.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly ApplicationDbContext _context;
+        private readonly ITaskManger _taskmanger;
 
-        public HomeController(ILogger<HomeController> logger,ApplicationDbContext context)
+        public HomeController(ILogger<HomeController> logger, ApplicationDbContext context, ITaskManger taskManger)
         {
             _logger = logger;
-            _context = context; 
+            _context = context;
+            _taskmanger = taskManger;
         }
 
         public IActionResult Index()
         {
-            ViewBag.Categorys=_context.Categories.ToList(); 
+            ViewBag.Categorys = _taskmanger.GetAllCategories();
             return View();
         }
 
@@ -36,11 +40,11 @@ namespace Practiced.Controllers
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
-        public IActionResult GetTaskDetails(string searchValue,int page=1)
+        public IActionResult GetTaskDetails(string searchValue, int page = 1)
         {
-            ViewBag.Categorys = _context.Categories.ToList();
+            ViewBag.Categorys = _taskmanger.GetAllCategories();
 
-            var DetailsTask =_context.Tasks.Include(req=>req.CategoryNavigation).Where(item=>string.IsNullOrEmpty(searchValue) || item.TaskName.Contains(searchValue)).ToList();
+            var DetailsTask = _taskmanger.GetTaskDetails(searchValue);
             int totalItems = DetailsTask.Count();
             int pageSize = 5;
             //Count TotalPage
@@ -54,45 +58,41 @@ namespace Practiced.Controllers
         }
 
         [HttpPost]
-        public IActionResult AddTaskDetails(string Taskname,string Asignee,string Discription,DateTime DueDate,string City,int Category)
+        public IActionResult AddTaskDetails(string Taskname, string Asignee, string Discription, DateTime DueDate, string City, int Category)
         {
-            Task task = new Task();
-            task.TaskName = Taskname;   
-            task.Assignee = Asignee;
-            task.Description= Discription;  
-            //task.Category = Category;
-            task.DueDate = DueDate;
-            task.CategoryId = Category;
-            task.Category = _context.Categories.Find(Category).CategoryName;
-            task.City=City;
-            _context.Tasks.Add(task);
-            _context.SaveChanges();
-            return Ok();
+            if (_taskmanger.AddTask(Taskname, Asignee, Discription, DueDate, City, Category))
+            {
+                return Ok();
+            }
+            else
+            {
+                return Ok();
+            }
         }
         [HttpPost]
-        public IActionResult EditTaskDetails(string Taskname,string Asignee,string Discription,DateTime DueDate,string City,string Category,int TaskID)
+        public IActionResult EditTaskDetails(string Taskname, string Asignee, string Discription, DateTime DueDate, string City, string Category, int TaskID)
         {
-            var task = _context.Tasks.Find(TaskID);
-            task.TaskName = Taskname;   
-            task.Assignee = Asignee;
-            task.Category = Category;
-            task.DueDate = DueDate;
-            task.City=City;
-            _context.Tasks.Update(task);
-            _context.SaveChanges();
+            if(_taskmanger.UpdateTask(Taskname,Asignee,Discription,DueDate,City,Category,TaskID))
+            {
+            return Ok();
+                
+            }
             return Ok();
         }
         public IActionResult DeleteTask(int taskid)
         {
-            var task = _context.Tasks.Find(taskid);
-            _context.Tasks.Remove(task);
-            _context.SaveChanges();
-            return RedirectToAction("Index");
+            if (_taskmanger.DeleteTask(taskid))
+            {
+                return RedirectToAction("Index");
+            }
+            else{
+                return RedirectToAction("Index");
+            }
         }
 
         public IActionResult TaskDetailsFromId(int item)
         {
-            var task=_context.Tasks.Find(item);
+            var task = _context.Tasks.Find(item);
             return Json(task);
         }
     }
