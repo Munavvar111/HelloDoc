@@ -79,7 +79,7 @@ namespace Practiced.Controllers
             }
         }
         [HttpPost]
-        public IActionResult EditTaskDetails(string Taskname, string Asignee, string Discription, DateTime DueDate, string City, string Category, int TaskID)
+        public IActionResult EditTaskDetails(string Taskname, string Asignee, string Discription, DateTime DueDate, string City, int Category, int TaskID)
         {
             //Edit The Task Details Using Modal
             if(_taskmanger.UpdateTask(Taskname,Asignee,Discription,DueDate,City,Category,TaskID))

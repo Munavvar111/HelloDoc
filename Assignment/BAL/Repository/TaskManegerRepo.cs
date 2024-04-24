@@ -51,13 +51,14 @@ namespace BAL.Repository
             _context.SaveChanges();
             return true;
         }
-        public bool UpdateTask(string TaskName, string Asignee, string Discription, DateTime DueDate, string City, string Category, int TaskId)
+        public bool UpdateTask(string TaskName, string Asignee, string Discription, DateTime DueDate, string City, int Category, int TaskId)
         {
 
             var task = _context.Tasks.Find(TaskId);
             task.TaskName = TaskName;
             task.Assignee = Asignee;
-            task.Category = Category;
+            task.CategoryId = Category;
+            task.Category = _context.Categories.Find(Category).CategoryName;
             task.DueDate = DueDate;
             task.City = City;
             _context.Tasks.Update(task);

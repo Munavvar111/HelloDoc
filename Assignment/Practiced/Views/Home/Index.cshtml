@@ -7,7 +7,7 @@
         <div class="">
             <button class="btn btn-success w-100" data-bs-toggle="modal" data-bs-target="#AddTask">Add Task</button>
         </div>
-        <div>
+        <div style="width:40%">
         <div class="input-group input-group-height">
             <input class="form-control" type="search" placeholder="Search Patients" aria-label="Search" id="searchInput">
         </div>
@@ -36,7 +36,14 @@
     $(document).ready(function () {
         console.log("Hii")
         
-        changeTable()
+        changeTable(1);
+        $('#AddTask').on('hidden.bs.modal', function () {
+            console.log("hidden")
+            $('#AddTaskForm').each(function () {
+                this.reset();
+            })
+
+        });
 
     })
     $(document).on("click", "#pagination a.page-link", function () {
@@ -64,7 +71,7 @@
     }
 
     //Add Validation Then Submit
-
+    
 
     $('#AddTaskForm').validate({
         rules: {

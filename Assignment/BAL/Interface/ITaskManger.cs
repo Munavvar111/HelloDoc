@@ -20,7 +20,7 @@ namespace BAL.Interface
         bool DeleteTask(int TaskId); 
 
 
-        bool UpdateTask(string TaskName, string Asignee, string Discription, DateTime DueDate, string City, string Category, int TaskId); 
+        bool UpdateTask(string TaskName, string Asignee, string Discription, DateTime DueDate, string City, int Category, int TaskId); 
 
         Task GetTaskById(int TaskId);
     }
