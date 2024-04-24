@@ -14,25 +14,24 @@
         </div>
 
     </div>
+    <!--> TaskMangerPartial Data Is Placed Here -->
     <div id="TaskMangementPartial">
 
     </div>
 
     
 </div>
+@* Add Task Form Partial *@
 <partial name="AddTaskFormPartial"></partial>
+@* Edit Task Form Partial *@
 <partial name="EditTaskPartial"></partial>
 <script>
 
-
+    //On Search Call Function Change Table
     $("#searchInput").on("input", function () {
-       
         changeTable();
     });
-
-    $('#SubmitTask').click(function(){
-        console.log("Hello")
-    })
+    // On Ready Call Function Change Table And Hide Form Details In Add New Task Form 
     $(document).ready(function () {
         console.log("Hii")
         
@@ -46,6 +45,7 @@
         });
 
     })
+    //When User Click In page Again Call ChangeThe Table
     $(document).on("click", "#pagination a.page-link", function () {
         console.log("Pagination link clicked!");
         var id = $(this).attr("id");
@@ -53,7 +53,7 @@
         console.log("Current Page: " + currentPage);
         changeTable(currentPage)
     });
-    //Call The Modal On Every Time Document Is Load
+    
     function changeTable(page) {
         var searchValue = $("#searchInput").val();
         
