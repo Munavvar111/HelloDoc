@@ -1,0 +1,90 @@
+﻿
+<div class="modal fade" id="EditTask" tabindex="-1" role="dialog" aria-labelledby="assigncase " aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h1 class="modal-title fs-5 title" id="exampleModalLabel">Task Form</h1>
+                <button type="button" class="close bg-success border border-success" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true" class="fs-1">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body text-start">
+                <form id="EditFormTask">
+                    <div>
+
+                    <input  class="d-none"  id="TaskID"/>
+                    <div class="row row-cols-2">
+
+                        <div class="form-floating mt-3 col">
+                            <input type="text"
+                                   class="form-control"
+                                   name="EditTaskName"
+                                   id="EditTaskName"
+                                   placeholder="TaskName"
+                                    />
+                            <label for="floatingInput">Task Name</label>
+                            <span class="text-danger error-EditTaskName"></span>
+                        </div>
+                        <div class="form-floating mt-3 col">
+                            <input type="text"
+                                   class="form-control"
+                                   name="EditAsignee"
+                                   id="EditAsignee"
+                                   placeholder="name@example.com"
+                                   />
+                            <label for="floatingInput">Asignee</label>
+                            <span class="text-danger error-EditAsignee"></span>
+                        </div>
+                        <div class="form-floating mt-3 col">
+                            <input type="text"
+                                   class="form-control"
+                                   placeholder="name@example.com"
+                                   id="EditDiscription"
+                                   name="EditDiscription"
+                                    />
+                            <label for="floatingInput">Discription</label>
+                            <span class="text-danger error-EditDiscription"></span>
+                        </div>
+                        <div class="form-floating mt-3 col">
+                            <input id="EditDate"
+                                   type="date"
+                                   class="form-control"
+                                   name="EditDate"
+                                   
+                                    />
+                            <label for="floatingInput">Due Date</label>
+                            <span class="text-danger error-EditDate"></span>
+
+                        </div>
+                        <div class="form-floating mt-3 col">
+                            <input id="EditCity"
+                                   type="text"
+                                   class="form-control"
+                                   name="EditCity"
+                                   />
+                            <label for="floatingInput">City</label>
+                            <span class="text-danger error-EditCity"></span>
+
+                        </div>
+                        <div class="form-floating mt-3 col">
+                            <select class="form-select  regionDropdown" name="EditCategory" aria-label="Default select example" id="EditCategory" >
+                                <option value="" disabled selected>Select The Category</option>
+                                @foreach (var cancelReason in ViewBag.Categorys)
+                                {
+                                    <option value="@cancelReason.CategoryId">@cancelReason.CategoryName</option>
+                                }
+                            </select>
+                        </div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-success ">Submit</button>
+                        <button type="button" class="btn btn-success" data-bs-dismiss="modal">Cancel</button>
+                    </div>
+                    </div>
+                </form> 
+                    
+            </div>
+        </div>
+    </div>
+</div>

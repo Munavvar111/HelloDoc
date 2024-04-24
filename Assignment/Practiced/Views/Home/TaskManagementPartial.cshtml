@@ -1,0 +1,121 @@
+﻿@model List<DAL.DataModels.Task>
+<div class="table-responsive mt-4 mb-4 d-">
+    <table class="table table-hover d-md-table d-none" style="vertical-align:middle">
+        <thead class="table-light">
+            <tr>
+                <th scope="col">Task Id</th>
+                <th scope="col">Task Name</th>
+                <th scope="col">Assignee</th>
+                <th scope="col">Discription</th>
+                <th scope="col">Due Date</th>
+                <th scope="col">Category</th>
+                <th scope="col">City</th>
+                <th scope="col">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td scope="row">
+                        @item.TaskId
+                    </td>
+                    <td scope="row">@item.TaskName</td>
+                    <td scope="row">@item.Assignee</td>
+                    <td scope="row">@item.Description</td>
+                    <td scope="row">
+                        @item.DueDate
+                    </td>
+                    <td scope="row">@item.Category</td>
+                    <td scope="row">@item.City</td>
+                    <td scope="row">
+                        <div class="d-flex">
+                            <a class="btn btn-success rounded me-2 editbtn" data-bs-toggle="modal" data-bs-target="#EditTask" id="editid" data-value="@item.TaskId"
+                            data-bs-taskId="@item.TaskId"
+                            data-bs-taskname="@item.TaskName"
+                            data-bs-asignee="@item.Assignee"
+                            data-bs-discription="@item.Description"
+                            data-bs-duedate="@item.DueDate"
+                            data-bs-city="@item.City"
+                            data-bs-category="@item.CategoryId">Edit</a>
+                            <a asp-action="DeleteTask" asp-route-taskid=@item.TaskId   class="btn btn-danger rounded ">Delete</a>
+                        </div>
+                    </td>
+                </tr>
+            }   
+        </tbody>
+    </table>
+</div>
+<div class="pb-3">
+    <nav id="pagination" aria-label="Page navigation">
+        <ul class="pagination justify-content-center mb-0">
+            @if (ViewBag.CurrentPage >= 1 && ViewBag.CurrentPage <= ViewBag.TotalPages)
+            {
+                int prevpage = Convert.ToInt32(ViewBag.CurrentPage) - 1;
+                int currpage = Convert.ToInt32(ViewBag.CurrentPage);
+                int nextpage = Convert.ToInt32(ViewBag.CurrentPage) + 1;
+                if (ViewBag.CurrentPage > 1)
+                {
+                    <li class="page-item ">
+                        <a class="page-link" id="previous" data-page="@(prevpage)" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                            <span class="visually-hidden">Previous</span>
+                        </a>
+                    </li>
+                }
+                for (int z = 0; z < 3; z++)
+                {
+                    if (currpage + z <= ViewBag.TotalPages)
+                    {
+                        <li class="page-item @(currpage + z == ViewBag.CurrentPage ? "active" : "")">
+                            <a class="page-link" id="current_@z" data-page="@(currpage + z)" aria-label="Current">
+                                <span>@(ViewBag.CurrentPage + z)</span>
+                            </a>
+                        </li>
+                    }
+                }
+                if (ViewBag.CurrentPage < ViewBag.TotalPages)
+                {
+                    <li class="page-item ">
+                        <a class="page-link" id="next" data-page="@(nextpage)" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                            <span class="visually-hidden">Next</span>
+                        </a>
+                    </li>
+                }
+
+            }
+        </ul>
+    </nav>
+</div>
+
+<script>
+
+    $('.editbtn').click(function () {
+        $('.editbtn').removeClass('active')
+        $(this).addClass('active')
+        var item = $('.editbtn.active').data('value')
+        $.ajax({
+            type:"GET",
+            url:"Home/TaskDetailsFromId",
+            data: { item: item },
+            success: function (data) {
+                console.log( new Date(data.dueDate).toLocaleDateString())
+                var now = new Date(data.dueDate);
+                var day = ("0" + now.getDate()).slice(-2);
+                var month = ("0" + (now.getMonth() + 1)).slice(-2);
+
+                var today = now.getFullYear() + "-" + (month) + "-" + (day);
+
+                $('#TaskID').val(data.taskId);
+                $('#EditTaskName').val(data.taskName);
+                $('#EditAsignee').val(data.assignee);
+                $('#EditDiscription').val(data.description);
+                $('#EditDate').val(today);
+                $('#EditCity').val(data.city);
+                $('#EditCategory').val(data.categoryId)
+            }
+        })
+        console.log(item)
+    })
+</script>
