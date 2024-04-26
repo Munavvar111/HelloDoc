@@ -41,6 +41,7 @@
                 <div class="col-md-6 form-floating mb-3">
                     <input id="EndTime" asp-for="Endtime" class="form-control rounded vcs" name="Endtime" type="time" placeholder=Suchtext autocomplete=off>
                     <label for="floatingInput">End</label>
+                    <span class="text-danger" asp-validation-for="Endtime"></span>
                 </div>
                 <div class="col-md-6 d-flex align-items-center justify-content-start mb-3">
                     <label for="floatingInput">Repeat</label>

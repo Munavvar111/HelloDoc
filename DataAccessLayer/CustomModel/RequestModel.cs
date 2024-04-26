@@ -77,4 +77,6 @@ namespace DataAccessLayer.CustomModel
 		public List<Region>? Regions { get; set; }
 	}
 
+
+
 }
