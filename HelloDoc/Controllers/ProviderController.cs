@@ -200,7 +200,7 @@ namespace HelloDoc.Controllers
 			if (_login.IsSendEmail("munavvarpopatiya999@gmail.com", "Munavvar", $"Click <a href='{requestlink}'>here</a> to Grant Access {physicianname} Of Edit Physician Account "))
             {
 				TempData["SuccessMessage"] = "Email Send ScueessFully.";
-                return RedirectToAction("PhysicanProfile", "Provider",new{id=requestid});
+                return RedirectToAction("PhysicanProfile", "Provider");
 			}
             else
             {

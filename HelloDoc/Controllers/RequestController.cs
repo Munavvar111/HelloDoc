@@ -49,7 +49,14 @@ namespace HalloDocPatient.Controllers
         public IActionResult BusinessRequest(RequestOthers requestOther)
         {
             Region? statebyregionid = _context.Regions.Where(item => item.Name == requestOther.State).FirstOrDefault();
-            if (ModelState.IsValid)
+			Blockrequest? blockrequest = _context.Blockrequests.Where(item => item.Email == requestOther.Email && item.Isactive.Value).FirstOrDefault();
+            if (blockrequest != null)
+            {
+
+				TempData["Error"] = "Your Request IS Block Beacuse Of Your Unaporpriate Behivour!";
+				return RedirectToAction("PatientRequest");
+			}
+			if (ModelState.IsValid)
             {
                 Business business = new Business();
                 business.Name = requestOther.FirstNameOther;
@@ -142,7 +149,7 @@ namespace HalloDocPatient.Controllers
         public async Task<IActionResult> PatientRequest(RequestModel requestModel)
         {
             requestModel.Username = requestModel.Firstname + requestModel.Lastname;
-            Blockrequest? blockrequest = _context.Blockrequests.Where(item => item.Email == requestModel.Email).FirstOrDefault();
+            Blockrequest? blockrequest = _context.Blockrequests.Where(item => item.Email == requestModel.Email && item.Isactive.Value).FirstOrDefault();
             if (blockrequest == null)
             {
                 if (!ModelState.IsValid)
@@ -235,7 +242,14 @@ namespace HalloDocPatient.Controllers
         [HttpPost]
         public async Task<IActionResult> FriendRequest(RequestOthers request)
         {
-            if (ModelState.IsValid)
+			Blockrequest? blockrequest = _context.Blockrequests.Where(item => item.Email == request.Email && item.Isactive.Value).FirstOrDefault();
+            if (blockrequest != null)
+            {
+
+                TempData["Error"] = "Your Request IS Block Beacuse Of Your Unaporpriate Behivour!";
+                return RedirectToAction("PatientRequest");
+            }
+				if (ModelState.IsValid)
             {
                 if (request.File != null && request.File.Length > 0)
                 {
@@ -289,7 +303,14 @@ namespace HalloDocPatient.Controllers
         [HttpPost]
         public IActionResult ConceirgeRequest(RequestOthers requestOther)
         {
-            if (ModelState.IsValid)
+			Blockrequest? blockrequest = _context.Blockrequests.Where(item => item.Email == requestOther.Email && item.Isactive.Value).FirstOrDefault();
+			if (blockrequest != null)
+			{
+
+				TempData["Error"] = "Your Request IS Block Beacuse Of Your Unaporpriate Behivour!";
+				return RedirectToAction("PatientRequest");
+			}
+			if (ModelState.IsValid)
             {
                 _otherrequest.AddConceirgeRequest(requestOther, ReqTypeId: 3);
                 Request? request1 = _patientRequest.GetRequestByEmail(requestOther.EmailOther);

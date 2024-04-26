@@ -439,7 +439,7 @@
 					</select>
 				</div>
 				<div class="col-md-12 form-floating mb-3">
-					<input id="StartDateView" class="form-control rounded vcs" name="Startdate" type="date" placeholder="Suchtext" autocomplete="off" value="${formatDate(event.start)}" disabled>
+						<input id="StartDateView" class="form-control rounded vcs" name="Startdate" type="date" placeholder="Suchtext" autocomplete="off" value="${formatDate(event.start)}" min="@DateTime.Today.ToString("yyyy-MM-dd")" disabled>
 						<label for="StartDate">Shifted Date</label>
 						<div class="d-flex gap-2 mt-3">
 							<div class="col-md-6 form-floating mb-3">
@@ -688,7 +688,12 @@
 				$('#editbtn').removeClass('d-none');
 			},
 			error: function (xhr, status, error) {
-				// Handle error
+				$('#eventModal').modal('hide');
+				swal.fire({
+					title: 'Error!',
+					text: xhr.responseText,
+					icon: 'error',
+				})
 			}
 		});
 	});

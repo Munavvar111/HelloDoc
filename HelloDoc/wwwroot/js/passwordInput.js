@@ -7,4 +7,4 @@ function togglePasswordVisibility(){
         passwordInput.type = "password";
       }
 }
-passwordBtn.addEventListener("click",()=>togglePasswordVisibility())
+passwordBtn.addEventListener("click", () => togglePasswordVisibility())

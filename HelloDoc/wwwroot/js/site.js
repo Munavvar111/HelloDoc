@@ -13,6 +13,7 @@ $(document).ready(function () {
 
 
 
+
     function updateUIWithCounts() {
         $.ajax({
             type: "GET",
@@ -51,14 +52,14 @@ $(document).ready(function () {
 
 
 
-    $(document).on("click", "#pagination a.page-link", function () {
-        console.log("Pagination link clicked!");
-        var id = $(this).attr("id");
-        currentPage = $("#" + id).data("page");
-        localStorage.setItem("currentPage", currentPage);
-        console.log("Current Page: " + currentPage);
-        filterTable(currentPartial, currentStatus, currentPage, pageSize, exportdata, exportAllData);
-    });
+        $(document).on("click", "#pagination a.page-link", function () {
+            console.log("Pagination link clicked!");
+            var id = $(this).attr("id");
+            currentPage = $("#" + id).data("page");
+            localStorage.setItem("currentPage", currentPage);
+            console.log("Current Page: " + currentPage);
+            filterTable(currentPartial, currentStatus, currentPage, pageSize, exportdata, exportAllData);
+        });
 
     if (currentPage) {
         currentPage = currentPage

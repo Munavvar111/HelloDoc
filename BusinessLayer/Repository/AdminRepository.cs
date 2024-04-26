@@ -82,7 +82,7 @@ namespace BusinessLayer.Repository
 
         public Shiftdetail? GetShiftDetailById(int shiftDetailId)
         {
-            return _context.Shiftdetails.Find(shiftDetailId);
+            return _context.Shiftdetails.Include(s=>s.Shift).FirstOrDefault(item=>item.Shiftdetailid==shiftDetailId);
         }
         public List<int> GetRoleMenuIdByRoleId(int roleId)
         {
@@ -90,7 +90,18 @@ namespace BusinessLayer.Repository
             return Rolemenus;
         }
 
-        public bool RequestIdExists(int requestId)
+        public Blockrequest? GetBlockrequestById(int id)
+        {
+            return _context.Blockrequests.Include(item => item.Request).FirstOrDefault(item => item.Blockrequestid == id && item.Isactive==true);
+
+		}
+        public Blockrequest? GetBlockRequestByEmail(string email)
+        {
+            return _context.Blockrequests.FirstOrDefault(_ => _.Email.Trim() == email.Trim() && _.Isactive.Value);
+		}
+
+
+		public bool RequestIdExists(int requestId)
         {
             return _context.Requests.Any(item => item.Requestid == requestId);
         }
@@ -435,7 +446,7 @@ namespace BusinessLayer.Repository
                                     (string.IsNullOrEmpty(searchValue) || item.PatientName.ToLower().Contains(searchValue.ToLower().Trim())) &&
                                     (string.IsNullOrEmpty(selectValue) || item.regionid == int.Parse(selectValue)) &&
                                     (string.IsNullOrEmpty(selectedFilter) || item.ReqTypeId == int.Parse(selectedFilter)) &&
-                                    currentStatus.Any(status => item.Status == status)).ToList();
+                                    currentStatus.Any(status => item.Status == status)).OrderBy(item=>item.RequestedDate).ToList();
 
             return searchRecord;
         }
@@ -1842,7 +1853,8 @@ namespace BusinessLayer.Repository
                                 status = totaladmin.Adminid,
                                 roleid = roles.Roleid,
                                 AccountTypeid = roles.Accounttype,
-                                useraccessid = totaladmin.Adminid,
+                                OpenRequest =  _context.Requests.Count(),
+								useraccessid = totaladmin.Adminid,
                             } : new UserAccess
                             {
                                 AccountType = roles.Name,
@@ -1850,7 +1862,8 @@ namespace BusinessLayer.Repository
                                 phone = totalphy.Mobile,
                                 status = totalphy.Status,
                                 roleid = roles.Roleid,
-                                AccountTypeid = roles.Accounttype,
+                                OpenRequest= _context.Requests.Where(i => i.Physicianid == totalphy.Physicianid).Count(),
+								AccountTypeid = roles.Accounttype,
                                 useraccessid = totalphy.Physicianid,
                             })).ToList();
             return list;

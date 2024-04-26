@@ -12,6 +12,7 @@ using ServiceStack;
 using System.Collections;
 using System.Data;
 using System.Globalization;
+using System.Web.Helpers;
 using BC = BCrypt.Net.BCrypt;
 
 
@@ -855,6 +856,7 @@ namespace HelloDoc.Controllers
                     return RedirectToAction("Index", "Login");
                 }
                 data.Status = 1;
+                //create shift here
                 _admin.CreateShift(data, email);
                 TempData["Success"] = "Shift created successfully";
             }
@@ -932,13 +934,24 @@ namespace HelloDoc.Controllers
         }
         #endregion
 
-        #region SaveShift
+        #region EditShifts
         [HttpPost]
         public IActionResult SaveShift(int shiftDetailId, DateTime startDate, TimeOnly startTime, TimeOnly endTime, int region)
         {
             Shiftdetail? shiftdetail = _admin.GetShiftDetailById(shiftDetailId);
-
-            if (shiftdetail == null)
+			bool shiftExists = _context.Shiftdetails.Any(sd =>
+											   sd.Shift.Physicianid == shiftdetail.Shift.Physicianid && sd.Isdeleted == false &&
+											   sd.Shiftdate.Equals(new DateTime(startDate.Year, startDate.Month,startDate.Day)) &&
+											   (
+											   (sd.Starttime.Hour <= startTime.Hour && startTime.Hour <= endTime.Hour) ||
+											   (startTime.Hour <= endTime.Hour && endTime.Hour <= endTime.Hour)
+											   )
+											   );
+            if (shiftExists)
+            {
+				return BadRequest("Shifts Are Conflicting With Each Other Please check Befor Update");
+			}
+			if (shiftdetail == null)
             {
                 return NotFound("Shift detail not found.");
             }
@@ -955,11 +968,10 @@ namespace HelloDoc.Controllers
 
                 if (Email == null)
                 {
-                    TempData["Error"] = "Session Is Not Found Please LogedIn Again!!";
-                    return RedirectToAction("Index", "Login");
+					return BadRequest("Session Is Expire Please Reload");
 
-                }
-                Admin? admin = _admin.GetAdminByEmail(Email);
+				}
+				Admin? admin = _admin.GetAdminByEmail(Email);
                 Physician? physician = _admin.GetPhysicianByEmail(Email);
                 bool IsPhysician = false;
 
@@ -1390,7 +1402,7 @@ namespace HelloDoc.Controllers
   (fromDos == DateTime.MinValue || item.DateOfService?.Date >= fromDos.Date) &&
   (toDos == new DateTime() || item.DateOfService?.Date <= toDos.Date)
   ).ToList();
-            int pageSize = 3;
+            int pageSize = 10;
             int totalItems = searchRecord.Count();
             int totalPages = (int)Math.Ceiling((double)totalItems / pageSize);
             List<SearchRecordVM> paginatedData = searchRecord.Skip((page - 1) * pageSize).Take(pageSize).ToList();
@@ -1455,10 +1467,16 @@ namespace HelloDoc.Controllers
 
         public IActionResult UnBlockUser(int id)
         {
-            Blockrequest? blockHistory = _context.Blockrequests.Find(id);
+            string email = HttpContext.Session.GetString("Email");
+            Admin? admin = _admin.GetAdminByEmail(email);
+            Blockrequest? blockHistory = _admin.GetBlockrequestById(id);
             if (blockHistory != null)
             {
                 blockHistory.Isactive = false;
+                blockHistory.Request.Status = 1;
+                blockHistory.Modifieddate = DateTime.Now;
+                blockHistory.Request.Physicianid = null;   
+                
                 _context.Blockrequests.Update(blockHistory);
                 _admin.SaveChanges();
                 TempData["SuccessMessage"] = "UnBlock SuccessFull!!";
@@ -2221,6 +2239,7 @@ namespace HelloDoc.Controllers
         public IActionResult BlockRequest(string blockreason, int requestid)
         {
             //It Will Visible In admin New State WHere Admin Can BLock The Request After That User Will Not Able To Create Request With That Partclure Email;
+            
             bool success = _admin.BlockRequest(blockreason, requestid);
             if (success)
             {
@@ -2299,15 +2318,15 @@ namespace HelloDoc.Controllers
         [HttpGet("Provider/createrequest", Name = "ProviderCreateRequest")]
         public IActionResult CreateRequest()
         {
-            string? Email = HttpContext.Session.GetString("Email");
-            if (Email == null)
+            string? email = HttpContext.Session.GetString("Email");
+            if (email == null)
             {
                 TempData["Error"] = "Session Is Not Found Please LogedIn Again!!";
                 return RedirectToAction("Index", "Login");
 
             }
-            Admin? admin = _admin.GetAdminByEmail(Email);
-            Physician? physician = _admin.GetPhysicianByEmail(Email);
+            Admin? admin = _admin.GetAdminByEmail(email);
+            Physician? physician = _admin.GetPhysicianByEmail(email);
             if (admin != null)
             {
                 ViewBag.IsPhysician = false;
@@ -2327,9 +2346,9 @@ namespace HelloDoc.Controllers
 
         #region CreateRequestPost
         [CustomAuthorize("Dashboard", "6", "19")]
-        [HttpPost]
         public IActionResult CreateRequest(RequestModel requestModel)
         {
+
             string? Email = HttpContext.Session.GetString("Email");
             if (Email == null)
             {
@@ -2341,6 +2360,8 @@ namespace HelloDoc.Controllers
             Physician? physician = _admin.GetPhysicianByEmail(Email);
             List<Region> regions = _admin.GetAllRegion();
             requestModel.Regions = regions;
+            //Check Thr Block Request If User Is Alreday Blocked Then It Can Not Be Added Request Via Admin 
+           
 
             if (ModelState.IsValid)
             {
@@ -2448,6 +2469,9 @@ namespace HelloDoc.Controllers
                 ViewBag.IsPhysician = true;
 
             }
+            RequestModel requestmoel = new RequestModel();
+            List<Region> regionall = _admin.GetAllRegion();
+            requestmoel.Regions = regionall;
             return View(requestModel);
         }
         #endregion
@@ -2868,7 +2892,7 @@ namespace HelloDoc.Controllers
             }
             else
             {
-                if (_login.IsSendEmail("munavvarpopatiya777@gmail.com", "Munavvar", $"Click <a href='{Agreemnet}'>here</a> to reset your password."))
+                if (_login.IsSendEmail(to, subject, body))
                 {
                     _emailService.EmailLog(to, body, subject, request.Firstname + " " + request.Lastname, physician.Roleid, requestid, physician.Physicianid, 0, 0, true, 1);
                     TempData["SuccessMessage"] = "Agreement Send successfully";

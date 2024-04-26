@@ -11,13 +11,15 @@ namespace HalloDocPatient.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly IPatientRequest _patientRequest;
+        private readonly IAdmin _admin;
         private readonly IWebHostEnvironment _hostingEnvironment;
 
-        public DashboardController(ApplicationDbContext context, IPatientRequest patientRequest, IWebHostEnvironment hostingEnvironment)
+        public DashboardController(ApplicationDbContext context, IPatientRequest patientRequest, IWebHostEnvironment hostingEnvironment,IAdmin admin)
         {
             _context = context;
             _patientRequest = patientRequest;
             _hostingEnvironment = hostingEnvironment;
+            _admin = admin;
         }
         #region ViewDocument
         public async Task<IActionResult> ViewDocument(int requestid)
@@ -57,7 +59,7 @@ namespace HalloDocPatient.Controllers
             DateOnly BirthDate = User != null && User.Intyear != null && User.Strmonth != null && User.Intdate != null
             ? new DateOnly((int)User.Intyear, int.Parse(User.Strmonth), (int)User.Intdate)
                                                                     : new DateOnly();
-            var regions = _context.Regions.ToList();
+            var regions = _admin.GetAllRegion();
             ViewBag.BirthDate = BirthDate.ToString("yyyy-MM-dd");
             ProfileVM profildata = new ProfileVM();
             profildata.Email = User?.Email ?? "";
@@ -82,7 +84,7 @@ namespace HalloDocPatient.Controllers
         [HttpPost]
         public async Task<IActionResult> Profile(ProfileVM profileVM)
         {
-            var statebyregionid = _context.Regions.Where(item => item.Name == profileVM.State).FirstOrDefault();
+            var statebyregionid = _admin.GetRegionByName(profileVM.State);
             int? id = HttpContext.Session.GetInt32("id");
             User? User = await _context.Users.FindAsync(id);
             ViewData["Name"] = User?.Firstname ?? "";

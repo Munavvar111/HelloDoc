@@ -79,13 +79,10 @@ namespace HalloDocPatient.Controllers
                                
                                     TempData["SuccessMessage"] = "Login successful!";
                                     return RedirectToAction("Dashboard", "Admin");
-                                
-                               
                             }
                             else if (user != null)
                             {
                                 TempData["SuccessMessage"] = "Login  successful!";
-
                                 return RedirectToAction("Index", "Dashboard");
                             }
                             else if(physician != null)

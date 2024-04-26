@@ -30,7 +30,11 @@
 					</td>
 					<td scope="row">
 						<div class="d-flex">
+							@if (@item.Isactive == true)
+							{
+								
 							<button class="btn btn-outline-info rounded me-2 unblock-btn" data-blockrequestid="@item.Blockrequestid">Unblock</button>
+							}
 						</div>
 					</td>
 				</tr>
@@ -85,7 +89,11 @@
 				</div>
 
 				<div class="d-flex justify-content-end mb-2 gap-2">
+					@if (@items.Isactive==true)
+					{
+						
 					<button class="btn btn-outline-info rounded me-2 unblock-btn" data-blockrequestid="@items.Blockrequestid">Unblock</button>
+					}
 				</div>
 			</div>
 		</div>
