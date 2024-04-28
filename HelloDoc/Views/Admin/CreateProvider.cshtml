@@ -7,7 +7,7 @@
 
     <div class="d-flex justify-content-between my-3">
         <div class="d-flex">
-            <span class="fs-2 text-muted fw-bold">My Profile</span>
+            <span class="fs-2 text-muted fw-bold">Create Provider</span>
         </div>
         <div class="d-flex justify-content-end">
             <a asp-controller="Admin" asp-action="Index" asp-area=""
@@ -42,6 +42,7 @@
                                    id="Password"
                                    placeholder="*****" required />
                             <label for="floatingInput" asp-for="Passwordhash">Password</label>
+                        <i class="fas fa-eye eye-icon togglePassword" id="togglePassword"></i>
                             <span asp-validation-for="Passwordhash" class="text-danger"></span>
                         </div>
                     </div>
@@ -60,6 +61,8 @@
                                 }
 
                             </select>
+                        <label for="floatingInput">Role</label>
+
                             <span class="error-state text-danger"></span>
 
                     </div>
@@ -190,6 +193,8 @@
                             }
 
                         </select>
+                        <label for="floatingInput">State</label>
+
                         <span class="error-state text-danger"></span>
 
                     </div>
@@ -326,6 +331,21 @@
     </div>
 </div>
 <script>
+
+    document.getElementById('togglePassword').addEventListener('click', function () {
+        var passwordInput = document.getElementById('Password');
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            this.classList.remove('fa-eye');
+            this.classList.add('fa-eye-slash');
+        } else {
+            passwordInput.type = 'password';
+            this.classList.remove('fa-eye-slash');
+            this.classList.add('fa-eye');
+        }
+    });
+
+
     const phone1 = document.querySelector("#phone1");
     const phoneInput1 = window.intlTelInput(phone1, {
         utilsScript:

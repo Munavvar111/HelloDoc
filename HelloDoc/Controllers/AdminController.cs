@@ -20,7 +20,6 @@ namespace HelloDoc.Controllers
 {
     public class AdminController : Controller
     {
-        private readonly ApplicationDbContext _context;
         private readonly IAdmin _admin;
         private readonly IPatientRequest _patient;
         private readonly IWebHostEnvironment _hostingEnvironment;
@@ -30,9 +29,8 @@ namespace HelloDoc.Controllers
         private readonly IDataProtectionProvider _dataProtectionProvider;
         private readonly IEmailServices _emailService;
 
-        public AdminController(ApplicationDbContext context, IUploadProvider uploadProvider, IEmailServices emailServices, IAdmin admin, IPatientRequest patient, IDataProtectionProvider dataProtectionProvider, IWebHostEnvironment hostingEnvironment, IJwtAuth jwtAuth, ILogin login)
+        public AdminController(IUploadProvider uploadProvider, IEmailServices emailServices, IAdmin admin, IPatientRequest patient, IDataProtectionProvider dataProtectionProvider, IWebHostEnvironment hostingEnvironment, IJwtAuth jwtAuth, ILogin login)
         {
-            _context = context;
             _admin = admin;
             _uploadProvider = uploadProvider;
             _patient = patient;
@@ -782,6 +780,7 @@ namespace HelloDoc.Controllers
             _admin.SaveChanges();
 
             _admin.AddAspnetUserRole(aspnetUser.Aspnetuserid, createProvider.RoleId);
+            TempData["SuccessMessage"] = "Provider Account Create Succesfully!!";
 
             return RedirectToAction("Provider");
         }
@@ -818,7 +817,7 @@ namespace HelloDoc.Controllers
             if (physician != null)
             {
                 ViewBag.IsPhysician = true;
-                region = _context.PhysicianRegions.Where(item => item.Physicianid == physician.Physicianid).Select(item => item.Region).ToList();
+                region = _admin.GetPhysicianWorkingRegion(physician.Physicianid);
 
             }
             ViewBag.regions = region;
@@ -939,21 +938,16 @@ namespace HelloDoc.Controllers
         public IActionResult SaveShift(int shiftDetailId, DateTime startDate, TimeOnly startTime, TimeOnly endTime, int region)
         {
             Shiftdetail? shiftdetail = _admin.GetShiftDetailById(shiftDetailId);
-			bool shiftExists = _context.Shiftdetails.Any(sd =>
-											   sd.Shift.Physicianid == shiftdetail.Shift.Physicianid && sd.Isdeleted == false &&
-											   sd.Shiftdate.Equals(new DateTime(startDate.Year, startDate.Month,startDate.Day)) &&
-											   (
-											   (sd.Starttime.Hour <= startTime.Hour && startTime.Hour <= endTime.Hour) ||
-											   (startTime.Hour <= endTime.Hour && endTime.Hour <= endTime.Hour)
-											   )
-											   );
-            if (shiftExists)
-            {
-				return BadRequest("Shifts Are Conflicting With Each Other Please check Befor Update");
-			}
+            
+            
 			if (shiftdetail == null)
             {
                 return NotFound("Shift detail not found.");
+            }
+            bool shiftExists = _admin.ShiftExists(startDate, startTime, endTime, shiftdetail);
+            if (shiftExists)
+            {
+                return BadRequest("Shifts Are Conflicting With Each Other Please check Befor Update");
             }
             try
             {
@@ -1334,74 +1328,12 @@ namespace HelloDoc.Controllers
         }
         #endregion
 
-        public DateTime? GetDateofService(int requestid)
-        {
-            Requeststatuslog? log = _context.Requeststatuslogs.OrderByDescending(x => x.Createddate).FirstOrDefault(x => x.Requestid == requestid && x.Status == 6 && x.Physicianid != null);
-            return log?.Createddate;
-        }
-
-        public DateTime? GetCloseDate(int requestid)
-        {
-            Requeststatuslog? log = _context.Requeststatuslogs.OrderByDescending(x => x.Createddate).FirstOrDefault(x => x.Requestid == requestid && x.Status == 9);
-            return log?.Createddate;
-        }
-        public string? GetPatientCancellationNotes(int requestid)
-        {
-            Requeststatuslog? log = _context.Requeststatuslogs.OrderByDescending(x => x.Createddate).FirstOrDefault(x => x.Requestid == requestid && x.Status == 3 && x.Physicianid != null);
-            return log?.Notes;
-        }
+       
 
         #region GetPatientSearchRecords
         public IActionResult GetPatientSearchRecords(int[] status, string patientName, int requestType, string providorName, string email, string phoneNumber, bool exportStatus, int page,DateTime fromDos,DateTime toDos)
         {
-            var data = (from r in _context.Requests
-                        join rc in _context.Requestclients on r.Requestid equals rc.Requestid
-                        join p in _context.Physicians on r.Physicianid equals p.Physicianid into prJoin
-                        from p in prJoin.DefaultIfEmpty()
-                        join rn in _context.Requestnotes on r.Requestid equals rn.Requestid into rrnJoin
-                        from rn in rrnJoin.DefaultIfEmpty()
-                        select new
-                        {
-                            Request = r,
-                            RequestClient = rc,
-                            Physician = p,
-                            RequestNote = rn
-                        }).ToList();
-
-            var searchRecords = data.Select(item => new SearchRecordVM
-            {
-                PatientName = $"{item.RequestClient.Firstname} {item.RequestClient.Lastname}",
-                Requestor = $"{item.Request.Firstname} {item.Request.Lastname}",
-                DateOfService = item.Request.Accepteddate,
-                ServiceDate = GetDateofService(item.Request.Requestid)?.ToString("MMMM dd, yyyy") ?? "",
-                DateofClose = GetCloseDate(item.Request.Requestid)?.ToString("MMMM dd, yyyy") ?? "",
-                CloseDate = GetCloseDate(item.Request.Requestid),
-                Email = item.RequestClient.Email,
-                PhoneNumber = item.RequestClient.Phonenumber,
-                Address = item.RequestClient.Location,
-                Zip = item.RequestClient.Zipcode,
-                RequestStatus = item.Request.Status,
-                PhysicianName = item.Physician != null ? $"{item.Physician.Firstname} {item.Physician.Lastname}" : "", // Handle null Physician
-                PhysicianNote = item.RequestNote?.Physiciannotes,
-                CancelledByProvidor = GetPatientCancellationNotes(item.Request.Requestid),
-                PatientNote = item.RequestClient.Notes,
-                RequestTypeId = item.Request.Requesttypeid,
-                AdminNotes = item.RequestNote?.Adminnotes,
-                RequestId = item.Request.Requestid,
-                IsDelted = item.Request.Isdeleted,
-            }).ToList();
-            var searchRecord = searchRecords.Where(item =>
-      (string.IsNullOrEmpty(email) || item.Email.Contains(email)) &&
-      (string.IsNullOrEmpty(phoneNumber) || item.PhoneNumber.Contains(phoneNumber)) &&
-      (string.IsNullOrEmpty(patientName) || item.PatientName.ToLower().Trim().Contains(patientName)) &&
-      (string.IsNullOrEmpty(providorName) || item.PhysicianName.ToLower().Contains(providorName)) &&
-      (status.Length == 0 || status.Contains(item.RequestStatus)) && item.IsDelted == false &&
-      (requestType == 0 || item.RequestTypeId == requestType)
-
-  &&
-  (fromDos == DateTime.MinValue || item.DateOfService?.Date >= fromDos.Date) &&
-  (toDos == new DateTime() || item.DateOfService?.Date <= toDos.Date)
-  ).ToList();
+            var searchRecord = _admin.GetSearchRecords(email, phoneNumber, patientName, providorName, status, requestType, fromDos, toDos);
             int pageSize = 10;
             int totalItems = searchRecord.Count();
             int totalPages = (int)Math.Ceiling((double)totalItems / pageSize);
@@ -1450,10 +1382,7 @@ namespace HelloDoc.Controllers
 
         public IActionResult GetBLockHistory(string name, string email, string phonenumber, int page)
         {
-            List<Blockrequest>? blockdata = _context.Blockrequests.Include(b => b.Request).Where(item =>
-            (string.IsNullOrEmpty(name) || item.Request.Firstname.Contains(name)) &&
-            (string.IsNullOrEmpty(email) || item.Email == email) &&
-            (string.IsNullOrEmpty(phonenumber) || item.Phonenumber == phonenumber)).ToList();
+            List<Blockrequest>? blockdata = _admin.GetBlockRequests(name, email, phonenumber);
             int pageSize = 3;
             int totalItems = blockdata.Count();
             int totalPages = (int)Math.Ceiling((double)totalItems / pageSize);
@@ -1475,9 +1404,9 @@ namespace HelloDoc.Controllers
                 blockHistory.Isactive = false;
                 blockHistory.Request.Status = 1;
                 blockHistory.Modifieddate = DateTime.Now;
-                blockHistory.Request.Physicianid = null;   
-                
-                _context.Blockrequests.Update(blockHistory);
+                blockHistory.Request.Physicianid = null;
+
+                _admin.UpdateBlockRequest(blockHistory);
                 _admin.SaveChanges();
                 TempData["SuccessMessage"] = "UnBlock SuccessFull!!";
 
@@ -1753,7 +1682,7 @@ namespace HelloDoc.Controllers
             aspnet.Createddat = DateTime.Now;
             aspnet.Passwordhash = BC.HashPassword(profileVm?.Password ?? "");
             aspnet.Phonenumber = profileVm?.MobileNo ?? "";
-            _admin.AddAspNetUser(aspnetUser);   
+            _admin.AddAspNetUser(aspnet);   
             _admin.SaveChanges();
 
             Admin admin = new Admin();
@@ -1778,7 +1707,7 @@ namespace HelloDoc.Controllers
             {
                 _admin.AddAdminRegion(admin.Adminid, region);
             }
-            _admin.AddAspnetUserRole(aspnetUser.Aspnetuserid, profileVm.RoleAdminId);
+            _admin.AddAspnetUserRole(aspnet.Aspnetuserid, profileVm.RoleAdminId);
 
             return RedirectToAction("UserAccess", "Admin");
         }
@@ -1864,7 +1793,7 @@ namespace HelloDoc.Controllers
 
         #region SearchPatientDashboard
         [CustomAuthorize("Dashboard", "6")]
-        public IActionResult SearchPatient(string searchValue, string selectValue, string partialName, string selectedFilter, int[] currentStatus, bool exportdata, bool exportAllData, int page, int pageSize = 10)
+        public IActionResult SearchPatient(string searchValue, string selectValue, string partialName, string selectedFilter, int[] currentStatus, bool exportdata, bool exportAllData, int page, int pageSize = 3)
         {
             //Its Define ALl Cancel Reason Theat Stored In Database
             ViewBag.Cancel = _admin.GetCancelCases();
@@ -1889,8 +1818,10 @@ namespace HelloDoc.Controllers
             int totalPages = (int)Math.Ceiling((double)totalItems / pageSize);
             List<NewRequestTableVM> paginatedData = filteredPatients.Skip((page - 1) * pageSize).Take(pageSize).ToList();
             ViewBag.totalPages = totalPages;
+            
             ViewBag.CurrentPage = page;
             ViewBag.PageSize = pageSize;
+            ViewBag.TotalEntries = totalItems;
 
             //If admin Click Exportdata  Then it download the excel File 
             if (exportdata)
@@ -2412,7 +2343,7 @@ namespace HelloDoc.Controllers
                     _admin.SaveChanges();
 
                     //Genrate Confirmation Number
-                    int count = _context.Requests.Where(x => x.Createddate.Date == request1.Createddate.Date).Count() + 1;
+                    int count = _patient.GetRequestCountByDate(request1.Createddate);
                     Region region = _admin.GetRegionByName(requestModel.State);
                     if (region != null)
                     {
@@ -2430,7 +2361,7 @@ namespace HelloDoc.Controllers
                     _admin.UpdateRequest(request1);
                     _admin.SaveChanges();
                     string token = Guid.NewGuid().ToString();
-                    string? resetLink = Url.Action("Index", "Register", new { userId = request1.Requestid, token }, protocol: HttpContext.Request.Scheme);
+                    string? resetLink = Url.Action("Index", "Register", new { RequestId = request1.Requestid, token }, protocol: HttpContext.Request.Scheme);
                     string to = requestModel.Email;
                     string body = $"Click <a href='{resetLink}'>here</a> to Create A new Account";
                     string subject = "Create Your New Account";
@@ -2848,8 +2779,7 @@ namespace HelloDoc.Controllers
 
         public IActionResult VendorNameByHelthProfession(int helthprofessionaltype)
         {
-            List<Healthprofessional> vendorname = _context.Healthprofessionals.Where(item => item.Healthprofessionalid == helthprofessionaltype).ToList();
-
+            List<Healthprofessional> vendorname = _admin.GetHealthProfessionalByHealthProfessionalId(helthprofessionaltype);
             return Ok(vendorname);
         }
 

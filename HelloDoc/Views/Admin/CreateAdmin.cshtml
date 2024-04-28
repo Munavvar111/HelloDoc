@@ -59,6 +59,8 @@
                             }
 
                         </select>
+                                                <label for="floatingInput">State</label>
+
                         <span class="error-RoleId text-danger"></span>
 
                     </div>
@@ -183,8 +185,8 @@
                         </div>
                     </div>
                     <div class="col-md-6">
-                        <div class="form-floating">
-                            <input name="PhoneNumber" type="tel" id='phone2' name="MobileNo" class="form-control" placeholder="(201)555-0123" asp-for="@Model.MobileNo">
+                    <div class="border rounded-2 tel-container">
+                        <input name="PhoneNumber" type="tel" id='phone2' name="MobileNo" class="form-control border-0 tel-input" placeholder="(201)555-0123" asp-for="@Model.MobileNo">
                             <span class="error-MobileNo text-danger"></span>
 
                         </div>

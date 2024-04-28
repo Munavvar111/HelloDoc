@@ -63,7 +63,6 @@
                 <input type="date"
                        class="form-control"
                        placeholder="name@example.com"
-                       name="birthday"
                        asp-for="@Model.BirthDate" id="birthday"/>
                 <label for="floatingInput" asp-for="BirthDate">Date of Birth</label>
                 <span asp-validation-for="BirthDate" class="text-danger"></span>
@@ -152,7 +151,7 @@
         </div>
         <div class="col">
             <div class="form-floating">
-                <select class="form-select" aria-label="Default select example" name="state" id="cancelReason" asp-for="State">
+                <select class="form-select" aria-label="Default select example"  id="cancelReason" asp-for="State">
 
                     <option value="" selected disabled>Select The State</option>
                     @if (Model.Regions != null)
@@ -164,6 +163,8 @@
                     }
 
                 </select>
+                <label for="floatingInput">State</label>
+
                 <span asp-validation-for="State" class="text-danger"></span>
 
             </div>
@@ -200,9 +201,9 @@
                        class="form-control"
                        id="floatingInput"
                        placeholder="Rajpath Road"
-                       asp-for="State" />
-                <label for="floatingInput" asp-for="Street">Street</label>
-                <span asp-validation-for="Street" class="text-danger"></span>
+                       asp-for="Relation" />
+                <label for="floatingInput" asp-for="Relation">Relation</label>
+                <span asp-validation-for="Relation" class="text-danger"></span>
 
             </div>
             </div>

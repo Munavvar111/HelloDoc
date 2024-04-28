@@ -49,7 +49,7 @@ namespace HalloDocPatient.Controllers
             {
                 return RedirectToAction("Index", "Login");
             }
-            else if (aspnetUser1 == null) {
+            else if (aspnetUser1 != null) {
 				return RedirectToAction("Index", "Login");
 
 			}
@@ -73,7 +73,8 @@ namespace HalloDocPatient.Controllers
                     AspnetUserrole aspnetUserrole=new AspnetUserrole();
                     aspnetUserrole.Userid = aspnetUser.Aspnetuserid;
                     aspnetUserrole.Roleid = 2;
-                    _context.AspnetUserroles.Add(aspnetUserrole); _context.SaveChanges();
+                    _context.AspnetUserroles.Add(aspnetUserrole); 
+                    _context.SaveChanges();
 
                     User uc = new User();
                     uc.Email =requestclient.Email;
@@ -99,7 +100,7 @@ namespace HalloDocPatient.Controllers
 
                     request.Userid = uc.Userid;
                     _admin.UpdateRequest(request);
-                    _context.SaveChanges();
+                    _admin.SaveChanges();
                     return RedirectToAction("Index","Login");
                 }
                 else

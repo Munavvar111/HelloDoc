@@ -30,17 +30,17 @@
                     <td scope="row">
                         @if (item.RequestTypeId == 1)
                         {
+                            <span>Patient</span>
+                        }
+                        @if (item.RequestTypeId == 4)
+                        {
                             <span>Business</span>
                         }
                         @if (item.RequestTypeId == 2)
                         {
-                            <span>Patient</span>
-                        }
-                        @if (item.RequestTypeId == 3)
-                        {
                             <span>Family/Friend</span>
                         }
-                        @if (item.RequestTypeId == 4)
+                        @if (item.RequestTypeId == 3)
                         {
                             <span>Concierge</span>
                         }

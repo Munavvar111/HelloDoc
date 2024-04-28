@@ -65,21 +65,11 @@
                             <a class="dropdown-item" asp-action="CloseCase" asp-controller="Admin" asp-route-requestid="@item.RequestId"><i class="fa-regular fa-circle-xmark me-3"></i>Close Case</a>
                             <a class="dropdown-item" asp-action="SendOrder" asp-controller="Admin" asp-route-requestid="@item.RequestId"><i class="fa-solid fa-cart-plus me-3"></i> Order </a>
                             <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#ClearModal" data-bs-requestid="@item.RequestId"><i class="fa-regular fa-circle-xmark me-3"></i>Clear Case</a>
-                            @if (@item.isfinalize == null)
-                            {
-                                <a class="dropdown-item" asp-action="EncounterForm" asp-route-requestid="@item.RequestId"><i class="fa-regular fa-note-sticky"></i>Encounter</a>
+                           
+                            
+                           
+                                <a class="dropdown-item" asp-action="EncounterForm" asp-route-requestid="@item.RequestId"><i class="fa-regular fa-note-sticky me-3"></i>Encounter</a>
 
-                            }
-                            else if (@item.isfinalize)
-                            {
-
-                                <button type="button" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#finalizedModal" data-requestid="@item.RequestId"><i class="bi bi-ban me-3"></i>Encounter</button>
-                            }
-                            else
-                            {
-                                <a class="dropdown-item" asp-action="EncounterForm" asp-route-requestid="@item.RequestId"><i class="fa-regular fa-note-sticky"></i>Encounter</a>
-
-                            }
                         </div>
                     </div>
                 </td>
@@ -211,47 +201,43 @@
     }
 }
 <div class="pb-3">
-    <nav id="pagination" aria-label="Page navigation">
-        <ul class="pagination justify-content-center mb-0">
-            @if (ViewBag.CurrentPage >= 1 && ViewBag.CurrentPage <= ViewBag.TotalPages)
-            {
-                int prevpage = Convert.ToInt32(ViewBag.CurrentPage) - 1;
-                int currpage = Convert.ToInt32(ViewBag.CurrentPage);
-                int nextpage = Convert.ToInt32(ViewBag.CurrentPage) + 1;
-                if (ViewBag.CurrentPage > 1)
+    <div class="d-flex justify-content-between align-items-center">
+        <div class="ms-3 fw-semibold">
+            Page @(ViewBag.CurrentPage) out of @ViewBag.TotalPages
+        </div>
+        <nav id="pagination" aria-label="Page navigation" class="me-3">
+            <ul class="pagination pagination-sm m-0">
+                @if (ViewBag.CurrentPage > 1)
                 {
-                    <li class="page-item ">
-                        <a class="page-link" id="previous" data-page="@(prevpage)" aria-label="Previous">
+                    <li class="page-item">
+                        <a class="page-link" href="#" id="previous" data-page="@(ViewBag.CurrentPage - 1)" aria-label="Previous">
                             <span aria-hidden="true">&laquo;</span>
                             <span class="visually-hidden">Previous</span>
                         </a>
                     </li>
                 }
-                for (int z = 0; z < 3; z++)
+                @for (int z = 1; z <= ViewBag.TotalPages; z++)
                 {
-                    if (currpage + z <= ViewBag.TotalPages)
-                    {
-                        <li class="page-item @(currpage + z == ViewBag.CurrentPage ? "active" : "")">
-                            <a class="page-link" id="current_@z" data-page="@(currpage + z)" aria-label="Current">
-                                <span>@(ViewBag.CurrentPage + z)</span>
-                            </a>
-                        </li>
-                    }
+                    <li class="page-item @(z == ViewBag.CurrentPage ? "active" : "")">
+                        <a class="page-link" href="#" id="current_@z" data-page="@z" aria-label="Page @z">
+                            @z
+                        </a>
+                    </li>
                 }
-                if (ViewBag.CurrentPage < ViewBag.TotalPages)
+                @if (ViewBag.CurrentPage < ViewBag.TotalPages)
                 {
-                    <li class="page-item ">
-                        <a class="page-link" id="next" data-page="@(nextpage)" aria-label="Next">
+                    <li class="page-item">
+                        <a class="page-link" href="#" id="next" data-page="@(ViewBag.CurrentPage + 1)" aria-label="Next">
                             <span aria-hidden="true">&raquo;</span>
                             <span class="visually-hidden">Next</span>
                         </a>
                     </li>
                 }
-
-            }
-        </ul>
-    </nav>
+            </ul>
+        </nav>
+    </div>
 </div>
+
 
 <script>
     $(document).ready(function () {

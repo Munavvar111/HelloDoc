@@ -12,23 +12,24 @@ namespace HalloDocPatient.Controllers
         private readonly ApplicationDbContext _context;
         private readonly IOtherRequest _otherrequest;
         private readonly ILogin _login;
-
+        private readonly IAdmin _admin;
         private readonly IPatientRequest _patientRequest;
         private readonly ILogger<RequestController> _logger;
         private readonly IDataProtectionProvider _dataProtectionProvider;
 
-        public RequestController(ApplicationDbContext context, IDataProtectionProvider dataProtectionProvider, IPatientRequest patientRequest, ILogger<RequestController> logger, IOtherRequest otherrequest, ILogin login)
+        public RequestController(ApplicationDbContext context,IAdmin admin, IDataProtectionProvider dataProtectionProvider, IPatientRequest patientRequest, ILogger<RequestController> logger, IOtherRequest otherrequest, ILogin login)
         {
             _context = context;
             _patientRequest = patientRequest;
             _logger = logger;
             _login = login;
+            _admin = admin; 
             _otherrequest = otherrequest;
             _dataProtectionProvider = dataProtectionProvider;
         }
         public IActionResult PatientRequest()
         {
-            List<Region> region = _context.Regions.ToList();
+            List<Region> region = _admin.GetAllRegion();
             RequestModel requestmodal = new RequestModel();
             requestmodal.Regions = region;
             return View(requestmodal);
@@ -39,7 +40,7 @@ namespace HalloDocPatient.Controllers
         }
         public IActionResult BusinessRequest()
         {
-            List<Region> region = _context.Regions.ToList();
+            List<Region> region = _admin.GetAllRegion();
             RequestOthers requestmodal = new RequestOthers();
             requestmodal.Regions = region;
             return View(requestmodal);
@@ -48,8 +49,8 @@ namespace HalloDocPatient.Controllers
         [HttpPost]
         public IActionResult BusinessRequest(RequestOthers requestOther)
         {
-            Region? statebyregionid = _context.Regions.Where(item => item.Name == requestOther.State).FirstOrDefault();
-			Blockrequest? blockrequest = _context.Blockrequests.Where(item => item.Email == requestOther.Email && item.Isactive.Value).FirstOrDefault();
+            Region? statebyregionid = _admin.GetRegionByName(requestOther.State);
+			Blockrequest? blockrequest = _admin.GetBlockRequestByEmail(requestOther.Email);
             if (blockrequest != null)
             {
 
@@ -66,7 +67,7 @@ namespace HalloDocPatient.Controllers
                 business.Regionid = 1;
 
                 _context.Businesses.Add(business);
-                _context.SaveChanges();
+                _admin.SaveChanges();
 
                 Request request = new Request();
                 request.Firstname = requestOther.FirstNameOther;
@@ -77,16 +78,16 @@ namespace HalloDocPatient.Controllers
                 request.Status = 1;
                 request.Createddate = DateTime.Now;
                 request.Isdeleted = false;
-
+                    
                 _context.Requests.Add(request);
-                _context.SaveChanges();
+                _admin.SaveChanges();
 
                 Requestbusiness requestbusiness = new Requestbusiness();
                 requestbusiness.Businessid = business.Businessid;
                 requestbusiness.Requestid = request.Requestid;
 
                 _context.Requestbusinesses.Add(requestbusiness);
-                _context.SaveChanges();
+                _admin.SaveChanges();
 
 
                 Requestclient requestclient = new Requestclient();
@@ -108,8 +109,8 @@ namespace HalloDocPatient.Controllers
 
                 _context.Requestclients.Add(requestclient);
                 _context.SaveChanges();
-                Region? region = _context.Regions.Where(x => x.Name == requestOther.State).FirstOrDefault();
-                int count = _context.Requests.Where(x => x.Createddate.Date == request.Createddate.Date).Count() + 1;
+                Region? region = _admin.GetRegionByName(requestOther.State);
+                int count = _patientRequest.GetRequestCountByDate(request.Createddate);
                 if (region != null)
                 {
                     string confirmNum = string.Concat(region?.Abbreviation ?? "".ToUpper(), request.Createddate.ToString("ddMMyy"), requestOther.LastName.Substring(0, 2).ToUpper() ?? "",
@@ -149,16 +150,10 @@ namespace HalloDocPatient.Controllers
         public async Task<IActionResult> PatientRequest(RequestModel requestModel)
         {
             requestModel.Username = requestModel.Firstname + requestModel.Lastname;
-            Blockrequest? blockrequest = _context.Blockrequests.Where(item => item.Email == requestModel.Email && item.Isactive.Value).FirstOrDefault();
+            Blockrequest? blockrequest = _admin.GetBlockRequestByEmail(requestModel.Email);
             if (blockrequest == null)
             {
-                if (!ModelState.IsValid)
-                {
-                    return View(requestModel);
-                }
-                else
-                {
-                    if (requestModel.File != null && requestModel.File.Length > 0)
+                  if (requestModel.File != null && requestModel.File.Length > 0)
                     {
                         string uniqueFileName = await _patientRequest.AddFileInUploader(requestModel.File);
                         _patientRequest.AddPatientRequest(requestModel, ReqTypeId: 1);
@@ -204,7 +199,7 @@ namespace HalloDocPatient.Controllers
                         return RedirectToAction("Index", "Login");
                     }
                 }
-            }
+           
             else
             {
                 TempData["Error"] = "Your Request IS Block Beacuse Of Your Unaporpriate Behivour!";
@@ -226,13 +221,13 @@ namespace HalloDocPatient.Controllers
         [HttpPost]
         public JsonResult CheckEmail([FromBody] string email)
         {
-            AspnetUser? user = _context.AspnetUsers.FirstOrDefault(u => u.Email == email);
+            AspnetUser? user = _patientRequest.GetAspnetUserBYEmail(email);
             bool isValid = user == null;
             return Json(isValid);
         }
         public IActionResult FriendRequest()
         {
-            List<Region> region = _context.Regions.ToList();
+            List<Region> region = _admin.GetAllRegion();
             RequestOthers requestmodal = new RequestOthers();
             requestmodal.Regions = region;
             return View(requestmodal);
@@ -242,7 +237,7 @@ namespace HalloDocPatient.Controllers
         [HttpPost]
         public async Task<IActionResult> FriendRequest(RequestOthers request)
         {
-			Blockrequest? blockrequest = _context.Blockrequests.Where(item => item.Email == request.Email && item.Isactive.Value).FirstOrDefault();
+			Blockrequest? blockrequest = _admin.GetBlockRequestByEmail(request.Email);
             if (blockrequest != null)
             {
 
@@ -295,7 +290,7 @@ namespace HalloDocPatient.Controllers
         }
         public IActionResult ConceirgeRequest()
         {
-            List<Region> region = _context.Regions.ToList();
+            List<Region> region = _admin.GetAllRegion();
             RequestOthers requestmodal = new RequestOthers();
             ViewBag.Regions = region;
             return View(requestmodal);
@@ -303,7 +298,7 @@ namespace HalloDocPatient.Controllers
         [HttpPost]
         public IActionResult ConceirgeRequest(RequestOthers requestOther)
         {
-			Blockrequest? blockrequest = _context.Blockrequests.Where(item => item.Email == requestOther.Email && item.Isactive.Value).FirstOrDefault();
+			Blockrequest? blockrequest = _admin.GetBlockRequestByEmail(requestOther.EmailOther);
 			if (blockrequest != null)
 			{
 
@@ -327,7 +322,7 @@ namespace HalloDocPatient.Controllers
                 }
                 return RedirectToAction("Index", "Login");
             }
-            List<Region> region = _context.Regions.ToList();
+            List<Region> region = _admin.GetAllRegion();
 
             ViewBag.Regions = region;
 
@@ -343,7 +338,7 @@ namespace HalloDocPatient.Controllers
 
 
                 int requesiddec = int.Parse(decryptedValue);
-                Request? request = _context.Requests.Where(item => item.Requestid == requesiddec).FirstOrDefault();
+                Request? request = _admin.GetRequestById(requesiddec);
                 if (request != null)
                 {
                     AgreementVM sendagrement = new AgreementVM();
@@ -379,22 +374,22 @@ namespace HalloDocPatient.Controllers
         {
             try
             {
-                Request? request = _context.Requests.Where(item => item.Requestid == id).FirstOrDefault();
+                Request? request = _admin.GetRequestById(id);
                 if (request == null)
                 {
                     return NotFound();
                 }
 
                 request.Status = 4;
-                _context.Requests.Update(request);
-                _context.SaveChanges();
+                _admin.UpdateRequest(request);  
+                _admin.SaveChanges();
 
                 Requeststatuslog requeststatuslog = new Requeststatuslog();
                 requeststatuslog.Status = 4;
                 requeststatuslog.Requestid = id;
                 requeststatuslog.Createddate = DateTime.Now;
-                _context.Requeststatuslogs.Add(requeststatuslog);
-                _context.SaveChanges();
+                _admin.AddRequestStatusLog(requeststatuslog);
+                _admin.SaveChanges();
 
                 TempData["SuccessMessage"] = "Agreement completed successfully";
 
@@ -410,18 +405,19 @@ namespace HalloDocPatient.Controllers
         [HttpPost]
         public IActionResult CancelPatient(AgreementVM ag)
         {
-            Request? request = _context.Requests.Where(item => item.Requestid == ag.RequestId).FirstOrDefault();
+            Request? request = _admin.GetRequestById(ag.RequestId);
             if (request != null)
             {
                 request.Status = 7;
-                _context.Requests.Update(request);
+                _admin.UpdateRequest(request);
+                _admin.SaveChanges();
                 Requeststatuslog requeststatuslog = new Requeststatuslog();
                 requeststatuslog.Status = 7;
                 requeststatuslog.Createddate = DateTime.Now;
                 requeststatuslog.Notes = ag.Notes;
                 requeststatuslog.Requestid = ag.RequestId;
-                _context.Requeststatuslogs.Add(requeststatuslog);
-                _context.SaveChanges();
+                _admin.AddRequestStatusLog(requeststatuslog);
+                _admin.SaveChanges();
             }
 
             return RedirectToAction("Index", "Login");

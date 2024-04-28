@@ -144,8 +144,18 @@ namespace BusinessLayer.InterFace
 		RequestStatusCounts GetStatusCountsAsync(int id);
 
 		Blockrequest? GetBlockrequestById(int id);	
-		Blockrequest? GetBlockRequestByEmail(string email);	
+		Blockrequest? GetBlockRequestByEmail(string email);
 
+		List<Region> GetPhysicianWorkingRegion(int physicianId);
 
-	}
+		bool ShiftExists(DateTime startDate, TimeOnly startTime, TimeOnly endTime, Shiftdetail shiftdetail);
+
+        List<SearchRecordVM> GetSearchRecords(string email, string phoenNo, string patientName, string providerName, int[] status, int requestTypeId, DateTime fromDos, DateTime toDos);
+
+        List<Blockrequest> GetBlockRequests(string name, string email, string phoneNumber);
+
+		void UpdateBlockRequest(Blockrequest blockrequest);
+		List<Healthprofessional> GetHealthProfessionalByHealthProfessionalId(int  healthprofessionalId);	
+
+    }
 }

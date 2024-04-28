@@ -69,6 +69,8 @@ namespace DataAccessLayer.CustomModel
 		[StringLength(20, MinimumLength = 10, ErrorMessage = "Enter valid Mobile Number")]
 		public string? PhoneNo { get; set; }
 
+		public string? Relation { get; set; }
+
 		[FromForm]
 		public IFormFile? File { get; set; }
 

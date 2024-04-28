@@ -15,11 +15,12 @@ namespace BusinessLayer.Repository
     {
         private readonly ApplicationDbContext _context;
         private readonly ILogger<PatientRequest> _logger; // Inject the logger
-        public PatientRequest(ApplicationDbContext context, ILogger<PatientRequest> logger) {
-        _context = context;
+        public PatientRequest(ApplicationDbContext context, ILogger<PatientRequest> logger)
+        {
+            _context = context;
             _logger = logger;
         }
-       
+
         public User? GetUserById(int id)
         {
             return _context!.Users.FirstOrDefault(x => x.Userid == id);
@@ -31,12 +32,16 @@ namespace BusinessLayer.Repository
         public User? GetUserByEmail(string email)
         {
             return _context.Users.FirstOrDefault(x => x.Email == email);
-            
-         
+        }
+
+        public int GetRequestCountByDate(DateTime date)
+        {
+            return _context.Requests
+                .Count(x => x.Createddate.Date == date.Date) + 1;
         }
         public Request? GetRequestByEmail(string email)
         {
-            return _context.Requests.OrderBy(e=>e.Requestid).LastOrDefault(r => r.Email == email);
+            return _context.Requests.OrderBy(e => e.Requestid).LastOrDefault(r => r.Email == email);
         }
 
         public AspnetUser? GetAspnetUserBYEmail(string email)
@@ -47,35 +52,35 @@ namespace BusinessLayer.Repository
         {
             var aspnetUser = new AspnetUser();
             {
-                if(requestModel.Passwordhash==requestModel.ConfirmPasswordhash)
+                if (requestModel.Passwordhash == requestModel.ConfirmPasswordhash)
                 {
 
 
-                aspnetUser.Passwordhash = BC.HashPassword(requestModel.Passwordhash);
+                    aspnetUser.Passwordhash = BC.HashPassword(requestModel.Passwordhash);
 
-                // populate aspnetUser properties from requestModel
-                aspnetUser.Aspnetuserid = Guid.NewGuid().ToString();
-                aspnetUser.Email = requestModel.Email;
-                aspnetUser.Username = requestModel.Firstname+requestModel.Lastname;
+                    // populate aspnetUser properties from requestModel
+                    aspnetUser.Aspnetuserid = Guid.NewGuid().ToString();
+                    aspnetUser.Email = requestModel.Email;
+                    aspnetUser.Username = requestModel.Firstname + requestModel.Lastname;
                     _context.AspnetUsers.Add(aspnetUser);
                     _context.SaveChanges();
                 }
-                }
+            }
             AspnetUserrole aspnetUserrole = new AspnetUserrole();
             aspnetUserrole.Userid = aspnetUser.Aspnetuserid;
             aspnetUserrole.Roleid = 2;
-            _context.AspnetUserroles.Add(aspnetUserrole);   
-            _context.SaveChanges(); 
-               
-            
-            
-                
+            _context.AspnetUserroles.Add(aspnetUserrole);
+            _context.SaveChanges();
+
+
+
+
 
         }
 
         public void AddUser(RequestModel requestModel, String AspnetUserID)
         {
-            var aspnetuser=GetAspnetUserBYEmail(requestModel.Email);
+            var aspnetuser = GetAspnetUserBYEmail(requestModel.Email);
             var user = new User();
             {
                 user.Mobile = requestModel.PhoneNo;
@@ -99,58 +104,25 @@ namespace BusinessLayer.Repository
             _context.SaveChanges();
         }
 
-        
 
-        public void AddPatientRequest(RequestModel requestModel,int ReqTypeId)
+
+        public void AddPatientRequest(RequestModel requestModel, int ReqTypeId)
         {
             using (var transactionScope = new TransactionScope())
             {
 
                 try
                 {
-                    
+
                     var user = GetUserByEmail(requestModel.Email);
 
                     if (user != null)
                     {
                         AddRequest(requestModel, user.Userid, ReqTypeId);
                         Request? request = GetRequestByEmail(requestModel.Email);
-                        if(request != null)
+                        if (request != null)
                         {
-                        AddRequestClient(requestModel, request.Requestid);
-                        int count = _context.Requests.Where(x => x.Createddate.Date == request.Createddate.Date).Count() + 1;
-                        var region = _context.Regions.Where(x => x.Name == requestModel.State).FirstOrDefault();
-                        if (region != null)
-                        {
-                            var confirmNum = string.Concat(region?.Abbreviation?.ToUpper(), request.Createddate.ToString("ddMMyy"), requestModel.Lastname.Substring(0, 2).ToUpper() ?? "",
-                           requestModel.Firstname.Substring(0, 2).ToUpper(), count.ToString("D4"));
-                            request.Confirmationnumber = confirmNum;
-                        }
-                        else
-                        {
-                            var confirmNum = string.Concat("ML", request.Createddate.ToString("ddMMyy"), requestModel.Lastname.Substring(0, 2).ToUpper() ?? "",
-                          requestModel.Firstname.Substring(0, 2).ToUpper(), count.ToString("D4"));
-                            request.Confirmationnumber = confirmNum;
-                        }
-                        _context.Update(request);
-                        _context.SaveChanges();
-                        }
-                    }
-                    else
-                    {
-                        AddAspnetUser(requestModel);
-                        AspnetUser? aspnetuserId1 = GetAspnetUserBYEmail(requestModel.Email);
-                        if(aspnetuserId1 != null) { 
-                        AddUser(requestModel, aspnetuserId1.Aspnetuserid);
-                        }
-                        User? user1= GetUserByEmail(requestModel.Email);
-                        if (user1!=null) {
-                        AddRequest(requestModel, user1.Userid, ReqTypeId);
-                        }
-                        Request? request = GetRequestByEmail(requestModel.Email);
-                        if(request!=null)
-                        {
-                        AddRequestClient(requestModel, request.Requestid);
+                            AddRequestClient(requestModel, request.Requestid);
                             int count = _context.Requests.Where(x => x.Createddate.Date == request.Createddate.Date).Count() + 1;
                             var region = _context.Regions.Where(x => x.Name == requestModel.State).FirstOrDefault();
                             if (region != null)
@@ -164,9 +136,44 @@ namespace BusinessLayer.Repository
                                 var confirmNum = string.Concat("ML", request.Createddate.ToString("ddMMyy"), requestModel.Lastname.Substring(0, 2).ToUpper() ?? "",
                               requestModel.Firstname.Substring(0, 2).ToUpper(), count.ToString("D4"));
                                 request.Confirmationnumber = confirmNum;
-                            }   
-                        _context.Requests.Update(request);
-                        _context.SaveChanges();
+                            }
+                            _context.Update(request);
+                            _context.SaveChanges();
+                        }
+                    }
+                    else
+                    {
+                        AddAspnetUser(requestModel);
+                        AspnetUser? aspnetuserId1 = GetAspnetUserBYEmail(requestModel.Email);
+                        if (aspnetuserId1 != null)
+                        {
+                            AddUser(requestModel, aspnetuserId1.Aspnetuserid);
+                        }
+                        User? user1 = GetUserByEmail(requestModel.Email);
+                        if (user1 != null)
+                        {
+                            AddRequest(requestModel, user1.Userid, ReqTypeId);
+                        }
+                        Request? request = GetRequestByEmail(requestModel.Email);
+                        if (request != null)
+                        {
+                            AddRequestClient(requestModel, request.Requestid);
+                            int count = _context.Requests.Where(x => x.Createddate.Date == request.Createddate.Date).Count() + 1;
+                            var region = _context.Regions.Where(x => x.Name == requestModel.State).FirstOrDefault();
+                            if (region != null)
+                            {
+                                var confirmNum = string.Concat(region?.Abbreviation?.ToUpper(), request.Createddate.ToString("ddMMyy"), requestModel.Lastname.Substring(0, 2).ToUpper() ?? "",
+                               requestModel.Firstname.Substring(0, 2).ToUpper(), count.ToString("D4"));
+                                request.Confirmationnumber = confirmNum;
+                            }
+                            else
+                            {
+                                var confirmNum = string.Concat("ML", request.Createddate.ToString("ddMMyy"), requestModel.Lastname.Substring(0, 2).ToUpper() ?? "",
+                              requestModel.Firstname.Substring(0, 2).ToUpper(), count.ToString("D4"));
+                                request.Confirmationnumber = confirmNum;
+                            }
+                            _context.Requests.Update(request);
+                            _context.SaveChanges();
                         }
 
                     }
@@ -183,29 +190,29 @@ namespace BusinessLayer.Repository
         }
         public void AddRequest(RequestModel requestModel, int UserId, int reqTypeId)
         {
-                var request =new DataAccessLayer.DataModels.Request();
+            var request = new DataAccessLayer.DataModels.Request();
             {
-            request.Userid = UserId==0?null:UserId;
-            request.Requesttypeid=reqTypeId;
-            request.Firstname = requestModel.Firstname;
-            request.Lastname = requestModel.Lastname;
-            request.Email = requestModel.Email;
-            request.Createddate = DateTime.Now;
+                request.Userid = UserId == 0 ? null : UserId;
+                request.Requesttypeid = reqTypeId;
+                request.Firstname = requestModel.Firstname;
+                request.Lastname = requestModel.Lastname;
+                request.Email = requestModel.Email;
+                request.Createddate = DateTime.Now;
                 request.Phonenumber = requestModel.PhoneNo;
                 request.Isdeleted = false;
-            request.Status = 1;
+                request.Status = 1;
             }
-        _context.Requests.Add(request);
+            _context.Requests.Add(request);
             _context.SaveChanges();
         }
 
-        public void AddRequestClient(RequestModel requestModel,int RequestID)
+        public void AddRequestClient(RequestModel requestModel, int RequestID)
         {
             var statebyregionid = _context.Regions.Where(item => item.Name == requestModel.State).FirstOrDefault();
             var requestClient = new Requestclient();
             {
-                requestClient.Notes= requestModel.Notes;
-                requestClient.Email= requestModel.Email;    
+                requestClient.Notes = requestModel.Notes;
+                requestClient.Email = requestModel.Email;
                 requestClient.Requestid = RequestID;
                 requestClient.Firstname = requestModel.Firstname;
                 requestClient.Lastname = requestModel.Lastname;
@@ -223,13 +230,13 @@ namespace BusinessLayer.Repository
             _context.Requestclients.Add(requestClient);
             _context.SaveChanges();
         }
-        public void AddRequestWiseFile(string Filename,int RequestID)
+        public void AddRequestWiseFile(string Filename, int RequestID)
         {
-            var requestWiseFile=new Requestwisefile();
+            var requestWiseFile = new Requestwisefile();
             {
                 requestWiseFile.Filename = Filename;
                 requestWiseFile.Createddate = DateTime.Now;
-                requestWiseFile.Requestid= RequestID;
+                requestWiseFile.Requestid = RequestID;
                 requestWiseFile.Isdeleted = new BitArray(new[] { false });
             }
             _context.Requestwisefiles.Add(requestWiseFile);
@@ -240,7 +247,7 @@ namespace BusinessLayer.Repository
 
         public async Task<List<Requestwisefile>> GetRequestwisefileByIdAsync(int RequestID)
         {
-            return await _context.Requestwisefiles.Where(r=>r.Requestid==RequestID).ToListAsync();
+            return await _context.Requestwisefiles.Where(r => r.Requestid == RequestID).ToListAsync();
         }
         public async Task<string> AddFileInUploader(IFormFile file)
         {
@@ -259,6 +266,6 @@ namespace BusinessLayer.Repository
             return uniqueFileName;
         }
 
-        
+
     }
 }

@@ -37,6 +37,7 @@
                 <div class="col-md-6 form-floating mb-3">
                     <input id="StartTime" asp-for="Starttime" class="form-control rounded vcs" name="Starttime" type="time" placeholder=Suchtext autocomplete=off>
                     <label for="floatingInput">Start</label>
+                    <span id="timeErrorMessage" class="text-danger"></span>
                 </div>
                 <div class="col-md-6 form-floating mb-3">
                     <input id="EndTime" asp-for="Endtime" class="form-control rounded vcs" name="Endtime" type="time" placeholder=Suchtext autocomplete=off>
@@ -114,7 +115,7 @@
 
                 <div class="row">
                     <div class="col-12 d-flex justify-content-end">
-                        <input type="submit" value="Save" class="btn btn-info text-white mx-2" />
+                        <input type="submit" id="submitButton" value="Save" class="btn btn-info text-white mx-2" />
                         <button type="button" class="btn btn-outline-info hover_white" data-bs-dismiss="modal">Cancel</button>
                     </div>
                 </div>
@@ -129,8 +130,29 @@
 
     var today = new Date();
     var formattedDate = today.toISOString().split('T')[0];
+    function checkTimeDifference() {
+        var startTime = document.getElementById('StartTime').value;
+        var endTime = document.getElementById('EndTime').value;
 
-    document.getElementById('StartDate').min = formattedDate;
+        // Calculate the time difference
+        var startDateTime = new Date('2000-01-01T' + startTime);
+        var endDateTime = new Date('2000-01-01T' + endTime);
+        var timeDiff = Math.abs(endDateTime - startDateTime) / 36e5; // Difference in hours
+
+        // Check if the time difference is less than 1 hour
+        if (timeDiff < 1) {
+            // Show error message
+            document.getElementById('timeErrorMessage').innerText = "Time difference must be at least 1 hour.";
+            // Disable form submission
+            document.getElementById('submitButton').disabled = true;
+        } else {
+            // Clear error message if time difference is valid
+            document.getElementById('timeErrorMessage').innerText = "";
+            // Enable form submission
+            document.getElementById('submitButton').disabled = false;
+        }
+    }
+
     document.getElementById('StartTime').addEventListener('change', function () {
         var startTime = this.value;
 
@@ -139,6 +161,8 @@
         if (document.getElementById('EndTime').value < startTime) {
             document.getElementById('EndTime').value = startTime;
         }
+
+        checkTimeDifference();
     });
 
     var startTimeInput = document.getElementById('StartTime');
@@ -152,8 +176,13 @@
         if (endTimeInput.value < startTimeValue) {
             endTimeInput.value = startTimeValue;
         }
+
+        checkTimeDifference();
     });
 
+    endTimeInput.addEventListener('input', function () {
+        checkTimeDifference();
+    });
 
     window.onload = toggleCheckboxes;
     function toggleCheckboxes() {

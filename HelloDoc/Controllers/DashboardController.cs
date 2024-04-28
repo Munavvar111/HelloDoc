@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace HalloDocPatient.Controllers
 {
-    [CustomAuthorize("Dashboard","24")]
+    [CustomAuthorize("Dashboard", "24")]
     public class DashboardController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -14,7 +14,7 @@ namespace HalloDocPatient.Controllers
         private readonly IAdmin _admin;
         private readonly IWebHostEnvironment _hostingEnvironment;
 
-        public DashboardController(ApplicationDbContext context, IPatientRequest patientRequest, IWebHostEnvironment hostingEnvironment,IAdmin admin)
+        public DashboardController(ApplicationDbContext context, IPatientRequest patientRequest, IWebHostEnvironment hostingEnvironment, IAdmin admin)
         {
             _context = context;
             _patientRequest = patientRequest;
@@ -52,10 +52,10 @@ namespace HalloDocPatient.Controllers
         #endregion
 
         #region Profile
-        public async Task<IActionResult> Profile()
+        public IActionResult Profile()
         {
             int? id = HttpContext.Session.GetInt32("id");
-            User? User = await _context.Users.FindAsync(id);
+            User? User = _patientRequest.GetUserById((int)id);
             DateOnly BirthDate = User != null && User.Intyear != null && User.Strmonth != null && User.Intdate != null
             ? new DateOnly((int)User.Intyear, int.Parse(User.Strmonth), (int)User.Intdate)
                                                                     : new DateOnly();
@@ -86,7 +86,7 @@ namespace HalloDocPatient.Controllers
         {
             var statebyregionid = _admin.GetRegionByName(profileVM.State);
             int? id = HttpContext.Session.GetInt32("id");
-            User? User = await _context.Users.FindAsync(id);
+            User? User = _patientRequest.GetUserById((int)id);
             ViewData["Name"] = User?.Firstname ?? "";
 
             if (ModelState.IsValid)
@@ -228,7 +228,7 @@ namespace HalloDocPatient.Controllers
         public async Task<IActionResult> AddRequestByme()
         {
             int? id = HttpContext.Session.GetInt32("id");
-            User? request = await _context.Users.FindAsync(id);
+            User? request = _patientRequest.GetUserById((int)id);
             RequestModel patientrequest = new RequestModel();
             patientrequest.Firstname = request?.Firstname ?? "";
             patientrequest.Lastname = request?.Lastname ?? "";
@@ -238,7 +238,7 @@ namespace HalloDocPatient.Controllers
             patientrequest.BirthDate = request != null && request.Intyear != null && request.Strmonth != null && request.Intdate != null
             ? new DateOnly((int)request.Intyear, int.Parse(request.Strmonth), (int)request.Intdate)
             : new DateOnly();
-            patientrequest.Regions = _context.Regions.ToList();
+            patientrequest.Regions = _admin.GetAllRegion();
             patientrequest.State = request?.State ?? "";
             return View(patientrequest);
         }
@@ -248,28 +248,27 @@ namespace HalloDocPatient.Controllers
         [HttpPost]
         public async Task<IActionResult> AddRequestByme(RequestModel rm)
         {
-            Blockrequest? block = _context.Blockrequests.Where(item => item.Email == rm.Email).FirstOrDefault();
+            Blockrequest? block = _admin.GetBlockRequestByEmail(rm.Email);
             if (block == null)
             {
-                if (ModelState.IsValid)
+
+                var id = HttpContext.Session.GetInt32("id");
+                if (rm.File != null)
                 {
-                    var id = HttpContext.Session.GetInt32("id");
-                    if (rm.File != null)
-                    {
-                        string uniqueFileName = await _patientRequest.AddFileInUploader(rm.File);
-                        _patientRequest.AddPatientRequest(rm, ReqTypeId: 1);
-                        Request? request = _patientRequest.GetRequestByEmail(rm.Email);
-                        _patientRequest.AddRequestWiseFile(uniqueFileName, request?.Requestid ?? 1);
-                        TempData["SuccessMessage"] = "Your Request Is Send Successful";
-                        return RedirectToAction("Index", "Dashboard");
-                    }
-                    else
-                    {
-                        _patientRequest.AddPatientRequest(rm, ReqTypeId: 1);
-                        TempData["SuccessMessage"] = "Your Request Is Send Successful";
-                        return RedirectToAction("Index", "Dashboard");
-                    }
+                    string uniqueFileName = await _patientRequest.AddFileInUploader(rm.File);
+                    _patientRequest.AddPatientRequest(rm, ReqTypeId: 1);
+                    Request? request = _patientRequest.GetRequestByEmail(rm.Email);
+                    _patientRequest.AddRequestWiseFile(uniqueFileName, request?.Requestid ?? 1);
+                    TempData["SuccessMessage"] = "Your Request Is Send Successful";
+                    return RedirectToAction("Index", "Dashboard");
                 }
+                else
+                {
+                    _patientRequest.AddPatientRequest(rm, ReqTypeId: 1);
+                    TempData["SuccessMessage"] = "Your Request Is Send Successful";
+                    return RedirectToAction("Index", "Dashboard");
+                }
+
             }
             else
             {
@@ -277,14 +276,13 @@ namespace HalloDocPatient.Controllers
                 return RedirectToAction("AddRequestByme", "Dashboard");
             }
 
-            return View(rm);
         }
         #endregion
 
         #region AddRequestByElse
         public IActionResult AddRequestByElse()
         {
-            List<Region> region = _context.Regions.ToList();
+            List<Region> region = _admin.GetAllRegion();
             RequestModel requestmodal = new RequestModel();
             requestmodal.Regions = region;
             return View(requestmodal);
@@ -295,92 +293,108 @@ namespace HalloDocPatient.Controllers
         [HttpPost]
         public async Task<IActionResult> AddRequestByElse(RequestModel requestModel)
         {
-            Blockrequest? block = _context.Blockrequests.Where(item => item.Email == requestModel.Email).FirstOrDefault();
+            Blockrequest? block = _admin.GetBlockRequestByEmail(requestModel.Email);
             if (block == null)
             {
-                if (ModelState.IsValid)
+
+                int? id = HttpContext.Session.GetInt32("id");
+                User? user = _patientRequest.GetUserById((int)id);
+                if (requestModel.File != null)
                 {
-                    int? id = HttpContext.Session.GetInt32("id");
-                    User? user = await _context.Users.FindAsync(id);
-                    if (requestModel.File != null)
+                    Region? region = _admin.GetRegionByName(requestModel.State);
+                    string uniqueFileName = await _patientRequest.AddFileInUploader(requestModel.File);
+                    Request request = new Request();
                     {
-                        Region? region = _context.Regions.Where(item => item.Name == requestModel.State).FirstOrDefault();
-                        string uniqueFileName = await _patientRequest.AddFileInUploader(requestModel.File);
-                        Request request = new Request();
-                        {
-                            request.Userid = user?.Userid;
-                            request.Firstname = user?.Firstname ?? "";
-                            request.Lastname = user?.Lastname ?? "";
-                            request.Email = user?.Email ?? "";
-                            request.Requesttypeid = 2;
-                            request.Createddate = DateTime.Now;
-                            request.Status = 1;
-                            request.Phonenumber = user?.Mobile ?? "";
-                            _context.Requests.Add(request);
-                            _context.SaveChanges();
+                        request.Userid = user?.Userid;
+                        request.Firstname = user?.Firstname ?? "";
+                        request.Lastname = user?.Lastname ?? "";
+                        request.Email = user?.Email ?? "";
+                        request.Requesttypeid = 2;
+                        request.Createddate = DateTime.Now;
+                        request.Status = 1;
+                        request.Phonenumber = user?.Mobile ?? "";
+                        request.Isdeleted = false;
+                        request.Relationname = requestModel.Relation;
+                        _context.Requests.Add(request);
+                        _context.SaveChanges();
 
-                        }
+                    }
 
-                        Requestclient requestclient = new Requestclient();
-                        {
-                            requestclient.Firstname = requestModel.Firstname;
-                            requestclient.Requestid = request.Requestid;
-                            requestclient.Lastname = requestModel.Lastname;
-                            requestclient.Phonenumber = requestModel.PhoneNo;
-                            requestclient.Email = requestModel.Email;
-                            requestclient.State = requestModel.State;
-                            requestclient.Street = requestModel.Street;
-                            requestclient.Regionid = region?.Regionid;
-                            requestclient.Zipcode = requestModel.Zipcode;
-                            requestclient.Intdate = requestModel.BirthDate.Day;
-                            requestclient.Intyear = requestModel.BirthDate.Year;
-                            requestclient.Strmonth = requestModel.BirthDate.Month.ToString();
-                            _context.Requestclients.Add(requestclient);
-                            _context.SaveChanges();
-                        }
-                        _patientRequest.AddRequestWiseFile(uniqueFileName, request.Requestid);
-                        return RedirectToAction("Index", "Dashboard");
+                    Requestclient requestclient = new Requestclient();
+                    {
+                        requestclient.Firstname = requestModel.Firstname;
+                        requestclient.Requestid = request.Requestid;
+                        requestclient.Lastname = requestModel.Lastname;
+                        requestclient.Phonenumber = requestModel.PhoneNo;
+                        requestclient.Email = requestModel.Email;
+                        requestclient.State = requestModel.State;
+                        requestclient.Street = requestModel.Street;
+                        requestclient.Regionid = region?.Regionid;
+                        requestclient.Zipcode = requestModel.Zipcode;
+                        requestclient.Intdate = requestModel.BirthDate.Day;
+                        requestclient.Intyear = requestModel.BirthDate.Year;
+                        
+                        requestclient.Strmonth = requestModel.BirthDate.Month.ToString();
+                        _context.Requestclients.Add(requestclient);
+                        _context.SaveChanges();
+                    }
+                    int count = _patientRequest.GetRequestCountByDate(request.Createddate);
+                    if (region != null)
+                    {
+                        var confirmNum = string.Concat(region?.Abbreviation?.ToUpper(), request.Createddate.ToString("ddMMyy"), requestModel.Lastname.Substring(0, 2).ToUpper() ?? "",
+                       requestModel.Firstname.Substring(0, 2).ToUpper(), count.ToString("D4"));
+                        request.Confirmationnumber = confirmNum;
                     }
                     else
                     {
-                        var request = new Request();
-                        {
-                            request.Userid = user?.Userid;
-                            request.Firstname = user?.Firstname ?? "";
-                            request.Lastname = user?.Lastname ?? "";
-                            request.Email = user?.Email ?? "";
-                            request.Requesttypeid = 2;
-                            request.Createddate = DateTime.Now;
-                            request.Status = 1;
-                            request.Phonenumber = user?.Mobile ?? "";
-                            _context.Requests.Add(request);
-                            _context.SaveChanges();
-
-                        }
-                        var requestclient = new Requestclient();
-                        {
-                            requestclient.Firstname = requestModel.Firstname;
-                            requestclient.Requestid = request.Requestid;
-                            requestclient.Lastname = requestModel.Lastname;
-                            requestclient.Phonenumber = requestModel.PhoneNo;
-                            requestclient.Email = requestModel.Email;
-                            requestclient.State = requestModel.State;
-                            requestclient.Street = requestModel.Street;
-                            requestclient.Zipcode = requestModel.Zipcode;
-                            requestclient.Intdate = requestModel.BirthDate.Day;
-                            requestclient.Intyear = requestModel.BirthDate.Year;
-                            requestclient.Strmonth = requestModel.BirthDate.Month.ToString();
-                            _context.Requestclients.Add(requestclient);
-                            _context.SaveChanges();
-                        }
-                        return RedirectToAction("Index", "Dashboard");
-
+                        var confirmNum = string.Concat("ML", request.Createddate.ToString("ddMMyy"), requestModel.Lastname.Substring(0, 2).ToUpper() ?? "",
+                      requestModel.Firstname.Substring(0, 2).ToUpper(), count.ToString("D4"));
+                        request.Confirmationnumber = confirmNum;
                     }
+                    _context.Requests.Update(request);
+                    _context.SaveChanges();
+                    _patientRequest.AddRequestWiseFile(uniqueFileName, request.Requestid);
+                    return RedirectToAction("Index", "Dashboard");
                 }
                 else
                 {
-                    return View(requestModel);
+                    var request = new Request();
+                    {
+                        request.Userid = user?.Userid;
+                        request.Firstname = user?.Firstname ?? "";
+                        request.Lastname = user?.Lastname ?? "";
+                        request.Email = user?.Email ?? "";
+                        request.Requesttypeid = 2;
+                        request.Createddate = DateTime.Now;
+                        request.Status = 1;
+                        request.Phonenumber = user?.Mobile ?? "";
+                        request.Isdeleted = false;
+                        _context.Requests.Add(request);
+                        _context.SaveChanges();
+
+                    }
+                    var requestclient = new Requestclient();
+                    {
+                        requestclient.Firstname = requestModel.Firstname;
+                        requestclient.Requestid = request.Requestid;
+                        requestclient.Lastname = requestModel.Lastname;
+                        requestclient.Phonenumber = requestModel.PhoneNo;
+                        requestclient.Email = requestModel.Email;
+                        requestclient.State = requestModel.State;
+                        requestclient.Street = requestModel.Street;
+                        requestclient.Zipcode = requestModel.Zipcode;
+                        requestclient.City = requestModel.City;
+                        requestclient.Intdate = requestModel.BirthDate.Day;
+                        requestclient.Intyear = requestModel.BirthDate.Year;
+                        requestclient.Strmonth = requestModel.BirthDate.Month.ToString();
+                        _context.Requestclients.Add(requestclient);
+                        _context.SaveChanges();
+                    }
+                    return RedirectToAction("Index", "Dashboard");
+
+
                 }
+
             }
             else
             {

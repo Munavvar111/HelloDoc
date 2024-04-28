@@ -34,5 +34,11 @@ namespace BusinessLayer.InterFace
         void AddRequestWiseFile(string Filename,int RequestId);
 
         Task<string> AddFileInUploader(IFormFile file);
+        int GetRequestCountByDate(DateTime date);
+
+
+
+        
+
     }
 }

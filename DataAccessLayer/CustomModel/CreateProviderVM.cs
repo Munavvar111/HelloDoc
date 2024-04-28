@@ -39,6 +39,7 @@ namespace DataAccessLayer.CustomModel
 
         [DataType(DataType.Password)]
         [StringLength(20, ErrorMessage = "Password should be between {2} and {1} characters.", MinimumLength = 6)]
+        [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$", ErrorMessage = "Password must be at least 8 characters long, contain at least one lowercase letter, one uppercase letter, one digit, and one special character.")]
         public string Passwordhash { get; set; } = null!;
 
         public string? MedicalLicense { get; set; }
