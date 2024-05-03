@@ -1,0 +1,79 @@
+﻿@model DataAccessLayer.CustomModel.InvoiceVM.ViewTimeSheet
+
+<div class="table-responsive my-4">
+    <h3>Timesheet Details</h3>
+
+    @if (Model.TimeSheetDetails.Count > 0)
+    {
+        <table class="table">
+            <thead>
+                <tr class="table-secondary">
+                    <th>Shift Date</th>
+                    <th>Shift</th>
+                    <th>Nightshift Weekend</th>
+                    <th>Housecall</th>
+                    <th>Housecall Nights Weekend</th>
+                    <th>Phone consults</th>
+                    <th>Phone consults Night Weekend</th>
+                    <th>Batch Testing</th>
+
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.TimeSheetDetails)
+                {
+                    <tr>
+                        <td>@item.TimeSheetDate</td>
+                        <td>@item.OnCallhours</td>
+                        <td>0</td>
+                        <td>@item.NumberOfHouseCall</td>
+                        <td>0</td>
+                        <td>@item.NumberOfPhoneCall</td>
+                        <td>0</td>
+                        <td>0</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <h5 class="text-center">No record(s) found</h5>
+    }
+
+    <h3>Timesheet Reimbursement</h3>
+
+    @if (Model.TimeSheetDetailReimbursements.Count > 0)
+    {
+        <table class="table my-4">
+            <thead>
+                <tr class="table-secondary">
+                    <th>Date</th>
+                    <th>Item</th>
+                    <th>Amount</th>
+                    <th>Bill</th>
+                    <th>action</th>
+
+
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.TimeSheetDetailReimbursements)
+                {
+                    <tr>
+                        <td>@item.Timesheetdate</td>
+                        <td>@item.BillFile</td>
+                        <td>@item.Amount</td>
+                        <td>@item.Bill</td>
+                        <td>0</td>
+
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <h5 class="text-center">No record(s) found</h5>
+    }
+</div>

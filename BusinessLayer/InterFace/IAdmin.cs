@@ -155,7 +155,12 @@ namespace BusinessLayer.InterFace
         List<Blockrequest> GetBlockRequests(string name, string email, string phoneNumber);
 
 		void UpdateBlockRequest(Blockrequest blockrequest);
-		List<Healthprofessional> GetHealthProfessionalByHealthProfessionalId(int  healthprofessionalId);	
+		List<Healthprofessional> GetHealthProfessionalByHealthProfessionalId(int  healthprofessionalId);
+		List<ViewProviderPayrate> GetPayRateDetails(int PhysicianId);
 
+		 bool EditPayRate(int providerPayrateId, decimal payRate, string id);
+
+		List<PayrateCategory> GetPayrateCategories();
+		void AddPayrateCategories(PayrateByProvider payrateByProvider);
     }
 }

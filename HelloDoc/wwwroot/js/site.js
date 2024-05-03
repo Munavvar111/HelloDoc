@@ -45,6 +45,7 @@ $(document).ready(function () {
     var statustext = localStorage.getItem('statustext');
 
     var currentPartial = storedPartial || "NewTablePartial";
+    
     var currentStatus = storedStatus || [1];
     var currentPage = localStorage.getItem("currentPage");
     var exportdata = false;
@@ -79,6 +80,10 @@ $(document).ready(function () {
     else {
         $('#statuschange').html('(New)');
 
+    }
+    if (currentPartial === "NewTablePartial") {
+        $(".Status-btn").removeClass('activee');
+        $("#statuslink1").addClass("activee");
     }
     filterTable(currentPartial, currentStatus, currentPage, pageSize, exportdata, exportAllData);
     updateUIWithCounts();
@@ -976,7 +981,7 @@ $(document).ready(function () {
             State: {
                 required: true,
             },
-            RoleId: {
+            RoleAdminId: {
                 required: true
             }
         },
@@ -985,7 +990,7 @@ $(document).ready(function () {
             FirstName: "Please enter your First Name.",
             LastName: "Please enter your Last Name.",
             Password: "Please Enter Password",
-            RoleId: "Please Enter Role",
+            RoleAdminId: "Please Enter Role",
             Password: {
                 required: "Please enter a password",
                 minlength: "Password must be at least {0} characters long",

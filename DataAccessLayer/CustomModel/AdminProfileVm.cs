@@ -26,6 +26,8 @@ namespace DataAccessLayer.CustomModel
         public List<AdminRegion>? WorkingRegions { get; set; }
         public List<Role>? Roles { get; set; }
         public int? RoleId { get; set; }
+
+        
         public int RoleAdminId { get; set; }
 
 }

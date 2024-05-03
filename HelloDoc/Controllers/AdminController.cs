@@ -1,4 +1,5 @@
 ﻿using BusinessLayer.InterFace;
+using BusinessLayer.Repository;
 using CsvHelper;
 using DataAccessLayer.CustomModel;
 using DataAccessLayer.DataContext;
@@ -13,6 +14,7 @@ using System.Collections;
 using System.Data;
 using System.Globalization;
 using System.Web.Helpers;
+using static DataAccessLayer.CustomModel.InvoiceVM;
 using BC = BCrypt.Net.BCrypt;
 
 
@@ -23,16 +25,18 @@ namespace HelloDoc.Controllers
         private readonly IAdmin _admin;
         private readonly IPatientRequest _patient;
         private readonly IWebHostEnvironment _hostingEnvironment;
+        private readonly IInvoiceInterface _invoiceInterface;
         private readonly IJwtAuth _jwtAuth;
         private readonly ILogin _login;
         private readonly IUploadProvider _uploadProvider;
         private readonly IDataProtectionProvider _dataProtectionProvider;
         private readonly IEmailServices _emailService;
 
-        public AdminController(IUploadProvider uploadProvider, IEmailServices emailServices, IAdmin admin, IPatientRequest patient, IDataProtectionProvider dataProtectionProvider, IWebHostEnvironment hostingEnvironment, IJwtAuth jwtAuth, ILogin login)
+        public AdminController(IUploadProvider uploadProvider, IEmailServices emailServices,IInvoiceInterface invoiceInterface, IAdmin admin, IPatientRequest patient, IDataProtectionProvider dataProtectionProvider, IWebHostEnvironment hostingEnvironment, IJwtAuth jwtAuth, ILogin login)
         {
             _admin = admin;
             _uploadProvider = uploadProvider;
+            _invoiceInterface = invoiceInterface;
             _patient = patient;
             _jwtAuth = jwtAuth;
             _emailService = emailServices;
@@ -61,15 +65,15 @@ namespace HelloDoc.Controllers
 
         #region Profile
         //Admin Profile Page
-        
+
         [CustomAuthorize("MyProfile", "5")]
         public IActionResult Profile()
         {
-            
+
             try
             {
                 ///Get The Email From The Session
-                
+
                 string? email = HttpContext.Session.GetString("Email");
                 //Check The Session Is Null Or Not
                 if (string.IsNullOrEmpty(email))
@@ -126,7 +130,7 @@ namespace HelloDoc.Controllers
 
                 // Get Particular Admin Data
                 AdminProfileVm adminProfile = _admin.GetAdminProfile(admin.Email);
-
+                ViewBag.IsEdit = true;
                 if (adminProfile == null)
                 {
                     TempData["Error"] = "Admin profile data not found.";
@@ -138,7 +142,7 @@ namespace HelloDoc.Controllers
             catch (Exception ex)
             {
 
-                TempData["Error"] = "An error occurred while processing your request. Please try again later.";
+                TempData["Error"] = "An error occurred while processing your request. Please try again later." + ex.Message;
                 return RedirectToAction("Index", "Admin");
             }
         }
@@ -701,6 +705,22 @@ namespace HelloDoc.Controllers
             physician.Npinumber = createProvider.NPINumber;
             physician.Iscredentialdoc = new BitArray(new[] { false });
             physician.Syncemailaddress = createProvider.SynchronizationEmail;
+            List<PayrateCategory> df = _admin.GetPayrateCategories();
+            foreach (var item in df)
+            {
+                var Payratebyprovider = new PayrateByProvider();
+                Payratebyprovider.PayrateCategoryId = item.PayrateCategoryId;
+                Payratebyprovider.PhysicianId = physician.Physicianid;
+                Payratebyprovider.CreatedDate = DateTime.Now;
+                Payratebyprovider.CreatedBy = admin.Aspnetuserid;
+                Payratebyprovider.Payrate = 0;
+                _admin.AddPayrateCategories(Payratebyprovider);
+                _admin.SaveChanges();
+            }
+
+
+
+
             if (createProvider.File != null)
             {
                 physician.Photo = "photo" + createProvider.File.FileName.GetExtension();
@@ -938,9 +958,9 @@ namespace HelloDoc.Controllers
         public IActionResult SaveShift(int shiftDetailId, DateTime startDate, TimeOnly startTime, TimeOnly endTime, int region)
         {
             Shiftdetail? shiftdetail = _admin.GetShiftDetailById(shiftDetailId);
-            
-            
-			if (shiftdetail == null)
+
+
+            if (shiftdetail == null)
             {
                 return NotFound("Shift detail not found.");
             }
@@ -962,10 +982,10 @@ namespace HelloDoc.Controllers
 
                 if (Email == null)
                 {
-					return BadRequest("Session Is Expire Please Reload");
+                    return BadRequest("Session Is Expire Please Reload");
 
-				}
-				Admin? admin = _admin.GetAdminByEmail(Email);
+                }
+                Admin? admin = _admin.GetAdminByEmail(Email);
                 Physician? physician = _admin.GetPhysicianByEmail(Email);
                 bool IsPhysician = false;
 
@@ -1210,7 +1230,7 @@ namespace HelloDoc.Controllers
         #endregion
 
 
-        #region EditPartner
+        #region EditPartnerPost
         [HttpPost]
         public IActionResult EditPartner(HealthProffesionalVM healthProffesionalVM)
         {
@@ -1328,10 +1348,10 @@ namespace HelloDoc.Controllers
         }
         #endregion
 
-       
+
 
         #region GetPatientSearchRecords
-        public IActionResult GetPatientSearchRecords(int[] status, string patientName, int requestType, string providorName, string email, string phoneNumber, bool exportStatus, int page,DateTime fromDos,DateTime toDos)
+        public IActionResult GetPatientSearchRecords(int[] status, string patientName, int requestType, string providorName, string email, string phoneNumber, bool exportStatus, int page, DateTime fromDos, DateTime toDos)
         {
             var searchRecord = _admin.GetSearchRecords(email, phoneNumber, patientName, providorName, status, requestType, fromDos, toDos);
             int pageSize = 10;
@@ -1425,7 +1445,7 @@ namespace HelloDoc.Controllers
             return View();
         }
 
-        public IActionResult GetEmailLogs(int accounttype, string receivername, string emailid, DateTime createddate, DateTime sentdate)    
+        public IActionResult GetEmailLogs(int accounttype, string receivername, string emailid, DateTime createddate, DateTime sentdate)
         {
             List<LogsVM> logs = _admin.GetEmailLogs(accounttype, receivername, emailid, createddate, sentdate);
             return PartialView("EmailLogsPartial", logs);
@@ -1450,12 +1470,12 @@ namespace HelloDoc.Controllers
 
         #region AccessPage
 
-        
+
         #region Access
         /// <summary>
         /// Its Showed The All Role Are Present In The Database
         /// </summary>
-        
+
         [CustomAuthorize("Role", "7")]
         public IActionResult Access()
         {
@@ -1521,7 +1541,7 @@ namespace HelloDoc.Controllers
             //Menulist Give The List Of All Menu Present In The Menu Table
             //Region="Patient","Admin","Physician"
             List<Menu> menuList = _admin.GetMenuByAccountType(region);
-            
+
             //rolemenu give The Menuid of the particular role Has How Many Menuid
             List<int>? rolemenu = _admin.GetRoleMenuIdByRoleId(roleid);
 
@@ -1587,7 +1607,7 @@ namespace HelloDoc.Controllers
         [HttpPost]
         public IActionResult EditAccess(int roleid, int[] rolemenu, string rolename, int accounttype)
         {
-            
+
             Role role = _admin.GetAllRolesById(roleid);
 
             //rolemenu give The Menuid of the particular role Has How Many Menuid
@@ -1682,7 +1702,7 @@ namespace HelloDoc.Controllers
             aspnet.Createddat = DateTime.Now;
             aspnet.Passwordhash = BC.HashPassword(profileVm?.Password ?? "");
             aspnet.Phonenumber = profileVm?.MobileNo ?? "";
-            _admin.AddAspNetUser(aspnet);   
+            _admin.AddAspNetUser(aspnet);
             _admin.SaveChanges();
 
             Admin admin = new Admin();
@@ -1818,7 +1838,7 @@ namespace HelloDoc.Controllers
             int totalPages = (int)Math.Ceiling((double)totalItems / pageSize);
             List<NewRequestTableVM> paginatedData = filteredPatients.Skip((page - 1) * pageSize).Take(pageSize).ToList();
             ViewBag.totalPages = totalPages;
-            
+
             ViewBag.CurrentPage = page;
             ViewBag.PageSize = pageSize;
             ViewBag.TotalEntries = totalItems;
@@ -1873,6 +1893,7 @@ namespace HelloDoc.Controllers
         #region ViewCasePage
 
         #region ViewCaseGet
+
         [CustomAuthorize("Dashboard", "6", "19")]
         [HttpGet("Admin/viewcase/{id}", Name = "AdminViewCase")]
         [HttpGet("Provider/viewcase/{id}", Name = "ProviderCase")]
@@ -2170,7 +2191,7 @@ namespace HelloDoc.Controllers
         public IActionResult BlockRequest(string blockreason, int requestid)
         {
             //It Will Visible In admin New State WHere Admin Can BLock The Request After That User Will Not Able To Create Request With That Partclure Email;
-            
+
             bool success = _admin.BlockRequest(blockreason, requestid);
             if (success)
             {
@@ -2292,7 +2313,7 @@ namespace HelloDoc.Controllers
             List<Region> regions = _admin.GetAllRegion();
             requestModel.Regions = regions;
             //Check Thr Block Request If User Is Alreday Blocked Then It Can Not Be Added Request Via Admin 
-           
+
 
             if (ModelState.IsValid)
             {
@@ -2415,7 +2436,7 @@ namespace HelloDoc.Controllers
 
             var counts = new
             {
-                NewCount =countsdetails.NewCount,
+                NewCount = countsdetails.NewCount,
                 PendingCount = countsdetails.PendingCount,
                 ActiveCount = countsdetails.ActiveCount,
                 ToClosedCount = countsdetails.ToClosedCount,
@@ -2441,7 +2462,7 @@ namespace HelloDoc.Controllers
             var countsdetails = _admin.GetStatusCountsAsync(physician.Physicianid);
             var counts = new
             {
-                NewCount =countsdetails.NewCount,
+                NewCount = countsdetails.NewCount,
                 PendingCount = countsdetails.PendingCount,
                 ActiveCount = countsdetails.ActiveCount,
                 ConcludeCount = countsdetails.ConcludeCount
@@ -3029,12 +3050,12 @@ namespace HelloDoc.Controllers
             }
             Physician? physician = _admin.GetPhysicianByEmail(Email);
             Admin? admin = _admin.GetAdminByEmail(Email);
-           
+
             Requestclient? requestclient = _admin.GetRequestclientByRequestId(requestid);
             List<Requestwisefile> requestwisedocument = await _patient.GetRequestwisefileByIdAsync(requestid);
             if (requestclient == null)
             {
-                
+
                 TempData["Error"] = "Something Went Wrong";
                 if (admin != null)
                     return RedirectToAction("Index", "Admin");
@@ -3057,7 +3078,7 @@ namespace HelloDoc.Controllers
 
             }
             //This Is Visible ONly In Admin Beacuse In Physician There Are Only Physician  Notes 
-            
+
 
             string? requestclientnumber = requestclient.Request.Confirmationnumber;
             CloseCaseVM closecase = new CloseCaseVM();
@@ -3072,7 +3093,7 @@ namespace HelloDoc.Controllers
             closecase.ConfirmNumber = requestclientnumber;
             closecase.Requestid = requestid;
             return View(closecase);
-           
+
 
         }
         #endregion
@@ -3171,7 +3192,7 @@ namespace HelloDoc.Controllers
         {
             //This Method Used When Physician Click On Conclude Care
             //It Checked The Encoutner Form Is Finalized Or Not If Encounter Form Is Not Finalized Show Sweet Alert
-            
+
             Encounterform? encounterform = _admin.GetEncounteFormByRequestId(requestId);
             if (encounterform != null)
             {
@@ -3198,7 +3219,7 @@ namespace HelloDoc.Controllers
         #region GrantAccessOfEdit
         public IActionResult GrantAccessOfEdit(int id)
         {
-        //GrantAccessOfEditPhysicianAccount
+            //GrantAccessOfEditPhysicianAccount
             Physician physician = _admin.GetPhysicianById(id);
             physician.Iscredentialdoc = new BitArray(new[] { true });
             _admin.UpdatePhysicianDataBase(physician);
@@ -3218,6 +3239,89 @@ namespace HelloDoc.Controllers
                 }
             }
             return false; // If all bits are true, return false
+        }
+
+
+        public IActionResult Payrate(int physicianId)
+        {
+            var PayrateDetails = _admin.GetPayRateDetails(physicianId);
+            return View(PayrateDetails);
+        }
+
+        public IActionResult EditPayrate(ViewProviderPayrate viewProviderPayrate)
+        {
+            string email = HttpContext.Session.GetString("Email");
+            Admin admin = _admin.GetAdminByEmail(email);
+
+            var EditPayrate = _admin.EditPayRate((int)viewProviderPayrate.ProviderPayrateId, (decimal)viewProviderPayrate.Payrate, admin.Aspnetuserid);
+            return RedirectToAction("Payrate", "Admin", new { physicianId = viewProviderPayrate.PhysicianId });
+        }
+
+        public IActionResult Invoice()
+        {
+            ViewData["ViewName"] = "Invoicing";
+            return View();
+        }
+        public IActionResult IsFinalizeSheet(DateOnly startDate)
+        {
+            int? physicianid = HttpContext.Session.GetInt32("PhysicianId");
+            if (physicianid != null)
+            {
+                bool x = _invoiceInterface.isFinalizeTimesheet((int)physicianid, startDate);
+                return Json(new { x });
+            }
+            else
+            {
+                return BadRequest();
+            }
+
+        }
+        public IActionResult TimeSheet(DateOnly startDate)
+        {
+            ViewData["ViewName"] = "Invoicing";
+            string? email = HttpContext.Session.GetString("Email");
+            Physician physician=_admin.GetPhysicianByEmail(email);
+            if (physician.Physicianid != null && _invoiceInterface.isFinalizeTimesheet((int)physician.Physicianid, startDate))
+            {
+                TempData["error"] = "Sheet is already Finalized";
+                return RedirectToAction("Invoicing", "ProviderSite");
+            }
+            else if (physician.Physicianid != null && physician.Aspnetuserid != null)
+            {
+                int afterDays = startDate.Day == 1 ? 14 : DateTime.DaysInMonth(startDate.Year, startDate.Month) - 14; ;
+                var TimesheetDetails = _invoiceInterface.PostTimesheetDetails((int)physician.Physicianid, startDate, afterDays, physician.Aspnetuserid);
+                List<TimesheetDetailReimbursement> h = _invoiceInterface.GetTimesheetBills(TimesheetDetails);
+                var Timesheet = _invoiceInterface.GetTimesheetDetails(TimesheetDetails, h, (int)physician.Physicianid);
+                Timesheet.PhysicianId = (int)physician.Physicianid;
+                return View("Timesheet", Timesheet);
+            }
+            else
+            {
+                return BadRequest();
+            }
+        }
+        public IActionResult GetTimesheetDetails(DateOnly StartDate)
+        {
+            string? email = HttpContext.Session.GetString("Email");
+            Physician physician = _admin.GetPhysicianByEmail(email);
+
+            if (physician.Physicianid != null && physician.Aspnetuserid != null && StartDate != DateOnly.MinValue)
+            {
+                List<TimesheetDetail>? x = _invoiceInterface.PostTimesheetDetails(physician.Physicianid, StartDate, 0, physician.Aspnetuserid);
+                List<TimesheetDetailReimbursement>? h = _invoiceInterface.GetTimesheetBills(x);
+                ViewTimeSheet timeSheet = _invoiceInterface.GetTimesheetDetails(x, h, physician.Physicianid);
+                return PartialView("_TimesheetDetailTable", timeSheet);
+            }
+            else
+            {
+                ViewTimeSheet timeSheet = new ViewTimeSheet()
+                {
+                    TimeSheetDetails = new List<ViewTimeSheetDetails>(),
+                    TimeSheetDetailReimbursements = new List<TimeSheetDetailReimbursements>(),
+                    PayrateWithProvider = new List<PayrateByProvider>(),
+                };
+                return PartialView("_TimesheetDetailTable", timeSheet);
+            }
         }
     }
 }

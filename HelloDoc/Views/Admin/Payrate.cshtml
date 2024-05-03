@@ -1,0 +1,61 @@
+﻿
+@{
+    ViewData["Title"] = "Payrate";
+    Layout = "~/Views/Shared/_Layout4.cshtml";
+}   
+@model List<DataAccessLayer.CustomModel.ViewProviderPayrate>    
+<section class="">
+    <div class="w-100 p-3 d-flex flex-column align-items-center">
+        <div class="req_form_container w-75 back_div d-flex justify-content-between mb-3">
+            <div class="d-flex align-items-center">
+                <h3 class="m-0 fw-bold">Enter Payrate</h3>
+            </div>
+            <div>
+                <a asp-controller="Admin" asp-action="Dashboard" class="back_btn d-flex align-items-center p-2 px-4 fw-semibold"
+                   role="button">
+                    <p class="m-0"><i class="fa-solid fa-chevron-left"></i> Back</p>
+                </a>
+            </div>
+        </div>
+        <div class="req_form_container w-75 shadow p-3">
+            <table class="table document_table my-3 me-0">
+                <thead>
+                    <tr class="table-secondary">
+                        <th>
+                            Category
+                        </th>
+                        <th>
+                            Payrate
+                        </th>
+                        <th>
+                            Action
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <form asp-action="EditPayrate" asp-controller="Admin">
+                        <tr>
+                            <td>@item.CategoryName</td>
+                            <td>
+                                <input hidden name="CategoryId" value="@item.CategoryId">
+                                <input hidden name="PhysicianId" value="@item.PhysicianId">
+                                <input hidden name="ProviderPayrateId" value="@item.ProviderPayrateId">
+                                <div class="form-floating ">
+                                    <input type="number" class="form-control" id="floatingInput" name="Payrate" value="@item.Payrate" placeholder="Payrate">
+                                    <label for="floatingInput">Payrate</label>
+                                </div>
+                            </td>
+                            <td>
+                                <input class="btn btn-info text-white" type="submit">
+                            </td>
+                        </tr>
+                        </form>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+

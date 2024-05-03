@@ -1,0 +1,177 @@
+﻿
+@{
+    ViewData["Title"] = "Invoice";
+    Layout = "~/Views/Shared/_Layout4.cshtml";
+}
+
+<section>
+    <div class="w-100 p-3 d-flex flex-column align-items-center">
+        <div class="req_form_container w-75 back_div d-flex justify-content-between mb-3">
+            <div class="d-flex align-items-center">
+                <h3 class="m-0 fw-bold">Timesheets</h3>
+            </div>
+            <div>
+                <a asp-controller="ProviderSite" asp-action="Dashboard" class="back_btn d-flex align-items-center p-2 px-3 fw-semibold" role="button">
+                    <p class="m-0"><i class="fa-solid fa-chevron-left"></i>&nbsp;Back</p>
+                </a>
+            </div>
+        </div>
+        <div class="req_form_container w-75 shadow p-3">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-center">
+                <div class="form-floating mb-2">
+                    <select class="form-select" id="dateRangeDropdown" aria-label="Floating label select example">
+                    </select>
+                    <label for="floatingSelect">Search by Timesheetperiod </label>
+                </div>
+                <a role="button" id="finalizeLink" class="text-decoration-none btn btn-info px-2 py-1" style="display:none">
+                    <span> Finalize Timesheet </span>
+                </a>
+            </div>
+            <div id="timeSheetDetails">
+            </div>
+        </div>
+    </div>
+</section>
+<script>
+    function generateDateOptions() {
+        var options = [];
+        var today = new Date();
+        var currentDay = today.getDate();
+        var currentMonth = today.getMonth() + 1; // Months are zero-based
+        var currentYear = today.getFullYear();
+
+        options.push({
+            text: "Select DateRange"
+        });
+
+        var startDate1, endDate1, startDate2, endDate2;
+
+        if (currentDay <= 14) {
+            // First option: 1-14 of the previous month
+            startDate1 = 1;
+            endDate1 = 14;
+            options.push({
+                value: formatDate(startDate1, currentMonth - 1, currentYear),
+                text: formatDate(startDate1, currentMonth - 1, currentYear) + " - " + formatDate(endDate1, currentMonth - 1, currentYear)
+            });
+
+            // Second option: 15-end of the previous month
+            startDate2 = 15;
+            endDate2 = new Date(currentYear, currentMonth - 1, 0).getDate();
+            options.push({
+                value: formatDate(startDate2, currentMonth - 1, currentYear),
+                text: formatDate(startDate2, currentMonth - 1, currentYear) + " - " + formatDate(endDate2, currentMonth - 1, currentYear)
+            });
+        } else {
+            // First option: 15-end of the previous month
+            startDate1 = 15;
+            endDate1 = new Date(currentYear, currentMonth - 1, 0).getDate();
+            options.push({
+                value: formatDate(startDate1, currentMonth - 1, currentYear),
+                text: formatDate(startDate1, currentMonth - 1, currentYear) + " - " + formatDate(endDate1, currentMonth - 1, currentYear)
+            });
+
+            // Second option: 1-14 of the current month
+            startDate2 = 1;
+            endDate2 = 14;
+            options.push({
+                value: formatDate(startDate2, currentMonth, currentYear),
+                text: formatDate(startDate2, currentMonth, currentYear) + " - " + formatDate(endDate2, currentMonth, currentYear)
+            });
+        }
+
+        return options;
+    }
+
+    function formatDate(day, month, year) {
+        var formattedMonth = month < 10 ? '0' + month : month;
+        var formattedDay = day < 10 ? '0' + day : day;
+        return year + '/' + formattedMonth + '/' + formattedDay;
+    }
+
+
+    // Function to get month name from month number
+    function getMonthName(month) {
+        var monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
+            "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        return monthNames[month - 1];
+    }
+
+    // Function to populate the dropdown with date options
+    function populateDropdown() {
+        var dropdown = document.getElementById("dateRangeDropdown");
+        var dateOptions = generateDateOptions();
+
+        // Add options to the dropdown
+        dateOptions.forEach(function (option) {
+            var opt = document.createElement("option");
+            opt.value = option.value;
+            opt.text = option.text;
+            dropdown.add(opt);
+        });
+    }
+    // Call the function to populate the dropdown on page load
+    populateDropdown();
+
+    $(document).ready(function () {
+        $("#dateRangeDropdown").change(function () {
+            // Get the selected value
+            var selectedValue = $(this).val();
+            checkIsFinalize(selectedValue);
+            // myFunctionfortimesheetData(selectedValue);
+            // $("#Startdate").val(selectedValue);
+            // $("#PhysicianId").val(loginId);
+
+            var dateObj = new Date(selectedValue);
+
+            var date = dateObj.getDate();
+            var month = dateObj.getMonth() + 1; // Months are zero-based
+            if (date == 1) {
+                // $("#AfterDays").val(14);
+                var url = '@Url.Action("TimeSheet", "Admin")' + '?startDate=' + selectedValue;
+            } else {
+                var daysInMonth = new Date(2024, month, 0).getDate();
+                // $("#AfterDays").val(daysInMonth - 14);
+                var url = '@Url.Action("TimeSheet", "Admin")' + '?startDate=' + selectedValue;
+            }
+
+            $('#finalizeLink').attr('href', url).show();
+
+            $.ajax({
+                method: "GET",
+                url: "/Admin/GetTimesheetDetails",
+                data: { StartDate: selectedValue },
+                success: function (response) {
+                    console.log(response)
+                    $("#timeSheetDetails").html(response);
+
+                }
+            });
+
+        });
+    });
+
+    function checkIsFinalize(selectedValue) {
+        $.ajax({
+            type: "POST",
+            url: "/Admin/IsFinalizeSheet",
+            data: { startDate: selectedValue },
+            cache: false,
+            success: function (response) {
+                console.log(response);
+                if (response.x == true) {
+                    $("#finalizeLink").hide();
+                }
+                else {
+                    $("#finalizeLink").show();
+                }
+            },
+            error: function () {
+                toastr.error("Error while checking date");
+            }
+        });
+    }
+
+
+</script>
+ 

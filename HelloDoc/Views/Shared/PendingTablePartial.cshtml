@@ -283,9 +283,12 @@
 }
 <div class="pb-3">
     <div class="d-flex justify-content-between align-items-center">
-        <div class="ms-3 fw-semibold">
-            Page @(ViewBag.CurrentPage) out of @ViewBag.TotalPages
-        </div>
+        @if (ViewBag.TotalPages >= 1)
+        {
+            <div class="ms-3 fw-semibold">
+                Page @(ViewBag.CurrentPage) out of @ViewBag.TotalPages
+            </div>
+        }
         <nav id="pagination" aria-label="Page navigation" class="me-3">
             <ul class="pagination pagination-sm m-0">
                 @if (ViewBag.CurrentPage > 1)

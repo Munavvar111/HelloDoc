@@ -151,6 +151,13 @@ namespace HalloDocPatient.Controllers
         {
             requestModel.Username = requestModel.Firstname + requestModel.Lastname;
             Blockrequest? blockrequest = _admin.GetBlockRequestByEmail(requestModel.Email);
+            Admin? admin = _admin.GetAdminByEmail(requestModel.Email);
+            Physician? physician=_admin.GetPhysicianByEmail(requestModel.Email);    
+            if(admin!=null || physician != null)
+            {
+                TempData["Error"] = "This Is Not User Pleased Changed Email To Request Or Try To RequestIn Business Or Frined";
+                return RedirectToAction("PatientRequest");
+            }
             if (blockrequest == null)
             {
                   if (requestModel.File != null && requestModel.File.Length > 0)
@@ -255,7 +262,7 @@ namespace HalloDocPatient.Controllers
                     string? token = Guid.NewGuid().ToString();
                     string? resetLink = Url.Action("Index", "Register", new { RequestId = request1?.Requestid ?? 1, token }, protocol: HttpContext.Request.Scheme);
 
-                    if (_login.IsSendEmail("munavvarpopatiya999@gmail.com", "Munavvar", $"Click <a href='{resetLink}'>here</a> to reset your password."))
+                    if (_login.IsSendEmail("munavvarpopatiya999@gmail.com", "Munavvar", $"Click <a href='{resetLink}'>here</a> Create New Account."))
                     {
                         TempData["SuccessMessage"] = "Your Request Is Send SuccessFully!!";
                         return RedirectToAction("Index", "Login");
@@ -273,7 +280,7 @@ namespace HalloDocPatient.Controllers
                     string? token = Guid.NewGuid().ToString();
                     string? resetLink = Url.Action("Index", "Register", new { RequestId = request1?.Requestid ?? 1, token }, protocol: HttpContext.Request.Scheme);
 
-                    if (_login.IsSendEmail("munavvarpopatiya777@outlook.com", "Munavvar", $"Click <a href='{resetLink}'>here</a> to reset your password."))
+                    if (_login.IsSendEmail("munavvarpopatiya777@outlook.com", "Munavvar", $"Click <a href='{resetLink}'>here</a> Create New Account."))
                     {
                         TempData["SuccessMessage"] = "Your Request Is Send SuccessFully!!";
                         return RedirectToAction("Index", "Login");
@@ -311,7 +318,7 @@ namespace HalloDocPatient.Controllers
                 Request? request1 = _patientRequest.GetRequestByEmail(requestOther.EmailOther);
                 string? token = Guid.NewGuid().ToString();
                 string? resetLink = Url.Action("Index", "Register", new { RequestId = request1?.Requestid ?? 1, token }, protocol: HttpContext.Request.Scheme);
-                if (_login.IsSendEmail("munavvarpopatiya999@gmail.com", "Munavvar", $"Click <a href='{resetLink}'>here</a> to reset your password."))
+                if (_login.IsSendEmail("munavvarpopatiya999@gmail.com", "Munavvar", $"Click <a href='{resetLink}'>here</a> Create New Account."))
                 {
                     TempData["SuccessMessage"] = "Your Request Is Send SuccessFully!!";
                     return RedirectToAction("Index", "Login");

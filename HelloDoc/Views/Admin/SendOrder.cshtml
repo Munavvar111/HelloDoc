@@ -86,7 +86,7 @@
 
         <div class="row">
             <div class="form-floating  col-12 col-md-6 mb-3 mt-3">
-                <select class="form-select " aria-label="Default select example" name="healthprofessionaltype" id="healthprofessionaltype" >
+                <select class="form-select " aria-label="Default select example" name="healthprofessionaltype" id="healthprofessionaltype" required>
                     <option selected>Please Select The Proffesion</option>
                     @foreach (var healthprofessionaltype in Model.Healthprofessionaltypes)
                     {
@@ -95,7 +95,7 @@
                 </select>
             </div>
             <div class="form-floating  col-12 col-md-6 mb-3  mt-md-3">
-                <select class="form-select " aria-label="Default select example" name="business" id="business" asp-for="BusinessId">
+                <select class="form-select " aria-label="Default select example" name="business" id="business" asp-for="BusinessId" required>
                     <option selected>Please Select The Business</option>
                     @foreach (var healthprofessional in Model.helthProfessional)
                     {
@@ -139,7 +139,7 @@
         </div>
         <div class="row">
             <div class="form-floating  col-md-6 mb-3">
-                <select class="form-select position-relative form-select-md mt-1 text-muted " aria-label="Default select example" name="countrySelect">
+                <select class="form-select position-relative form-select-md mt-1 text-muted " aria-label="Default select example" name="countrySelect" >
                     <option value="0">Not required</option>
                     <option value="1">1</option>
                     <option value="2">2</option>

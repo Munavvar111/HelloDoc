@@ -53,4 +53,16 @@ namespace DataAccessLayer.CustomModel
         public BitArray? License { get; set; }      
         public BitArray? IsCredential { get; set; }      
     }
+    public class ViewProviderPayrate
+    {
+        public int? ProviderPayrateId { get; set; }
+        public int? PhysicianId { get; set; }
+        public int? CategoryId { get; set; }
+        public string? CategoryName { get; set; }
+        public double? Payrate { get; set; }
+        public TimeOnly CreatedDate { get; set; }
+        public string CreatedBy { get; set; }
+        public DateTime? ModifiedDate { get; set; }
+        public string? ModifiedBy { get; set; }
+    }
 }

@@ -629,6 +629,7 @@ namespace BusinessLayer.Repository
                     Phone = requestClientWithRequest.Phonenumber ?? "",
                     EmailView = requestClientWithRequest.Email ?? "",
                     Location = requestClientWithRequest.Location,
+                    ConfirmationNumber=req.Confirmationnumber,
                     RegionId = requestClientWithRequest.Regionid,
                     RequestClientId = requestClientWithRequest.Requestclientid,
                     PhysicianId = req.Physicianid
@@ -2056,6 +2057,54 @@ namespace BusinessLayer.Repository
         }
         #endregion
 
+        public List<ViewProviderPayrate> GetPayRateDetails(int PhysicianId)
+        {
+            List<ViewProviderPayrate> payrateByProviders = new List<ViewProviderPayrate>();
+
+            payrateByProviders = (from payrate in _context.PayrateByProviders
+                                  join category in _context.PayrateCategories
+                                  on payrate.PayrateCategoryId equals category.PayrateCategoryId
+                                  where payrate.PhysicianId == PhysicianId
+                                  orderby payrate.PayrateCategoryId
+                                  select new ViewProviderPayrate
+                                  {
+                                      ProviderPayrateId = payrate.PayrateId,
+                                      PhysicianId = PhysicianId,
+                                      CategoryId = payrate.PayrateCategoryId,
+                                      CategoryName = category.CategoryName,
+                                      Payrate = (double)payrate.Payrate
+                                  }).ToList();
+
+            return payrateByProviders;
+        }
+        public bool EditPayRate(int providerPayrateId, decimal payRate, string id)
+        {
+            PayrateByProvider? p = _context.PayrateByProviders.Where(e => e.PayrateId == providerPayrateId).FirstOrDefault();
+
+            if (p == null)
+            {
+                return false;
+            }
+            else
+            {
+                p.Payrate = (decimal)payRate;
+                p.ModifiedDate = DateTime.Now;
+                p.ModifiedBy = id;
+                _context.PayrateByProviders.Update(p);
+                _context.SaveChanges();
+                return true;
+            }
+        }
+
+        public List<PayrateCategory> GetPayrateCategories()
+        {
+            return _context.PayrateCategories.ToList(); 
+        }
+
+        public void AddPayrateCategories(PayrateByProvider payrateByProvider)
+        {
+            _context.PayrateByProviders.Add(payrateByProvider);
+        }
     }
 }
 

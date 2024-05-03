@@ -1,0 +1,82 @@
+﻿@model DataAccessLayer.CustomModel.InvoiceVM.ViewTimeSheet
+@{
+    Layout = "~/Views/Shared/_Layout5.cshtml";
+}
+@{
+    ViewData["Title"] = "Invoicing";
+}
+<section>
+    <div class="w-100 p-3 d-flex flex-column align-items-center">
+        <div class="req_form_container w-75 back_div d-flex justify-content-between mb-3">
+            <div class="d-flex align-items-center">
+                <h3 class="m-0 fw-bold"></h3>
+            </div>
+            <div>
+                <a asp-controller="ProviderSite" asp-action="Invoicing" class="back_btn d-flex align-items-center p-2 px-3 fw-semibold" role="button">
+                    <p class="m-0"><i class="fa-solid fa-chevron-left"></i>&nbsp;Back</p>
+                </a>
+            </div>
+        </div>
+        <div class="req_form_container w-75 shadow p-3">
+            <table class="document_table table">
+                <thead>
+                    <tr class="table-secondary">
+                        <th>
+                            Date
+                        </th>
+                        <th>
+                            On-call Hours
+                        </th>
+                        <th>
+                            Total Hours
+                        </th>
+                        <th>
+                            Weekend/Holidays
+                        </th>
+                        <th>
+                            Number of HouseCalls
+                        </th>
+                        <th>
+                            Number of PhoneConsults
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.TimeSheetDetails)
+                    {
+                        <form asp-action="" asp-controller="">
+                        <tr>
+                            <td>@item.TimeSheetDate </td>
+                            <td>@item.OnCallhours</td>
+                            <td>
+                                <div class="form-floating ">
+                                    <input type="number" class="form-control" id="floatingInput" name="Payrate" value="@item.TotalHours" placeholder="Payrate">
+                                    <label for="floatingInput"></label>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="@item.IsWeekend" id="flexCheckDefault">
+
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-floating ">
+                                    <input type="number" class="form-control" id="floatingInput" name="Payrate" value="@item.NumberOfHouseCall" placeholder="Payrate">
+                                    <label for="floatingInput"></label>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-floating ">
+                                    <input type="number" class="form-control" id="floatingInput" name="Payrate" value="@item.NumberOfPhoneCall" placeholder="Payrate">
+                                    <label for="floatingInput"></label>
+                                </div>
+                            </td>
+                        </tr>
+                        </form>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>

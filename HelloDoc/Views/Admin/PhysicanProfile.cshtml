@@ -231,6 +231,7 @@
 							<button class="btn btn-outline-info" id="EditBtn" type="button" onclick="toggleEdit()">
 								Edit
 							</button>
+							<a asp-action="Payrate" asp-route-physicianId="@Model.physicianid" class="btn btn-outline-info mx-3">Payrate</a>
 						}
 
 						<button class="btn btn-outline-info mx-3" type="Submit" id="SubBtn">
@@ -345,15 +346,17 @@
 					</div>
 					<div class="col">
 						<div class="input-group input-group-lg">
-							<div id="fileName" asp-for="FileName" class="form-control fs-6 align-middle">
+							<div id="fileName1" asp-for="FileName" class="form-control fs-6 align-middle">
 								Select Photo
 							</div>
-							<input type="file" asp-for="File" name="PhotoFile" class="form-control" id="fileInput" hidden disabled accept="jpg,png" />
-							<label class="input-group-text btn btn-info text-light" for="fileInput">
+							<input type="file" asp-for="File" name="PhotoFile" class="form-control" id="fileInput1" hidden disabled accept="jpg,png" />
+							<label class="input-group-text btn btn-info text-light" for="fileInput1">
 								<span class="material-symbols-outlined me-2">cloud_upload</span>
 								<span class="d-none d-md-inline">Upload</span>
 							</label>
 						</div>
+						<img src="~/Physician/@Model.physicianid/@Model.PhotoFileName" style="max-width :100% ;max-height:200px" class="mt-3"/>
+
 					</div>
 					<div class="col">
 						<div class="input-group input-group-lg">
@@ -366,12 +369,10 @@
 								<span class="d-none d-md-inline">Upload Sign</span>
 							</label>
 							<button class="btn btn-outline-info mx-2" type="button" id="createBtn" disabled>Create</button>
+
 						</div>
-					</div>
-
-					<div class="col-12">
-
-						<div id="canvasContainer" style="display: block;">
+						<img src="~/Physician/@Model.physicianid/@Model.SignatureFilename" alt="Signature" id="signatureImage" style="max-width: 100%; max-height: 200px;" class="mt-3" />
+						<div id="canvasContainer" style="display: block;" class="mt-3">
 							<div id="signatureArea">
 								<canvas id="signatureCanvas" width="400" height="200"></canvas>
 							</div>
@@ -380,9 +381,13 @@
 								<button id="saveBtn" class="btn btn-outline-info" type="button">Save</button>
 							</div>
 						</div>
+					</div>
+
+					<div class="col-12">
+
+						
 
 
-						<img src="~/Physician/@Model.physicianid/@Model.SignatureFilename" alt="Signature" id="signatureImage" style="max-width: 100%; max-height: 200px;" />
 
 					</div>
 					<div class="col-12 col-md-12">
@@ -927,4 +932,11 @@
 			}
 		})
 	};
+</script>
+<script>
+	document.getElementById("fileInput1").onchange = function () {
+		let path = this.value.substr(this.value.lastIndexOf(`\\`) + 1);
+		document.getElementById("fileName1").innerText = path;
+	};
+
 </script>
