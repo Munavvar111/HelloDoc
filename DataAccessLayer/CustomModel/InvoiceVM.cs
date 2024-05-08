@@ -20,6 +20,8 @@ namespace DataAccessLayer.CustomModel
             public bool IsWeekend { get; set; }
             public int? NumberOfHouseCall { get; set; }
             public int? NumberOfPhoneCall { get; set; }
+            public DateOnly StartDate { get; set; }
+
         }
 
         public class ViewTimeSheet

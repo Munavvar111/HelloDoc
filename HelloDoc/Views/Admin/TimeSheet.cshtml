@@ -5,78 +5,302 @@
 @{
     ViewData["Title"] = "Invoicing";
 }
+
 <section>
     <div class="w-100 p-3 d-flex flex-column align-items-center">
         <div class="req_form_container w-75 back_div d-flex justify-content-between mb-3">
             <div class="d-flex align-items-center">
-                <h3 class="m-0 fw-bold"></h3>
+                <h3 class="m-0 fw-bold">Invoicing</h3>
             </div>
             <div>
-                <a asp-controller="ProviderSite" asp-action="Invoicing" class="back_btn d-flex align-items-center p-2 px-3 fw-semibold" role="button">
+                <a asp-controller="Admin" asp-action="Invoice" class="back_btn d-flex align-items-center p-2 px-3 fw-semibold" role="button">
                     <p class="m-0"><i class="fa-solid fa-chevron-left"></i>&nbsp;Back</p>
                 </a>
             </div>
         </div>
         <div class="req_form_container w-75 shadow p-3">
-            <table class="document_table table">
-                <thead>
-                    <tr class="table-secondary">
-                        <th>
-                            Date
-                        </th>
-                        <th>
-                            On-call Hours
-                        </th>
-                        <th>
-                            Total Hours
-                        </th>
-                        <th>
-                            Weekend/Holidays
-                        </th>
-                        <th>
-                            Number of HouseCalls
-                        </th>
-                        <th>
-                            Number of PhoneConsults
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var item in Model.TimeSheetDetails)
-                    {
-                        <form asp-action="" asp-controller="">
-                        <tr>
-                            <td>@item.TimeSheetDate </td>
-                            <td>@item.OnCallhours</td>
-                            <td>
-                                <div class="form-floating ">
-                                    <input type="number" class="form-control" id="floatingInput" name="Payrate" value="@item.TotalHours" placeholder="Payrate">
-                                    <label for="floatingInput"></label>
-                                </div>
-                            </td>
-                            <td>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="@item.IsWeekend" id="flexCheckDefault">
+            <form asp-action="TimeSheetDetailsEdit" asp-controller="Admin" method="post">
+                <div class="table-responsive ">
+                    <input hidden asp-for="TimeSheetId" />
+                    <input hidden asp-for="@Model.TimeSheetDetails[0].StartDate" />
+                    <table class="table w-100">
+                        <thead>
+                            <tr class="table_header">
+                                <th>
+                                    Date
+                                </th>
+                                <th>
+                                    On-call Hours
+                                </th>
+                                <th>
+                                    Total Hours
+                                </th>
+                                <th>
+                                    Weekend/Holidays
+                                </th>
+                                <th>
+                                    Number of HouseCalls
+                                </th>
+                                <th>
+                                    Number of PhoneConsults
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (var i = 0; i < Model.TimeSheetDetails.Count; i++)
+                            {
 
-                                </div>
-                            </td>
-                            <td>
-                                <div class="form-floating ">
-                                    <input type="number" class="form-control" id="floatingInput" name="Payrate" value="@item.NumberOfHouseCall" placeholder="Payrate">
-                                    <label for="floatingInput"></label>
-                                </div>
-                            </td>
-                            <td>
-                                <div class="form-floating ">
-                                    <input type="number" class="form-control" id="floatingInput" name="Payrate" value="@item.NumberOfPhoneCall" placeholder="Payrate">
-                                    <label for="floatingInput"></label>
-                                </div>
-                            </td>
-                        </tr>
-                        </form>
-                    }
-                </tbody>
-            </table>
+                                <input hidden asp-for="TimeSheetDetails[i].TimeSheetDetailId">
+                                <tr>
+                                    <td>@Model.TimeSheetDetails[i].TimeSheetDate </td>
+                                    <td>
+                                        <div class="d-flex justify-content-center">
+                                            @Model.TimeSheetDetails[i].OnCallhours
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="form-floating ">
+                                            <input type="number" class="form-control" id="totalHours" asp-for="TimeSheetDetails[i].TotalHours" placeholder="Total Hours">
+                                            <label for="totalHours">Total Hours</label>
+                                        </div>
+                                    </td>
+                                    <td class="">
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="checkbox" asp-for="TimeSheetDetails[i].IsWeekend" checked="@Model.TimeSheetDetails[i].IsWeekend">
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="form-floating ">
+                                            <input type="number" class="form-control" asp-for="TimeSheetDetails[i].NumberOfHouseCall" id="noOfHouseCall" placeholder="No of HouseCall">
+                                            <label for="noOfHouseCall">No of HouseCall</label>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="form-floating ">
+                                            <input type="number" class="form-control" asp-for="TimeSheetDetails[i].NumberOfPhoneCall" id="noOfPhoneCall" placeholder="No of PhoneCall">
+                                            <label for="noOfPhoneCall">No of PhoneCall</label>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                    <input type="submit" class="info_button" />
+                </div>
+            </form>
         </div>
+
+        <button class="btn btn-info show-bill">Add Receipt</button>
+        <div id="billsection" style="display:none" class="card border-0 shadow py-4 mb-5 mx-3 mt-3 rounded">
+
+
+            <div id="table" class="table-responsive  d-md-block">
+
+                <input type="hidden" name="PhysicianId" value="@Model.PhysicianId" />
+                <table class="table table-responsive mt-3 p-3">
+                    <thead>
+                        <tr class="table-secondary">
+                            <th>Date</th>
+                            <th>Item</th>
+                            <th>Amount</th>
+                            <th class="text-center">Bill</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody class=" mx-5">
+                        @for (int i = 0; i < Model.TimeSheetDetails.Count; i++)
+                        {
+
+                            <tr>
+                                <td scope="col">
+                                    @Html.DisplayFor(m => m.TimeSheetDetails[i].TimeSheetDate)
+                                </td>
+                                <td scope="col">
+                                    @if (i < Model.TimeSheetDetailReimbursements.Count)
+                                    {
+                                        <div class="pay-item-div">@Model.TimeSheetDetailReimbursements[i].Itemname</div>
+                                        <input type="hidden" class="pay-item form-control form-control-disable rounded" value="@Model.TimeSheetDetailReimbursements[i].Itemname" />
+                                    }
+                                    else
+                                    {
+                                        <input class="pay-item form-control form-control-disable rounded" type="text" />
+                                    }
+                                </td>
+                                <td scope="col">
+                                    <div class="">
+                                        @if (i < Model.TimeSheetDetailReimbursements.Count)
+                                        {
+                                            <div class="pay-amount-div">@Model.TimeSheetDetailReimbursements[i].Amount</div>
+                                            <input type="hidden" class="pay-amount form-control form-control-disable rounded numeric-input" value="@Model.TimeSheetDetailReimbursements[i].Amount" />
+                                        }
+                                        else
+                                        {
+                                            <input class="pay-amount form-control form-control-disable rounded" type="text" />
+                                        }
+                                    </div>
+                                </td>
+                                <td scope="col" class="text-center">
+                                    @if (i < Model.TimeSheetDetailReimbursements.Count)
+                                    {
+                                        @Html.DisplayFor(m => m.TimeSheetDetailReimbursements[i].Bill, new { @class = "form-control form-control-disable rounded", autocomplete = "off" })
+                                        @Html.HiddenFor(m => m.TimeSheetDetailReimbursements[i].Itemname, new { @class = "pay-item-hidden"})
+                                        @Html.HiddenFor(m => m.TimeSheetDetailReimbursements[i].Amount, new { @class = "pay-amount-hidden"})
+                                    }
+                                    else
+                                    {
+                                        <form method="post" class="myform" asp-action="TimeSheetBillAddEdit" asp-controller="Admin" enctype="multipart/form-data">
+
+                                            <input type="hidden" class="pay-item-hidden" name="Item" />
+                                            <input type="hidden" class="pay-amount-hidden" name="Amount" />
+                                            <input type="hidden" name="PhysicianId" value="@Model.PhysicianId" />
+                                            <input type="hidden" name="StartDate" value="@Model.TimeSheetDetails[0].TimeSheetDate" />
+                                            <input type="hidden" value="@Model.TimeSheetDetails[i].TimeSheetDetailId" name="Timesheetdetailid" />
+
+                                            <div class="form-floating">
+                                                <div class="col-md-12 form-floating d-flex file-parent">
+                                                    <div class="file-upload-timesheet border border-1" data-text="Select file">
+                                                        <input name="file" type="file" class="file-upload-field" style="display:block;" id="file" value="">
+
+                                                    </div>
+                                                    <input type="submit" class="btn text-light btn-info rounded-0 d-flex align-items-lg-center fileupload" id="">
+                                                </div>
+                                            </div>
+                                        </form>
+                                    }
+
+                                </td>
+                                <td scope="col">
+                                    <div class="d-flex">
+                                        @if (i < @Model.TimeSheetDetailReimbursements.Count)
+                                        {
+                                            <div>
+                                                <form method="post" class="myform" asp-action="TimeSheetBillAddEdit" asp-controller="Admin" enctype="multipart/form-data">
+
+                                                    <input type="hidden" class="pay-item-hidden" name="Item" value="@Model.TimeSheetDetailReimbursements[i].Itemname" />
+                                                    <input type="hidden" class="pay-amount-hidden" name="Amount" value="@Model.TimeSheetDetailReimbursements[i].Amount" />
+                                                    <input type="hidden" name="PhysicianId" value="@Model.PhysicianId" />
+                                                    <input type="hidden" name="StartDate" value="@Model.TimeSheetDetails[0].TimeSheetDate" />
+                                                    <input type="hidden" value="@Model.TimeSheetDetails[i].TimeSheetDetailId" name="Timesheetdetailid" />
+                                                    <input type="hidden" value="@Model.TimeSheetDetailReimbursements[i].Timesheetdetailreimbursementid" name="Trid" />
+
+                                                    <button type="submit" class="btn mx-1 btn-sm btn-outline-info save-btn d-none">
+                                                        save
+                                                    </button>
+                                                </form>
+                                            </div>
+                                            <div class="btn mx-1 btn-sm btn-outline-info cancel-btn d-none">
+                                                cancel
+                                            </div>
+                                            <div class="btn mx-1 btn-sm btn-outline-info edit-btn">
+                                                edit
+                                            </div>
+                                            <form method="post" class="myform" asp-action="TimeSheetBillRemove" asp-coasp-controller="Admin" enctype="multipart/form-data">
+                                                <button type="submit" class="btn mx-1 btn-sm btn-outline-info delete-btn">
+                                                    <input type="hidden" name="PhysicianId" value="@Model.PhysicianId" />
+                                                    <input type="hidden" value="@Model.TimeSheetDetailReimbursements[i].Timesheetdetailreimbursementid" name="Trid" />
+
+                                                    <input type="hidden" name="StartDate" value="@Model.TimeSheetDetails[0].TimeSheetDate" />
+                                                    delete
+                                                </button>
+                                            </form>
+                                            <a target="_blank" href="/Upload/TimeSheet/@Model.TimeSheetId/@Model.TimeSheetDetailReimbursements[i].Bill" class="btn mx-1 btn-sm btn-outline-info view-btn">
+                                                view
+                                            </a>
+                                        }
+                                    </div>
+                                </td>
+
+                            </tr>
+
+                        }
+
+                    </tbody>
+                </table>
+            </div>
+            @if (ViewBag.IsPhysicain==false)
+            {
+
+                <div class="text-end mx-3 mb-3">
+                    <form asp-action="SetToApprove" class="d-flex justify-content-end" asp-controller="Admin">
+                        <input asp-for="TimeSheetId" type="hidden" />
+
+                        <div class="bg-white mx-2 form-floating  ">
+                            <input asp-for="Bonus" class="form-control rounded numeric-input" type="text" placeholder=Suchtext autocomplete=off>
+                            <label for="floatingInput">Bonus Amount</label>
+                        </div>
+
+                        <div class="bg-white mx-2 form-floating  ">
+                            <input asp-for="AdminNotes" class="form-control rounded " type="text" placeholder=Suchtext autocomplete=off>
+                            <label for="floatingInput">Admin Notes </label>
+                        </div>
+                        <input type="submit" value="Approve" class="btn btn-info text-white" />
+                    </form>
+                </div>
+            }
+            else
+            {
+                <div class="text-end mx-3 mb-3">
+                    <a asp-action="SetToFinalize" asp-controller="Admin" asp-route-timesheetid="@Model.TimeSheetId" type="submit" class="btn btn-info text-white">Finalize</a>
+                </div>
+            }
+
+        </div>
+        </div>
+</section>
+
+@section Scripts{
+    <script>
+        $(document).on('click', '.show-bill', function () {
+            $('#billsection').show();
+            $(this).addClass('hide-bill').removeClass('show-bill');
+        });
+
+        $(document).on('click', '.hide-bill', function () {
+            $('#billsection').hide();
+            $(this).removeClass('hide-bill').addClass('show-bill');
+        });
+
+        $('.edit-btn').click(function () {
+            var row = $(this).closest('tr');
+            row.find('.pay-item').attr('type', 'text');
+            row.find('.pay-amount').attr('type', 'text');
+            row.find('.pay-item-div').addClass('d-none');
+            row.find('.pay-amount-div').addClass('d-none');
+            row.find('.edit-btn').addClass('d-none');
+            row.find('.save-btn').removeClass('d-none');
+            row.find('.cancel-btn').removeClass('d-none');
+            row.find('.form-control-disable').prop('disabled', false);
+        });
+
+        $('.cancel-btn').click(function () {
+            var row = $(this).closest('tr');
+            row.find('.pay-item').attr('type', 'hidden');
+            row.find('.pay-amount').attr('type', 'hidden');
+            row.find('.pay-item-div').removeClass('d-none');
+            row.find('.pay-amount-div').removeClass('d-none');
+            row.find('.edit-btn').removeClass('d-none');
+            row.find('.save-btn').addClass('d-none');
+            row.find('.cancel-btn').addClass('d-none');
+            row.find('.form-control-disable').prop('disabled', true);
+        });
+
+        $(document).ready(function () {
+            $('.pay-item-hidden').attr('name', 'Item');
+            $('.pay-amount-hidden').attr('name', 'Amount');
+            $(".pay-item").on("input", function () {
+                // Get the updated value
+                var newValue = $(this).val();
+                // Update the value of the hidden input field
+                $(this).closest("tr").find(".pay-item-hidden").val(newValue);
+            });
+            $(".pay-amount").on("input", function () {
+                // Get the updated value
+                var newValue = $(this).val();
+                // Update the value of the hidden input field
+                $(this).closest("tr").find(".pay-amount-hidden").val(newValue);
+            });
+        });
+    </script>
+}
     </div>
 </section>

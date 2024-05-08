@@ -62,10 +62,14 @@
                 {
                     <tr>
                         <td>@item.Timesheetdate</td>
-                        <td>@item.BillFile</td>
+                        <td>@item.Itemname</td>
                         <td>@item.Amount</td>
                         <td>@item.Bill</td>
-                        <td>0</td>
+                        <td>
+                            <a target="_blank" href="/Upload/TimeSheet/@Model.TimeSheetId/@item.Bill" class="btn mx-1 btn-sm btn-outline-info view-btn">
+                                view
+                            </a>
+                        </td>
 
                     </tr>
                 }

@@ -3293,6 +3293,8 @@ namespace HelloDoc.Controllers
                 List<TimesheetDetailReimbursement> h = _invoiceInterface.GetTimesheetBills(TimesheetDetails);
                 var Timesheet = _invoiceInterface.GetTimesheetDetails(TimesheetDetails, h, (int)physician.Physicianid);
                 Timesheet.PhysicianId = (int)physician.Physicianid;
+                Timesheet.TimeSheetDetails[0].StartDate = startDate;
+                ViewBag.IsPhysician = false;
                 return View("Timesheet", Timesheet);
             }
             else
@@ -3322,6 +3324,63 @@ namespace HelloDoc.Controllers
                 };
                 return PartialView("_TimesheetDetailTable", timeSheet);
             }
+        }
+        [HttpPost]
+        public IActionResult TimeSheetDetailsEdit(ViewTimeSheet viewTimeSheet)
+        {
+            string? email = HttpContext.Session.GetString("Email");
+            Physician physician = _admin.GetPhysicianByEmail(email);
+
+            if (_invoiceInterface.PutTimesheetDetails(viewTimeSheet.TimeSheetDetails, physician.Aspnetuserid))
+            {
+                TempData["success"] = ("Timesheet edited Successfully..!");
+            }
+
+            return RedirectToAction("Timesheet", new { StartDate = viewTimeSheet.TimeSheetDetails[0].StartDate});
+        }
+        public IActionResult TimeSheetBillAddEdit(int? Trid, DateOnly Timesheetdate, IFormFile file, int Timesheetdetailid, int Amount, string Item, int PhysicianId, DateOnly StartDate)
+        {
+            string? email = HttpContext.Session.GetString("Email");
+            Physician physician = _admin.GetPhysicianByEmail(email);
+
+            TimeSheetDetailReimbursements timesheetdetailreimbursement = new TimeSheetDetailReimbursements();
+            timesheetdetailreimbursement.Timesheetdetailid = Timesheetdetailid;
+            timesheetdetailreimbursement.Timesheetdetailreimbursementid = Trid;
+            timesheetdetailreimbursement.Amount = Amount;
+            timesheetdetailreimbursement.BillFile = file;
+            timesheetdetailreimbursement.Itemname = Item;
+            if (_invoiceInterface.TimeSheetBillAddEdit(timesheetdetailreimbursement,physician.Aspnetuserid ))
+            {
+                TempData["success"] = ("Bill Changed Succesfull..!");
+            }
+            return RedirectToAction("Timesheet", new { PhysicianId = PhysicianId, StartDate = StartDate });
+        }
+        #region TimeSheetBill_Delete
+        public IActionResult TimeSheetBillRemove(int? Trid, int PhysicianId, DateOnly StartDate)
+        {
+            string? email = HttpContext.Session.GetString("Email");
+            Physician physician = _admin.GetPhysicianByEmail(email);
+
+            TimeSheetDetailReimbursements timesheetdetailreimbursement = new TimeSheetDetailReimbursements();
+            timesheetdetailreimbursement.Timesheetdetailreimbursementid = Trid;
+            if (_invoiceInterface.TimeSheetBillRemove(timesheetdetailreimbursement, physician.Aspnetuserid))
+            {
+                TempData["success"] = ("Bill Deleted Succesfull..!");
+
+            }
+            return RedirectToAction("Timesheet", new { PhysicianId = PhysicianId, StartDate = StartDate });
+        }
+        #endregion
+        public IActionResult SetToFinalize(int timesheetid)
+        {
+            string? email = HttpContext.Session.GetString("Email");
+            Physician physician = _admin.GetPhysicianByEmail(email);
+
+            if (_invoiceInterface.SetToFinalize(timesheetid, physician.Aspnetuserid))
+            {
+                TempData["success"] = ("Bill Deleted Succesfull..!");
+            }
+            return RedirectToAction("Index");
         }
     }
 }

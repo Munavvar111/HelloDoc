@@ -1,6 +1,7 @@
 ﻿using BusinessLayer.InterFace;
 using DataAccessLayer.DataContext;
 using DataAccessLayer.DataModels;
+using Microsoft.AspNetCore.Http;
 using static DataAccessLayer.CustomModel.InvoiceVM;
 
 namespace BusinessLayer.Repository
@@ -147,6 +148,140 @@ namespace BusinessLayer.Repository
                 return null;
             }
         }
+
+        public bool PutTimesheetDetails(List<ViewTimeSheetDetails> tds, string aspNetUserId)
+        {
+            try
+            {
+                foreach (var item in tds)
+                {                                                                                                       
+                    var td = _context.TimesheetDetails.Where(r => r.TimesheetDetailId == item.TimeSheetDetailId).FirstOrDefault();
+                    td.TotalHours = item.TotalHours;
+                    td.NumberOfHouseCall = item.NumberOfHouseCall;
+                    td.NumberOfPhoneCall = item.NumberOfPhoneCall;
+                    td.IsWeekend = item.IsWeekend;
+                    td.ModifiedBy = aspNetUserId;
+                    td.ModifiedDate = DateTime.Now;
+                    _context.TimesheetDetails.Update(td);
+                    _context.SaveChanges();
+                }
+                return true;
+            }
+            catch (Exception e)
+            {
+                return false;
+            }
+
+        }
+
+
+        public bool TimeSheetBillRemove(TimeSheetDetailReimbursements trb, string AdminId)
+        {
+            TimesheetDetailReimbursement data = _context.TimesheetDetailReimbursements.Where(e => e.TimesheetDetailReimbursementId == trb.Timesheetdetailreimbursementid).FirstOrDefault();
+            if (data != null)
+            {
+
+                data.ModifiedDate = DateTime.Now;
+                data.ModifiedBy = AdminId;
+                data.IsDeleted = true;
+                _context.TimesheetDetailReimbursements.Update(data);
+                _context.SaveChanges();
+
+
+                return true;
+            }
+            return false;
+
+        }
+
+        public  string UploadTimesheetDoc(IFormFile UploadFile, int TimeSheetId)
+        {
+            string newfilename = null;
+            if (UploadFile != null)
+            {
+                string FilePath = "wwwroot\\Upload\\TimeSheet\\" + TimeSheetId;
+                string path = Path.Combine(Directory.GetCurrentDirectory(), FilePath);
+
+                if (!Directory.Exists(path))
+                    Directory.CreateDirectory(path);
+
+                newfilename = $"{Path.GetFileNameWithoutExtension(UploadFile.FileName)}-{DateTime.Now.ToString("yyyyMMddhhmmss")}.{Path.GetExtension(UploadFile.FileName).Trim('.')}"; ;
+
+                string fileNameWithPath = Path.Combine(path, newfilename);
+                //upload_path = FilePath.Replace("wwwroot\\Upload\\TimeSheet\\", "/Upload/TimeSheet/") + "/" + newfilename;
+
+
+                using (var stream = new FileStream(fileNameWithPath, FileMode.Create))
+                {
+                    UploadFile.CopyTo(stream);
+                }
+
+
+            }
+
+            return newfilename;
+        }
+
+
+        public bool TimeSheetBillAddEdit(TimeSheetDetailReimbursements trb, string AdminId)
+        {
+            TimesheetDetail data = _context.TimesheetDetails.Where(e => e.TimesheetDetailId == trb.Timesheetdetailid).FirstOrDefault();
+            if (data != null && trb.Timesheetdetailreimbursementid == null)
+            {
+                TimesheetDetailReimbursement timesheetdetailreimbursement = new TimesheetDetailReimbursement();
+                timesheetdetailreimbursement.TimesheetDetailId = trb.Timesheetdetailid;
+                timesheetdetailreimbursement.Amount = (int)trb.Amount;
+                timesheetdetailreimbursement.Bill = UploadTimesheetDoc(trb.BillFile, data.TimesheetId);
+                timesheetdetailreimbursement.ItemName = trb.Itemname;
+                timesheetdetailreimbursement.CreatedDate = DateTime.Now;
+                timesheetdetailreimbursement.CreatedBy = AdminId;
+                timesheetdetailreimbursement.IsDeleted = false;
+                _context.TimesheetDetailReimbursements.Add(timesheetdetailreimbursement);
+                _context.SaveChanges();
+
+
+                return true;
+            }
+            else if (data != null && trb.Timesheetdetailreimbursementid != null)
+            {
+                TimesheetDetailReimbursement timesheetdetailreimbursement = _context.TimesheetDetailReimbursements.Where(r => r.TimesheetDetailReimbursementId == trb.Timesheetdetailreimbursementid).FirstOrDefault(); ;
+                timesheetdetailreimbursement.Amount = (int)trb.Amount;
+
+                timesheetdetailreimbursement.ItemName = trb.Itemname;
+                timesheetdetailreimbursement.ModifiedDate = DateTime.Now;
+                timesheetdetailreimbursement.ModifiedBy = AdminId;
+                _context.TimesheetDetailReimbursements.Update(timesheetdetailreimbursement);
+                _context.SaveChanges();
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+
+        }
+
+        public bool SetToFinalize(int timesheetid, string AdminId)
+        {
+            try
+            {
+                var data = _context.Timesheets.Where(e => e.TimesheetId == timesheetid).FirstOrDefault();
+                if (data != null)
+                {
+                    data.IsFinalize = true;
+                    _context.Timesheets.Update(data);
+                    _context.SaveChanges();
+                    return true;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+            return false;
+        }
+
 
     }
 }
