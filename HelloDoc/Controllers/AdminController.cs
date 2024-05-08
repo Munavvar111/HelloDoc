@@ -705,21 +705,7 @@ namespace HelloDoc.Controllers
             physician.Npinumber = createProvider.NPINumber;
             physician.Iscredentialdoc = new BitArray(new[] { false });
             physician.Syncemailaddress = createProvider.SynchronizationEmail;
-            List<PayrateCategory> df = _admin.GetPayrateCategories();
-            foreach (var item in df)
-            {
-                var Payratebyprovider = new PayrateByProvider();
-                Payratebyprovider.PayrateCategoryId = item.PayrateCategoryId;
-                Payratebyprovider.PhysicianId = physician.Physicianid;
-                Payratebyprovider.CreatedDate = DateTime.Now;
-                Payratebyprovider.CreatedBy = admin.Aspnetuserid;
-                Payratebyprovider.Payrate = 0;
-                _admin.AddPayrateCategories(Payratebyprovider);
-                _admin.SaveChanges();
-            }
-
-
-
+            
 
             if (createProvider.File != null)
             {
@@ -801,6 +787,20 @@ namespace HelloDoc.Controllers
 
             _admin.AddAspnetUserRole(aspnetUser.Aspnetuserid, createProvider.RoleId);
             TempData["SuccessMessage"] = "Provider Account Create Succesfully!!";
+            List<PayrateCategory> df = _admin.GetPayrateCategories();
+            foreach (var item in df)
+            {
+                var Payratebyprovider = new PayrateByProvider();
+                Payratebyprovider.PayrateCategoryId = item.PayrateCategoryId;
+                Payratebyprovider.PhysicianId = physician.Physicianid;
+                Payratebyprovider.CreatedDate = DateTime.Now;
+                Payratebyprovider.CreatedBy = admin.Aspnetuserid;
+                Payratebyprovider.Payrate = 0;
+                _admin.AddPayrateCategories(Payratebyprovider);
+                _admin.SaveChanges();
+            }
+
+
 
             return RedirectToAction("Provider");
         }
@@ -3252,22 +3252,35 @@ namespace HelloDoc.Controllers
         {
             string email = HttpContext.Session.GetString("Email");
             Admin admin = _admin.GetAdminByEmail(email);
-
             var EditPayrate = _admin.EditPayRate((int)viewProviderPayrate.ProviderPayrateId, (decimal)viewProviderPayrate.Payrate, admin.Aspnetuserid);
             return RedirectToAction("Payrate", "Admin", new { physicianId = viewProviderPayrate.PhysicianId });
         }
 
+        [HttpGet("Provider/Invoice", Name = "ProviderInvoice")]
+        [HttpGet("Admin/Invoice", Name = "AdminInvoice")]
         public IActionResult Invoice()
         {
+            string email = HttpContext.Session.GetString("Email");
+            Admin? admin = _admin.GetAdminByEmail(email);
+            Physician physician = _admin.GetPhysicianByEmail(email);
+            string region="";
+            ViewBag.ProviderComboBox = _admin.GetAllPhysician();
+            if (admin != null)
+                ViewBag.IsPhysician = false;
+            else if (physician != null)
+                ViewBag.IsPhysician = true;
             ViewData["ViewName"] = "Invoicing";
             return View();
         }
+
         public IActionResult IsFinalizeSheet(DateOnly startDate)
         {
-            int? physicianid = HttpContext.Session.GetInt32("PhysicianId");
-            if (physicianid != null)
+            string email = HttpContext.Session.GetString("Email");
+            Physician physician = _admin.GetPhysicianByEmail(email);
+
+            if (physician != null)
             {
-                bool x = _invoiceInterface.isFinalizeTimesheet((int)physicianid, startDate);
+                bool x = _invoiceInterface.isFinalizeTimesheet((int)physician.Physicianid, startDate);
                 return Json(new { x });
             }
             else
@@ -3276,16 +3289,20 @@ namespace HelloDoc.Controllers
             }
 
         }
+        [HttpGet("Provider/TimeSheet", Name = "ProviderTimeSheet")]
+
         public IActionResult TimeSheet(DateOnly startDate)
         {
             ViewData["ViewName"] = "Invoicing";
             string? email = HttpContext.Session.GetString("Email");
-            Physician physician=_admin.GetPhysicianByEmail(email);
+            Physician? physician=_admin.GetPhysicianByEmail(email);
+            
             if (physician.Physicianid != null && _invoiceInterface.isFinalizeTimesheet((int)physician.Physicianid, startDate))
             {
                 TempData["error"] = "Sheet is already Finalized";
                 return RedirectToAction("Invoicing", "ProviderSite");
             }
+
             else if (physician.Physicianid != null && physician.Aspnetuserid != null)
             {
                 int afterDays = startDate.Day == 1 ? 14 : DateTime.DaysInMonth(startDate.Year, startDate.Month) - 14; ;
@@ -3306,7 +3323,7 @@ namespace HelloDoc.Controllers
         {
             string? email = HttpContext.Session.GetString("Email");
             Physician physician = _admin.GetPhysicianByEmail(email);
-
+            Admin admin = _admin.GetAdminByEmail(email);
             if (physician.Physicianid != null && physician.Aspnetuserid != null && StartDate != DateOnly.MinValue)
             {
                 List<TimesheetDetail>? x = _invoiceInterface.PostTimesheetDetails(physician.Physicianid, StartDate, 0, physician.Aspnetuserid);
@@ -3314,6 +3331,7 @@ namespace HelloDoc.Controllers
                 ViewTimeSheet timeSheet = _invoiceInterface.GetTimesheetDetails(x, h, physician.Physicianid);
                 return PartialView("_TimesheetDetailTable", timeSheet);
             }
+            
             else
             {
                 ViewTimeSheet timeSheet = new ViewTimeSheet()
@@ -3349,6 +3367,7 @@ namespace HelloDoc.Controllers
             timesheetdetailreimbursement.Amount = Amount;
             timesheetdetailreimbursement.BillFile = file;
             timesheetdetailreimbursement.Itemname = Item;
+            
             if (_invoiceInterface.TimeSheetBillAddEdit(timesheetdetailreimbursement,physician.Aspnetuserid ))
             {
                 TempData["success"] = ("Bill Changed Succesfull..!");
@@ -3380,7 +3399,7 @@ namespace HelloDoc.Controllers
             {
                 TempData["success"] = ("Bill Deleted Succesfull..!");
             }
-            return RedirectToAction("Index");
+            return RedirectToAction("Index","Provider");
         }
     }
 }

@@ -2105,6 +2105,11 @@ namespace BusinessLayer.Repository
         {
             _context.PayrateByProviders.Add(payrateByProvider);
         }
+
+        public List<Physician> GetAllPhysician()
+        {
+            return _context.Physicians.ToList();
+        }
     }
 }
 

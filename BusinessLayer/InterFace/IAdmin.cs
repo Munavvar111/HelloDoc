@@ -141,7 +141,7 @@ namespace BusinessLayer.InterFace
 		void AddAdmin(Admin admin);
 		List<CancelCase> GetCancelCases();
 
-		RequestStatusCounts GetStatusCountsAsync(int id);
+		RequestStatusCounts GetStatusCountsAsync(int id);	
 
 		Blockrequest? GetBlockrequestById(int id);	
 		Blockrequest? GetBlockRequestByEmail(string email);
@@ -162,5 +162,6 @@ namespace BusinessLayer.InterFace
 
 		List<PayrateCategory> GetPayrateCategories();
 		void AddPayrateCategories(PayrateByProvider payrateByProvider);
+		List<Physician> GetAllPhysician();
     }
 }

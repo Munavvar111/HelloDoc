@@ -127,6 +127,15 @@
 
                     </li>
                 }
+                @if (userPermissions != null && userPermissions.Contains("22"))
+                {
+                    <li class="nav-item ">
+                        <a class="nav-link @(ViewContext.ActionDescriptor.RouteValues["action"] == "PhysicanProfile" ? "active" : "")"
+                           asp-action="Invoice" asp-controller="Provider">Invoice</a>
+
+                    </li>
+                }
+
             </ul>
         </div>
 
@@ -153,6 +162,14 @@
                     <li class="nav-item ">
                         <a class="nav-link @(ViewContext.ActionDescriptor.RouteValues["action"] == "PhysicanProfile" ? "active" : "")"
                         asp-action="PhysicanProfile" asp-controller="Provider" >My Profile</a>
+
+                    </li>
+                }
+                @if (userPermissions != null && userPermissions.Contains("22"))
+                {
+                    <li class="nav-item ">
+                        <a class="nav-link @(ViewContext.ActionDescriptor.RouteValues["action"] == "PhysicanProfile" ? "active" : "")"
+                        asp-action="Invoice" asp-controller="Provider" >Invoice</a>
 
                     </li>
                 }
