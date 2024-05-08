@@ -544,7 +544,7 @@ namespace BusinessLayer.Repository
                 RequestId = item.reqclient?.Requestid ?? 0,
                 isfinalize = item.eno?.IsFinalize ?? false,
                 Regions = _context.Regions.ToList(),
-
+                PhysicianId=item.req?.Physicianid ?? 0,
                 PhysicianName = $"{item.ps?.Firstname} {item.ps?.Lastname}",
                 Cancel = _context.Casetags.Select(cc => new CancelCase
                 {
