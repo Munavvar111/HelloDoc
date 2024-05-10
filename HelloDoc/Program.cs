@@ -8,8 +8,11 @@ using Newtonsoft.Json;
 using Rotativa.AspNetCore;
 using ServiceStack.Text;
 using Geocoding;
+using HelloDoc.Chat;
+using Microsoft.AspNetCore.SignalR;
+using HelloDoc.Chat;
 
-    var builder = WebApplication.CreateBuilder(args);
+var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
@@ -22,6 +25,7 @@ builder.Services.AddScoped<IJwtAuth, JwtAuthRepo>();
 builder.Services.AddScoped<IEmailServices,EmailServiceRepository>();    
 builder.Services.AddScoped<IUploadProvider, UploadProvider>();
 builder.Services.AddScoped<IProvider, ProviderRepository>();
+builder.Services.AddSignalR();
 
 RotativaConfiguration.Setup(builder.Environment.WebRootPath, "Rotativa");
 
@@ -60,17 +64,19 @@ if (!app.Environment.IsDevelopment())
 
 
 app.UseHttpsRedirection();
-app.UseRotativa();
+app.UseRotativa();  
 app.UseStaticFiles();
 
 app.UseRouting();
 app.UseSession();
-
 app.UseAuthorization();
+app.UseEndpoints(endpoints =>
+{
+	endpoints.MapControllerRoute(
+		name: "default",
+		pattern: "{controller=Home}/{action=Index}/{id?}");
+	endpoints.MapHub<ChatHub>("/chatHub"); // <-- This line should come after UseRouting
+});
 
-
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();

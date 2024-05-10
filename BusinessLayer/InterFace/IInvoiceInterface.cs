@@ -22,6 +22,9 @@ namespace BusinessLayer.InterFace
          string UploadTimesheetDoc(IFormFile UploadFile, int TimeSheetId);
         public bool TimeSheetBillRemove(TimeSheetDetailReimbursements trb, string AdminId);
         public bool SetToFinalize(int timesheetid, string AdminId);
+        public bool isApprovedTimesheet(int PhysicianId, DateOnly StartDate);
+        public Task<bool> SetToApprove(ViewTimeSheet vts, string AdminId);
+        public List<Timesheet> GetPendingTimesheet(int PhysicianId, DateOnly StartDate);
 
 
     }

@@ -222,7 +222,15 @@ namespace BusinessLayer.Repository
             return newfilename;
         }
 
+        public List<Timesheet> GetPendingTimesheet(int PhysicianId, DateOnly StartDate)
+        {
+            var result = new List<Timesheet>();
+            result = (from timesheet in _context.Timesheets
+                      where (timesheet.IsApproved == false && timesheet.PhysicianId == PhysicianId && timesheet.StartDate == StartDate)
+                      select timesheet).ToList();
 
+            return result;
+        }
         public bool TimeSheetBillAddEdit(TimeSheetDetailReimbursements trb, string AdminId)
         {
             TimesheetDetail data = _context.TimesheetDetails.Where(e => e.TimesheetDetailId == trb.Timesheetdetailid).FirstOrDefault();
@@ -282,6 +290,80 @@ namespace BusinessLayer.Repository
             return false;
         }
 
+
+        public bool isApprovedTimesheet(int PhysicianId, DateOnly StartDate)
+        {
+            if (StartDate == DateOnly.MinValue)
+            {
+                return false;
+            }
+            var data = _context.Timesheets.Where(e => e.PhysicianId == PhysicianId && e.StartDate == StartDate).FirstOrDefault();
+            if (data.IsApproved == false)
+            {
+
+                return false;
+            }
+            return true;
+        }
+
+        public async Task<bool> SetToApprove(ViewTimeSheet vts, string AdminId)
+        {
+            try
+            {
+                var data = _context.Timesheets.Where(e => e.TimesheetId == vts.TimeSheetId).FirstOrDefault();
+                if (data != null)
+                {
+                    data.IsApproved = true;
+                    data.BonusAmount = vts.Bonus;
+                    data.AdminNotes = vts.AdminNotes;
+                    _context.Timesheets.Update(data);
+                    _context.SaveChanges();
+                }
+                //var d = HttpContextAccessor.HttpContext.Request.Host;
+                ////var res = _context.Requestclients.FirstOrDefault(e => e.Requestid == v.RequestID);
+                //string emailContent = @"
+                //                <!DOCTYPE html>
+                //                <html lang=""en"">
+                //                <head>
+                //                 <meta charset=""UTF-8"">
+                //                 <meta name=""viewport"" content=""width=device-width, initial-scale=1.0"">
+                //                 <title>Provider</title>
+                //                </head>
+                //                <body>
+                //                 <div style=""background-color: #f5f5f5; padding: 20px;"">
+                //                 <h2>Welcome to Our Healthcare Platform!</h2>
+                //                <p>Dear Provider ,</p>
+                //                <ol>
+                //                    <li>Your TimeSheet Startwith" + data.StartDate + @""" and End With " + data.EndDate + @""" Is Approve</li>
+                //                </ol>
+                //                <p>If you have any questions or need further assistance, please don't hesitate to contact us.</p>
+                //                <p>Thank you,</p>
+                //                <p>The Healthcare Team</p>
+                //                </div>
+                //                </body>
+                //                </html>
+                //                ";
+                //EmailLog elog = new EmailLog();
+                //elog.EmailTemplate = emailContent;
+                //elog.SubjectName = "Request Agreement";
+                //elog.EmailId = "dasete8625@haislot.com";
+                //elog.CreateDate = DateTime.Now;
+                //elog.SentDate = DateTime.Now;
+                //elog.PhysicianId = data.PhysicianId;
+                //elog.Action = 12;
+                //elog.Recipient = data.Physician.FirstName;
+                //elog.RoleId = 3;
+                //elog.SentTries = 1;
+
+                //await _requestRepository.EmailLog(elog);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+            return false;
+        }
 
     }
 }

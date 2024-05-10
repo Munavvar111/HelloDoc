@@ -1,0 +1,193 @@
+﻿<section class="container-fluid w-75 my-5">
+
+    <div class=" d-flex flex-row-reverse justify-content-between form-admin mb-3">
+        <a onclick="history.back()" class="text-decoration-none text-info ">
+            <span class="ml-5 btn btn-outline-info">
+                <i class="fa fa-solid fa-angle-left"></i> Back
+            </span>
+        </a>
+        <h3>Timesheets Admin</h3>
+    </div>
+    <div class="d-flex">
+        <div class="form-floating w-25">
+            <select required="" class="form-select form-select-sm mt-3 p-2" data-allow-clear="true" tabindex="-1" id="Physicianinvoice" data-control="select2" data-placeholder="Select Level">
+                <option selected value="0">Select Physician</option>
+                @foreach (var region in ViewBag.GetAllPhysicians)
+                {
+                    <option value="@region.Physicianid">@region.Firstname</option>
+                }
+            </select>
+            <label for="floatingSelect">Search by Physician </label>
+            </div>
+            <div class="form-floating w-25 mx-3">
+            <select class="form-select form-select-sm mt-3 p-2" id="dateRangeDropdownadmin" aria-label="Floating label select example">
+                <option selected value="@DateOnly.MinValue">Select timesheet period</option>
+            </select>
+            <label for="floatingSelect">Search by timesheet period </label>
+        </div>
+        
+    </div>
+    <div id="NotFinalize" style="display : none;">
+        
+        <h5 class="my-5 mx-2 text-muted">“Provider has not finalized the timesheet in specified time period.”</h5>
+    </div>
+    <div id="NotApprove" style="display : none !important;"></div>
+    <div id="Approve" style="display : none;"></div>
+</section>
+
+
+    <script>
+        var Physicianid;
+        $("#Physicianinvoice").change(function () {
+             Physicianid = $('#Physicianinvoice').val();
+            document.getElementById("dateRangeDropdownadmin").value = "01-01-0001";
+            console.log(Physicianid + " Physicianid");
+            $("#NotApprove").hide();
+            $("#NotFinalize").hide();
+            $("#Approve").hide();
+        });
+        
+        // Function to generate date options for the past and next six months
+        function generateDateOptions() {
+            var options = [];
+            var today = new Date(); 
+            var currentDay = today.getDate();
+            var currentMonth = today.getMonth() + 1; // Months are zero-based
+            var currentYear = today.getFullYear();
+
+            var startDate1, endDate1, startDate2, endDate2;
+
+            if (currentDay <= 14) {
+                // First option: 1-14 of the previous month
+                startDate1 = 1;
+                endDate1 = 14;
+                options.push({
+                    value: formatDate(startDate1, currentMonth - 1, currentYear),
+                    text: formatDate(startDate1, currentMonth - 1, currentYear) + " - " + formatDate(endDate1, currentMonth - 1, currentYear)
+                });
+
+                // Second option: 15-end of the previous month
+                startDate2 = 15;
+                endDate2 = new Date(currentYear, currentMonth - 1, 0).getDate();
+                options.push({
+                    value: formatDate(startDate2, currentMonth - 1, currentYear),
+                    text: formatDate(startDate2, currentMonth - 1, currentYear) + " - " + formatDate(endDate2, currentMonth - 1, currentYear)
+                });
+            } else {
+                // First option: 15-end of the previous month
+                startDate1 = 15;
+                endDate1 = new Date(currentYear, currentMonth - 1, 0).getDate();
+                options.push({
+                    value: formatDate(startDate1, currentMonth - 1, currentYear),
+                    text: formatDate(startDate1, currentMonth - 1, currentYear) + " - " + formatDate(endDate1, currentMonth - 1, currentYear)
+                });
+
+                // Second option: 1-14 of the current month
+                startDate2 = 1;
+                endDate2 = 14;
+                options.push({
+                    value: formatDate(startDate2, currentMonth, currentYear),
+                    text: formatDate(startDate2, currentMonth, currentYear) + " - " + formatDate(endDate2, currentMonth, currentYear)
+                });
+            }
+            return options;
+        }
+
+        // Function to format date as "yyyy/mm/dd"
+        function formatDate(day, month, year) {
+            var formattedMonth = month < 10 ? '0' + month : month;
+            var formattedDay = day < 10 ? '0' + day : day;
+            return year + '/' + formattedMonth + '/' + formattedDay;
+        }
+
+        // Function to populate the dropdown with date options
+        function populateDropdown() {
+            var dropdown = document.getElementById("dateRangeDropdownadmin");
+            var dateOptions = generateDateOptions();
+
+            // Add options to the dropdown
+            dateOptions.forEach(function (option) {
+                var opt = document.createElement("option");
+                opt.value = option.value;
+                opt.text = option.text;
+                dropdown.add(opt);
+
+                // Trigger the function for the default value
+                var selectedValue = dropdown.value;
+
+                myFunction(Physicianid, selectedValue);
+
+            });
+        }
+        // Call the function to populate the dropdown on page load
+        populateDropdown();
+
+        function myFunction(Physicianid, selectedValue) {
+            console.log(selectedValue);
+            console.log(Physicianid);
+            debugger
+            $.ajax({
+                type: "POST",
+            url: '@Url.Action("IsFinalizeSheetAdmin","Admin")',
+                data: { PhysicianId: Physicianid, StartDate: selectedValue },
+                cache: false,
+                success: function (response) {
+                    if (response.x == true) {
+                        $("#NotFinalize").hide();
+                        $.ajax({
+                            type: "POST",
+                            url: '@Url.Action("IsApproveSheet","Admin")',
+                            data: { PhysicianId: Physicianid, StartDate: selectedValue },
+                            cache: false,
+                            success: function (response) {
+                                if (response.x == true) {
+                                    $("#NotApprove").hide();
+                                    debugger;
+                                    $.ajax({
+                                        method: "GET",
+                                        url: "/Admin/GetTimesheetDetailsData",
+                                        data: { PhysicianId: Physicianid, StartDate: selectedValue},
+                                        success: function (response) {
+                                            
+                                            $("#Approve").show();
+                                            $("#Approve").html(response);
+                                            $("#NotFinalize").hide();
+                                            $("#NotApprove").hide();
+                                        }
+                                    });
+                                }
+                                else {
+                                    $("#NotApprove").show();
+                                    $("#NotApprove").html(response);
+                                    $("#NotFinalize").hide();
+                                    $("#Approve").hide();
+                                }
+                            },
+                            error: function () {
+                                alert("Error while checking date.");
+                            }
+                        });
+                    }
+                    else {
+                        $("#NotFinalize").show();
+                        $("#NotApprove").hide();
+                        $("#Approve").hide();
+                    }
+                },
+                error: function () {
+                    alert("Error while checking date.");
+                }
+            });
+
+        }
+
+        $(document).ready(function () {
+            $("#dateRangeDropdownadmin").change(function () {
+                // Get the selected value
+                var selectedValue = $(this).val();
+                myFunction(Physicianid, selectedValue);
+                
+            });
+        });
+
+    </script>

@@ -3289,6 +3289,13 @@ namespace HelloDoc.Controllers
             }
 
         }
+        public IActionResult IsFinalizeSheetAdmin(int PhysicianId,DateOnly startDate)
+        {
+                bool x = _invoiceInterface.isFinalizeTimesheet(PhysicianId, startDate);
+                return Json(new { x });
+           
+
+        }
         [HttpGet("Provider/TimeSheet", Name = "ProviderTimeSheet")]
 
         public IActionResult TimeSheet(DateOnly startDate)
@@ -3390,10 +3397,11 @@ namespace HelloDoc.Controllers
             return RedirectToAction("Timesheet", new { PhysicianId = PhysicianId, StartDate = StartDate });
         }
         #endregion
+       
         public IActionResult SetToFinalize(int timesheetid)
         {
             string? email = HttpContext.Session.GetString("Email");
-            Physician physician = _admin.GetPhysicianByEmail(email);
+            Physician? physician = _admin.GetPhysicianByEmail(email);
 
             if (_invoiceInterface.SetToFinalize(timesheetid, physician.Aspnetuserid))
             {
@@ -3401,5 +3409,55 @@ namespace HelloDoc.Controllers
             }
             return RedirectToAction("Index","Provider");
         }
+        public IActionResult IndexAdmin()
+        {
+            ViewBag.GetAllPhysicians = _admin.GetAllPhysician();
+            return View();
+        }
+
+        public IActionResult IsApproveSheet(int PhysicianId, DateOnly StartDate)
+        {
+            var x = _invoiceInterface.GetPendingTimesheet(PhysicianId, StartDate);
+            if (x.Count() == 0)
+            {
+                return Json(new { x = true });
+            }
+            return PartialView("_PendingApprove", x);
+        }
+        #region ChatPerson
+        public IActionResult ChatPerSonDetails(int physicianId)
+        {
+            Physician physician=_admin.GetPhysicianById(physicianId);
+            return Json(physician);
+        }
+
+        public async Task<IActionResult> GetTimesheetDetailsData(int PhysicianId, DateOnly StartDate)
+        {
+            var Timesheet = new ViewTimeSheet();
+            string Email = HttpContext.Session.GetString("Email");
+            Admin admin = _admin.GetAdminByEmail(Email);
+            if (StartDate == DateOnly.MinValue || PhysicianId == 0)
+            {
+                Timesheet.TimeSheetDetails = new List<ViewTimeSheetDetails> { };
+                Timesheet.TimeSheetDetailReimbursements = new List<TimeSheetDetailReimbursements> { };
+            }
+            else
+            {
+                List<TimesheetDetail> x = _invoiceInterface.PostTimesheetDetails(PhysicianId, StartDate, 0, admin.Aspnetuserid);
+                List<TimesheetDetailReimbursement> h =  _invoiceInterface.GetTimesheetBills(x);
+                Timesheet = _invoiceInterface.GetTimesheetDetails(x, h, PhysicianId);
+            }
+            if (Timesheet == null)
+            {
+                var Timesheets = new ViewTimeSheet();
+                Timesheets.TimeSheetDetails = new List<ViewTimeSheetDetails> { };
+                Timesheets.TimeSheetDetailReimbursements = new List<TimeSheetDetailReimbursements> { };
+                return PartialView("_TimesheetDetailTable", Timesheets);
+            }
+
+
+            return PartialView("_TimesheetDetailTable", Timesheet);
+        }
+        #endregion
     }
 }

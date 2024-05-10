@@ -1,9 +1,62 @@
-﻿<div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasRight" aria-labelledby="offcanvasRightLabel">
-    <div class="offcanvas-header">
-        <h5 class="offcanvas-title" id="offcanvasRightLabel">Physician ID</h5>
+﻿<!-- Include SignalR scripts -->
+@* <script src="~/Scripts/jquery.signalR-2.1.0.min.js"></script> *@
+
+<div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasRight" aria-labelledby="offcanvasRightLabel">
+    <div class="offcanvas-header bg-info">
+        <div class="d-flex">
+            <img id="providerImage" src="" alt="Provider Image" width="40">
+            <p id="physicianName"></p>
+        </div>
         <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
     </div>
     <div class="offcanvas-body">
-        <p id="physicianIdDisplay"></p>
+        <input id="userMessage" type="text" />
+        <input type="button" id="sendMessage" value="Send" />
+        <input type="hidden" id="displayName" />
+        <ul id="chats"></ul>
     </div>
 </div>
+
+<script>
+    if (typeof connection === 'undefined') {
+
+    const connection = new signalR.HubConnectionBuilder()
+        .withUrl("/chatHub")
+        .build();
+
+    connection.on("ReceiveMessage", (user, message) => {
+        const msg = message.replace(/&/g, "&").replace(/</g, "<");
+        const encodedMsg = user + " :: " + msg;
+        const li = document.createElement("li");
+        li.textContent = encodedMsg;
+        document.getElementById("chats").appendChild(li);
+        console.log(user, message);
+    });
+
+    connection.start().catch(err => console.error(err.toString()));
+
+    document.getElementById("sendMessage").addEventListener("click", event => {
+        const message = document.getElementById("userMessage").value;
+        connection.invoke("SendMessage", "User", message).catch(err => console.error(err.toString()));
+        event.preventDefault();
+    });
+
+    $('#offcanvasRight').on('shown.bs.offcanvas', function (event) {
+        var button = $(event.relatedTarget);
+        var physicianId = button.data('bs-physician-id');
+
+        $.ajax({
+            method: "GET",
+            url: "/Admin/ChatPerSonDetails",
+            data: { physicianId: physicianId },
+            success: function (data) {
+                $('#physicianName').text(data.firstname);
+                $('#providerImage').attr('src', '/Physician/' + physicianId + '/' + data.photo);
+            }
+        });
+
+        $('#physicianIdDisplay').val(physicianId);
+    });
+    }
+
+</script>

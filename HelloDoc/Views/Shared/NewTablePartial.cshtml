@@ -87,7 +87,7 @@
 						<td style="background-color:@(GetRowClass(@item.ReqTypeId))!important">@item.Notes</td>
 					<td style="background-color:@(GetRowClass(@item.ReqTypeId))!important">
 							@if (item.PhysicianId!=0){
-								<button class="btn border-white @(GetRowClass(@item.ReqTypeId)) text-white " type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" data-physician-id="@item.PhysicianId" aria-controls="offcanvasRight">
+								<button class="btn border-white @(GetRowClass(@item.ReqTypeId)) text-white " type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" data-bs-physician-id="@item.PhysicianId" aria-controls="offcanvasRight">
 							<i class="bi bi-person me-1"></i> provider
 						</button>
 							}
@@ -236,7 +236,7 @@
 		}
 </tbody>
 </table>
-<partial name="_ChatPartial"></partial>
+<partial name="../Admin/_ChatPartial"></partial>
 @functions {
 	public string GetRowClass(int requestTypeId)
 	{
@@ -296,13 +296,6 @@
 	</div>
 </div>
 
-<script>
-	$('#offcanvasRight').on('shown.bs.offcanvas', function () {
-		// Get the physician ID from the button's data attribute
-		var physicianId = $('[data-bs-target="#offcanvasRight"]').data('physician-id');
-		// Display the physician ID in the offcanvas body
-		$('#physicianIdDisplay').text("Physician ID: " + physicianId);
-	});</script>
 <script>
 	$(document).ready(function () {
 		
